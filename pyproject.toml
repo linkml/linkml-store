@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "linkml-store"
+version = "0.0.0"
+description = "linkml-store"
+authors = ["Author 1 <author@org.org>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "*"
+linkml-runtime = "^1.7.5"
+streamlit = "^1.32.2"
+duckdb = "^0.10.1"
+duckdb-engine = "^0.11.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = {version = ">=7.1.2"}
+tox = {version = ">=3.25.1"}
+pre-commit = {version = ">=3.3.3"}
+sphinx = {version = ">=6.1.3"}
+sphinx-rtd-theme = {version = ">=1.0.0"}
+sphinx-autodoc-typehints = {version = "<2.0.0"}
+sphinx-click = {version = ">=4.3.0"}
+myst-parser = {version = ">=0.18.1"}
+
+[tool.poetry.scripts]
+linkml-store = "linkml_store.cli:main"
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+style = "pep440"
+
+[tool.black]
+line-length = 120
+target-version = ["py38", "py39", "py310"]
+
+[tool.ruff]
+extend-ignore = [
+    "D211",  # `no-blank-line-before-class`
+    "D212",  # `multi-line-summary-first-line`
+    "D203",  # `blank-line-before-docstring`
+    ]
+line-length = 120
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+
+# Select or ignore from https://beta.ruff.rs/docs/rules/
+select = [
+    "B",  # bugbear
+    "D",  # pydocstyle
+    "E",  # pycodestyle errors
+    "F",  # Pyflakes
+    "I",  # isort
+    "S",  # flake8-bandit
+    "W",  # Warning
+]
+
+unfixable = []
+target-version = "py310"
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
+
+[tool.codespell]
+skip = "*.po,*.ts,.git,pyproject.toml"
+count = ""
+quiet-level = 3
+# ignore-words-list = ""
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"

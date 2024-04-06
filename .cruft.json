@@ -1,0 +1,24 @@
+{
+  "template": "https://github.com/monarch-initiative/monarch-project-template",
+  "commit": "c4cf47d15c641eb906a49249b5e8ce43e7392252",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "linkml-data-browser",
+      "github_org_name": "linkml",
+      "__project_slug": "linkml_data_browser",
+      "project_description": "This is the project description.",
+      "min_python_version": "3.9",
+      "file_name": "main",
+      "greeting_recipient": "World",
+      "full_name": "Author 1",
+      "email": "author@org.org",
+      "__author": "Author 1 <author@org.org>",
+      "license": "MIT",
+      "github_token_for_doc_deployment": "GH_TOKEN",
+      "github_token_for_pypi_deployment": "PYPI_TOKEN",
+      "_template": "https://github.com/monarch-initiative/monarch-project-template"
+    }
+  },
+  "directory": null
+}
