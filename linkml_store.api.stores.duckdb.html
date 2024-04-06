@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>linkml_store.api.stores.duckdb package &mdash; linkml-store  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="linkml_store.api.stores package" href="linkml_store.api.stores.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            linkml-store
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">linkml_store</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="linkml_store.html">linkml_store package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="linkml_store.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">linkml-store</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">linkml_store</a></li>
+          <li class="breadcrumb-item"><a href="linkml_store.html">linkml_store package</a></li>
+          <li class="breadcrumb-item"><a href="linkml_store.api.html">linkml_store.api package</a></li>
+          <li class="breadcrumb-item"><a href="linkml_store.api.stores.html">linkml_store.api.stores package</a></li>
+      <li class="breadcrumb-item active">linkml_store.api.stores.duckdb package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/linkml_store.api.stores.duckdb.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-linkml_store.api.stores.duckdb">
+<span id="linkml-store-api-stores-duckdb-package"></span><h1>linkml_store.api.stores.duckdb package<a class="headerlink" href="#module-linkml_store.api.stores.duckdb" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-linkml_store.api.stores.duckdb.duckdb_collection">
+<span id="linkml-store-api-stores-duckdb-duckdb-collection-module"></span><h2>linkml_store.api.stores.duckdb.duckdb_collection module<a class="headerlink" href="#module-linkml_store.api.stores.duckdb.duckdb_collection" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_collection.</span></span><span class="sig-name descname"><span class="pre">DuckDBCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_table_created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets">
+<span class="sig-name descname"><span class="pre">query_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets" title="Link to this definition"></a></dt>
+<dd><p>Run a query to get facet counts for one or more columns.</p>
+<p>This function takes a database connection, a Query object, and a list of column names.
+It generates and executes a facet count query for each specified column and returns
+the results as a dictionary where the keys are the column names and the values are
+pandas DataFrames containing the facet counts.</p>
+<p>The facet count query is generated by modifying the original query’s WHERE clause
+to exclude conditions directly related to the facet column. This allows for counting
+the occurrences of each unique value in the facet column while still applying the
+other filtering conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>con</strong> – A DuckDB database connection.</p></li>
+<li><p><strong>query</strong> – A Query object representing the base query.</p></li>
+<li><p><strong>facet_columns</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – A list of column names to get facet counts for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are column names and values are pandas DataFrames
+containing the facet counts for each unique value in the respective column.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-linkml_store.api.stores.duckdb.duckdb_database">
+<span id="linkml-store-api-stores-duckdb-duckdb-database-module"></span><h2>linkml_store.api.stores.duckdb.duckdb_database module<a class="headerlink" href="#module-linkml_store.api.stores.duckdb.duckdb_database" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_database.</span></span><span class="sig-name descname"><span class="pre">DuckDBDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_schema_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_collections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection">
+<span class="sig-name descname"><span class="pre">create_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection" title="Link to this definition"></a></dt>
+<dd><p>Create a new collection</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Person&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of the collection</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection" title="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuckDBCollection</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.engine">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">engine</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Engine</span></em><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.engine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.induce_schema_view">
+<span class="sig-name descname"><span class="pre">induce_schema_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.induce_schema_view" title="Link to this definition"></a></dt>
+<dd><p>Induce a schema view from a schema definition.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema_view</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">induce_schema_view</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cd</span> <span class="o">=</span> <span class="n">schema_view</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cd</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">range</span>
+<span class="go">&#39;string&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchemaView</span></code></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A schema view</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.init_collections">
+<span class="sig-name descname"><span class="pre">init_collections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.init_collections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.query" title="Link to this definition"></a></dt>
+<dd><p>Run a query against the database.</p>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<span class="go">&#39;P1&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type query<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query" title="linkml_store.api.queries.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a></span></p>
+</dd>
+<dt class="field-even">param query<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult" title="linkml_store.api.queries.QueryResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></a></span></p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.run_query">
+<span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_database.</span></span><span class="sig-name descname"><span class="pre">run_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.run_query" title="Link to this definition"></a></dt>
+<dd><p>Run a query and return the result.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">duckdb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">con</span> <span class="o">=</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;db/mgi.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;gaf_association&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">run_query</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">num_rows</span><span class="p">)</span>
+<span class="go">532233</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>con</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuckDBPyConnection</span></code></span>) – </p></li>
+<li><p><strong>query</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query" title="linkml_store.api.queries.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a></span>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-linkml_store.api.stores.duckdb.mappings">
+<span id="linkml-store-api-stores-duckdb-mappings-module"></span><h2>linkml_store.api.stores.duckdb.mappings module<a class="headerlink" href="#module-linkml_store.api.stores.duckdb.mappings" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="linkml_store.api.stores.html" class="btn btn-neutral float-left" title="linkml_store.api.stores package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Author 1 &lt;author@org.org&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
