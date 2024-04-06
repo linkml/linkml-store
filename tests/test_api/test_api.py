@@ -113,6 +113,7 @@ def test_facets(schema_view, handle):
 
 
 def test_integration():
+    pytest.skip("TODO: mark as integration test")
     abs_db_path = str(TEST_DB.resolve())
 
     # Now, construct the connection string

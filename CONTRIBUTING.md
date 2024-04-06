@@ -6,7 +6,7 @@ When contributing to this repository, please first discuss the changes you wish 
 
 ### Reporting bugs or making feature requests
 
-To report a bug or suggest a new feature, please go to the [linkml/linkml-data-browser issue tracker](https://github.com/linkml/linkml-data-browser/issues), as we are
+To report a bug or suggest a new feature, please go to the [linkml/linkml-store issue tracker](https://github.com/linkml/linkml-store/issues), as we are
 consolidating issues there.
 
 Please supply enough details to the developers to enable them to verify and troubleshoot your issue:
@@ -46,7 +46,7 @@ and make your changes on a [new branch][about-branches].
 [about-branches]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches
 [about-issues]: https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues
 [about-pulls]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests
-[issues]: https://github.com/linkml/linkml-data-browser/issues/
-[pulls]: https://github.com/linkml/linkml-data-browser/pulls/
+[issues]: https://github.com/linkml/linkml-store/issues/
+[pulls]: https://github.com/linkml/linkml-store/pulls/
 
 We recommend also reading [GitHub Pull Requests: 10 Tips to Know](https://blog.mergify.com/github-pull-requests-10-tips-to-know/)
