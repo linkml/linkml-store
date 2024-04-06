@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from linkml_runtime import SchemaView
 
@@ -16,8 +16,8 @@ class Client:
     """
     A client provides access to named collections.
 
-    Examples:
-
+    Examples
+    --------
     >>> client = Client()
     >>> db = client.attach_database("duckdb", alias="test")
     >>> collection = db.create_collection("Person")
@@ -35,16 +35,20 @@ class Client:
     1
     >>> qr.rows[0]["name"]
     'John'
+
     """
+
     handle: Optional[str] = None
     _databases: Optional[Dict[str, Database]] = None
 
-    def attach_database(self, handle: str, alias: Optional[str] = None, schema_view: Optional[SchemaView] = None, **kwargs) -> Database:
+    def attach_database(
+        self, handle: str, alias: Optional[str] = None, schema_view: Optional[SchemaView] = None, **kwargs
+    ) -> Database:
         """
         Associate a database with a handle.
 
-        Examples:
-
+        Examples
+        --------
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="memory")
         >>> "memory" in client.databases
@@ -60,6 +64,7 @@ class Client:
         :param schema_view: schema view to associate with the database
         :param kwargs:
         :return:
+
         """
         if ":" not in handle:
             scheme = handle
@@ -83,8 +88,8 @@ class Client:
         """
         Get a named database.
 
-        Examples:
-
+        Examples
+        --------
         >>> client = Client()
         >>> db = client.attach_database("duckdb:///test.db", alias="test")
         >>> retrieved_db = client.get_database("test")
@@ -95,6 +100,7 @@ class Client:
         :param create_if_not_exists:
         :param kwargs:
         :return:
+
         """
         if not name:
             if not self._databases:
@@ -116,8 +122,8 @@ class Client:
         """
         Return all attached databases
 
-        Examples:
-
+        Examples
+        --------
         >>> client = Client()
         >>> _ = client.attach_database("duckdb", alias="test1")
         >>> _ = client.attach_database("duckdb", alias="test2")
@@ -133,11 +139,8 @@ class Client:
         'duckdb:///:memory:'
 
         :return:
+
         """
         if not self._databases:
             self._databases = {}
         return self._databases
-
-
-
-

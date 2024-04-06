@@ -1,14 +1,13 @@
 from dataclasses import dataclass
-from typing import Union, List, Optional, Dict
+from typing import Dict, List, Union
 
-from linkml_runtime.linkml_model import ClassDefinition
-from sqlalchemy import insert, Table, Column, text
 import sqlalchemy as sqla
+from linkml_runtime.linkml_model import ClassDefinition
+from sqlalchemy import Column, Table, insert, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
 from linkml_store.api.collection import OBJECT
-from linkml_store.api.queries import QueryResult
 from linkml_store.api.stores.duckdb.mappings import TMAP
 
 
@@ -28,7 +27,7 @@ class DuckDBCollection(Collection):
         stmt = insert(table).values(objs)
         engine = self.parent.engine
         with engine.connect() as conn:
-            result = conn.execute(stmt)
+            _ = conn.execute(stmt)
             conn.commit()
 
     def query_facets(self, where: Dict, facet_columns: List[str]) -> Dict[str, Dict[str, int]]:
@@ -60,7 +59,3 @@ class DuckDBCollection(Collection):
             conn.commit()
         if not self._table_created:
             self._table_created = True
-
-
-
-

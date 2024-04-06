@@ -1,4 +1,4 @@
-# linkml-data-browser
+# linkml-store
 
 This is the project description.
 

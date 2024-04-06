@@ -1,8 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Sequence, Union, List
 
-import duckdb
 import pandas as pd
 import sqlalchemy
 from duckdb import DuckDBPyConnection
@@ -10,13 +8,10 @@ from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
 from sqlalchemy import text
-import sqlalchemy as sqla
 
 from linkml_store.api import Database
-from linkml_store.api.collection import OBJECT
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
-
 
 TYPE_MAP = {
     "VARCHAR": "string",
@@ -26,6 +21,7 @@ TYPE_MAP = {
 
 
 logger = logging.getLogger(__name__)
+
 
 def run_query(con: DuckDBPyConnection, query: Query, **kwargs):
     """
@@ -70,7 +66,6 @@ class DuckDBDatabase(Database):
             if not handle.startswith("duckdb://") and not handle.startswith(":"):
                 handle = f"duckdb://{handle}"
             self._engine = sqlalchemy.create_engine(handle)
-        con = self._engine.connect()
         return self._engine
 
     def query(self, query: Query, **kwargs) -> QueryResult:
@@ -86,10 +81,9 @@ class DuckDBDatabase(Database):
             return qr
 
     def init_collections(self):
-        with self.engine.connect() as conn:
-            query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
-            qr = self.query(query)
-            table_names = [row["table_name"] for row in qr.rows]
+        query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
+        qr = self.query(query)
+        table_names = [row["table_name"] for row in qr.rows]
         if self._collections is None:
             self._collections = {}
         for table_name in table_names:
@@ -125,10 +119,9 @@ class DuckDBDatabase(Database):
                 else:
                     multivalued = False
                 rng = TYPE_MAP.get(dt, "string")
-                sd = SlotDefinition(row["column_name"],
-                                    required=row["is_nullable"] == "NO",
-                                    multivalued=multivalued,
-                                    range=rng)
+                sd = SlotDefinition(
+                    row["column_name"], required=row["is_nullable"] == "NO", multivalued=multivalued, range=rng
+                )
                 sb.schema.classes[tbl_name].attributes[sd.name] = sd
         sb.add_defaults()
         return SchemaView(schema)

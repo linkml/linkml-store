@@ -1,15 +1,12 @@
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 import streamlit as st
-
-from linkml_runtime.linkml_model import SlotDefinition, ClassDefinition
-
+from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_store.api import Collection
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
-from linkml_data_browser.state import get_state
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +23,8 @@ DBS = {
     "gcrp": TABLES,
 }
 
-DB_PATH = 'db/{db}.db'
+DB_PATH = "db/{db}.db"
+
 
 def init_reset_filters(cd: ClassDefinition, reset=False):
     for att_name in cd.attributes:
@@ -35,16 +33,18 @@ def init_reset_filters(cd: ClassDefinition, reset=False):
             st.session_state[key] = ""  # Assuming text input, adjust for other types
 
 
-def apply_filters(collection: Collection, cd: ClassDefinition, filters: Dict[str, Any], offset: int, limit: int, **kwargs):
+def apply_filters(
+    collection: Collection, cd: ClassDefinition, filters: Dict[str, Any], offset: int, limit: int, **kwargs
+):
     print(f"FILTERS={filters}")
     return collection.find(filters, offset=offset, limit=limit, **kwargs)
+
 
 def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     """Render appropriate Streamlit widget based on column type."""
     logger.info("Rendering filter widget")
     col_type = attribute.range
     col_name = attribute.name
-    tbl_name = collection.name
     if col_type == "string":
         return st.sidebar.text_input(f"Filter by {col_name}")
     # elif col_type == "integer":
@@ -64,7 +64,7 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
 # Main function to render the app
 def main():
     st.title("LinkML Table Browser")
-    selected_db = st.selectbox("Select a Database", list(DBS.keys()), key='db_selector')
+    selected_db = st.selectbox("Select a Database", list(DBS.keys()), key="db_selector")
     # con = duckdb.connect(DB_PATH.format(db=selected_db))
     db_name = DB_PATH.format(db=selected_db)
     database = DuckDBDatabase(f"duckdb:///{db_name}")
@@ -76,7 +76,7 @@ def main():
 
     # Pagination setup
     session_state = st.session_state
-    if 'current_page' not in session_state:
+    if "current_page" not in session_state:
         session_state.current_page = 0  # Start with page 0
     rows_per_page = DEFAULT_LIMIT
 
@@ -109,7 +109,7 @@ def main():
 
     # Pagination buttons
     cols = st.columns(4)
-    prev_button, next_button, first_button, last_button = cols[0], cols[1], cols[2], cols[3]
+    prev_button, next_button, _first_button, _last_button = cols[0], cols[1], cols[2], cols[3]
 
     if prev_button.button("Previous"):
         if session_state.current_page > 0:
@@ -124,38 +124,35 @@ def main():
         session_state.current_page = int(result.num_rows / rows_per_page)
 
     # Refresh the data after pagination change
-    if 'current_page' in session_state:
+    if "current_page" in session_state:
         result = apply_filters(collection, cd, filters, session_state.current_page * rows_per_page, rows_per_page)
         filtered_data = pd.DataFrame(result.rows)
 
     # Add 'id' column to the DataFrame for easier tracking of changes; incremental
-    filtered_data['id'] = range(1, len(filtered_data)+1)
+    filtered_data["id"] = range(1, len(filtered_data) + 1)
     edited_df = st.data_editor(filtered_data, width=2000, num_rows="dynamic")
     original_data = filtered_data
 
     for index, row in edited_df.iterrows():
-        if np.isnan(row['id']):
+        if np.isnan(row["id"]):
             print(f"INSERT: {row}")
 
-    original_ids = set(original_data['id'])
-    edited_ids = set(edited_df['id'])
+    original_ids = set(original_data["id"])
+    edited_ids = set(edited_df["id"])
 
     deleted_ids = original_ids - edited_ids
     for deleted_id in deleted_ids:
         print(f"DELETE: {original_data[original_data['id'] == deleted_id]}")
 
     # For modified rows, compare values row by row where ids match
-    modified_ids = []
-    for id_val in (original_ids & edited_ids):  # Intersection: ids present in both
-        original_row = original_data[original_data['id'] == id_val]
-        edited_row = edited_df[edited_df['id'] == id_val]
+    _modified_ids = []
+    for id_val in original_ids & edited_ids:  # Intersection: ids present in both
+        _original_row = original_data[original_data["id"] == id_val]
+        _edited_row = edited_df[edited_df["id"] == id_val]
         # Assuming you have a function to compare rows and decide if they are different
-        #if not rows_are_equal(original_row, edited_row):
+        # if not rows_are_equal(original_row, edited_row):
         #    modified_ids.append(id_val)
         #    print(f"MODIFY: {original_row} -> {edited_row}")
-
-
-
 
 
 if __name__ == "__main__":

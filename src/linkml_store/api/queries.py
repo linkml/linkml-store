@@ -1,4 +1,4 @@
-from typing import Optional, List, Union, Dict, Any
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 from pydantic import BaseModel
@@ -30,7 +30,7 @@ class Query(BaseModel):
     def sql(self, count=False, limit=None, offset: Optional[int] = None):
         select_cols = self.select_cols if self.select_cols else ["*"]
         if count:
-            query = [f"SELECT COUNT(*)"]
+            query = ["SELECT COUNT(*)"]
         else:
             query = [f"SELECT {', '.join(select_cols)}"]
         query.append(f"FROM {self.from_table}")
@@ -59,10 +59,7 @@ class Query(BaseModel):
             conditions = [cond for cond in self.where_clause.split(" AND ") if not cond.startswith(f"{facet_column} ")]
             modified_where = " AND ".join(conditions)
 
-        query = [
-            f"SELECT {facet_column}, COUNT(*) as count",
-            f"FROM {self.from_table}"
-        ]
+        query = [f"SELECT {facet_column}, COUNT(*) as count", f"FROM {self.from_table}"]
         if modified_where:
             query.append(f"WHERE {modified_where}")
         query.append(f"GROUP BY {facet_column}")
@@ -74,6 +71,7 @@ class QueryResult(BaseModel):
     """
     A query result
     """
+
     query: Query
     num_rows: int
     offset: Optional[int] = 0
