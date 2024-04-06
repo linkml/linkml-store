@@ -66,7 +66,6 @@ class DuckDBDatabase(Database):
             if not handle.startswith("duckdb://") and not handle.startswith(":"):
                 handle = f"duckdb://{handle}"
             self._engine = sqlalchemy.create_engine(handle)
-        con = self._engine.connect()
         return self._engine
 
     def query(self, query: Query, **kwargs) -> QueryResult:
@@ -82,10 +81,9 @@ class DuckDBDatabase(Database):
             return qr
 
     def init_collections(self):
-        with self.engine.connect() as conn:
-            query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
-            qr = self.query(query)
-            table_names = [row["table_name"] for row in qr.rows]
+        query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
+        qr = self.query(query)
+        table_names = [row["table_name"] for row in qr.rows]
         if self._collections is None:
             self._collections = {}
         for table_name in table_names:

@@ -45,7 +45,6 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     logger.info("Rendering filter widget")
     col_type = attribute.range
     col_name = attribute.name
-    tbl_name = collection.name
     if col_type == "string":
         return st.sidebar.text_input(f"Filter by {col_name}")
     # elif col_type == "integer":
@@ -110,7 +109,7 @@ def main():
 
     # Pagination buttons
     cols = st.columns(4)
-    prev_button, next_button, first_button, last_button = cols[0], cols[1], cols[2], cols[3]
+    prev_button, next_button, _first_button, _last_button = cols[0], cols[1], cols[2], cols[3]
 
     if prev_button.button("Previous"):
         if session_state.current_page > 0:
@@ -146,10 +145,10 @@ def main():
         print(f"DELETE: {original_data[original_data['id'] == deleted_id]}")
 
     # For modified rows, compare values row by row where ids match
-    modified_ids = []
+    _modified_ids = []
     for id_val in original_ids & edited_ids:  # Intersection: ids present in both
-        original_row = original_data[original_data["id"] == id_val]
-        edited_row = edited_df[edited_df["id"] == id_val]
+        _original_row = original_data[original_data["id"] == id_val]
+        _edited_row = edited_df[edited_df["id"] == id_val]
         # Assuming you have a function to compare rows and decide if they are different
         # if not rows_are_equal(original_row, edited_row):
         #    modified_ids.append(id_val)

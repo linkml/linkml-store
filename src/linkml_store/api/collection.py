@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from pydantic import BaseModel
 
+import linkml_store.api as api
 from linkml_store.api.queries import Query, QueryResult
 
 OBJECT = Union[Dict[str, Any], BaseModel, Type]
@@ -16,7 +17,7 @@ FIELD_NAME = str
 @dataclass
 class Collection:
     name: str
-    parent: Optional["Database"] = None
+    parent: Optional["api.Database"] = None
 
     def add(self, objs: Union[OBJECT, List[OBJECT]]):
         if not isinstance(objs, list):
@@ -59,11 +60,10 @@ class Collection:
         """
         raise NotImplementedError
 
-    def get(self, ids: Optional[List[IDENTIFIER]] = None, where: Optional[Any] = None, **kwargs) -> QueryResult:
-        if ids:
-            raise NotImplementedError
-        query = self._create_query(where_clause=where)
-        return self.query(query, **kwargs)
+    def get(self, ids: Optional[IDENTIFIER], **kwargs) -> QueryResult:
+        id_field = self.identifier_field
+        q = self._create_query(where_clause={id_field: ids})
+        return self.query(q, **kwargs)
 
     def find(self, where: Optional[Any] = None, **kwargs) -> QueryResult:
         query = self._create_query(where_clause=where)
@@ -75,11 +75,6 @@ class Collection:
 
     def identifier_field(self) -> FIELD_NAME:
         raise NotImplementedError
-
-    def get(self, ids: Optional[IDENTIFIER], **kwargs) -> QueryResult:
-        id_field = self.identifier_field
-        q = self._create_query(where_clause={id_field: ids})
-        return self.query(q, **kwargs)
 
     def class_definition(self) -> Optional[ClassDefinition]:
         sv = self.parent.schema_view

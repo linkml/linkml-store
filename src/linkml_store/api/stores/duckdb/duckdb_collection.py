@@ -27,7 +27,7 @@ class DuckDBCollection(Collection):
         stmt = insert(table).values(objs)
         engine = self.parent.engine
         with engine.connect() as conn:
-            result = conn.execute(stmt)
+            _ = conn.execute(stmt)
             conn.commit()
 
     def query_facets(self, where: Dict, facet_columns: List[str]) -> Dict[str, Dict[str, int]]:

@@ -164,7 +164,8 @@ class Database(ABC):
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
         >>> collection = db.create_collection("Person")
-        >>> collection.add([{"id": "P1", "name": "John", "age_in_years": 25}, {"id": "P2", "name": "Alice", "age_in_years": 25}])
+        >>> collection.add([{"id": "P1", "name": "John", "age_in_years": 25},
+        ...                 {"id": "P2", "name": "Alice", "age_in_years": 25}])
         >>> schema_view = db.induce_schema_view()
         >>> cd = schema_view.get_class("Person")
         >>> cd.attributes["id"].range
