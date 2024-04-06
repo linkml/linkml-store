@@ -3,10 +3,10 @@ import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-
 from linkml_store.api.client import Client
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
+
 from tests import INPUT_DIR
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
@@ -17,8 +17,10 @@ SCHEMES = [
 
 DEFAULT_DB = "default"
 
+
 def remove_none(d: dict):
     return {k: v for k, v in d.items() if v is not None}
+
 
 @pytest.fixture()
 def schema_view() -> SchemaView:
@@ -45,8 +47,7 @@ def test_induced(handle):
     assert len(database.list_collections()) == 0
     collection = database.create_collection("foo")
     assert collection.class_definition() is None
-    objs = [{"id": 1, "name": "n1"},
-            {"id": 2, "name": "n2", "age_in_years": 30}]
+    objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
     collection.add(objs)
     collection.query(collection._create_query())
     qr = collection.peek()
@@ -127,4 +128,3 @@ def test_integration():
     print(row.keys())
     print(pd.DataFrame(qr.rows))
     # print(qr.rows_dataframe)
-

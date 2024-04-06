@@ -1,12 +1,12 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import Sequence, Optional, Dict, List
+from typing import Dict, Optional, Sequence
 
 from linkml_runtime import SchemaView
 
-from linkml_store.api.queries import Query, QueryResult
-from linkml_store.api.metadata import MetaData
 from linkml_store.api.collection import Collection
+from linkml_store.api.metadata import MetaData
+from linkml_store.api.queries import Query, QueryResult
 
 
 @dataclass
@@ -14,8 +14,8 @@ class Database(ABC):
     """
     A Database provides access to named collections of data.
 
-    Examples:
-
+    Examples
+    --------
     >>> from linkml_store.api.client import Client
     >>> client = Client()
     >>> db = client.attach_database("duckdb", alias="test")
@@ -42,6 +42,7 @@ class Database(ABC):
     'John'
 
     """
+
     handle: Optional[str] = None
     _schema_view: Optional[SchemaView] = None
     _collections: Optional[Dict[str, Collection]] = None
@@ -65,8 +66,8 @@ class Database(ABC):
         """
         List all collections.
 
-        Examples:
-
+        Examples
+        --------
         >>> from linkml_store.api.client import Client
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
@@ -77,6 +78,7 @@ class Database(ABC):
         2
         >>> [c.name for c in collections]
         ['Person', 'Product']
+
         """
         if not self._collections:
             self.init_collections()
@@ -86,8 +88,8 @@ class Database(ABC):
         """
         Get a named collection.
 
-        Examples:
-
+        Examples
+        --------
         >>> from linkml_store.api.client import Client
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
@@ -119,8 +121,8 @@ class Database(ABC):
         """
         Run a query against the database.
 
-        Examples:
-
+        Examples
+        --------
         >>> from linkml_store.api.client import Client
         >>> from linkml_store.api.queries import Query
         >>> client = Client()
@@ -137,6 +139,7 @@ class Database(ABC):
         :param query:
         :param kwargs:
         :return:
+
         """
         raise NotImplementedError
 
@@ -170,4 +173,3 @@ class Database(ABC):
         :return: A schema view
         """
         raise NotImplementedError()
-
