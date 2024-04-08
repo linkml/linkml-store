@@ -47,7 +47,24 @@ class Database(ABC):
     _schema_view: Optional[SchemaView] = None
     _collections: Optional[Dict[str, Collection]] = None
 
-    def create_collection(self, name: str, metadata: Optional[MetaData] = None, **kwargs) -> Collection:
+    def store(self, obj: Dict[str, str], **kwargs):
+        """
+        Store an object in the database
+
+        :param obj: object to store
+        :param kwargs: additional arguments
+        """
+        for k, v in obj.items():
+            collection = self.get_collection(k, create_if_not_exists=True)
+            collection.add(v)
+
+    def commit(self, **kwargs):
+        """
+        Commit any pending changes to the database
+        """
+        raise NotImplementedError()
+
+    def create_collection(self, name: str, alias: Optional[str] = None, metadata: Optional[MetaData] = None, **kwargs) -> Collection:
         """
         Create a new collection
 
@@ -59,6 +76,9 @@ class Database(ABC):
         'Person'
 
         :param name: name of the collection
+        :param alias: alias for the collection
+        :param metadata: metadata for the collection
+        :param kwargs: additional arguments
         """
         raise NotImplementedError()
 
@@ -99,7 +119,7 @@ class Database(ABC):
         >>> db.get_collection("NonExistent", create_if_not_exists=False)
         Traceback (most recent call last):
             ...
-        ValueError: Collection NonExistent does not exist
+        KeyError: 'Collection NonExistent does not exist'
 
         :param name: name of the collection
         :param create_if_not_exists: create the collection if it does not exist
@@ -111,7 +131,7 @@ class Database(ABC):
             if create_if_not_exists:
                 self._collections[name] = self.create_collection(name)
             else:
-                raise ValueError(f"Collection {name} does not exist")
+                raise KeyError(f"Collection {name} does not exist")
         return self._collections[name]
 
     def init_collections(self):

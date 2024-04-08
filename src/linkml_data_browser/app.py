@@ -34,7 +34,7 @@ def init_reset_filters(cd: ClassDefinition, reset=False):
 
 
 def apply_filters(
-    collection: Collection, cd: ClassDefinition, filters: Dict[str, Any], offset: int, limit: int, **kwargs
+    collection: Collection, filters: Dict[str, Any], offset: int, limit: int, **kwargs
 ):
     print(f"FILTERS={filters}")
     return collection.find(filters, offset=offset, limit=limit, **kwargs)
@@ -99,7 +99,7 @@ def main():
     # If any filter has changed, reset pagination
     if filter_changed:
         st.session_state.current_page = 0  # Reset offset
-    result = apply_filters(collection, cd, filters, session_state.current_page * rows_per_page, rows_per_page)
+    result = apply_filters(collection, filters, session_state.current_page * rows_per_page, rows_per_page)
     if filter_changed:
         facet_results = collection.query_facets(filters, facet_columns=["evidence_type"])
         print(f"FACET={facet_results}")
@@ -125,7 +125,7 @@ def main():
 
     # Refresh the data after pagination change
     if "current_page" in session_state:
-        result = apply_filters(collection, cd, filters, session_state.current_page * rows_per_page, rows_per_page)
+        result = apply_filters(collection, filters, session_state.current_page * rows_per_page, rows_per_page)
         filtered_data = pd.DataFrame(result.rows)
 
     # Add 'id' column to the DataFrame for easier tracking of changes; incremental

@@ -1,4 +1,3 @@
-import pandas as pd
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
@@ -6,6 +5,8 @@ from linkml_runtime.utils.schema_builder import SchemaBuilder
 from linkml_store.api.client import Client
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
+from linkml_store.constants import LINKML_STORE_MODULE
+from linkml_store.utils.sql_utils import introspect_schema
 
 from tests import INPUT_DIR
 
@@ -18,8 +19,10 @@ SCHEMES = [
 DEFAULT_DB = "default"
 
 
-def remove_none(d: dict):
-    return {k: v for k, v in d.items() if v is not None}
+def remove_none(d: dict, additional_keys=None):
+    if additional_keys is None:
+        additional_keys = []
+    return {k: v for k, v in d.items() if v is not None and k not in additional_keys}
 
 
 @pytest.fixture()
@@ -29,7 +32,8 @@ def schema_view() -> SchemaView:
     name_slot = SlotDefinition("name")
     age_in_years_slot = SlotDefinition("age_in_years", range="integer")
     occupation_slot = SlotDefinition("occupation")
-    sb.add_class("Person", [id_slot, name_slot, age_in_years_slot, occupation_slot], use_attributes=True)
+    moon_slot = SlotDefinition("moon")
+    sb.add_class("Person", [id_slot, name_slot, age_in_years_slot, occupation_slot, moon_slot], use_attributes=True)
     return SchemaView(sb.schema)
 
 
@@ -40,15 +44,138 @@ def create_client(handle: str) -> Client:
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
-def test_induced(handle):
+@pytest.mark.parametrize("name_alias", [("Person", None,), ("Person", "persons")])
+def test_induced(handle, name_alias):
+    name, alias = name_alias
     client = create_client(handle)
     database = client.get_database()
     # database = database_class()
     assert len(database.list_collections()) == 0
-    collection = database.create_collection("foo")
+    if alias:
+        collection = database.create_collection(name, alias=alias)
+    else:
+        collection = database.create_collection(name)
+    assert len(database.list_collections()) == 1
     assert collection.class_definition() is None
     objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
     collection.add(objs)
+    assert collection.parent.schema_view is not None
+    assert collection.parent.schema_view.schema is not None
+    assert collection.parent.schema_view.schema.classes
+    assert collection.parent.schema_view.schema.classes[name]
+    assert collection.parent.schema_view.schema.classes[name].name == collection.name
+    assert collection.parent.schema_view.get_class(name)
+    assert collection.class_definition() is not None
+    assert len(database.list_collections()) == 1, "xxxx"
+    collection.query(collection._create_query())
+    assert len(database.list_collections()) == 1, "FOOOZ"
+    qr = collection.peek()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == objs[0]
+    for coll in database.list_collections():
+        print(coll.name)
+    assert len(database.list_collections()) == 1, "BAAAZ"
+    dummy_collection = database.get_collection("dummy", create_if_not_exists=True)
+    assert dummy_collection.class_definition() is None
+    with pytest.raises(KeyError):
+        database.get_collection("dummy2", create_if_not_exists=False)
+    if alias:
+        collection = database.get_collection(alias, create_if_not_exists=True)
+    else:
+        collection = database.get_collection(name, create_if_not_exists=True)
+    sv = database.schema_view
+    cd = sv.get_class(name)
+    assert cd is not None
+    assert cd.name == name
+    assert len(cd.attributes) == 3
+    assert cd.attributes["id"].range == "integer"
+    assert cd.attributes["name"].range == "string"
+    assert cd.attributes["age_in_years"].range == "integer"
+    collection.delete(objs[0])
+    qr = collection.find()
+    assert qr.num_rows == 1
+    assert remove_none(qr.rows[0]) == objs[1]
+    collection.delete_where({"age_in_years": 99})
+    qr = collection.find()
+    assert qr.num_rows == 1
+    collection.delete_where({"age_in_years": 30})
+    qr = collection.find()
+    assert qr.num_rows == 0
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_store(handle):
+    client = create_client(handle)
+    database = client.get_database()
+    obj = {
+        "persons": [
+            {"id": 1, "name": "n1", "employed_by": "Org1"},
+            {"id": 2, "name": "n2", "age_in_years": 30},
+        ],
+        "organizations": [
+            {"id": "Org1", "name": "org1"},
+            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
+        ],
+    }
+    database.store(obj)
+    persons_coll = database.get_collection("persons")
+    qr = persons_coll.find()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == obj["persons"][0]
+    orgs_coll = database.get_collection("organizations")
+    qr = orgs_coll.find()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == obj["organizations"][0]
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_store_nested(handle):
+    client = create_client(handle)
+    database = client.get_database()
+    obj = {
+        "persons": [
+            {"id": 1, "name": "n1", "history": [
+                {"event": "birth", "date": "2021-01-01"},
+                {"event": "death", "date": "2021-02-01"},
+                {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
+            ]},
+            {"id": 2, "name": "n2", "age_in_years": 30},
+        ],
+        "organizations": [
+            {"id": "Org1", "name": "org1"},
+            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
+        ],
+    }
+    database.store(obj)
+    database.commit()
+    persons_coll = database.get_collection("persons")
+    qr = persons_coll.find()
+    assert qr.num_rows == 2
+    p1 = qr.rows[0]
+    p1events = p1["history"]
+    assert all(isinstance(e, dict) for e in p1events)
+    ignore = ["history"]
+    assert remove_none(qr.rows[0], ignore) == remove_none(obj["persons"][0], ignore)
+    orgs_coll = database.get_collection("organizations")
+    qr = orgs_coll.find()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == obj["organizations"][0]
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_induced_multivalued(handle):
+    client = create_client(handle)
+    database = client.get_database()
+    collection = database.create_collection("foo")
+    objs = [{"id": 1, "name": "n1", "aliases": ["a", "b"]}, {"id": 2, "name": "n2", "age_in_years": 30, "aliases": ["b", "c"]}]
+    collection.add(objs)
+    assert collection.parent.schema_view is not None
+    assert collection.parent.schema_view.schema is not None
+    assert collection.parent.schema_view.schema.classes
+    assert collection.parent.schema_view.schema.classes["foo"]
+    assert collection.parent.schema_view.schema.classes["foo"].name == collection.name
+    assert collection.parent.schema_view.get_class("foo")
+    assert collection.class_definition() is not None
     collection.query(collection._create_query())
     qr = collection.peek()
     assert qr.num_rows == 2
@@ -58,11 +185,21 @@ def test_induced(handle):
     cd = sv.get_class("foo")
     assert cd is not None
     assert cd.name == "foo"
-    assert len(cd.attributes) == 3
+    assert len(cd.attributes) == 4
     assert cd.attributes["id"].range == "integer"
     assert cd.attributes["name"].range == "string"
-    # TODO:
-    # assert cd.attributes["age_in_years"].range == "integer"
+    assert cd.attributes["age_in_years"].range == "integer"
+    assert cd.attributes["aliases"].range == "string"
+    assert cd.attributes["aliases"].multivalued
+    fcs = collection.query_facets(facet_columns=["aliases"])["aliases"]
+    assert set(fcs) == {("a", 1), ("b", 2), ("c", 1)}
+    # check ordering
+    assert fcs[0] == ("b", 2)
+    collection.delete(objs[0])
+    qr = collection.find()
+    assert qr.num_rows == 1
+    assert remove_none(qr.rows[0]) == objs[1]
+
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
@@ -76,7 +213,7 @@ def test_schema(schema_view, handle):
     cd = collection.class_definition()
     assert cd is not None
     assert cd.name == "Person"
-    assert len(cd.attributes) == 4
+    assert len(cd.attributes) == 5
     assert cd.attributes["id"].identifier
     obj = {"id": "p1", "name": "n1"}
     collection.add([obj])
@@ -96,28 +233,40 @@ def test_facets(schema_view, handle):
     database.set_schema_view(schema_view)
     collection = database.create_collection("Person")
     objs = [
-        {"id": "P1", "name": "n1", "occupation": "Welder"},
-        {"id": "P2", "name": "n2", "occupation": "Welder"},
-        {"id": "P3", "name": "n3", "occupation": "Bricklayer"},
+        {"id": "P1", "name": "n1", "occupation": "Welder", "moon": "Io"},
+        {"id": "P2", "name": "n2", "occupation": "Welder", "moon": "Europa"},
+        {"id": "P3", "name": "n3", "occupation": "Bricklayer", "moon": "Io"},
     ]
     collection.add(objs)
-    for where, expected in [({"occupation": "Welder"}, {"P1", "P2"})]:
+    r = collection.query_facets(facet_columns=["occupation"])
+    assert r == {"occupation": [("Welder", 2), ("Bricklayer", 1)]}
+    cases = [
+        (["occupation"], {"occupation": "Welder"}, {"P1", "P2"}, {"occupation": [("Welder", 2)]}),
+        (["occupation"], None, {"P1", "P2", "P3"}, {"occupation": [("Welder", 2), ("Bricklayer", 1)]}),
+        (["moon"], None, {"P1", "P2", "P3"}, {"moon": [("Io", 2), ("Europa", 1)]}),
+        (["occupation", "moon"], None, {"P1", "P2", "P3"}, {"occupation": [("Welder", 2), ("Bricklayer", 1)], "moon": [("Io", 2), ("Europa", 1)]}),
+        ([("occupation", "moon")], None, {"P1", "P2", "P3"}, {('occupation', 'moon'): [('Welder', 'Io', 1), ('Bricklayer', 'Io', 1), ('Welder', 'Europa', 1)]}),
+    ]
+    for facet_slots, where, expected, expected_facets in cases:
         qr = database.query(Query(from_table="Person", where_clause=where))
         ids = {row["id"] for row in qr.rows}
         assert ids == expected
         qr = collection.find(where)
         ids = {row["id"] for row in qr.rows}
         assert ids == expected
-    r = collection.query_facets({}, ["occupation"])
-    print(r)
+        r = collection.query_facets(where=where, facet_columns=facet_slots)
+        for k, v in r.items():
+            assert set(r[k]) == set(expected_facets[k])
+            del expected_facets[k]
+        assert expected_facets == {}
 
 
+@pytest.mark.integration
 def test_integration():
-    pytest.skip("TODO: mark as integration test")
     abs_db_path = str(TEST_DB.resolve())
 
     # Now, construct the connection string
-    handle = f"duckdb:///{abs_db_path}"  # Notice the three slashes (duckdb:///absolute/path/to/db)
+    handle = f"duckdb:///{abs_db_path}"
     database = DuckDBDatabase(handle)
     collection = database.get_collection("gaf_association")
     qr = collection.find()
@@ -127,5 +276,36 @@ def test_integration():
     print(type(row))
     print(row)
     print(row.keys())
-    print(pd.DataFrame(qr.rows))
+    # print(pd.DataFrame(qr.rows))
     # print(qr.rows_dataframe)
+
+MONARCH_KG_DB = "https://data.monarchinitiative.org/monarch-kg/latest/monarch-kg.db.gz"
+
+@pytest.mark.integration
+def test_integration_kg():
+    path = LINKML_STORE_MODULE.ensure_gunzip(url=MONARCH_KG_DB, autoclean=True)
+    print(path)
+    handle = f"duckdb:///{path}"
+    database = DuckDBDatabase(handle)
+    schema = introspect_schema(database.engine)
+    collection = database.get_collection("denormalized_edges")
+    qr = collection.find()
+    print(qr.num_rows)
+    print(qr.rows_dataframe)
+
+
+def test_sql_utils():
+    import duckdb
+    # con = duckdb.connect("file.db")
+    con = duckdb.connect()
+    ddl = """
+    CREATE TABLE foo (
+        a JSON
+    );
+    """
+    con.sql(ddl)
+    con.sql("INSERT INTO foo VALUES ([1, {a: 2}::JSON])")
+    r = con.sql("SELECT * FROM foo").fetchall()
+    assert isinstance(r[0][0], str)
+    r = con.sql("SELECT json_extract(a, '/1/a') AS e FROM foo").fetchall()
+    assert r[0][0] == "2"

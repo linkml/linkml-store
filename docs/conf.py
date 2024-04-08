@@ -23,6 +23,7 @@ extensions = [
     "sphinx_click",
     "sphinx_autodoc_typehints",
     "myst_parser",
+    "nbsphinx",
 ]
 
 # generate autosummary pages

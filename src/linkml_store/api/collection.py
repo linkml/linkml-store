@@ -1,11 +1,13 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type, Union
+from pathlib import Path
+from typing import Any, Dict, List, Optional, TextIO, Type, Union
 
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from pydantic import BaseModel
 
 import linkml_store.api as api
+from linkml_store.api.index import Index
 from linkml_store.api.queries import Query, QueryResult
 
 OBJECT = Union[Dict[str, Any], BaseModel, Type]
@@ -16,14 +18,57 @@ FIELD_NAME = str
 
 @dataclass
 class Collection:
+    """
+    A collection is an organized set of objects of the same or similar type.
+
+    - For relational databases, a collection is typically a table
+    - For document databases such as MongoDB, a collection is the native type
+    - For a file system, a collection could be a single tabular file such as Parquet or CSV
+    """
+
     name: str
     parent: Optional["api.Database"] = None
+    _indexes: Optional[Dict[str, Index]] = None
 
-    def add(self, objs: Union[OBJECT, List[OBJECT]]):
-        if not isinstance(objs, list):
-            objs = [objs]
-        if not self.class_definition():
-            raise ValueError(f"Class definition not found for {self.name}")
+    def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+        """
+        Add one or more objects to the collection
+
+        :param objs:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
+    def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
+        """
+        Delete one or more objects from the collection
+
+        :param objs:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, **kwargs) -> int:
+        """
+        Delete objects that match a query
+
+        :param where:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
+    def update(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+        """
+        Update one or more objects in the collection
+
+        :param objs:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
 
     def _create_query(self, **kwargs) -> Query:
         return Query(from_table=self.name, **kwargs)
@@ -38,7 +83,7 @@ class Collection:
         """
         return self.parent.query(query, **kwargs)
 
-    def query_facets(self, where: Dict = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
+    def query_facets(self, where: Optional[Dict] = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
         """
         Run a query to get facet counts for one or more columns.
 
@@ -69,6 +114,25 @@ class Collection:
         query = self._create_query(where_clause=where)
         return self.query(query, **kwargs)
 
+    def search(
+        self, query: str, where: Optional[Any] = None, index_name: Optional[str] = None, **kwargs
+    ) -> QueryResult:
+        ix = self._indexes.get(index_name)
+        ix_function = ix.index_function
+        distance_function = ix.distance_function
+        indexed_query = ix_function(query)
+        qr = self.find(where=where, **kwargs)
+        ranks_rows = []
+        for row in qr.rows:
+            indexed_row = ix_function(row)
+            dist = distance_function(indexed_query, indexed_row)
+        new_qr = QueryResult(query=qr.query, num_rows=len(filtered_rows))
+        new_qr.ranked_rows = ranks_rows
+        return new_qr
+
+    def attach_index(self, index: Index, **kwargs):
+        raise NotImplementedError
+
     def peek(self, limit: Optional[int] = None) -> QueryResult:
         q = self._create_query()
         return self.query(q, limit=limit)
@@ -78,7 +142,7 @@ class Collection:
 
     def class_definition(self) -> Optional[ClassDefinition]:
         sv = self.parent.schema_view
-        if sv and self.name in sv.all_classes():
+        if sv:
             return sv.get_class(self.name)
         return None
 
@@ -95,6 +159,7 @@ class Collection:
                 keys[k].append(v)
         for k, vs in keys.items():
             multivalueds = []
+            inlineds = []
             rngs = []
             for v in vs:
                 if not v:
@@ -102,9 +167,7 @@ class Collection:
                 if isinstance(v, list):
                     v = v[0]
                     multivalueds.append(True)
-                else:
-                    multivalueds.append(False)
-                if isinstance(v, dict):
+                elif isinstance(v, dict):
                     v = list(v.values())[0]
                     multivalueds.append(True)
                 else:
@@ -119,17 +182,42 @@ class Collection:
                     rng = "integer"
                 elif isinstance(v, float):
                     rng = "float"
+                elif isinstance(v, dict):
+                    rng = None
+                    inlineds.append(True)
                 else:
                     raise ValueError(f"No mappings for {type(v)} // v={v}")
                 rngs.append(rng)
             multivalued = any(multivalueds)
+            inlined = any(inlineds)
             if multivalued and False in multivalueds:
-                raise ValueError(f"Mixed list non list: {vs}")
+                raise ValueError(f"Mixed list non list: {vs} // inferred= {multivalueds}")
             rng = rngs[0]
             for other_rng in rngs:
                 if rng != other_rng:
                     raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
-            cd.attributes[k] = SlotDefinition(k, range=rng)
+            cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined)
         sv = self.parent.schema_view
         sv.schema.classes[self.name] = cd
+        sv.set_modified()
         return cd
+
+    def import_data(self, location: Union[Path, str, TextIO], **kwargs):
+        """
+        Import data from a file or stream
+
+        :param location:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
+    def export_data(self, location: Union[Path, str, TextIO], **kwargs):
+        """
+        Export data to a file or stream
+
+        :param location:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError

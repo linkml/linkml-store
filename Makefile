@@ -3,9 +3,19 @@ CODE = src/linkml_data_browser
 
 
 test: pytest doctest
+test-full: test integration-tests
 
 pytest:
 	$(RUN) pytest
+
+integration-tests:
+	$(RUN) pytest -m integration
+
+all-pytest:
+	$(RUN) pytest -m "integration or not integration"
+
+install-all:
+	poetry install -E analytics -E app -E tests
 
 # not yet deployed
 doctest:
