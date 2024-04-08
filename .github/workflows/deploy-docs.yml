@@ -17,6 +17,13 @@ jobs:
       with:
         python-version: 3.9
 
+    - name: Install dependencies for nbsphinx
+      run: |
+        sudo apt update
+        sudo apt install -y pandoc
+    - name: Run Pandoc
+      run: |
+        pandoc --version        
     - name: Install Poetry.
       uses: snok/install-poetry@v1.3
 
