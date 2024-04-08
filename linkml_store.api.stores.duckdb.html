@@ -18,6 +18,7 @@
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,12 +46,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">linkml_store</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="linkml_store.html">linkml_store package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.html#linkml_store.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="linkml_store.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.html#module-linkml_store.constants">linkml_store.constants module</a></li>
 </ul>
 </li>
 </ul>
@@ -94,16 +99,68 @@
 <span id="linkml-store-api-stores-duckdb-duckdb-collection-module"></span><h2>linkml_store.api.stores.duckdb.duckdb_collection module<a class="headerlink" href="#module-linkml_store.api.stores.duckdb.duckdb_collection" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_collection.</span></span><span class="sig-name descname"><span class="pre">DuckDBCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_table_created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_collection.</span></span><span class="sig-name descname"><span class="pre">DuckDBCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_table_created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add" title="Link to this definition"></a></dt>
+<dd><p>Add one or more objects to the collection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>) – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete one or more objects from the collection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>) – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete_where">
+<span class="sig-name descname"><span class="pre">delete_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete_where" title="Link to this definition"></a></dt>
+<dd><p>Delete objects that match a query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>where</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span>) – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets">
-<span class="sig-name descname"><span class="pre">query_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">query_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets" title="Link to this definition"></a></dt>
 <dd><p>Run a query to get facet counts for one or more columns.</p>
 <p>This function takes a database connection, a Query object, and a list of column names.
 It generates and executes a facet count query for each specified column and returns
@@ -118,7 +175,7 @@ other filtering conditions.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>con</strong> – A DuckDB database connection.</p></li>
 <li><p><strong>query</strong> – A Query object representing the base query.</p></li>
-<li><p><strong>facet_columns</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – A list of column names to get facet counts for.</p></li>
+<li><p><strong>facet_columns</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – A list of column names to get facet counts for.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -141,8 +198,14 @@ containing the facet counts for each unique value in the respective column.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.api.stores.duckdb.duckdb_database.</span></span><span class="sig-name descname"><span class="pre">DuckDBDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_schema_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_collections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.commit" title="Link to this definition"></a></dt>
+<dd><p>Commit any pending changes to the database</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection">
-<span class="sig-name descname"><span class="pre">create_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection" title="Link to this definition"></a></dt>
 <dd><p>Create a new collection</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
@@ -154,7 +217,12 @@ containing the facet counts for each unique value in the respective column.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of the collection</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of the collection</p></li>
+<li><p><strong>alias</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – alias for the collection</p></li>
+<li><p><strong>metadata</strong> – metadata for the collection</p></li>
+<li><p><strong>kwargs</strong> – additional arguments</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection" title="linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuckDBCollection</span></code></a></span></p>

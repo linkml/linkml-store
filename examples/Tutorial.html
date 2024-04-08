@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkML-Store Tutorial &mdash; linkml-store  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="linkml_store" href="../modules.html" />
+    <link rel="prev" title="Welcome to the linkml-store documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            linkml-store
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LinkML-Store Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Create-a-Client-object">Create a Client object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-databse">Attach and populate a DuckDB in-memory databse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Querying">Querying</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Faceting">Faceting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Complex-objects">Complex objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Schemas">Schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Asserting-schemas">Asserting schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Other-adapters">Other adapters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">linkml-store</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LinkML-Store Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/Tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="LinkML-Store-Tutorial">
+<h1>LinkML-Store Tutorial<a class="headerlink" href="#LinkML-Store-Tutorial" title="Link to this heading"></a></h1>
+<p>This tutorial walks through the basics of using the LinkML-Store API. It uses the DuckDB adapter.</p>
+<section id="Create-a-Client-object">
+<h2>Create a Client object<a class="headerlink" href="#Create-a-Client-object" title="Link to this heading"></a></h2>
+<p>A <a class="reference external" href="linkml_store.api.client.rst">Client</a> acts as a holder for databases.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Attach-and-populate-a-DuckDB-in-memory-databse">
+<h2>Attach and populate a DuckDB in-memory databse<a class="headerlink" href="#Attach-and-populate-a-DuckDB-in-memory-databse" title="Link to this heading"></a></h2>
+<p>Here we will create/attach a database to the client, and populate it with some JSON objects. Note that for this example, we don’t provide a schema - this is <em>induced</em> behind the scenes for us.</p>
+<p>We will use the <a class="reference external" href="linkml_store.api.stores.duckdb.rst">duckdb adapter</a>, which is currently the only one in linkml-store. This is a very flexible adapter that can work in-memory or on-disk, and can be used for “classic” relational data as well as complex nested objects.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">attach_database</span></code> method creates a new database or attaches to an existing one. Here we will specify <code class="docutils literal notranslate"><span class="pre">duckdb</span></code> with no additional parameters (you could pass a full sqlalchemy URI like <code class="docutils literal notranslate"><span class="pre">duckdb:////tmp/test.db</span></code> to create a disk-based database). We will also give it as alias <code class="docutils literal notranslate"><span class="pre">mem</span></code> so we can refer to it later.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="s2">&quot;mem&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Next we’ll create a <a class="reference external" href="linkml_store.api.collection.rst">Collection</a> and add some objects to it. For the duckdb adapter, a collection corresponds to a table, but linkml-store does not dictate any particular behavior and different adapters may implement differently. But in general a collection should be a list of entities of a similar type.</p>
+<p>When creating a collection we can also optionally pass an alias, in addition to the type of objects stored in it. Conventionally, this might be the name of the key in an overall container object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can add some objects to the collection. We can add them one at a time, or in a batch.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">add</span><span class="p">([</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jie&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;StuntDouble&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Welder&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P3&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Joe&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Welder&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P4&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Baz&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Plumber&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P5&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Xan&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Plumber&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P6&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Gav&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Plumber&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P7&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Mechanic&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Querying">
+<h2>Querying<a class="headerlink" href="#Querying" title="Link to this heading"></a></h2>
+<p>We can query the collection methods such as <code class="docutils literal notranslate"><span class="pre">find</span></code>, <code class="docutils literal notranslate"><span class="pre">query</span></code>. Queries are generally mongodb-style key-value pairs. Currently only exact matches are supported. The query language is independent of the underlying database, e.g. this will work for mongodb, triplestores, etc later on.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">QueryResult</span></code> object can be interrogated to get overall row count, actual rows, etc. It is designed to support windowing over larger payloads than the toy example here.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;id&#39;: &#39;P3&#39;, &#39;name&#39;: &#39;Joe&#39;, &#39;occupation&#39;: &#39;Welder&#39;, &#39;moon&#39;: &#39;Europa&#39;},
+ {&#39;id&#39;: &#39;P4&#39;, &#39;name&#39;: &#39;Baz&#39;, &#39;occupation&#39;: &#39;Plumber&#39;, &#39;moon&#39;: &#39;Europa&#39;},
+ {&#39;id&#39;: &#39;P5&#39;, &#39;name&#39;: &#39;Xan&#39;, &#39;occupation&#39;: &#39;Plumber&#39;, &#39;moon&#39;: &#39;Europa&#39;}]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>moon</th>
+      <th>name</th>
+      <th>occupation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>P3</td>
+      <td>Europa</td>
+      <td>Joe</td>
+      <td>Welder</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>P4</td>
+      <td>Europa</td>
+      <td>Baz</td>
+      <td>Plumber</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>P5</td>
+      <td>Europa</td>
+      <td>Xan</td>
+      <td>Plumber</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Faceting">
+<h2>Faceting<a class="headerlink" href="#Faceting" title="Link to this heading"></a></h2>
+<p>We can also perform faceted queries. Again, behind the scenes, the adapter figures the best way to do this. For a SQL database this may involve multiple queries and may be less performant than Solr/ES.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;occupation&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;occupation&#39;: [(&#39;Plumber&#39;, 3),
+  (&#39;Welder&#39;, 2),
+  (&#39;Mechanic&#39;, 1),
+  (&#39;StuntDouble&#39;, 1)]}
+</pre></div></div>
+</div>
+<p>We can also facet on multiple columns, or specify a combinatorial facet. Here we will get facet counts for different occupations on different moons.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;occupation&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{(&#39;occupation&#39;, &#39;moon&#39;): [(&#39;Plumber&#39;, &#39;Europa&#39;, 2),
+  (&#39;Welder&#39;, &#39;Io&#39;, 1),
+  (&#39;StuntDouble&#39;, &#39;Io&#39;, 1),
+  (&#39;Mechanic&#39;, &#39;Io&#39;, 1),
+  (&#39;Welder&#39;, &#39;Europa&#39;, 1),
+  (&#39;Plumber&#39;, &#39;Io&#39;, 1)]}
+</pre></div></div>
+</div>
+</section>
+<section id="Plotting">
+<h2>Plotting<a class="headerlink" href="#Plotting" title="Link to this heading"></a></h2>
+<p>Although it doesn’t really make sense for such a small dataset we will plot the facet counts. First we will pivot the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Provided dictionary</span>
+<span class="n">data_dict</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;occupation&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">)])</span>
+
+<span class="c1"># Transforming the data into a format suitable for a DataFrame</span>
+<span class="n">data_for_df</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">occupation_moon</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">occupation</span><span class="p">,</span> <span class="n">moon</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">data_for_df</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Occupation&#39;</span><span class="p">:</span> <span class="n">occupation</span><span class="p">,</span>
+            <span class="s1">&#39;Moon&#39;</span><span class="p">:</span> <span class="n">moon</span><span class="p">,</span>
+            <span class="s1">&#39;Count&#39;</span><span class="p">:</span> <span class="n">count</span>
+        <span class="p">})</span>
+
+<span class="c1"># Creating the DataFrame</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_for_df</span><span class="p">)</span>
+
+<span class="c1"># Pivoting the DataFrame to get it ready for a stacked bar chart</span>
+<span class="n">df_pivoted</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Moon&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Occupation&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">df_pivoted</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Occupation</th>
+      <th>Mechanic</th>
+      <th>Plumber</th>
+      <th>StuntDouble</th>
+      <th>Welder</th>
+    </tr>
+    <tr>
+      <th>Moon</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Europa</th>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>Io</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_stacked_counts</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">)])</span>
+    <span class="n">data_for_df</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">data_for_df</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="n">col1</span><span class="p">:</span> <span class="n">v1</span><span class="p">,</span>
+                <span class="n">col2</span><span class="p">:</span> <span class="n">v2</span><span class="p">,</span>
+                <span class="s1">&#39;Count&#39;</span><span class="p">:</span> <span class="n">count</span>
+            <span class="p">})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_for_df</span><span class="p">)</span>
+    <span class="n">df_pivoted</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">col1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col2</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Count&#39;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">df_pivoted</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Object count by </span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">col1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Objects&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">col2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plot_stacked_counts</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_Tutorial_22_0.png" src="../_images/examples_Tutorial_22_0.png" />
+</div>
+</div>
+</section>
+<section id="Complex-objects">
+<h2>Complex objects<a class="headerlink" href="#Complex-objects" title="Link to this heading"></a></h2>
+<p>We can also store complex objects with arbitrary levels of nesting.</p>
+<p>For the duckdb adapter, we explicitly do not use the standard linkml relmodel transform; instead we put top level objects in individual collections, and behind the scenes duckdb will use lists and json objects for nesting, rather than rewriting these to normalized tables.</p>
+<p>Here we will create a top level json objects that lists persons and organizations. Persons can have histories that are lists of event objects:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;persons&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;n1&quot;</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;birth&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-01-01&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;death&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-02-01&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;hired&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-02-01&quot;</span><span class="p">,</span> <span class="s2">&quot;organization&quot;</span><span class="p">:</span> <span class="s2">&quot;Org1&quot;</span><span class="p">},</span>
+            <span class="p">]},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;n2&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;organizations&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Org1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;org1&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Org2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;org2&quot;</span><span class="p">,</span> <span class="s2">&quot;found_date&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-01-01&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows_dataframe</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age_in_years</th>
+      <th>history</th>
+      <th>id</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>[{'event': 'birth', 'date': '2021-01-01'}, {'e...</td>
+      <td>1</td>
+      <td>n1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>30.0</td>
+      <td>None</td>
+      <td>2</td>
+      <td>n2</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Schemas">
+<h2>Schemas<a class="headerlink" href="#Schemas" title="Link to this heading"></a></h2>
+<p>Every Database has a <strong>schema</strong>. These can be provided explicitly via a LinkML specification, or they can be <em>induced</em> from data.</p>
+<p>In the first example, the schema is induced. We can query it:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_runtime.dumpers</span> <span class="kn">import</span> <span class="n">yaml_dumper</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">yaml_dumper</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+name: Person
+from_schema: http://example.org/test-schema
+attributes:
+  id:
+    name: id
+    from_schema: http://example.org/test-schema
+    multivalued: false
+    range: string
+    inlined: false
+  name:
+    name: name
+    from_schema: http://example.org/test-schema
+    multivalued: false
+    range: string
+    inlined: false
+  occupation:
+    name: occupation
+    from_schema: http://example.org/test-schema
+    multivalued: false
+    range: string
+    inlined: false
+  moon:
+    name: moon
+    from_schema: http://example.org/test-schema
+    multivalued: false
+    range: string
+    inlined: false
+</pre></div></div>
+</div>
+</section>
+<section id="Asserting-schemas">
+<h2>Asserting schemas<a class="headerlink" href="#Asserting-schemas" title="Link to this heading"></a></h2>
+<p>Inducing schemas is useful for quick operations but in general you are better specifying a schema up-front. This makes things more explicit, and in future can be used to do things like validate at time of insertion.</p>
+<p><strong>TODO</strong></p>
+</section>
+<section id="Other-adapters">
+<h2>Other adapters<a class="headerlink" href="#Other-adapters" title="Link to this heading"></a></h2>
+<p><strong>TODO</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to the linkml-store documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules.html" class="btn btn-neutral float-right" title="linkml_store" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Author 1 &lt;author@org.org&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

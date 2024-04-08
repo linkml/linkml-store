@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monarch-KG notebook &mdash; linkml-store  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            linkml-store
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">linkml-store</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Monarch-KG notebook</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/Monarch-KG.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Monarch-KG-notebook">
+<h1>Monarch-KG notebook<a class="headerlink" href="#Monarch-KG-notebook" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.constants</span> <span class="kn">import</span> <span class="n">LINKML_STORE_MODULE</span>
+
+<span class="n">MONARCH_KG_DB</span> <span class="o">=</span> <span class="s2">&quot;https://data.monarchinitiative.org/monarch-kg/latest/monarch-kg.db.gz&quot;</span>
+
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">LINKML_STORE_MODULE</span><span class="o">.</span><span class="n">ensure_gunzip</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">MONARCH_KG_DB</span><span class="p">,</span> <span class="n">autoclean</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;duckdb:///</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;monarch-kg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">edges_coll</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;denormalized_edges&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">edges_coll</span><span class="o">.</span><span class="n">find</span><span class="p">()</span>
+<span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "182b69dcd1fa463abdf10c1d9c1bc6b0"}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>aggregator_knowledge_source</th>
+      <th>category</th>
+      <th>evidence</th>
+      <th>frequency_qualifier</th>
+      <th>has_evidence</th>
+      <th>id</th>
+      <th>knowledge_source</th>
+      <th>negated</th>
+      <th>object</th>
+      <th>object_category</th>
+      <th>...</th>
+      <th>qualifiers</th>
+      <th>relation</th>
+      <th>sex_qualifier</th>
+      <th>stage_qualifier</th>
+      <th>subject</th>
+      <th>subject_category</th>
+      <th>subject_closure</th>
+      <th>subject_closure_label</th>
+      <th>subject_label</th>
+      <th>subject_namespace</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:9d3db3b3-0e55-462f-9876-b125014e7a63</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:100147</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:62070</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:35757|CHEBI:62070</td>
+      <td>monocarboxylic acid anion|nalidixic acid anion</td>
+      <td>nalidixic acid anion</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:fbc60452-f951-4f81-8dcf-bcc20834e7ab</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:100241</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:192484</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:27369|CHEBI:192484</td>
+      <td>ciprofloxacin zwitterion|zwitterion</td>
+      <td>ciprofloxacin zwitterion</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:fe862fe6-0ae3-4f83-97ec-39f1d7683a87</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:100241</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:192486</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:137419|CHEBI:192486</td>
+      <td>secondary ammonium ion|ciprofloxacin(1+)</td>
+      <td>ciprofloxacin(1+)</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:773f1b21-bf81-4208-ab59-448545ffe46b</td>
+      <td>Graph</td>
+      <td></td>
+      <td>CHEBI:10545</td>
+      <td>biolink:ChemicalSubstance</td>
+      <td>...</td>
+      <td></td>
+      <td>BFO:0000051</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:33250</td>
+      <td>biolink:ChemicalEntity</td>
+      <td>CHEBI:24431|CHEBI:33250</td>
+      <td>chemical entity|atom</td>
+      <td>atom</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:83584793-1852-4166-9723-24287c85f136</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:10642</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:27405</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:24436|CHEBI:61689|CHEBI:27405</td>
+      <td>guanidines|streptidine|amino cyclitol</td>
+      <td>streptidine</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:2e2135d0-f67b-4f18-bf6d-363e2a70a42f</td>
+      <td>Graph</td>
+      <td></td>
+      <td>CHEBI:133135</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>rdfs:subClassOf</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:72579</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:133135|CHEBI:72579</td>
+      <td>chromenochromene|tetrahydrochromenochromene</td>
+      <td>tetrahydrochromenochromene</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:d93f9e52-2825-436b-91fb-97ea82d01a83</td>
+      <td>Graph</td>
+      <td></td>
+      <td>CHEBI:133251</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>rdfs:subClassOf</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:17325</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:133251|CHEBI:17325</td>
+      <td>3-hydroxydicarboxylate(2-)|3-hydroxy-3-methylg...</td>
+      <td>3-hydroxy-3-methylglutarate(2-)</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:e1d4dc4d-3142-48cf-ba4d-1946638d61eb</td>
+      <td>Graph</td>
+      <td></td>
+      <td>CHEBI:133291</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>rdfs:subClassOf</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:15792</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:133291|CHEBI:15792</td>
+      <td>saturated dicarboxylic acid dianion(2-)|malona...</td>
+      <td>malonate(2-)</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:341fe57a-f81c-4e50-83d7-c755e74f48a1</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:133294</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:36145</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:35692|CHEBI:25754|CHEBI:36145</td>
+      <td>oxo carboxylic acid|dicarboxylic acid|oxo dica...</td>
+      <td>oxo dicarboxylic acid</td>
+      <td>CHEBI</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>urn:uuid:40cd5ad8-e276-4e68-905a-0776fff6cb52</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:133538</td>
+      <td>biolink:MolecularEntity</td>
+      <td>...</td>
+      <td></td>
+      <td>OBO:chebi</td>
+      <td></td>
+      <td></td>
+      <td>CHEBI:18019</td>
+      <td>biolink:MolecularEntity</td>
+      <td>CHEBI:25094|CHEBI:22658|CHEBI:18019</td>
+      <td>L-lysine|aspartate family amino acid|lysine</td>
+      <td>L-lysine</td>
+      <td>CHEBI</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 31 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;subject_category&quot;</span><span class="p">,</span> <span class="s2">&quot;object_category&quot;</span><span class="p">)</span>
+<span class="n">facets</span> <span class="o">=</span> <span class="n">edges_coll</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "a3fbf5b3441b41749f262ee384a41030"}</script></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="k">def</span> <span class="nf">heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+
+    <span class="c1"># Convert data into a DataFrame</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Pivot the data to create a matrix suitable for a heatmap</span>
+    <span class="n">pivot_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Source&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Value&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="c1"># Plot the heatmap</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">pivot_df</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.0f&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;YlGnBu&quot;</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Frequency&#39;</span><span class="p">})</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Heatmap of Biolink Data Frequencies&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">facets</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_Monarch-KG_9_0.png" src="../_images/examples_Monarch-KG_9_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span><span class="o">.</span><span class="n">list_collections</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[DuckDBCollection(name=&#39;dangling_edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: ..., &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
+ DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: ..., &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
+ DuckDBCollection(name=&#39;edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: ..., &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
+ DuckDBCollection(name=&#39;nodes&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: ...}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None)]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Author 1 &lt;author@org.org&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

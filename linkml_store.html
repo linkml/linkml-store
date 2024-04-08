@@ -18,6 +18,7 @@
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,12 +47,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">linkml_store</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">linkml_store package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linkml_store.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.attach_database"><code class="docutils literal notranslate"><span class="pre">Client.attach_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.databases"><code class="docutils literal notranslate"><span class="pre">Client.databases</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.get_database"><code class="docutils literal notranslate"><span class="pre">Client.get_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.handle"><code class="docutils literal notranslate"><span class="pre">Client.handle</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-linkml_store.constants">linkml_store.constants module</a></li>
 </ul>
 </li>
 </ul>
@@ -85,26 +96,188 @@
              
   <section id="module-linkml_store">
 <span id="linkml-store-package"></span><h1>linkml_store package<a class="headerlink" href="#module-linkml_store" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.Client">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A client provides access to named collections.</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<span class="go">&#39;P1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+<span class="go">&#39;Alice&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+<span class="go">&#39;John&#39;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.Client.attach_database">
+<span class="sig-name descname"><span class="pre">attach_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client.attach_database" title="Link to this definition"></a></dt>
+<dd><p>Associate a database with a handle.</p>
+<section id="id1">
+<h3>Examples<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;memory&quot;</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///tmp/another.db&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;disk&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;disk&quot;</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type handle<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+<dt class="field-even">param handle<span class="colon">:</span></dt>
+<dd class="field-even"><p>handle for the database, e.g. duckdb:///foo.db</p>
+</dd>
+<dt class="field-odd">type alias<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">param alias<span class="colon">:</span></dt>
+<dd class="field-even"><p>alias for the database, e.g foo</p>
+</dd>
+<dt class="field-odd">type schema_view<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">SchemaView</span></code>]</span></p>
+</dd>
+<dt class="field-even">param schema_view<span class="colon">:</span></dt>
+<dd class="field-even"><p>schema view to associate with the database</p>
+</dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></span></p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.Client.databases">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">databases</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><span class="pre">Database</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#linkml_store.Client.databases" title="Link to this definition"></a></dt>
+<dd><p>Return all attached databases</p>
+<section id="id2">
+<h3>Examples<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;test1&quot;</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;test2&quot;</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="s2">&quot;test1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">handle</span>
+<span class="go">&#39;duckdb:///:memory:&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="s2">&quot;test2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">handle</span>
+<span class="go">&#39;duckdb:///:memory:&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">return<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.Client.get_database">
+<span class="sig-name descname"><span class="pre">get_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_if_not_exists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client.get_database" title="Link to this definition"></a></dt>
+<dd><p>Get a named database.</p>
+<section id="id3">
+<h3>Examples<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///test.db&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">retrieved_db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">==</span> <span class="n">retrieved_db</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type name<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">param name<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type create_if_not_exists<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param create_if_not_exists<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></span></p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.Client.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#linkml_store.Client.handle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
 <section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.attach_database"><code class="docutils literal notranslate"><span class="pre">Client.attach_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.databases"><code class="docutils literal notranslate"><span class="pre">Client.databases</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.get_database"><code class="docutils literal notranslate"><span class="pre">Client.get_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.handle"><code class="docutils literal notranslate"><span class="pre">Client.handle</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection"><code class="docutils literal notranslate"><span class="pre">Collection</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.add"><code class="docutils literal notranslate"><span class="pre">Collection.add()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.attach_index"><code class="docutils literal notranslate"><span class="pre">Collection.attach_index()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.class_definition"><code class="docutils literal notranslate"><span class="pre">Collection.class_definition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.delete"><code class="docutils literal notranslate"><span class="pre">Collection.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.delete_where"><code class="docutils literal notranslate"><span class="pre">Collection.delete_where()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.export_data"><code class="docutils literal notranslate"><span class="pre">Collection.export_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.find"><code class="docutils literal notranslate"><span class="pre">Collection.find()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.get"><code class="docutils literal notranslate"><span class="pre">Collection.get()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.identifier_field"><code class="docutils literal notranslate"><span class="pre">Collection.identifier_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.import_data"><code class="docutils literal notranslate"><span class="pre">Collection.import_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.induce_class_definition_from_objects"><code class="docutils literal notranslate"><span class="pre">Collection.induce_class_definition_from_objects()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.name"><code class="docutils literal notranslate"><span class="pre">Collection.name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.parent"><code class="docutils literal notranslate"><span class="pre">Collection.parent</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.peek"><code class="docutils literal notranslate"><span class="pre">Collection.peek()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.query"><code class="docutils literal notranslate"><span class="pre">Collection.query()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.query_facets"><code class="docutils literal notranslate"><span class="pre">Collection.query_facets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.search"><code class="docutils literal notranslate"><span class="pre">Collection.search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Collection.update"><code class="docutils literal notranslate"><span class="pre">Collection.update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database"><code class="docutils literal notranslate"><span class="pre">Database</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.commit"><code class="docutils literal notranslate"><span class="pre">Database.commit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.create_collection"><code class="docutils literal notranslate"><span class="pre">Database.create_collection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.get_collection"><code class="docutils literal notranslate"><span class="pre">Database.get_collection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.handle"><code class="docutils literal notranslate"><span class="pre">Database.handle</span></code></a></li>
@@ -114,6 +287,7 @@
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.query"><code class="docutils literal notranslate"><span class="pre">Database.query()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.schema_view"><code class="docutils literal notranslate"><span class="pre">Database.schema_view</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.set_schema_view"><code class="docutils literal notranslate"><span class="pre">Database.set_schema_view()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.store"><code class="docutils literal notranslate"><span class="pre">Database.store()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.MetaData"><code class="docutils literal notranslate"><span class="pre">MetaData</span></code></a><ul>
@@ -143,22 +317,30 @@
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#module-linkml_store.api.collection">linkml_store.api.collection module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection"><code class="docutils literal notranslate"><span class="pre">Collection</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.add"><code class="docutils literal notranslate"><span class="pre">Collection.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.attach_index"><code class="docutils literal notranslate"><span class="pre">Collection.attach_index()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.class_definition"><code class="docutils literal notranslate"><span class="pre">Collection.class_definition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.delete"><code class="docutils literal notranslate"><span class="pre">Collection.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.delete_where"><code class="docutils literal notranslate"><span class="pre">Collection.delete_where()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.export_data"><code class="docutils literal notranslate"><span class="pre">Collection.export_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.find"><code class="docutils literal notranslate"><span class="pre">Collection.find()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.get"><code class="docutils literal notranslate"><span class="pre">Collection.get()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.identifier_field"><code class="docutils literal notranslate"><span class="pre">Collection.identifier_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.import_data"><code class="docutils literal notranslate"><span class="pre">Collection.import_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.induce_class_definition_from_objects"><code class="docutils literal notranslate"><span class="pre">Collection.induce_class_definition_from_objects()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.name"><code class="docutils literal notranslate"><span class="pre">Collection.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.parent"><code class="docutils literal notranslate"><span class="pre">Collection.parent</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.peek"><code class="docutils literal notranslate"><span class="pre">Collection.peek()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.query"><code class="docutils literal notranslate"><span class="pre">Collection.query()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.query_facets"><code class="docutils literal notranslate"><span class="pre">Collection.query_facets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.search"><code class="docutils literal notranslate"><span class="pre">Collection.search()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection.update"><code class="docutils literal notranslate"><span class="pre">Collection.update()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#module-linkml_store.api.database">linkml_store.api.database module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database"><code class="docutils literal notranslate"><span class="pre">Database</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.commit"><code class="docutils literal notranslate"><span class="pre">Database.commit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.create_collection"><code class="docutils literal notranslate"><span class="pre">Database.create_collection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.get_collection"><code class="docutils literal notranslate"><span class="pre">Database.get_collection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.handle"><code class="docutils literal notranslate"><span class="pre">Database.handle</span></code></a></li>
@@ -168,6 +350,19 @@
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.query"><code class="docutils literal notranslate"><span class="pre">Database.query()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.schema_view"><code class="docutils literal notranslate"><span class="pre">Database.schema_view</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.set_schema_view"><code class="docutils literal notranslate"><span class="pre">Database.set_schema_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.store"><code class="docutils literal notranslate"><span class="pre">Database.store()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#module-linkml_store.api.index">linkml_store.api.index module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index"><code class="docutils literal notranslate"><span class="pre">Index</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.distance_function"><code class="docutils literal notranslate"><span class="pre">Index.distance_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.index_function"><code class="docutils literal notranslate"><span class="pre">Index.index_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Index.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.model_config"><code class="docutils literal notranslate"><span class="pre">Index.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.model_fields"><code class="docutils literal notranslate"><span class="pre">Index.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.index.Index.name"><code class="docutils literal notranslate"><span class="pre">Index.name</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -182,9 +377,15 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#module-linkml_store.api.queries">linkml_store.api.queries module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Between"><code class="docutils literal notranslate"><span class="pre">Between</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Between.max"><code class="docutils literal notranslate"><span class="pre">Between.max</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Between.min"><code class="docutils literal notranslate"><span class="pre">Between.min</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.facet_count_sql"><code class="docutils literal notranslate"><span class="pre">Query.facet_count_sql()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.facet_slots"><code class="docutils literal notranslate"><span class="pre">Query.facet_slots</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.from_table"><code class="docutils literal notranslate"><span class="pre">Query.from_table</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.include_facet_counts"><code class="docutils literal notranslate"><span class="pre">Query.include_facet_counts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.limit"><code class="docutils literal notranslate"><span class="pre">Query.limit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Query.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.model_config"><code class="docutils literal notranslate"><span class="pre">Query.model_config</span></code></a></li>
@@ -192,12 +393,12 @@
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.offset"><code class="docutils literal notranslate"><span class="pre">Query.offset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.select_cols"><code class="docutils literal notranslate"><span class="pre">Query.select_cols</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.sort_by"><code class="docutils literal notranslate"><span class="pre">Query.sort_by</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.sql"><code class="docutils literal notranslate"><span class="pre">Query.sql()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.Query.where_clause"><code class="docutils literal notranslate"><span class="pre">Query.where_clause</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult"><code class="docutils literal notranslate"><span class="pre">QueryResult</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config"><code class="docutils literal notranslate"><span class="pre">QueryResult.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.facet_counts"><code class="docutils literal notranslate"><span class="pre">QueryResult.facet_counts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">QueryResult.model_computed_fields</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_config"><code class="docutils literal notranslate"><span class="pre">QueryResult.model_config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_fields"><code class="docutils literal notranslate"><span class="pre">QueryResult.model_fields</span></code></a></li>
@@ -205,6 +406,7 @@
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.num_rows"><code class="docutils literal notranslate"><span class="pre">QueryResult.num_rows</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.offset"><code class="docutils literal notranslate"><span class="pre">QueryResult.offset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.query"><code class="docutils literal notranslate"><span class="pre">QueryResult.query</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.ranked_rows"><code class="docutils literal notranslate"><span class="pre">QueryResult.ranked_rows</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows"><code class="docutils literal notranslate"><span class="pre">QueryResult.rows</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows_dataframe"><code class="docutils literal notranslate"><span class="pre">QueryResult.rows_dataframe</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.queries.QueryResult.set_rows"><code class="docutils literal notranslate"><span class="pre">QueryResult.set_rows()</span></code></a></li>
@@ -216,6 +418,12 @@
 </li>
 </ul>
 </div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-linkml_store.constants">
+<span id="linkml-store-constants-module"></span><h2>linkml_store.constants module<a class="headerlink" href="#module-linkml_store.constants" title="Link to this heading"></a></h2>
 </section>
 </section>
 

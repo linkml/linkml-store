@@ -41,6 +41,14 @@ linkml\_store.api.database module
    :undoc-members:
    :show-inheritance:
 
+linkml\_store.api.index module
+------------------------------
+
+.. automodule:: linkml_store.api.index
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 linkml\_store.api.metadata module
 ---------------------------------
 
