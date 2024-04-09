@@ -83,7 +83,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pystow</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pystow</span>
 </pre></div>
 </div>
 </div>
@@ -169,12 +170,151 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">attach_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">nodes_collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;sugar transporters&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "fc12210d1b814e2b831b8441bc7d0799"}</script></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sim&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;lbl&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sim</th>
+      <th>id</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.797146</td>
+      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.2</td>
+      <td>ABC-type oligosaccharide transporter</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.792401</td>
+      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.1</td>
+      <td>ABC-type maltose transporter</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.791816</td>
+      <td>http://purl.obolibrary.org/obo/eccode_7.3.2.3</td>
+      <td>ABC-type sulfate transporter</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.791232</td>
+      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.11</td>
+      <td>ABC-type D-galactose transporter</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.789132</td>
+      <td>http://purl.obolibrary.org/obo/eccode_7.6.2.12</td>
+      <td>ABC-type capsular-polysaccharide transporter</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>7172</th>
+      <td>0.673991</td>
+      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.57</td>
+      <td>caspase-4</td>
+    </tr>
+    <tr>
+      <th>7173</th>
+      <td>0.673331</td>
+      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.63</td>
+      <td>caspase-10</td>
+    </tr>
+    <tr>
+      <th>7174</th>
+      <td>0.670908</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.14.99</td>
+      <td>Miscellaneous</td>
+    </tr>
+    <tr>
+      <th>7175</th>
+      <td>0.668042</td>
+      <td>http://purl.obolibrary.org/obo/eccode_3.4.24.4</td>
+      <td>3.4.24.30, 3.4.24.31, 3.4.24.32, 3.4.24.39 and...</td>
+    </tr>
+    <tr>
+      <th>7176</th>
+      <td>0.663048</td>
+      <td>http://www.geneontology.org/formats/oboInOwl#h...</td>
+      <td>has_obo_format_version</td>
+    </tr>
+  </tbody>
+</table>
+<p>7177 rows × 3 columns</p>
+</div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:

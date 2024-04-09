@@ -17,6 +17,7 @@
    "execution_count": 1,
    "outputs": [],
    "source": [
+    "import pandas as pd\n",
     "import pystow"
    ],
    "metadata": {
@@ -175,19 +176,107 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 10,
    "outputs": [],
    "source": [
     "nodes_collection.attach_index(index)"
    ],
    "metadata": {
     "collapsed": false,
-    "is_executing": true,
     "ExecuteTime": {
+     "end_time": "2024-04-09T23:36:56.250827Z",
      "start_time": "2024-04-09T23:15:17.203593Z"
     }
    },
    "id": "993c0360941dbb3b"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "outputs": [
+    {
+     "data": {
+      "text/plain": "FloatProgress(value=0.0, layout=Layout(width='auto'), style=ProgressStyle(bar_color='black'))",
+      "application/vnd.jupyter.widget-view+json": {
+       "version_major": 2,
+       "version_minor": 0,
+       "model_id": "fc12210d1b814e2b831b8441bc7d0799"
+      }
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "qr = nodes_collection.search(\"sugar transporters\")"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-09T23:49:53.572209Z",
+     "start_time": "2024-04-09T23:49:49.405422Z"
+    }
+   },
+   "id": "e3abb5d529063c6e"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "outputs": [],
+   "source": [
+    "results = [{\"sim\": r[0], \"id\": r[1][\"id\"], \"name\": r[1][\"lbl\"]} for r in qr.ranked_rows]"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-09T23:51:25.885621Z",
+     "start_time": "2024-04-09T23:51:25.879513Z"
+    }
+   },
+   "id": "cc3bce09e81d66a"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "df = pd.DataFrame(results)"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-09T23:51:40.405772Z",
+     "start_time": "2024-04-09T23:51:40.402585Z"
+    }
+   },
+   "id": "5b9d6d63561b72db"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "outputs": [
+    {
+     "data": {
+      "text/plain": "           sim                                                 id  \\\n0     0.797146      http://purl.obolibrary.org/obo/eccode_7.5.2.2   \n1     0.792401      http://purl.obolibrary.org/obo/eccode_7.5.2.1   \n2     0.791816      http://purl.obolibrary.org/obo/eccode_7.3.2.3   \n3     0.791232     http://purl.obolibrary.org/obo/eccode_7.5.2.11   \n4     0.789132     http://purl.obolibrary.org/obo/eccode_7.6.2.12   \n...        ...                                                ...   \n7172  0.673991    http://purl.obolibrary.org/obo/eccode_3.4.22.57   \n7173  0.673331    http://purl.obolibrary.org/obo/eccode_3.4.22.63   \n7174  0.670908      http://purl.obolibrary.org/obo/eccode_1.14.99   \n7175  0.668042     http://purl.obolibrary.org/obo/eccode_3.4.24.4   \n7176  0.663048  http://www.geneontology.org/formats/oboInOwl#h...   \n\n                                                   name  \n0                  ABC-type oligosaccharide transporter  \n1                          ABC-type maltose transporter  \n2                          ABC-type sulfate transporter  \n3                      ABC-type D-galactose transporter  \n4          ABC-type capsular-polysaccharide transporter  \n...                                                 ...  \n7172                                          caspase-4  \n7173                                         caspase-10  \n7174                                      Miscellaneous  \n7175  3.4.24.30, 3.4.24.31, 3.4.24.32, 3.4.24.39 and...  \n7176                             has_obo_format_version  \n\n[7177 rows x 3 columns]",
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>sim</th>\n      <th>id</th>\n      <th>name</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0.797146</td>\n      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.2</td>\n      <td>ABC-type oligosaccharide transporter</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>0.792401</td>\n      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.1</td>\n      <td>ABC-type maltose transporter</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>0.791816</td>\n      <td>http://purl.obolibrary.org/obo/eccode_7.3.2.3</td>\n      <td>ABC-type sulfate transporter</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>0.791232</td>\n      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.11</td>\n      <td>ABC-type D-galactose transporter</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>0.789132</td>\n      <td>http://purl.obolibrary.org/obo/eccode_7.6.2.12</td>\n      <td>ABC-type capsular-polysaccharide transporter</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>7172</th>\n      <td>0.673991</td>\n      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.57</td>\n      <td>caspase-4</td>\n    </tr>\n    <tr>\n      <th>7173</th>\n      <td>0.673331</td>\n      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.63</td>\n      <td>caspase-10</td>\n    </tr>\n    <tr>\n      <th>7174</th>\n      <td>0.670908</td>\n      <td>http://purl.obolibrary.org/obo/eccode_1.14.99</td>\n      <td>Miscellaneous</td>\n    </tr>\n    <tr>\n      <th>7175</th>\n      <td>0.668042</td>\n      <td>http://purl.obolibrary.org/obo/eccode_3.4.24.4</td>\n      <td>3.4.24.30, 3.4.24.31, 3.4.24.32, 3.4.24.39 and...</td>\n    </tr>\n    <tr>\n      <th>7176</th>\n      <td>0.663048</td>\n      <td>http://www.geneontology.org/formats/oboInOwl#h...</td>\n      <td>has_obo_format_version</td>\n    </tr>\n  </tbody>\n</table>\n<p>7177 rows × 3 columns</p>\n</div>"
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-09T23:51:42.967147Z",
+     "start_time": "2024-04-09T23:51:42.954407Z"
+    }
+   },
+   "id": "dc81533a0b074360"
   },
   {
    "cell_type": "code",
@@ -197,7 +286,7 @@
    "metadata": {
     "collapsed": false
    },
-   "id": "e3abb5d529063c6e"
+   "id": "864179ee57c531f6"
   }
  ],
  "metadata": {
