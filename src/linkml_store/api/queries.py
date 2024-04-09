@@ -35,7 +35,7 @@ class QueryResult(BaseModel):
     A query result
     """
 
-    query: Query
+    query: Optional[Query] = None
     num_rows: int
     offset: Optional[int] = 0
     rows: Optional[List[Dict[str, Any]]] = None

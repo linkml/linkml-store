@@ -44,6 +44,7 @@ class Database(ABC):
     """
 
     handle: Optional[str] = None
+    recreate_if_exists: Optional[bool] = False
     _schema_view: Optional[SchemaView] = None
     _collections: Optional[Dict[str, Collection]] = None
 
@@ -55,12 +56,22 @@ class Database(ABC):
         :param kwargs: additional arguments
         """
         for k, v in obj.items():
+            if not isinstance(v, list):
+                continue
+            if not v:
+                continue
             collection = self.get_collection(k, create_if_not_exists=True)
             collection.add(v)
 
     def commit(self, **kwargs):
         """
         Commit any pending changes to the database
+        """
+        raise NotImplementedError()
+
+    def close(self, **kwargs):
+        """
+        Close the database and all connection objects
         """
         raise NotImplementedError()
 
@@ -135,6 +146,12 @@ class Database(ABC):
         return self._collections[name]
 
     def init_collections(self):
+        """
+        Initialize collections.
+
+        Not typically called directly: consider making hidden
+        :return:
+        """
         raise NotImplementedError
 
     def query(self, query: Query, **kwargs) -> QueryResult:

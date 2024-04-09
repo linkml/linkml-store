@@ -1,3 +1,6 @@
+import json
+
+import pystow
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
@@ -6,6 +9,7 @@ from linkml_store.api.client import Client
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.constants import LINKML_STORE_MODULE
+from linkml_store.index.implementations.simple_index import SimpleIndex
 from linkml_store.utils.sql_utils import introspect_schema
 
 from tests import INPUT_DIR
@@ -227,7 +231,8 @@ def test_schema(schema_view, handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
-def test_facets(schema_view, handle):
+@pytest.mark.parametrize("index_class", [SimpleIndex])
+def test_facets(schema_view, handle, index_class):
     client = create_client(handle)
     database = client.get_database()
     database.set_schema_view(schema_view)
@@ -238,6 +243,18 @@ def test_facets(schema_view, handle):
         {"id": "P3", "name": "n3", "occupation": "Bricklayer", "moon": "Io"},
     ]
     collection.add(objs)
+    ix = index_class(name="test")
+    collection.attach_index(ix)
+    cases = [
+        ("Bricklayer", "P3"),
+        ("bricks", "P3"),
+        ("welder on Io", "P1"),
+        ("welding on europa", "P2"),
+        ]
+    for q, expected_top in cases:
+        results = collection.search(q).ranked_rows
+        top_result = results[0][1]
+        assert top_result["id"] == expected_top
     r = collection.query_facets(facet_columns=["occupation"])
     assert r == {"occupation": [("Welder", 2), ("Bricklayer", 1)]}
     cases = [
@@ -292,6 +309,38 @@ def test_integration_kg():
     qr = collection.find()
     print(qr.num_rows)
     print(qr.rows_dataframe)
+
+
+@pytest.mark.integration
+def test_integration_store():
+    path=pystow.ensure("tmp", "eccode.json", url="https://w3id.org/biopragmatics/resources/eccode/eccode.json")
+    graphdoc = json.load(open(path))
+    graph = graphdoc["graphs"][0]
+    client = Client()
+    db = client.attach_database("duckdb")
+    #db.store(graph)
+    #coll = db.create_collection("Edge", "edges")
+    #coll.induce_class_definition_from_objects(graph["edges"])
+    #cd = coll.class_definition()
+    #assert cd is not None
+    #assert len(cd.attributes) > 2
+    #coll.add(graph["edges"])
+    coll = db.create_collection("Node", "nodes")
+    coll.add(graph["nodes"])
+    index = SimpleIndex(name="test")
+    coll.attach_index(index)
+    cases = [
+        "lyase",
+        "lysine",
+        "abc"
+    ]
+    for case in cases:
+        results = coll.search(case).ranked_rows
+        print(f"Results for {case}")
+        for score, r in results[0:3]:
+            print(f"  * {score} :: {r['id']} :: {r['lbl']}")
+
+
 
 
 def test_sql_utils():

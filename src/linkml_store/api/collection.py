@@ -1,14 +1,19 @@
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, TextIO, Type, Union
 
+import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
+from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
 import linkml_store.api as api
-from linkml_store.api.index import Index
+from linkml_store.index.index import Index
 from linkml_store.api.queries import Query, QueryResult
+
+logger = logging.getLogger(__name__)
 
 OBJECT = Union[Dict[str, Any], BaseModel, Type]
 
@@ -29,6 +34,7 @@ class Collection:
     name: str
     parent: Optional["api.Database"] = None
     _indexes: Optional[Dict[str, Index]] = None
+    hidden: Optional[bool] = False
 
     def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
@@ -115,55 +121,140 @@ class Collection:
         return self.query(query, **kwargs)
 
     def search(
-        self, query: str, where: Optional[Any] = None, index_name: Optional[str] = None, **kwargs
+        self, query: str, where: Optional[Any] = None, index_name: Optional[str] = None, limit: Optional[int] = None, **kwargs
     ) -> QueryResult:
+        """
+        Search the collection using a full-text search index.
+
+        :param query:
+        :param where:
+        :param index_name:
+        :param limit:
+        :param kwargs:
+        :return:
+        """
+        if index_name is None:
+            if len(self._indexes) == 1:
+                index_name = list(self._indexes.keys())[0]
+            else:
+                raise ValueError("Multiple indexes found. Please specify an index name.")
+        ix_coll = self.parent.get_collection(self._index_collection_name(index_name))
         ix = self._indexes.get(index_name)
-        ix_function = ix.index_function
-        distance_function = ix.distance_function
-        indexed_query = ix_function(query)
-        qr = self.find(where=where, **kwargs)
-        ranks_rows = []
-        for row in qr.rows:
-            indexed_row = ix_function(row)
-            dist = distance_function(indexed_query, indexed_row)
-        new_qr = QueryResult(query=qr.query, num_rows=len(filtered_rows))
-        new_qr.ranked_rows = ranks_rows
+        if not ix:
+            raise ValueError(f"No index named {index_name}")
+        qr = ix_coll.find(where=where, limit=-1, **kwargs)
+        index_col = ix.index_field
+        vector_pairs = [(row, np.array(row[index_col], dtype=float)) for row in qr.rows]
+        results = ix.search(query, vector_pairs, limit=limit)
+        new_qr = QueryResult(num_rows=len(results))
+        new_qr.ranked_rows = results
         return new_qr
 
-    def attach_index(self, index: Index, **kwargs):
-        raise NotImplementedError
+    def attach_index(self, index: Index, auto_index=True, **kwargs):
+        """
+        Attach an index to the collection.
+
+        :param index:
+        :param auto_index:
+        :param kwargs:
+        :return:
+        """
+        index_name = index.name
+        if not index_name:
+            raise ValueError("Index must have a name")
+        if not self._indexes:
+            self._indexes = {}
+        self._indexes[index_name] = index
+        if auto_index:
+            all_objs = self.find(limit=-1).rows
+            self.index_objects(all_objs, index_name, **kwargs)
+
+    def _index_collection_name(self, index_name: str) -> str:
+        return f"index__{self.name}_{index_name}"
+
+    def index_objects(self, objs: List[OBJECT], index_name: str, **kwargs):
+        """
+        Index a list of objects
+
+        :param objs:
+        :param index_name:
+        :param kwargs:
+        :return:
+        """
+        ix = self._indexes.get(index_name)
+        if not ix:
+            raise ValueError(f"No index named {index_name}")
+        ix_coll = self.parent.get_collection(self._index_collection_name(index_name), create_if_not_exists=True)
+        vectors = [list(float(e) for e in v) for v in ix.objects_to_vectors(objs)]
+        objects_with_ix = []
+        index_col = ix.index_field
+        for obj, vector in zip(objs, vectors):
+            # TODO: id field
+            objects_with_ix.append({**obj, **{index_col: vector}})
+        ix_coll.add(objects_with_ix, **kwargs)
 
     def peek(self, limit: Optional[int] = None) -> QueryResult:
         q = self._create_query()
         return self.query(q, limit=limit)
 
-    def identifier_field(self) -> FIELD_NAME:
-        raise NotImplementedError
 
     def class_definition(self) -> Optional[ClassDefinition]:
+        """
+        Return the class definition for the collection.
+
+        :return:
+        """
         sv = self.parent.schema_view
         if sv:
             return sv.get_class(self.name)
         return None
 
-    def induce_class_definition_from_objects(self, objs: List[OBJECT]) -> ClassDefinition:
+    def identifier_attribute_name(self) -> Optional[str]:
         """
-        Induce a class definition from a list of objects
+        Return the name of the identifier attribute for the collection.
+
+        :return: The name of the identifier attribute, if one exists.
+        """
+        cd = self.class_definition()
+        if cd:
+            for att in cd.attributes.values():
+                if att.identifier:
+                    return att.name
+        return None
+
+    def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size=10) -> ClassDefinition:
+        """
+        Induce a class definition from a list of objects.
+
+        This uses a heuristic procedure to infer the class definition from a list of objects.
+        In general it is recommended you explicitly provide a schema.
+
+        :param objs:
+        :param max_sample_size:
+        :return:
         """
         cd = ClassDefinition(self.name)
         keys = defaultdict(list)
-        for obj in objs:
+        for obj in objs[0:max_sample_size]:
             if isinstance(obj, BaseModel):
                 obj = obj.model_dump()
+            if not isinstance(obj, dict):
+                logger.warning(f"Skipping non-dict object: {obj}")
+                continue
             for k, v in obj.items():
                 keys[k].append(v)
         for k, vs in keys.items():
             multivalueds = []
             inlineds = []
             rngs = []
+            exact_dimensions_list = []
             for v in vs:
-                if not v:
+                if v is None:
                     continue
+                if isinstance(v, np.ndarray):
+                    rngs.append("float")
+                    exact_dimensions_list.append(v.shape)
+                    break
                 if isinstance(v, list):
                     v = v[0]
                     multivalueds.append(True)
@@ -186,17 +277,24 @@ class Collection:
                     rng = None
                     inlineds.append(True)
                 else:
-                    raise ValueError(f"No mappings for {type(v)} // v={v}")
+                    # raise ValueError(f"No mappings for {type(v)} // v={v}")
+                    rng = None
+                    inlineds.append(False)
                 rngs.append(rng)
             multivalued = any(multivalueds)
             inlined = any(inlineds)
             if multivalued and False in multivalueds:
                 raise ValueError(f"Mixed list non list: {vs} // inferred= {multivalueds}")
-            rng = rngs[0]
+            #if not rngs:
+            #    raise AssertionError(f"Empty rngs for {k} = {vs}")
+            rng = rngs[0] if rngs else None
             for other_rng in rngs:
                 if rng != other_rng:
                     raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
             cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined)
+            if exact_dimensions_list:
+                array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
+                cd.attributes[k].array = array_expr
         sv = self.parent.schema_view
         sv.schema.classes[self.name] = cd
         sv.set_modified()

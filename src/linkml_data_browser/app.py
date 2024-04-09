@@ -16,7 +16,7 @@ st.set_page_config(layout="wide")
 
 DEFAULT_LIMIT = 25
 
-TABLES = ["gaf_association"]
+TABLES = ["gaf_association", "gaf_association_plus_violations_m"]
 DBS = {
     "mgi": TABLES,
     "goa_human": TABLES,
@@ -43,10 +43,22 @@ def apply_filters(
 def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     """Render appropriate Streamlit widget based on column type."""
     logger.info("Rendering filter widget")
+    # print(f"{attribute.name} // RANGE={attribute.range}")
     col_type = attribute.range
     col_name = attribute.name
-    if col_type == "string":
-        return st.sidebar.text_input(f"Filter by {col_name}")
+    cols = st.sidebar.columns([1, 10])
+    with cols[0]:
+        if st.button("▼", key=f"facet_button_{col_name}", use_container_width=True):
+            # Toggle the facet view state for this filter
+            key = f"facet_view_{col_name}"
+            if key not in st.session_state:
+                st.session_state[key] = True
+            else:
+                st.session_state[key] = not st.session_state[key]
+    with cols[1]:
+        filter_value = st.text_input(f"Filter by {col_name}", key=f"filter_{col_name}")
+    return filter_value
+    #return st.sidebar.text_input(f"Filter by {col_name}")
     # elif col_type == "integer":
     #     max_value = con.execute(f"SELECT MAX({col_name}) FROM {tbl_name}").fetchall()[0][0]
     #     min_value = con.execute(f"SELECT MIN({col_name}) FROM {tbl_name}").fetchall()[0][0]
@@ -57,8 +69,6 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     #     return st.sidebar.slider(f"Filter by {col_name}", float(min_value), float(max_value),
     #                              (float(min_value), float(max_value)))
     # Add more data types as needed
-    else:
-        return None
 
 
 # Main function to render the app
@@ -69,7 +79,11 @@ def main():
     db_name = DB_PATH.format(db=selected_db)
     database = DuckDBDatabase(f"duckdb:///{db_name}")
     st.write(f"Connected to {selected_db}")
-    curr_table = DBS.get(selected_db)[0]
+    candidate_tables = DBS.get(selected_db)
+    if len(candidate_tables) > 1:
+        curr_table = st.selectbox("Select a Table", candidate_tables, key="table_selector")
+    else:
+        curr_table = DBS.get(selected_db)[0]
     collection = database.get_collection(curr_table)
     cd = collection.class_definition()
     filters = {}
@@ -93,9 +107,14 @@ def main():
             filters[att_name] = filter_widget
         new_value = filters.get(att_name)
         if prev_value != new_value:
-            print(f"CHANGE FOR {att_name}: {prev_value} -> {new_value}")
+            # print(f"CHANGE FOR {att_name}: {prev_value} -> {new_value}")
             filter_changed = True
-            st.session_state[key] = new_value
+            #st.session_state[key] = new_value
+        facet_key = f"facet_view_{att_name}"
+        if facet_key in st.session_state and st.session_state[facet_key]:
+            facet_results = collection.query_facets(filters, facet_columns=[att_name])
+            facet_df = pd.DataFrame(facet_results[att_name])
+            st.sidebar.write(facet_df)
     # If any filter has changed, reset pagination
     if filter_changed:
         st.session_state.current_page = 0  # Reset offset

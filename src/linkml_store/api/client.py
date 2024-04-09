@@ -42,7 +42,7 @@ class Client:
     _databases: Optional[Dict[str, Database]] = None
 
     def attach_database(
-        self, handle: str, alias: Optional[str] = None, schema_view: Optional[SchemaView] = None, **kwargs
+        self, handle: str, alias: Optional[str] = None, schema_view: Optional[SchemaView] = None, recreate_if_exists=False, **kwargs
     ) -> Database:
         """
         Associate a database with a handle.
@@ -74,7 +74,7 @@ class Client:
         if scheme not in HANDLE_MAP:
             raise ValueError(f"Unknown scheme: {scheme}")
         cls = HANDLE_MAP[scheme]
-        db = cls(handle=handle, **kwargs)
+        db = cls(handle=handle, recreate_if_exists=recreate_if_exists, **kwargs)
         if schema_view:
             db.set_schema_view(schema_view)
         if not alias:

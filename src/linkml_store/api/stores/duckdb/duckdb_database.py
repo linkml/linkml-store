@@ -75,6 +75,9 @@ class DuckDBDatabase(Database):
         with self.engine.connect() as conn:
             conn.commit()
 
+    def close(self, **kwargs):
+        self.engine.dispose()
+
     def query(self, query: Query, **kwargs) -> QueryResult:
         json_encoded_cols = []
         if query.from_table:
@@ -115,6 +118,7 @@ class DuckDBDatabase(Database):
             return qr
 
     def init_collections(self):
+        # TODO: unify schema introspection
         schema = introspect_schema(self.engine)
         table_names = schema.classes.keys()
         if self._collections is None:
@@ -134,6 +138,7 @@ class DuckDBDatabase(Database):
         return collection
 
     def induce_schema_view(self) -> SchemaView:
+        # TODO: unify schema introspection
         sb = SchemaBuilder()
         schema = sb.schema
         query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
@@ -142,21 +147,22 @@ class DuckDBDatabase(Database):
             table_names = [row["table_name"] for row in qr.rows]
             for tbl in table_names:
                 sb.add_class(tbl)
-            query = Query(from_table="information_schema.columns", sort_by=["ordinal_position"])
-            for row in self.query(query).rows:
-                tbl_name = row["table_name"]
-                if tbl_name not in sb.schema.classes:
-                    continue
-                dt = row["data_type"]
-                if dt.endswith("[]"):
-                    dt = dt[0:-2]
-                    multivalued = True
-                else:
-                    multivalued = False
-                rng = TYPE_MAP.get(dt, "string")
-                sd = SlotDefinition(
-                    row["column_name"], required=row["is_nullable"] == "NO", multivalued=multivalued, range=rng
-                )
-                sb.schema.classes[tbl_name].attributes[sd.name] = sd
+        query = Query(from_table="information_schema.columns",
+                      sort_by=["ordinal_position"])
+        for row in self.query(query, limit=-1).rows:
+            tbl_name = row["table_name"]
+            if tbl_name not in sb.schema.classes:
+                continue
+            dt = row["data_type"]
+            if dt.endswith("[]"):
+                dt = dt[0:-2]
+                multivalued = True
+            else:
+                multivalued = False
+            rng = TYPE_MAP.get(dt, "string")
+            sd = SlotDefinition(
+                row["column_name"], required=row["is_nullable"] == "NO", multivalued=multivalued, range=rng
+            )
+            sb.schema.classes[tbl_name].attributes[sd.name] = sd
         sb.add_defaults()
         return SchemaView(schema)

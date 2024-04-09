@@ -55,7 +55,9 @@ def query_to_sql(query: Query, count=False, limit=None, offset: Optional[int] = 
             limit = query.limit
         if limit is None:
             limit = 100
-        if limit:
+        if limit < 0:
+            limit = None
+        if limit is not None:
             sql_str.append(f" LIMIT {limit}")
         offset = offset if offset else query.offset
         if offset:
@@ -90,6 +92,12 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
 
 
 def introspect_schema(engine: sqlalchemy.Engine) -> SchemaDefinition:
+    """
+    Introspect a database schema and return a SchemaDefinition object
+
+    :param engine:
+    :return:
+    """
     metadata_obj = MetaData()
     logging.info(f"Reflecting using {engine}")
     metadata_obj.reflect(bind=engine)

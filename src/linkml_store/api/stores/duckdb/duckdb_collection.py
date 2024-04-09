@@ -20,18 +20,20 @@ class DuckDBCollection(Collection):
     def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
             objs = [objs]
+        if not objs:
+            return
         cd = self.class_definition()
         if not cd:
             cd = self.induce_class_definition_from_objects(objs)
         self._create_table(cd)
         table = self._sqla_table(cd)
         engine = self.parent.engine
+        col_names = [c.name for c in table.columns]
+        objs = [{k: obj.get(k, None) for k in col_names} for obj in objs]
         with engine.connect() as conn:
-            for obj in objs:
-                stmt = insert(table).values(**obj)
-                stmt = stmt.compile(engine)
-                _ = conn.execute(stmt)
-                conn.commit()
+            with conn.begin():
+                conn.execute(insert(table), objs)
+            conn.commit()
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
         if not isinstance(objs, list):
@@ -88,6 +90,8 @@ class DuckDBCollection(Collection):
             if att.inlined:
                 typ = sqla.JSON
             if att.multivalued:
+                typ = sqla.ARRAY(typ, dimensions=1)
+            if att.array:
                 typ = sqla.ARRAY(typ, dimensions=1)
             col = Column(att.name, typ)
             cols.append(col)
