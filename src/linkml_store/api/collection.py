@@ -9,7 +9,6 @@ from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
-import linkml_store.api as api
 from linkml_store.index.index import Index
 from linkml_store.api.queries import Query, QueryResult
 
