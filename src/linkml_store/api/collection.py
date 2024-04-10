@@ -2,15 +2,15 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TextIO, Type, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Type, Union
 
 import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
-from linkml_store.index.index import Index
 from linkml_store.api.queries import Query, QueryResult
+from linkml_store.index.index import Index
 
 if TYPE_CHECKING:
     from linkml_store.api.database import Database
