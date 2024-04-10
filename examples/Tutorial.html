@@ -52,7 +52,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">LinkML-Store Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Create-a-Client-object">Create a Client object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-databse">Attach and populate a DuckDB in-memory databse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Querying">Querying</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Faceting">Faceting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Plotting">Plotting</a></li>
@@ -105,8 +105,8 @@
 </div>
 </div>
 </section>
-<section id="Attach-and-populate-a-DuckDB-in-memory-databse">
-<h2>Attach and populate a DuckDB in-memory databse<a class="headerlink" href="#Attach-and-populate-a-DuckDB-in-memory-databse" title="Link to this heading"></a></h2>
+<section id="Attach-and-populate-a-DuckDB-in-memory-database">
+<h2>Attach and populate a DuckDB in-memory database<a class="headerlink" href="#Attach-and-populate-a-DuckDB-in-memory-database" title="Link to this heading"></a></h2>
 <p>Here we will create/attach a database to the client, and populate it with some JSON objects. Note that for this example, we don’t provide a schema - this is <em>induced</em> behind the scenes for us.</p>
 <p>We will use the <a class="reference external" href="linkml_store.api.stores.duckdb.rst">duckdb adapter</a>, which is currently the only one in linkml-store. This is a very flexible adapter that can work in-memory or on-disk, and can be used for “classic” relational data as well as complex nested objects.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">attach_database</span></code> method creates a new database or attaches to an existing one. Here we will specify <code class="docutils literal notranslate"><span class="pre">duckdb</span></code> with no additional parameters (you could pass a full sqlalchemy URI like <code class="docutils literal notranslate"><span class="pre">duckdb:////tmp/test.db</span></code> to create a disk-based database). We will also give it as alias <code class="docutils literal notranslate"><span class="pre">mem</span></code> so we can refer to it later.</p>
