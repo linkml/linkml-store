@@ -44,7 +44,7 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     """Render appropriate Streamlit widget based on column type."""
     logger.info("Rendering filter widget")
     # print(f"{attribute.name} // RANGE={attribute.range}")
-    col_type = attribute.range
+    # col_type = attribute.range
     col_name = attribute.name
     cols = st.sidebar.columns([1, 10])
     with cols[0]:
