@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 import pytest
-
 from linkml_store.index.implementations.llm_index import LLMIndex
 from linkml_store.index.implementations.simple_index import SimpleIndex
 
