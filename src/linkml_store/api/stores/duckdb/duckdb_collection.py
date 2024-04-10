@@ -3,7 +3,7 @@ from typing import Dict, List, Union, Optional, Any
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from sqlalchemy import Column, Table, insert, text, Dialect, delete
+from sqlalchemy import Column, Table, insert, text, delete
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection

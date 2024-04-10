@@ -42,7 +42,7 @@ class MongoDBCollection(Collection):
 
     def query_facets(self, where: Dict = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
         results = {}
-        cd = self.class_definition()
+        _cd = self.class_definition()
         collection = self.parent.database[self.name]
         if not facet_columns:
             facet_columns = list(self.class_definition().attributes.keys())
