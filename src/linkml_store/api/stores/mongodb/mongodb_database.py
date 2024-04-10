@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from pymongo import MongoClient
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
+from pymongo import MongoClient
 
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
