@@ -15,7 +15,7 @@ all-pytest:
 	$(RUN) pytest -m "integration or not integration"
 
 install-all:
-	poetry install -E analytics -E app -E tests -E llm
+	poetry install -E analytics -E app -E tests -E llm -E mongodb
 
 # not yet deployed
 doctest:
