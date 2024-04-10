@@ -2,7 +2,7 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TextIO, Type, Union
+from typing import Any, Dict, List, Optional, TextIO, Type, Union, TYPE_CHECKING
 
 import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
@@ -12,6 +12,9 @@ from pydantic import BaseModel
 import linkml_store.api as api
 from linkml_store.index.index import Index
 from linkml_store.api.queries import Query, QueryResult
+
+if TYPE_CHECKING:
+    from linkml_store.api.database import Database
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +35,7 @@ class Collection:
     """
 
     name: str
-    parent: Optional["api.Database"] = None
+    parent: Optional["Database"] = None
     _indexes: Optional[Dict[str, Index]] = None
     hidden: Optional[bool] = False
 
