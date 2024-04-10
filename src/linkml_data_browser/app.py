@@ -33,9 +33,7 @@ def init_reset_filters(cd: ClassDefinition, reset=False):
             st.session_state[key] = ""  # Assuming text input, adjust for other types
 
 
-def apply_filters(
-    collection: Collection, filters: Dict[str, Any], offset: int, limit: int, **kwargs
-):
+def apply_filters(collection: Collection, filters: Dict[str, Any], offset: int, limit: int, **kwargs):
     print(f"FILTERS={filters}")
     return collection.find(filters, offset=offset, limit=limit, **kwargs)
 
@@ -58,7 +56,7 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     with cols[1]:
         filter_value = st.text_input(f"Filter by {col_name}", key=f"filter_{col_name}")
     return filter_value
-    #return st.sidebar.text_input(f"Filter by {col_name}")
+    # return st.sidebar.text_input(f"Filter by {col_name}")
     # elif col_type == "integer":
     #     max_value = con.execute(f"SELECT MAX({col_name}) FROM {tbl_name}").fetchall()[0][0]
     #     min_value = con.execute(f"SELECT MIN({col_name}) FROM {tbl_name}").fetchall()[0][0]
@@ -109,7 +107,7 @@ def main():
         if prev_value != new_value:
             # print(f"CHANGE FOR {att_name}: {prev_value} -> {new_value}")
             filter_changed = True
-            #st.session_state[key] = new_value
+            # st.session_state[key] = new_value
         facet_key = f"facet_view_{att_name}"
         if facet_key in st.session_state and st.session_state[facet_key]:
             facet_results = collection.query_facets(filters, facet_columns=[att_name])

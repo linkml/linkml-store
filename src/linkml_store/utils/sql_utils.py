@@ -13,16 +13,18 @@ from linkml_store.api.queries import Query
 logger = logging.getLogger(__name__)
 
 TYPE_MAP = {
-    sqlt.TEXT: 'string',
-    sqlt.INTEGER: 'integer',
-    sqlt.FLOAT: 'float',
+    sqlt.TEXT: "string",
+    sqlt.INTEGER: "integer",
+    sqlt.FLOAT: "float",
 }
+
 
 def _map_type(typ: Type) -> str:
     for k, v in TYPE_MAP.items():
         if isinstance(typ, k):
             return v
-    return 'string'
+    return "string"
+
 
 def where_clause_to_sql(query: Query) -> str:
     if not query.where_clause:
@@ -82,8 +84,7 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
     from_table = query.from_table
     if multivalued:
         from_table = f"(SELECT UNNEST({facet_column}) as {facet_column} FROM {query.from_table})"
-    sql_str = [f"SELECT {facet_column}, COUNT(*) as count",
-               f"FROM {from_table}"]
+    sql_str = [f"SELECT {facet_column}, COUNT(*) as count", f"FROM {from_table}"]
     if modified_where:
         sql_str.append(f"{modified_where}")
     sql_str.append(f"GROUP BY {facet_column}")
@@ -119,7 +120,7 @@ def introspect_schema(engine: sqlalchemy.Engine) -> SchemaDefinition:
                 slot.identifier = True
             if column.foreign_keys:
                 for fk in column.foreign_keys:
-                    [fk_table, fk_table_col] = str(fk.column).split('.')
+                    [fk_table, fk_table_col] = str(fk.column).split(".")
                     slot.range = fk_table
             else:
                 slot.range = _map_type(column.type)

@@ -22,14 +22,14 @@ class SimpleIndex(Index):
         vector_length = self.vector_default_length
         text = text.lower()
         # trigrams
-        words = [text[i:i+3] for i in range(len(text)-2)]
+        words = [text[i : i + 3] for i in range(len(text) - 2)]
 
         vector = np.zeros(vector_length, dtype=float)
 
         # Iterate over each trigram in the text
         for word in words:
             # Generate a hash value for the word
-            hash_value = int(hashlib.sha1(word.encode('utf-8')).hexdigest(), 16)
+            hash_value = int(hashlib.sha1(word.encode("utf-8")).hexdigest(), 16)
 
             # Compute the index in the vector using modulo
             index = hash_value % vector_length

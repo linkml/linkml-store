@@ -10,6 +10,7 @@ class MongoDBCollection(Collection):
     """
     A wrapper around a MongoDB collection
     """
+
     def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
             objs = [objs]
@@ -48,7 +49,7 @@ class MongoDBCollection(Collection):
         for col in facet_columns:
             facet_pipeline = [
                 {"$match": where} if where else {"$match": {}},
-                {"$group": {"_id": f"${col}", "count": {"$sum": 1}}}
+                {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
             ]
             facet_results = list(collection.aggregate(facet_pipeline))
             results[col] = [(row["_id"], row["count"]) for row in facet_results]

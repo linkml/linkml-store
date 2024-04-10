@@ -121,7 +121,12 @@ class Collection:
         return self.query(query, **kwargs)
 
     def search(
-        self, query: str, where: Optional[Any] = None, index_name: Optional[str] = None, limit: Optional[int] = None, **kwargs
+        self,
+        query: str,
+        where: Optional[Any] = None,
+        index_name: Optional[str] = None,
+        limit: Optional[int] = None,
+        **kwargs,
     ) -> QueryResult:
         """
         Search the collection using a full-text search index.
@@ -196,7 +201,6 @@ class Collection:
     def peek(self, limit: Optional[int] = None) -> QueryResult:
         q = self._create_query()
         return self.query(q, limit=limit)
-
 
     def class_definition(self) -> Optional[ClassDefinition]:
         """
@@ -285,7 +289,7 @@ class Collection:
             inlined = any(inlineds)
             if multivalued and False in multivalueds:
                 raise ValueError(f"Mixed list non list: {vs} // inferred= {multivalueds}")
-            #if not rngs:
+            # if not rngs:
             #    raise AssertionError(f"Empty rngs for {k} = {vs}")
             rng = rngs[0] if rngs else None
             for other_rng in rngs:

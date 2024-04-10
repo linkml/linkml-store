@@ -16,6 +16,7 @@ class MongoDBDatabase(Database):
     """
     A wrapper around a MongoDB database
     """
+
     _client: MongoClient = None
     _database = None
 

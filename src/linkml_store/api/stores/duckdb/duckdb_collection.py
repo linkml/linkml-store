@@ -14,7 +14,6 @@ from linkml_store.utils.sql_utils import facet_count_sql
 
 @dataclass
 class DuckDBCollection(Collection):
-
     _table_created: bool = None
 
     def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
@@ -63,7 +62,6 @@ class DuckDBCollection(Collection):
             conn.execute(stmt)
             conn.commit()
         return 0
-
 
     def query_facets(self, where: Dict = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
         results = {}
