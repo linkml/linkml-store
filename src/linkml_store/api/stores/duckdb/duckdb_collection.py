@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Dict, List, Union, Optional, Any
+from typing import Any, Dict, List, Optional, Union
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from sqlalchemy import Column, Table, insert, text, delete
+from sqlalchemy import Column, Table, delete, insert, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection

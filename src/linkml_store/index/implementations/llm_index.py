@@ -11,7 +11,7 @@ class LLMIndex(Index):
     """
 
     embedding_model_name: str = "ada-002"
-    _embedding_model: "EmbeddingModel" = None
+    _embedding_model: "llm.EmbeddingModel" = None
 
     @property
     def embedding_model(self):
