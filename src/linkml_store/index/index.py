@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Dict, Any, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from pydantic import BaseModel
@@ -86,7 +86,6 @@ class Index(BaseModel):
         :param limit: The maximum number of results to return (optional)
         :return: A list of item IDs that match the query
         """
-        import numpy as np
 
         # Convert the query string to a vector
         query_vector = self.text_to_vector(query)
