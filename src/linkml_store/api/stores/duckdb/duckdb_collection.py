@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Dict, List, Union, Optional, Any
+from typing import Any, Dict, List, Optional, Union
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from sqlalchemy import Column, Table, insert, text, Dialect, delete
+from sqlalchemy import Column, Table, delete, insert, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
@@ -14,7 +14,6 @@ from linkml_store.utils.sql_utils import facet_count_sql
 
 @dataclass
 class DuckDBCollection(Collection):
-
     _table_created: bool = None
 
     def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
@@ -63,7 +62,6 @@ class DuckDBCollection(Collection):
             conn.execute(stmt)
             conn.commit()
         return 0
-
 
     def query_facets(self, where: Dict = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
         results = {}

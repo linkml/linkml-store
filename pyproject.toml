@@ -21,6 +21,7 @@ plotly = { version = "*", optional = true }
 pystow = "^0.5.4"
 black = { version=">=24.0.0", optional = true }
 llm = { version="*", optional = true }
+pymongo = { version="*", optional = true }
 pandas = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -48,6 +49,7 @@ analytics = ["pandas", "matplotlib", "seaborn", "plotly"]
 app = ["streamlit"]
 tests = ["black"]
 llm = ["llm"]
+mongodb = ["pymongo"]
 
 [tool.poetry.scripts]
 linkml-store = "linkml_store.cli:main"
@@ -109,7 +111,7 @@ max-complexity = 10
 
 [tool.codespell]
 # TODO: bring in tests in too
-skip = '.git,*.pdf,*.svg,./tests,pyproject.toml,*.dill,poetry.lock'
+skip = '.git,*.pdf,*.svg,./tests,pyproject.toml,*.dill,poetry.lock,*.ipynb'
 # Ignore table where words could be split across rows
 # Ignore shortcut specifications like [Ff]alse
 ignore-regex = '(\|.*\|.*\|.*\||\[[A-Z][a-z]\][a-z][a-z])'

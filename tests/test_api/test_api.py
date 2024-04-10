@@ -48,7 +48,16 @@ def create_client(handle: str) -> Client:
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
-@pytest.mark.parametrize("name_alias", [("Person", None,), ("Person", "persons")])
+@pytest.mark.parametrize(
+    "name_alias",
+    [
+        (
+            "Person",
+            None,
+        ),
+        ("Person", "persons"),
+    ],
+)
 def test_induced(handle, name_alias):
     name, alias = name_alias
     client = create_client(handle)
@@ -138,11 +147,15 @@ def test_store_nested(handle):
     database = client.get_database()
     obj = {
         "persons": [
-            {"id": 1, "name": "n1", "history": [
-                {"event": "birth", "date": "2021-01-01"},
-                {"event": "death", "date": "2021-02-01"},
-                {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
-            ]},
+            {
+                "id": 1,
+                "name": "n1",
+                "history": [
+                    {"event": "birth", "date": "2021-01-01"},
+                    {"event": "death", "date": "2021-02-01"},
+                    {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
+                ],
+            },
             {"id": 2, "name": "n2", "age_in_years": 30},
         ],
         "organizations": [
@@ -171,7 +184,10 @@ def test_induced_multivalued(handle):
     client = create_client(handle)
     database = client.get_database()
     collection = database.create_collection("foo")
-    objs = [{"id": 1, "name": "n1", "aliases": ["a", "b"]}, {"id": 2, "name": "n2", "age_in_years": 30, "aliases": ["b", "c"]}]
+    objs = [
+        {"id": 1, "name": "n1", "aliases": ["a", "b"]},
+        {"id": 2, "name": "n2", "age_in_years": 30, "aliases": ["b", "c"]},
+    ]
     collection.add(objs)
     assert collection.parent.schema_view is not None
     assert collection.parent.schema_view.schema is not None
@@ -203,7 +219,6 @@ def test_induced_multivalued(handle):
     qr = collection.find()
     assert qr.num_rows == 1
     assert remove_none(qr.rows[0]) == objs[1]
-
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
@@ -250,7 +265,7 @@ def test_facets(schema_view, handle, index_class):
         ("bricks", "P3"),
         ("welder on Io", "P1"),
         ("welding on europa", "P2"),
-        ]
+    ]
     for q, expected_top in cases:
         results = collection.search(q).ranked_rows
         top_result = results[0][1]
@@ -261,8 +276,18 @@ def test_facets(schema_view, handle, index_class):
         (["occupation"], {"occupation": "Welder"}, {"P1", "P2"}, {"occupation": [("Welder", 2)]}),
         (["occupation"], None, {"P1", "P2", "P3"}, {"occupation": [("Welder", 2), ("Bricklayer", 1)]}),
         (["moon"], None, {"P1", "P2", "P3"}, {"moon": [("Io", 2), ("Europa", 1)]}),
-        (["occupation", "moon"], None, {"P1", "P2", "P3"}, {"occupation": [("Welder", 2), ("Bricklayer", 1)], "moon": [("Io", 2), ("Europa", 1)]}),
-        ([("occupation", "moon")], None, {"P1", "P2", "P3"}, {('occupation', 'moon'): [('Welder', 'Io', 1), ('Bricklayer', 'Io', 1), ('Welder', 'Europa', 1)]}),
+        (
+            ["occupation", "moon"],
+            None,
+            {"P1", "P2", "P3"},
+            {"occupation": [("Welder", 2), ("Bricklayer", 1)], "moon": [("Io", 2), ("Europa", 1)]},
+        ),
+        (
+            [("occupation", "moon")],
+            None,
+            {"P1", "P2", "P3"},
+            {("occupation", "moon"): [("Welder", "Io", 1), ("Bricklayer", "Io", 1), ("Welder", "Europa", 1)]},
+        ),
     ]
     for facet_slots, where, expected, expected_facets in cases:
         qr = database.query(Query(from_table="Person", where_clause=where))
@@ -296,7 +321,9 @@ def test_integration():
     # print(pd.DataFrame(qr.rows))
     # print(qr.rows_dataframe)
 
+
 MONARCH_KG_DB = "https://data.monarchinitiative.org/monarch-kg/latest/monarch-kg.db.gz"
+
 
 @pytest.mark.integration
 def test_integration_kg():
@@ -304,7 +331,7 @@ def test_integration_kg():
     print(path)
     handle = f"duckdb:///{path}"
     database = DuckDBDatabase(handle)
-    schema = introspect_schema(database.engine)
+    _schema = introspect_schema(database.engine)
     collection = database.get_collection("denormalized_edges")
     qr = collection.find()
     print(qr.num_rows)
@@ -313,27 +340,23 @@ def test_integration_kg():
 
 @pytest.mark.integration
 def test_integration_store():
-    path=pystow.ensure("tmp", "eccode.json", url="https://w3id.org/biopragmatics/resources/eccode/eccode.json")
+    path = pystow.ensure("tmp", "eccode.json", url="https://w3id.org/biopragmatics/resources/eccode/eccode.json")
     graphdoc = json.load(open(path))
     graph = graphdoc["graphs"][0]
     client = Client()
     db = client.attach_database("duckdb")
-    #db.store(graph)
-    #coll = db.create_collection("Edge", "edges")
-    #coll.induce_class_definition_from_objects(graph["edges"])
-    #cd = coll.class_definition()
-    #assert cd is not None
-    #assert len(cd.attributes) > 2
-    #coll.add(graph["edges"])
+    # db.store(graph)
+    # coll = db.create_collection("Edge", "edges")
+    # coll.induce_class_definition_from_objects(graph["edges"])
+    # cd = coll.class_definition()
+    # assert cd is not None
+    # assert len(cd.attributes) > 2
+    # coll.add(graph["edges"])
     coll = db.create_collection("Node", "nodes")
     coll.add(graph["nodes"])
     index = SimpleIndex(name="test")
     coll.attach_index(index)
-    cases = [
-        "lyase",
-        "lysine",
-        "abc"
-    ]
+    cases = ["lyase", "lysine", "abc"]
     for case in cases:
         results = coll.search(case).ranked_rows
         print(f"Results for {case}")
@@ -341,10 +364,9 @@ def test_integration_store():
             print(f"  * {score} :: {r['id']} :: {r['lbl']}")
 
 
-
-
 def test_sql_utils():
     import duckdb
+
     # con = duckdb.connect("file.db")
     con = duckdb.connect()
     ddl = """

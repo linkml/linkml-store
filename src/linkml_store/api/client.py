@@ -42,7 +42,12 @@ class Client:
     _databases: Optional[Dict[str, Database]] = None
 
     def attach_database(
-        self, handle: str, alias: Optional[str] = None, schema_view: Optional[SchemaView] = None, recreate_if_exists=False, **kwargs
+        self,
+        handle: str,
+        alias: Optional[str] = None,
+        schema_view: Optional[SchemaView] = None,
+        recreate_if_exists=False,
+        **kwargs,
     ) -> Database:
         """
         Associate a database with a handle.

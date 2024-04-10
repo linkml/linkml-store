@@ -2,16 +2,18 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TextIO, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Type, Union
 
 import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
-import linkml_store.api as api
-from linkml_store.index.index import Index
 from linkml_store.api.queries import Query, QueryResult
+from linkml_store.index.index import Index
+
+if TYPE_CHECKING:
+    from linkml_store.api.database import Database
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ class Collection:
     """
 
     name: str
-    parent: Optional["api.Database"] = None
+    parent: Optional["Database"] = None
     _indexes: Optional[Dict[str, Index]] = None
     hidden: Optional[bool] = False
 
@@ -121,7 +123,12 @@ class Collection:
         return self.query(query, **kwargs)
 
     def search(
-        self, query: str, where: Optional[Any] = None, index_name: Optional[str] = None, limit: Optional[int] = None, **kwargs
+        self,
+        query: str,
+        where: Optional[Any] = None,
+        index_name: Optional[str] = None,
+        limit: Optional[int] = None,
+        **kwargs,
     ) -> QueryResult:
         """
         Search the collection using a full-text search index.
@@ -196,7 +203,6 @@ class Collection:
     def peek(self, limit: Optional[int] = None) -> QueryResult:
         q = self._create_query()
         return self.query(q, limit=limit)
-
 
     def class_definition(self) -> Optional[ClassDefinition]:
         """
@@ -285,7 +291,7 @@ class Collection:
             inlined = any(inlineds)
             if multivalued and False in multivalueds:
                 raise ValueError(f"Mixed list non list: {vs} // inferred= {multivalueds}")
-            #if not rngs:
+            # if not rngs:
             #    raise AssertionError(f"Empty rngs for {k} = {vs}")
             rng = rngs[0] if rngs else None
             for other_rng in rngs:

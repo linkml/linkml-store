@@ -14,7 +14,7 @@ from sqlalchemy import text
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
-from linkml_store.utils.sql_utils import query_to_sql, introspect_schema
+from linkml_store.utils.sql_utils import introspect_schema, query_to_sql
 
 TYPE_MAP = {
     "VARCHAR": "string",
@@ -54,7 +54,6 @@ def run_query(con: DuckDBPyConnection, query: Query, **kwargs):
 
 @dataclass
 class DuckDBDatabase(Database):
-
     _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
 
@@ -147,8 +146,7 @@ class DuckDBDatabase(Database):
             table_names = [row["table_name"] for row in qr.rows]
             for tbl in table_names:
                 sb.add_class(tbl)
-        query = Query(from_table="information_schema.columns",
-                      sort_by=["ordinal_position"])
+        query = Query(from_table="information_schema.columns", sort_by=["ordinal_position"])
         for row in self.query(query, limit=-1).rows:
             tbl_name = row["table_name"]
             if tbl_name not in sb.schema.classes:

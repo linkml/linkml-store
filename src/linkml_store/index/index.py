@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Dict, Any, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from pydantic import BaseModel
@@ -75,7 +75,9 @@ class Index(BaseModel):
             return self.text_template.format(**obj)
         return str(obj)
 
-    def search(self, query: str, vectors: List[Tuple[str, INDEX_ITEM]], limit: Optional[int] = None) -> List[Tuple[float, str]]:
+    def search(
+        self, query: str, vectors: List[Tuple[str, INDEX_ITEM]], limit: Optional[int] = None
+    ) -> List[Tuple[float, str]]:
         """
         Search the index for a query string
 
@@ -84,7 +86,6 @@ class Index(BaseModel):
         :param limit: The maximum number of results to return (optional)
         :return: A list of item IDs that match the query
         """
-        import numpy as np
 
         # Convert the query string to a vector
         query_vector = self.text_to_vector(query)
@@ -94,7 +95,7 @@ class Index(BaseModel):
         # Iterate over each indexed item
         for item_id, item_vector in vectors:
             # Calculate the Euclidean distance between the query vector and the item vector
-            #distance = 1-np.linalg.norm(query_vector - item_vector)
+            # distance = 1-np.linalg.norm(query_vector - item_vector)
             distance = cosine_similarity(query_vector, item_vector)
             distances.append((distance, item_id))
 
@@ -106,8 +107,3 @@ class Index(BaseModel):
             distances = distances[:limit]
 
         return distances
-
-
-
-
-

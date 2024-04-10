@@ -1,25 +1,28 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List
 
 import numpy as np
 
 from linkml_store.index.index import INDEX_ITEM, Index
+
+if TYPE_CHECKING:
+    import llm
 
 
 class LLMIndex(Index):
     """
     A implementations index wraps the llm library
     """
+
     embedding_model_name: str = "ada-002"
-    _embedding_model: "EmbeddingModel" = None
+    _embedding_model: "llm.EmbeddingModel" = None
 
     @property
     def embedding_model(self):
         import llm
+
         if self._embedding_model is None:
             self._embedding_model = llm.get_embedding_model(self.embedding_model_name)
         return self._embedding_model
-
-
 
     def text_to_vector(self, text: str) -> INDEX_ITEM:
         """
@@ -39,4 +42,3 @@ class LLMIndex(Index):
         """
         embeddings = self.embedding_model.embed_multi(texts)
         return [np.array(v, dtype=float) for v in embeddings]
-
