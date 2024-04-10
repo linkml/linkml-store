@@ -13,6 +13,9 @@ from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 
 @dataclass
 class MongoDBDatabase(Database):
+    """
+    A wrapper around a MongoDB database
+    """
     _client: MongoClient = None
     _database = None
 
