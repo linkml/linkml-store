@@ -1,8 +1,11 @@
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import numpy as np
 
 from linkml_store.index.index import INDEX_ITEM, Index
+
+if TYPE_CHECKING:
+    import llm
 
 
 class LLMIndex(Index):
