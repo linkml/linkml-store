@@ -1,12 +1,11 @@
 import logging
-from typing import Optional, Tuple, Union, Type
+from typing import Optional, Tuple, Type, Union
 
 import sqlalchemy
+import sqlalchemy.sql.sqltypes as sqlt
 from linkml_runtime.linkml_model import SchemaDefinition, SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
 from sqlalchemy import MetaData
-import sqlalchemy.sql.sqltypes as sqlt
-
 
 from linkml_store.api.queries import Query
 
