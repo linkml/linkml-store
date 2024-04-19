@@ -8,10 +8,9 @@ from sqlalchemy import Column, Table, delete, insert, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
-from linkml_store.api.collection import OBJECT, DEFAULT_FACET_LIMIT
+from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.stores.duckdb.mappings import TMAP
 from linkml_store.utils.sql_utils import facet_count_sql
-
 
 logger = logging.getLogger(__name__)
 

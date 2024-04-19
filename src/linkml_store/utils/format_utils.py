@@ -2,7 +2,7 @@ import csv
 import json
 from enum import Enum
 from io import StringIO
-from typing import Union, List, Dict, Any
+from typing import Any, Dict, List, Union
 
 import yaml
 

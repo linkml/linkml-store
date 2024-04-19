@@ -1,11 +1,11 @@
 import json
+from typing import Any, Dict, List, Union
+
 import pytest
-from typing import List, Dict, Any, Union
-
 import yaml
-from linkml_store.utils.format_utils import load_objects, render_output, Format
-from tests.conftest import TEST_DATA, JSON_FILE, YAML_FILE, TSV_FILE, CSV_FILE
+from linkml_store.utils.format_utils import Format, load_objects, render_output
 
+from tests.conftest import CSV_FILE, JSON_FILE, TEST_DATA, TSV_FILE, YAML_FILE
 
 
 # Test cases for load_objects

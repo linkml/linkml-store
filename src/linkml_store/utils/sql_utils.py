@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Tuple, Type, Union, Any
+from typing import Any, Optional, Tuple, Type, Union
 
 import sqlalchemy
 import sqlalchemy.sql.sqltypes as sqlt

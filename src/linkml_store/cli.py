@@ -10,7 +10,6 @@ from linkml_store.index.implementations.simple_index import SimpleIndex
 from linkml_store.index.index import Index
 from linkml_store.utils.format_utils import load_objects, render_output
 
-
 index_type_option = click.option('--index-type', '-t')
 
 

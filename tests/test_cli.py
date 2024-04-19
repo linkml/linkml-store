@@ -5,6 +5,7 @@ import pytest
 from click.testing import CliRunner
 from linkml_store import Client
 from linkml_store.cli import cli
+
 from tests import INPUT_DIR, OUTPUT_DIR
 from tests.conftest import JSON_FILE
 
