@@ -22,7 +22,7 @@ class Query(BaseModel):
 
     from_table: Optional[str]
     select_cols: Optional[List[str]] = None
-    where_clause: Optional[Union[str, List[str], Dict[str, str]]] = None
+    where_clause: Optional[Union[str, List[str], Dict[str, Any]]] = None
     sort_by: Optional[List[str]] = None
     limit: Optional[int] = None
     offset: Optional[int] = None

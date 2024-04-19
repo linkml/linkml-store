@@ -13,6 +13,7 @@ Currently this is alpha, check back later for more docs
    :caption: Contents:
 
    examples/Tutorial
+   examples/Semantic-Search
    modules
 
 Indices and tables

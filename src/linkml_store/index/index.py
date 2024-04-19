@@ -77,14 +77,14 @@ class Index(BaseModel):
 
     def search(
         self, query: str, vectors: List[Tuple[str, INDEX_ITEM]], limit: Optional[int] = None
-    ) -> List[Tuple[float, str]]:
+    ) -> List[Tuple[float, Any]]:
         """
         Search the index for a query string
 
         :param query: The query string to search for
         :param vectors: A list of indexed items, where each item is a tuple of (id, vector)
         :param limit: The maximum number of results to return (optional)
-        :return: A list of item IDs that match the query
+        :return: A list of item IDs or objects that match the query
         """
 
         # Convert the query string to a vector

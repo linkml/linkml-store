@@ -1,4 +1,5 @@
 import json
+import shutil
 
 import pystow
 import pytest
@@ -6,13 +7,14 @@ from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
 from linkml_store.api.client import Client
+from linkml_store.api.config import ClientConfig
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.constants import LINKML_STORE_MODULE
 from linkml_store.index.implementations.simple_index import SimpleIndex
 from linkml_store.utils.sql_utils import introspect_schema
 
-from tests import INPUT_DIR
+from tests import INPUT_DIR, OUTPUT_DIR
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
 
@@ -70,6 +72,9 @@ def test_induced(handle, name_alias):
         collection = database.create_collection(name)
     assert len(database.list_collections()) == 1
     assert collection.class_definition() is None
+    # check is empty
+    qr = collection.find()
+    assert qr.num_rows == 0
     objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
     collection.add(objs)
     assert collection.parent.schema_view is not None
@@ -211,13 +216,37 @@ def test_induced_multivalued(handle):
     assert cd.attributes["age_in_years"].range == "integer"
     assert cd.attributes["aliases"].range == "string"
     assert cd.attributes["aliases"].multivalued
+    # test facets with multivalued slots
     fcs = collection.query_facets(facet_columns=["aliases"])["aliases"]
+    all_fcs = collection.query_facets()
+    assert set(all_fcs["aliases"]) == set(fcs)
     assert set(fcs) == {("a", 1), ("b", 2), ("c", 1)}
     # check ordering
     assert fcs[0] == ("b", 2)
+    for fc_key, fc_counts in all_fcs.items():
+        for fc_val, num in fc_counts:
+            # print(fc_key, fc_val, num)
+            if fc_val is None:
+                # Currently there is no distinction between a missing key and
+                # explicit null value from that key
+                continue
+            if fc_val is None:
+                w = None
+            else:
+                w = {fc_key: fc_val}
+                if fc_key == "aliases":
+                    #w = {fc_key: ("ARRAY_CONTAINS", fc_val)}
+                    w = {fc_key: {"$contains": fc_val}}
+            fc_results = collection.find(w)
+            assert fc_results.num_rows == num, f"unexpected diff for fc_key={fc_key}, fc_val={fc_val} // {w}, num={num}"
+            facet_subq = collection.query_facets(w, facet_columns=[fc_key])
+            if fc_key == "aliases":
+                assert (fc_val, num) in facet_subq[fc_key]
+            else:
+                assert facet_subq[fc_key] == [(fc_val, num)], f"expected single facet result for {fc_key}={fc_val}"
     collection.delete(objs[0])
     qr = collection.find()
-    assert qr.num_rows == 1
+    assert qr.num_rows == 1, "expected 1 row after delete"
     assert remove_none(qr.rows[0]) == objs[1]
 
 
@@ -301,6 +330,80 @@ def test_facets(schema_view, handle, index_class):
             assert set(r[k]) == set(expected_facets[k])
             del expected_facets[k]
         assert expected_facets == {}
+
+
+def test_from_config():
+    config = ClientConfig(
+        databases={
+            "test1": {
+                "handle": "duckdb",
+                "collections": {
+                    "persons": {"category": "Person"},
+                }
+            }
+        })
+    assert config.databases["test1"].handle == "duckdb"
+    client = Client().from_config(config)
+    db1 = client.get_database("test1")
+    assert db1 is not None
+    collection1 = db1.get_collection("persons")
+    assert collection1 is not None
+
+
+@pytest.mark.parametrize("name,inserts", [
+    ("conf1", [
+        ("personnel", "persons", [
+            {"id": "p1", "name": "n1", "employed_by": "org1"},
+            {"id": "p2", "name": "n2", "employed_by": "org1"},
+                                  ]),
+        ("personnel", "organizations", [{"id": "org1", "name": "o1", "category": "non-profit"}]),
+        ]
+     ),
+     ("conf1", [
+        ("clinical", "samples", [
+            {"id": "s1", "name": "s1", "employed_by": "org1"},
+            {"id": "s2", "name": "s2", "employed_by": "org1"},
+                                  ]),
+        ]
+     ),
+])
+def test_from_config_file(name, inserts):
+    source_dir = INPUT_DIR / "configurations" / name
+    target_dir = OUTPUT_DIR / "configurations" / name
+    shutil.rmtree(target_dir, ignore_errors=True)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+
+    path = target_dir / "config.yaml"
+    client = Client().from_config(path)
+    config = client.config
+    index = SimpleIndex(name="test")
+
+    for db_name in config.databases:
+        print(db_name)
+        db = client.get_database(db_name)
+        for coll in db.list_collections():
+            print(coll.name)
+            coll_config = config.databases[db_name].collections[coll.name]
+            if coll_config.attributes:
+                cd = coll.class_definition()
+                assert cd is not None
+                assert cd.attributes.keys() == coll_config.attributes.keys()
+
+    for insert in inserts:
+        db_name, coll_name, objs = insert
+        db = client.get_database(db_name)
+        collection = db.get_collection(coll_name)
+        collection.add(objs)
+        qr = collection.find()
+        assert qr.num_rows == len(objs)
+
+    for db_name in config.databases:
+        db = client.get_database(db_name)
+        for coll in db.list_collections():
+            coll.attach_index(index)
+            _results = coll.search("e")
+
 
 
 @pytest.mark.integration

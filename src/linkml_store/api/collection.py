@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 OBJECT = Union[Dict[str, Any], BaseModel, Type]
 
+DEFAULT_FACET_LIMIT = 100
 IDENTIFIER = str
 FIELD_NAME = str
 
@@ -91,7 +92,7 @@ class Collection:
         """
         return self.parent.query(query, **kwargs)
 
-    def query_facets(self, where: Optional[Dict] = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
+    def query_facets(self, where: Optional[Dict] = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs) -> Dict[str, Dict[str, int]]:
         """
         Run a query to get facet counts for one or more columns.
 
@@ -108,6 +109,7 @@ class Collection:
         :param con: A DuckDB database connection.
         :param query: A Query object representing the base query.
         :param facet_columns: A list of column names to get facet counts for.
+        :param facet_limit:
         :return: A dictionary where keys are column names and values are pandas DataFrames
                  containing the facet counts for each unique value in the respective column.
         """
@@ -153,6 +155,8 @@ class Collection:
         index_col = ix.index_field
         vector_pairs = [(row, np.array(row[index_col], dtype=float)) for row in qr.rows]
         results = ix.search(query, vector_pairs, limit=limit)
+        for r in results:
+            del r[1][index_col]
         new_qr = QueryResult(num_rows=len(results))
         new_qr.ranked_rows = results
         return new_qr
@@ -162,7 +166,7 @@ class Collection:
         Attach an index to the collection.
 
         :param index:
-        :param auto_index:
+        :param auto_index: Automatically index all objects in the collection
         :param kwargs:
         :return:
         """
