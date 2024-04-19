@@ -235,7 +235,7 @@ def test_induced_multivalued(handle):
             else:
                 w = {fc_key: fc_val}
                 if fc_key == "aliases":
-                    #w = {fc_key: ("ARRAY_CONTAINS", fc_val)}
+                    # w = {fc_key: ("ARRAY_CONTAINS", fc_val)}
                     w = {fc_key: {"$contains": fc_val}}
             fc_results = collection.find(w)
             assert fc_results.num_rows == num, f"unexpected diff for fc_key={fc_key}, fc_val={fc_val} // {w}, num={num}"
@@ -339,9 +339,10 @@ def test_from_config():
                 "handle": "duckdb",
                 "collections": {
                     "persons": {"category": "Person"},
-                }
+                },
             }
-        })
+        }
+    )
     assert config.databases["test1"].handle == "duckdb"
     client = Client().from_config(config)
     db1 = client.get_database("test1")
@@ -350,23 +351,38 @@ def test_from_config():
     assert collection1 is not None
 
 
-@pytest.mark.parametrize("name,inserts", [
-    ("conf1", [
-        ("personnel", "persons", [
-            {"id": "p1", "name": "n1", "employed_by": "org1"},
-            {"id": "p2", "name": "n2", "employed_by": "org1"},
-                                  ]),
-        ("personnel", "organizations", [{"id": "org1", "name": "o1", "category": "non-profit"}]),
-        ]
-     ),
-     ("conf1", [
-        ("clinical", "samples", [
-            {"id": "s1", "name": "s1", "employed_by": "org1"},
-            {"id": "s2", "name": "s2", "employed_by": "org1"},
-                                  ]),
-        ]
-     ),
-])
+@pytest.mark.parametrize(
+    "name,inserts",
+    [
+        (
+            "conf1",
+            [
+                (
+                    "personnel",
+                    "persons",
+                    [
+                        {"id": "p1", "name": "n1", "employed_by": "org1"},
+                        {"id": "p2", "name": "n2", "employed_by": "org1"},
+                    ],
+                ),
+                ("personnel", "organizations", [{"id": "org1", "name": "o1", "category": "non-profit"}]),
+            ],
+        ),
+        (
+            "conf1",
+            [
+                (
+                    "clinical",
+                    "samples",
+                    [
+                        {"id": "s1", "name": "s1", "employed_by": "org1"},
+                        {"id": "s2", "name": "s2", "employed_by": "org1"},
+                    ],
+                ),
+            ],
+        ),
+    ],
+)
 def test_from_config_file(name, inserts):
     source_dir = INPUT_DIR / "configurations" / name
     target_dir = OUTPUT_DIR / "configurations" / name
@@ -403,7 +419,6 @@ def test_from_config_file(name, inserts):
         for coll in db.list_collections():
             coll.attach_index(index)
             _results = coll.search("e")
-
 
 
 @pytest.mark.integration

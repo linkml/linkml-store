@@ -93,8 +93,8 @@ class Collection:
         return self.parent.query(query, **kwargs)
 
     def query_facets(
-            self, where: Optional[Dict] = None,
-            facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs) -> Dict[str, Dict[str, int]]:
+        self, where: Optional[Dict] = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
+    ) -> Dict[str, Dict[str, int]]:
         """
         Run a query to get facet counts for one or more columns.
 

@@ -26,16 +26,17 @@ def test_files():
         JSON_FILE,
     ]
 
+
 @pytest.fixture
 def output_dir():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     return OUTPUT_DIR
 
+
 def test_help_option(cli_runner):
     """Ensures --help works."""
     result = cli_runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-
 
 
 def test_insert_and_query_command(cli_runner, config_file, test_files, output_dir):
@@ -73,7 +74,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             "test_collection",
             "query",
             "--where",
-            'name: John',
+            "name: John",
             "--limit",
             "10",
             "--output-type",
@@ -90,7 +91,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
     assert os.path.exists(output_file)
 
     # Check query results
-    #client = Client().from_config(config_file)
+    # client = Client().from_config(config_file)
     if db_name != "duckdb:///:memory:":
         client = Client()
         database = client.get_database(db_name)

@@ -118,7 +118,7 @@ def main():
     if filter_changed:
         st.session_state.current_page = 0  # Reset offset
     result = apply_filters(collection, filters, session_state.current_page * rows_per_page, rows_per_page)
-    #if filter_changed:
+    # if filter_changed:
     #    facet_results = collection.query_facets(filters, facet_columns=["evidence_type"])
     #    print(f"FACET={facet_results}")
     st.write(f"Number of rows: {result.num_rows}")

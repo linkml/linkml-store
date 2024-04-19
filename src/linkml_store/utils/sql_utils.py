@@ -21,8 +21,8 @@ OP_MAP = {
     "eq": "=",
     "in": "ARRAY_CONTAINS",
     "$contains": "ARRAY_CONTAINS",
-
 }
+
 
 def _map_type(typ: Type) -> str:
     for k, v in TYPE_MAP.items():
@@ -121,7 +121,7 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
     else:
         from_table += f" {modified_where}" if modified_where else ""
     sql_str = [f"SELECT {facet_column}, COUNT(*) as count", f"FROM {from_table}"]
-    #if modified_where:
+    # if modified_where:
     #    sql_str.append(f"{modified_where}")
     sql_str.append(f"GROUP BY {facet_column}")
     sql_str.append("ORDER BY count DESC")  # Optional, order by count for convenience

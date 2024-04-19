@@ -39,6 +39,7 @@ def test_load_objects_invalid_format():
     with pytest.raises(ValueError):
         load_objects("invalid.txt", format="invalid")
 
+
 # Test cases for render_output
 @pytest.mark.parametrize(
     "data, format, expected",
@@ -48,8 +49,8 @@ def test_load_objects_invalid_format():
         (TEST_DATA, Format.YAML, yaml.safe_dump(TEST_DATA, sort_keys=False)),
         (TEST_DATA, "yaml", yaml.safe_dump(TEST_DATA, sort_keys=False)),
         (
-                TEST_DATA,
-                Format.TSV,
+            TEST_DATA,
+            Format.TSV,
             "id\tname\tage\n1\tJohn\t30\n2\tAlice\t25\n3\tBob\t35\n",
         ),
         (TEST_DATA, "tsv", "id\tname\tage\n1\tJohn\t30\n2\tAlice\t25\n3\tBob\t35\n"),
