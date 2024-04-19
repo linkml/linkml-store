@@ -81,7 +81,9 @@ class DuckDBDatabase(Database):
         json_encoded_cols = []
         if query.from_table:
             if not query.from_table.startswith("information_schema"):
-                meta_query = Query(from_table="information_schema.tables", where_clause={"table_name": query.from_table})
+                meta_query = Query(
+                    from_table="information_schema.tables",
+                    where_clause={"table_name": query.from_table})
                 qr = self.query(meta_query)
                 if qr.num_rows == 0:
                     logger.debug(f"Table {query.from_table} not created yet")

@@ -226,7 +226,8 @@ class Database(ABC):
         self.handle = db_config.handle
         self.recreate_if_exists = db_config.recreate_if_exists
         for name, collection_config in db_config.collections.items():
-            collection = self.create_collection(name, alias=collection_config.alias, metadata=collection_config.metadata)
+            collection = self.create_collection(name, alias=collection_config.alias,
+                                                metadata=collection_config.metadata)
             if collection_config.attributes:
                 sv = self.schema_view
                 cd = ClassDefinition(name, attributes=collection_config.attributes)

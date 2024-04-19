@@ -104,7 +104,8 @@ def fq(ctx, where, limit, columns, output_type, output):
     db = ctx.obj['client'].get_database(ctx.obj['database'])
     collection = db.get_collection(ctx.obj['collection'])
     where_clause = yaml.safe_load(where) if where else None
-    count_dict = collection.query_facets(where_clause, facet_columns=columns.split(",") if columns else None, limit=limit)
+    count_dict = collection.query_facets(
+        where_clause, facet_columns=columns.split(",") if columns else None, limit=limit)
     for key, value in count_dict.items():
         count_dict[key] = dict(value)
     output_data = render_output(count_dict, output_type)

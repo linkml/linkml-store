@@ -65,7 +65,9 @@ class DuckDBCollection(Collection):
             conn.commit()
         return 0
 
-    def query_facets(self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs) -> Dict[str, Dict[str, int]]:
+    def query_facets(
+            self, where: Dict = None,
+            facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs) -> Dict[str, Dict[str, int]]:
         results = {}
         cd = self.class_definition()
         with self.parent.engine.connect() as conn:
