@@ -16,7 +16,7 @@ st.set_page_config(layout="wide")
 
 DEFAULT_LIMIT = 25
 
-TABLES = ["gaf_association", "gaf_association_plus_violations_m"]
+TABLES = ["gaf_association", "gaf_association_plus_violations_m", "gpi"]
 DBS = {
     "mgi": TABLES,
     "goa_human": TABLES,
@@ -73,6 +73,7 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
 def main():
     st.title("LinkML Table Browser")
     selected_db = st.selectbox("Select a Database", list(DBS.keys()), key="db_selector")
+    print(f"DB SELECTED={selected_db}")
     # con = duckdb.connect(DB_PATH.format(db=selected_db))
     db_name = DB_PATH.format(db=selected_db)
     database = DuckDBDatabase(f"duckdb:///{db_name}")
@@ -117,9 +118,9 @@ def main():
     if filter_changed:
         st.session_state.current_page = 0  # Reset offset
     result = apply_filters(collection, filters, session_state.current_page * rows_per_page, rows_per_page)
-    if filter_changed:
-        facet_results = collection.query_facets(filters, facet_columns=["evidence_type"])
-        print(f"FACET={facet_results}")
+    # if filter_changed:
+    #    facet_results = collection.query_facets(filters, facet_columns=["evidence_type"])
+    #    print(f"FACET={facet_results}")
     st.write(f"Number of rows: {result.num_rows}")
     st.write(f"Page: {session_state.current_page + 1}")
     filtered_data = pd.DataFrame(result.rows)

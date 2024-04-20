@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
@@ -7,9 +8,11 @@ from sqlalchemy import Column, Table, delete, insert, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
-from linkml_store.api.collection import OBJECT
+from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.stores.duckdb.mappings import TMAP
 from linkml_store.utils.sql_utils import facet_count_sql
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -63,19 +66,23 @@ class DuckDBCollection(Collection):
             conn.commit()
         return 0
 
-    def query_facets(self, where: Dict = None, facet_columns: List[str] = None) -> Dict[str, Dict[str, int]]:
+    def query_facets(
+        self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
+    ) -> Dict[str, Dict[str, int]]:
         results = {}
         cd = self.class_definition()
         with self.parent.engine.connect() as conn:
             if not facet_columns:
                 facet_columns = list(self.class_definition().attributes.keys())
             for col in facet_columns:
+                logger.debug(f"Faceting on {col}")
                 if isinstance(col, tuple):
                     sd = SlotDefinition(name="PLACEHOLDER")
                 else:
                     sd = cd.attributes[col]
                 facet_query = self._create_query(where_clause=where)
                 facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued)
+                logger.debug(f"Facet query: {facet_query_str}")
                 rows = list(conn.execute(text(facet_query_str)))
                 results[col] = rows
             return results

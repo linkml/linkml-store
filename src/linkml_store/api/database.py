@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Sequence
 
 from linkml_runtime import SchemaView
+from linkml_runtime.linkml_model import ClassDefinition
 
 from linkml_store.api.collection import Collection
+from linkml_store.api.config import DatabaseConfig
 from linkml_store.api.metadata import MetaData
 from linkml_store.api.queries import Query, QueryResult
 
@@ -140,7 +142,7 @@ class Database(ABC):
         """
         if not self._collections:
             self.init_collections()
-        if name not in self._collections:
+        if name not in self._collections.keys():
             if create_if_not_exists:
                 self._collections[name] = self.create_collection(name)
             else:
@@ -213,3 +215,24 @@ class Database(ABC):
         :return: A schema view
         """
         raise NotImplementedError()
+
+    def from_config(self, db_config: DatabaseConfig, **kwargs):
+        """
+        Initialize a database from a configuration
+
+        :param db_config: database configuration
+        :param kwargs: additional arguments
+        """
+        self.handle = db_config.handle
+        self.recreate_if_exists = db_config.recreate_if_exists
+        for name, collection_config in db_config.collections.items():
+            collection = self.create_collection(
+                name, alias=collection_config.alias, metadata=collection_config.metadata
+            )
+            if collection_config.attributes:
+                sv = self.schema_view
+                cd = ClassDefinition(name, attributes=collection_config.attributes)
+                sv.schema.classes[cd.name] = cd
+                sv.set_modified()
+                assert collection.class_definition() is not None
+        return self

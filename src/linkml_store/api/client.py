@@ -1,9 +1,12 @@
 from dataclasses import dataclass
-from typing import Dict, Optional
+from pathlib import Path
+from typing import Dict, Optional, Union
 
+import yaml
 from linkml_runtime import SchemaView
 
 from linkml_store.api import Database
+from linkml_store.api.config import ClientConfig
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 
 HANDLE_MAP = {
@@ -39,7 +42,43 @@ class Client:
     """
 
     handle: Optional[str] = None
+    config: Optional[ClientConfig] = None
     _databases: Optional[Dict[str, Database]] = None
+
+    def from_config(self, config: Union[ClientConfig, str, Path], base_dir=None, **kwargs):
+        """
+        Create a client from a configuration.
+
+        Examples
+        --------
+        >>> from linkml_store.api.config import ClientConfig
+        >>> client = Client().from_config(ClientConfig(databases={"test": {"handle": "duckdb:///:memory:"}}))
+        >>> len(client.databases)
+        1
+        >>> "test" in client.databases
+        True
+        >>> client.databases["test"].handle
+        'duckdb:///:memory:'
+
+        :param config:
+        :param kwargs:
+        :return:
+
+        """
+        if isinstance(config, Path):
+            config = str(config)
+        if isinstance(config, str):
+            if not base_dir:
+                base_dir = Path(config).parent
+            parsed_obj = yaml.safe_load(open(config))
+            config = ClientConfig(**parsed_obj)
+        self.config = config
+        for name, db_config in config.databases.items():
+            handle = db_config.handle.format(base_dir=base_dir)
+            db_config.handle = handle
+            db = self.attach_database(handle, alias=name, **kwargs)
+            db.from_config(db_config)
+        return self
 
     def attach_database(
         self,
@@ -101,7 +140,7 @@ class Client:
         >>> db == retrieved_db
         True
 
-        :param name:
+        :param name: if None, there must be a single database attached
         :param create_if_not_exists:
         :param kwargs:
         :return:

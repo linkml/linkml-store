@@ -30,13 +30,6 @@ def run_query(con: DuckDBPyConnection, query: Query, **kwargs):
     """
     Run a query and return the result.
 
-    >>> import duckdb
-    >>> con = duckdb.connect("db/mgi.db")
-    >>> query = Query(from_table="gaf_association", limit=5)
-    >>> result = run_query(con, query)
-    >>> print(result.num_rows)
-    532233
-
     :param con:
     :param query:
     :return:
@@ -80,6 +73,14 @@ class DuckDBDatabase(Database):
     def query(self, query: Query, **kwargs) -> QueryResult:
         json_encoded_cols = []
         if query.from_table:
+            if not query.from_table.startswith("information_schema"):
+                meta_query = Query(
+                    from_table="information_schema.tables", where_clause={"table_name": query.from_table}
+                )
+                qr = self.query(meta_query)
+                if qr.num_rows == 0:
+                    logger.debug(f"Table {query.from_table} not created yet")
+                    return QueryResult(query=query, num_rows=0, rows=[])
             sv = self._schema_view
             if sv:
                 cd = None

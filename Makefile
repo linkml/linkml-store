@@ -5,6 +5,9 @@ CODE = src/linkml_data_browser
 test: pytest doctest
 test-full: test integration-tests
 
+install:
+	poetry install --extras "mongodb llm validation app"
+
 pytest:
 	$(RUN) pytest
 
@@ -25,7 +28,8 @@ doctest:
 	$(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE $<
 
 app:
-	$(RUN) streamlit run $(CODE)/app.py --logger.level=debug
+	$(RUN) streamlit run $(CODE)/app.py
+#	$(RUN) streamlit run $(CODE)/app.py --logger.level=debug
 
 apidoc:
 	$(RUN) sphinx-apidoc -f -M -o docs/ src/linkml_store/ && cd docs && $(RUN) make html

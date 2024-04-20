@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Tuple, Type, Union
+from typing import Any, Optional, Tuple, Type, Union
 
 import sqlalchemy
 import sqlalchemy.sql.sqltypes as sqlt
@@ -15,6 +15,12 @@ TYPE_MAP = {
     sqlt.TEXT: "string",
     sqlt.INTEGER: "integer",
     sqlt.FLOAT: "float",
+}
+
+OP_MAP = {
+    "eq": "=",
+    "in": "ARRAY_CONTAINS",
+    "$contains": "ARRAY_CONTAINS",
 }
 
 
@@ -33,11 +39,38 @@ def where_clause_to_sql(query: Query) -> str:
     elif isinstance(query.where_clause, list):
         where_clause_sql = " AND ".join(query.where_clause)
     elif isinstance(query.where_clause, dict):
-        # TODO: bobby tables
-        where_clause_sql = " AND ".join([f"{k} = '{v}'" for k, v in query.where_clause.items()])
+        conjs = []
+        for k, v in query.where_clause.items():
+            conjs.extend(col_val_constraints_to_conjs(k, v))
+        where_clause_sql = " AND ".join(conjs)
+
     else:
         raise ValueError(f"Invalid where_clause type: {type(query.where_clause)}")
     return "WHERE " + where_clause_sql
+
+
+def col_val_constraints_to_conjs(col_name: str, val_constraints: Any) -> list:
+    if val_constraints is None:
+        return []
+
+    def _quote(v: Any):
+        if isinstance(v, str):
+            # escape internal vs
+            v = v.replace("'", "''")
+            return f"'{v}'"
+        else:
+            return v
+
+    if isinstance(val_constraints, dict):
+        conjs = []
+        for k, v in val_constraints.items():
+            if k in OP_MAP:
+                conjs.append(f"{OP_MAP[k]}({col_name}, {_quote(v)})")
+            else:
+                conjs.append(f"{col_name} {k} {_quote(v)}")
+        return conjs
+    else:
+        return [f"{col_name} = {_quote(val_constraints)}"]
 
 
 def query_to_sql(query: Query, count=False, limit=None, offset: Optional[int] = None):
@@ -67,7 +100,7 @@ def query_to_sql(query: Query, count=False, limit=None, offset: Optional[int] = 
     return "\n".join(sql_str)
 
 
-def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], multivalued=False) -> str:
+def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], multivalued=False, limit=100) -> str:
     # Create a modified WHERE clause that excludes conditions directly related to facet_column
     modified_where = None
     if query.where_clause:
@@ -82,12 +115,18 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
         facet_column = ", ".join(facet_column)
     from_table = query.from_table
     if multivalued:
-        from_table = f"(SELECT UNNEST({facet_column}) as {facet_column} FROM {query.from_table})"
+        from_table = f"(SELECT UNNEST({facet_column}) as {facet_column} FROM {query.from_table}"
+        from_table += f" {modified_where}" if modified_where else ""
+        from_table += ")"
+    else:
+        from_table += f" {modified_where}" if modified_where else ""
     sql_str = [f"SELECT {facet_column}, COUNT(*) as count", f"FROM {from_table}"]
-    if modified_where:
-        sql_str.append(f"{modified_where}")
+    # if modified_where:
+    #    sql_str.append(f"{modified_where}")
     sql_str.append(f"GROUP BY {facet_column}")
     sql_str.append("ORDER BY count DESC")  # Optional, order by count for convenience
+    if limit is not None:
+        sql_str.append(f"LIMIT {limit}")
     return "\n".join(sql_str)
 
 

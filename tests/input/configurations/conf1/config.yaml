@@ -1,0 +1,58 @@
+databases:
+  personnel:
+    collections:
+      persons:
+        type: Person
+        attributes:
+          id:
+            identifier: true
+            range: string
+          name:
+            range: string
+          employer:
+            range: Organization
+      organizations:
+        type: Organization
+        attributes:
+          id:
+            identifier: true
+            range: string
+          name:
+            range: string
+          category:
+            range: string
+  clinical:
+    handle: duckdb:///{base_dir}/clinical.db
+    schema:
+      classes:
+        Patient:
+          attributes:
+            id:
+              identifier: true
+              range: string
+            name:
+              range: string
+            birth_date:
+              range: string
+            vital_status:
+              range: string
+            primary_email:
+              range: string
+              pattern: "^\\S+@[\\S+\\.]+\\S+"
+        Sample:
+          attributes:
+            id:
+              identifier: true
+              range: string
+            name:
+              range: string
+              collection_date:
+            sources:
+              range: string
+              multivalued: true
+    collections:
+      patients:
+        type: Patient
+      samples:
+        type: Sample
+
