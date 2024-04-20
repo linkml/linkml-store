@@ -13,6 +13,8 @@ Currently this is alpha, check back later for more docs
    :caption: Contents:
 
    examples/Tutorial
+   examples/Semantic-Search
+   examples/Monarch-KG
    modules
 
 Indices and tables

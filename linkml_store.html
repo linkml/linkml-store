@@ -48,11 +48,15 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Monarch-KG notebook</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">linkml_store</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">linkml_store package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#linkml_store.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.attach_database"><code class="docutils literal notranslate"><span class="pre">Client.attach_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.config"><code class="docutils literal notranslate"><span class="pre">Client.config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.databases"><code class="docutils literal notranslate"><span class="pre">Client.databases</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.from_config"><code class="docutils literal notranslate"><span class="pre">Client.from_config()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.get_database"><code class="docutils literal notranslate"><span class="pre">Client.get_database()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#linkml_store.Client.handle"><code class="docutils literal notranslate"><span class="pre">Client.handle</span></code></a></li>
 </ul>
@@ -98,7 +102,7 @@
 <span id="linkml-store-package"></span><h1>linkml_store package<a class="headerlink" href="#module-linkml_store" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="linkml_store.Client">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml_store.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A client provides access to named collections.</p>
 <section id="examples">
@@ -171,6 +175,11 @@
 </section>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.Client.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientConfig</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#linkml_store.Client.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="linkml_store.Client.databases">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">databases</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><span class="pre">Database</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#linkml_store.Client.databases" title="Link to this definition"></a></dt>
@@ -200,11 +209,43 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.Client.from_config">
+<span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client.from_config" title="Link to this definition"></a></dt>
+<dd><p>Create a client from a configuration.</p>
+<section id="id3">
+<h3>Examples<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.config</span> <span class="kn">import</span> <span class="n">ClientConfig</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">ClientConfig</span><span class="p">(</span><span class="n">databases</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;handle&quot;</span><span class="p">:</span> <span class="s2">&quot;duckdb:///:memory:&quot;</span><span class="p">}}))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;test&quot;</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">handle</span>
+<span class="go">&#39;duckdb:///:memory:&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type config<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ClientConfig</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]</span></p>
+</dd>
+<dt class="field-even">param config<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">return<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="linkml_store.Client.get_database">
 <span class="sig-name descname"><span class="pre">get_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_if_not_exists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#linkml_store.Client.get_database" title="Link to this definition"></a></dt>
 <dd><p>Get a named database.</p>
-<section id="id3">
-<h3>Examples<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Examples<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///test.db&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">retrieved_db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
@@ -217,7 +258,8 @@
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
 </dd>
 <dt class="field-even">param name<span class="colon">:</span></dt>
-<dd class="field-even"><p></p></dd>
+<dd class="field-even"><p>if None, there must be a single database attached</p>
+</dd>
 <dt class="field-odd">type create_if_not_exists<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
 <dt class="field-even">param create_if_not_exists<span class="colon">:</span></dt>
@@ -250,7 +292,9 @@
 <li class="toctree-l1"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.attach_database"><code class="docutils literal notranslate"><span class="pre">Client.attach_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.config"><code class="docutils literal notranslate"><span class="pre">Client.config</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.databases"><code class="docutils literal notranslate"><span class="pre">Client.databases</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.from_config"><code class="docutils literal notranslate"><span class="pre">Client.from_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.get_database"><code class="docutils literal notranslate"><span class="pre">Client.get_database()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Client.handle"><code class="docutils literal notranslate"><span class="pre">Client.handle</span></code></a></li>
 </ul>
@@ -282,6 +326,7 @@
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.close"><code class="docutils literal notranslate"><span class="pre">Database.close()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.commit"><code class="docutils literal notranslate"><span class="pre">Database.commit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.create_collection"><code class="docutils literal notranslate"><span class="pre">Database.create_collection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.from_config"><code class="docutils literal notranslate"><span class="pre">Database.from_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.get_collection"><code class="docutils literal notranslate"><span class="pre">Database.get_collection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.handle"><code class="docutils literal notranslate"><span class="pre">Database.handle</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.Database.induce_schema_view"><code class="docutils literal notranslate"><span class="pre">Database.induce_schema_view()</span></code></a></li>
@@ -311,7 +356,9 @@
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.html#module-linkml_store.api.client">linkml_store.api.client module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.attach_database"><code class="docutils literal notranslate"><span class="pre">Client.attach_database()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.config"><code class="docutils literal notranslate"><span class="pre">Client.config</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.databases"><code class="docutils literal notranslate"><span class="pre">Client.databases</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.from_config"><code class="docutils literal notranslate"><span class="pre">Client.from_config()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.get_database"><code class="docutils literal notranslate"><span class="pre">Client.get_database()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.client.Client.handle"><code class="docutils literal notranslate"><span class="pre">Client.handle</span></code></a></li>
 </ul>
@@ -349,6 +396,7 @@
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.close"><code class="docutils literal notranslate"><span class="pre">Database.close()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.commit"><code class="docutils literal notranslate"><span class="pre">Database.commit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.create_collection"><code class="docutils literal notranslate"><span class="pre">Database.create_collection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.from_config"><code class="docutils literal notranslate"><span class="pre">Database.from_config()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.get_collection"><code class="docutils literal notranslate"><span class="pre">Database.get_collection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.handle"><code class="docutils literal notranslate"><span class="pre">Database.handle</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database.induce_schema_view"><code class="docutils literal notranslate"><span class="pre">Database.induce_schema_view()</span></code></a></li>

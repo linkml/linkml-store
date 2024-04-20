@@ -24,7 +24,9 @@
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="linkml_store" href="../modules.html" />
+    <link rel="prev" title="Semantic Search tutorial" href="Semantic-Search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,8 +49,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Semantic-Search.html">Semantic Search tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
 </ul>
 
@@ -524,26 +528,6 @@ PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
 <img alt="../_images/examples_Monarch-KG_9_0.png" src="../_images/examples_Monarch-KG_9_0.png" />
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span><span class="o">.</span><span class="n">list_collections</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[DuckDBCollection(name=&#39;dangling_edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: ..., &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
- DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: ..., &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
- DuckDBCollection(name=&#39;edges&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: ..., &#39;nodes&#39;: DuckDBCollection(name=&#39;nodes&#39;, parent=..., _indexes=None, _table_created=None)}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None),
- DuckDBCollection(name=&#39;nodes&#39;, parent=DuckDBDatabase(handle=&#39;duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db&#39;, _schema_view=None, _collections={&#39;dangling_edges&#39;: DuckDBCollection(name=&#39;dangling_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;denormalized_edges&#39;: DuckDBCollection(name=&#39;denormalized_edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;edges&#39;: DuckDBCollection(name=&#39;edges&#39;, parent=..., _indexes=None, _table_created=None), &#39;nodes&#39;: ...}, _connection=None, _engine=Engine(duckdb:////Users/cjm/.data/linkml/store/monarch-kg.db)), _indexes=None, _table_created=None)]
-</pre></div></div>
-</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -557,7 +541,10 @@ PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Semantic-Search.html" class="btn btn-neutral float-left" title="Semantic Search tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules.html" class="btn btn-neutral float-right" title="linkml_store" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
