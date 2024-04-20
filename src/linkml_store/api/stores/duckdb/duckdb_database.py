@@ -30,13 +30,6 @@ def run_query(con: DuckDBPyConnection, query: Query, **kwargs):
     """
     Run a query and return the result.
 
-    >>> import duckdb
-    >>> con = duckdb.connect("db/mgi.db")
-    >>> query = Query(from_table="gaf_association", limit=5)
-    >>> result = run_query(con, query)
-    >>> print(result.num_rows)
-    532233
-
     :param con:
     :param query:
     :return:
