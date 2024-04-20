@@ -25,7 +25,7 @@ jobs:
         uses: snok/install-poetry@v1.3.1
         
       - name: Install dependencies
-        run: poetry install --extras "mongodb llm validation app"
+        run: poetry install --no-interaction --all-extras
 
       - name: Check common spelling errors
         run: poetry run tox -e codespell
@@ -34,4 +34,4 @@ jobs:
         run: poetry run tox -e lint
 
       - name: Test with pytest and generate coverage file
-        run: poetry run tox -e py
+        run: poetry run pytest
