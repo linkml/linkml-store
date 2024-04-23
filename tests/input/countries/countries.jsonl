@@ -1,0 +1,20 @@
+{"name": "United States", "code": "US", "capital": "Washington, D.C.", "continent": "North America", "languages": ["English"]}
+{"name": "Canada", "code": "CA", "capital": "Ottawa", "continent": "North America", "languages": ["English", "French"]}
+{"name": "Mexico", "code": "MX", "capital": "Mexico City", "continent": "North America", "languages": ["Spanish"]}
+{"name": "Brazil", "code": "BR", "capital": "Brasília", "continent": "South America", "languages": ["Portuguese"]}
+{"name": "Argentina", "code": "AR", "capital": "Buenos Aires", "continent": "South America", "languages": ["Spanish"]}
+{"name": "United Kingdom", "code": "GB", "capital": "London", "continent": "Europe", "languages": ["English"]}
+{"name": "France", "code": "FR", "capital": "Paris", "continent": "Europe", "languages": ["French"]}
+{"name": "Germany", "code": "DE", "capital": "Berlin", "continent": "Europe", "languages": ["German"]}
+{"name": "Italy", "code": "IT", "capital": "Rome", "continent": "Europe", "languages": ["Italian"]}
+{"name": "Spain", "code": "ES", "capital": "Madrid", "continent": "Europe", "languages": ["Spanish"]}
+{"name": "China", "code": "CN", "capital": "Beijing", "continent": "Asia", "languages": ["Standard Chinese"]}
+{"name": "Japan", "code": "JP", "capital": "Tokyo", "continent": "Asia", "languages": ["Japanese"]}
+{"name": "India", "code": "IN", "capital": "New Delhi", "continent": "Asia", "languages": ["Hindi", "English"]}
+{"name": "South Korea", "code": "KR", "capital": "Seoul", "continent": "Asia", "languages": ["Korean"]}
+{"name": "Indonesia", "code": "ID", "capital": "Jakarta", "continent": "Asia", "languages": ["Indonesian"]}
+{"name": "Australia", "code": "AU", "capital": "Canberra", "continent": "Oceania", "languages": ["English"]}
+{"name": "New Zealand", "code": "NZ", "capital": "Wellington", "continent": "Oceania", "languages": ["English", "Māori"]}
+{"name": "Egypt", "code": "EG", "capital": "Cairo", "continent": "Africa", "languages": ["Arabic"]}
+{"name": "Nigeria", "code": "NG", "capital": "Abuja", "continent": "Africa", "languages": ["English"]}
+{"name": "South Africa", "code": "ZA", "capital": "Pretoria", "continent": "Africa", "languages": ["Zulu", "Xhosa", "Afrikaans", "English", "Northern Sotho", "Tswana", "Southern Sotho", "Tsonga", "Swazi", "Venda", "Southern Ndebele"]}
