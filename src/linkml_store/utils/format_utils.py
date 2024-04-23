@@ -2,21 +2,24 @@ import csv
 import json
 from enum import Enum
 from io import StringIO
+from pathlib import Path
 from typing import Any, Dict, List, Union
 
 import yaml
+from pydantic import BaseModel
 
 
 class Format(Enum):
     JSON = "json"
+    JSONL = "jsonl"
     YAML = "yaml"
     TSV = "tsv"
     CSV = "csv"
 
 
-def load_objects(file_path: str, format: Union[Format, str] = None) -> List[Dict[str, Any]]:
+def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None) -> List[Dict[str, Any]]:
     """
-    Load objects from a file in JSON, YAML, CSV, or TSV format.
+    Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
 
     :param file_path: The path to the file.
     :param format: The format of the file. Can be a Format enum or a string value.
@@ -25,9 +28,15 @@ def load_objects(file_path: str, format: Union[Format, str] = None) -> List[Dict
     if isinstance(format, str):
         format = Format(format)
 
+    if isinstance(file_path, Path):
+        file_path = str(file_path)
+
     if format == Format.JSON or (not format and file_path.endswith(".json")):
         with open(file_path) as f:
             return json.load(f)
+    elif format == Format.JSONL or (not format and file_path.endswith(".jsonl")):
+        with open(file_path) as f:
+            return [json.loads(line) for line in f]
     elif format == Format.YAML or (not format and (file_path.endswith(".yaml") or file_path.endswith(".yml"))):
         with open(file_path) as f:
             return yaml.safe_load(f)
@@ -43,9 +52,9 @@ def load_objects(file_path: str, format: Union[Format, str] = None) -> List[Dict
         raise ValueError(f"Unsupported file format: {file_path}")
 
 
-def render_output(data: List[Dict[str, Any]], format: Union[Format, str]) -> str:
+def render_output(data: List[Dict[str, Any]], format: Union[Format, str] = Format.YAML) -> str:
     """
-    Render output data in JSON, YAML, CSV, or TSV format.
+    Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
 
     :param data: The data to be rendered.
     :param format: The desired output format. Can be a Format enum or a string value.
@@ -54,8 +63,13 @@ def render_output(data: List[Dict[str, Any]], format: Union[Format, str]) -> str
     if isinstance(format, str):
         format = Format(format)
 
+    if isinstance(data, BaseModel):
+        data = data.model_dump()
+
     if format == Format.JSON:
         return json.dumps(data, indent=2, default=str)
+    elif format == Format.JSONL:
+        return "\n".join(json.dumps(obj) for obj in data)
     elif format == Format.YAML:
         return yaml.safe_dump(data, sort_keys=False)
     elif format == Format.TSV:

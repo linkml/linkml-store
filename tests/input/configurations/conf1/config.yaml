@@ -23,7 +23,7 @@ databases:
             range: string
   clinical:
     handle: duckdb:///{base_dir}/clinical.db
-    schema:
+    schema_dict:
       classes:
         Patient:
           attributes:
@@ -46,7 +46,6 @@ databases:
               range: string
             name:
               range: string
-              collection_date:
             sources:
               range: string
               multivalued: true

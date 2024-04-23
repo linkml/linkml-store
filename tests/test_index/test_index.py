@@ -2,10 +2,10 @@ import os
 
 import numpy as np
 import pytest
-from linkml_store.index.implementations.llm_index import LLMIndex
-from linkml_store.index.implementations.simple_index import SimpleIndex
+from linkml_store.index.implementations.llm_indexer import LLMIndexer
+from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 
-INDEX_CLASSES = [SimpleIndex, LLMIndex]
+INDEX_CLASSES = [SimpleIndexer, LLMIndexer]
 
 
 @pytest.mark.parametrize("index_class", INDEX_CLASSES)
@@ -31,7 +31,7 @@ INDEX_CLASSES = [SimpleIndex, LLMIndex]
     ],
 )
 def test_index(index_class, texts):
-    if os.environ.get("GITHUB_ACTIONS") == "true" and index_class == LLMIndex:
+    if os.environ.get("GITHUB_ACTIONS") == "true" and index_class == LLMIndexer:
         pytest.skip("Skipping LLMIndex test in GitHub Actions")
     index = index_class()
     vectors = index.texts_to_vectors(texts.values())

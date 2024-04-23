@@ -6,7 +6,8 @@ test: pytest doctest
 test-full: test integration-tests
 
 install:
-	poetry install --extras "mongodb llm validation app"
+	#poetry install --extras "mongodb llm validation app"
+	poetry install --no-interaction --all-extras
 
 pytest:
 	$(RUN) pytest

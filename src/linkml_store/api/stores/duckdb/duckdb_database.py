@@ -1,17 +1,19 @@
 import json
 import logging
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 import sqlalchemy
 from duckdb import DuckDBPyConnection
 from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model import SlotDefinition
+from linkml_runtime.linkml_model import SlotDefinition, ClassDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-from sqlalchemy import text
+from sqlalchemy import text, NullPool
 
 from linkml_store.api import Database
+from linkml_store.api.config import CollectionConfig
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
 from linkml_store.utils.sql_utils import introspect_schema, query_to_sql
@@ -20,47 +22,36 @@ TYPE_MAP = {
     "VARCHAR": "string",
     "BIGINT": "integer",
     "BOOLEAN": "boolean",
+    "DATE": "date",
+    "DOUBLE": "float",
+    "INTEGER": "integer",
 }
 
 
 logger = logging.getLogger(__name__)
 
 
-def run_query(con: DuckDBPyConnection, query: Query, **kwargs):
-    """
-    Run a query and return the result.
-
-    :param con:
-    :param query:
-    :return:
-    """
-    count_query_str = query_to_sql(query, count=True)
-    num_rows = con.execute(count_query_str).fetchall()[0][0]
-    logger.debug(f"num_rows: {num_rows}")
-    query_str = query_to_sql(query, **kwargs)
-    logger.debug(f"query_str: {query_str}")
-    rows = con.execute(query_str).fetchdf()
-    qr = QueryResult(query=query, num_rows=num_rows)
-    qr.set_rows(rows)
-    return qr
-
-
-@dataclass
 class DuckDBDatabase(Database):
     _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
+    collection_class = DuckDBCollection
 
-    def __post_init__(self):
-        if not self.handle:
-            self.handle = "duckdb:///:memory:"
+    def __init__(self, handle: Optional[str] = None, **kwargs):
+        if handle is None:
+            handle = "duckdb:///:memory:"
+        super().__init__(handle=handle, **kwargs)
 
     @property
     def engine(self) -> sqlalchemy.Engine:
         if not self._engine:
             handle = self.handle
             if not handle.startswith("duckdb://") and not handle.startswith(":"):
-                handle = f"duckdb://{handle}"
-            self._engine = sqlalchemy.create_engine(handle)
+                handle = f"duckdb:///{handle}"
+            if ":memory:" not in handle:
+                # TODO: investigate this; duckdb appears to be prematurely caching
+                self._engine = sqlalchemy.create_engine(handle, poolclass=NullPool)
+            else:
+                self._engine = sqlalchemy.create_engine(handle)
         return self._engine
 
     def commit(self, **kwargs):
@@ -128,21 +119,15 @@ class DuckDBDatabase(Database):
                 collection = DuckDBCollection(name=table_name, parent=self)
                 self._collections[table_name] = collection
 
-    def create_collection(self, name: str, alias: Optional[str] = None, **kwargs) -> DuckDBCollection:
-        collection = DuckDBCollection(name=name, parent=self)
-        if not self._collections:
-            self._collections = {}
-        if not alias:
-            alias = name
-        self._collections[alias] = collection
-        return collection
-
     def induce_schema_view(self) -> SchemaView:
         # TODO: unify schema introspection
+        # TODO: handle case where schema is provided in advance
+        logger.info(f"Inducing schema view for {self.metadata.handle}")
         sb = SchemaBuilder()
         schema = sb.schema
         query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
         qr = self.query(query)
+        logger.info(f"Found {qr.num_rows} information_schema.tables // {qr.rows}")
         if qr.num_rows:
             table_names = [row["table_name"] for row in qr.rows]
             for tbl in table_names:
@@ -163,5 +148,13 @@ class DuckDBDatabase(Database):
                 row["column_name"], required=row["is_nullable"] == "NO", multivalued=multivalued, range=rng
             )
             sb.schema.classes[tbl_name].attributes[sd.name] = sd
+            logger.info(f"Introspected slot: {tbl_name}.{sd.name}: {sd.range}")
         sb.add_defaults()
+        for cls_name in schema.classes:
+            if cls_name in self.metadata.collections:
+                collection_metadata = self.metadata.collections[cls_name]
+                if collection_metadata.attributes:
+                    del schema.classes[cls_name]
+                    cls = ClassDefinition(name=collection_metadata.type, attributes=collection_metadata.attributes)
+                    schema.classes[cls.name] = cls
         return SchemaView(schema)

@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -14,7 +13,6 @@ HANDLE_MAP = {
 }
 
 
-@dataclass
 class Client:
     """
     A client provides access to named collections.
@@ -25,7 +23,7 @@ class Client:
     >>> db = client.attach_database("duckdb", alias="test")
     >>> collection = db.create_collection("Person")
     >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
-    >>> collection.add(objs)
+    >>> collection.insert(objs)
     >>> qr = collection.find()
     >>> len(qr.rows)
     2
@@ -41,9 +39,35 @@ class Client:
 
     """
 
-    handle: Optional[str] = None
-    config: Optional[ClientConfig] = None
+    metadata: Optional[ClientConfig] = None
     _databases: Optional[Dict[str, Database]] = None
+
+    def __init__(self, handle: Optional[str] = None, metadata: Optional[ClientConfig] = None):
+        """
+        Initialize a client.
+
+        :param handle:
+        :param metadata:
+        """
+        self.metadata = metadata
+        if not self.metadata:
+            self.metadata = ClientConfig()
+        self.metadata.handle = handle
+
+    @property
+    def handle(self) -> Optional[str]:
+        return self.metadata.handle
+
+    @property
+    def base_dir(self) -> Optional[str]:
+        """
+        Get the base directory for the client.
+
+        Wraps metadata.base_dir.
+
+        :return:
+        """
+        return self.metadata.base_dir
 
     def from_config(self, config: Union[ClientConfig, str, Path], base_dir=None, **kwargs):
         """
@@ -72,13 +96,18 @@ class Client:
                 base_dir = Path(config).parent
             parsed_obj = yaml.safe_load(open(config))
             config = ClientConfig(**parsed_obj)
-        self.config = config
-        for name, db_config in config.databases.items():
-            handle = db_config.handle.format(base_dir=base_dir)
+        self.metadata = config
+        if base_dir:
+            self.metadata.base_dir = base_dir
+        self._initialize_databases(**kwargs)
+        return self
+
+    def _initialize_databases(self, **kwargs):
+        for name, db_config in self.metadata.databases.items():
+            handle = db_config.handle.format(base_dir=self.base_dir)
             db_config.handle = handle
             db = self.attach_database(handle, alias=name, **kwargs)
             db.from_config(db_config)
-        return self
 
     def attach_database(
         self,
@@ -108,7 +137,6 @@ class Client:
         :param schema_view: schema view to associate with the database
         :param kwargs:
         :return:
-
         """
         if ":" not in handle:
             scheme = handle
@@ -126,6 +154,7 @@ class Client:
         if not self._databases:
             self._databases = {}
         self._databases[alias] = db
+        db.parent = self
         return db
 
     def get_database(self, name: Optional[str] = None, create_if_not_exists=True, **kwargs) -> Database:

@@ -1,16 +1,16 @@
 import logging
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Type, Union, Iterator
 
 import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
+from linkml_store.api.config import CollectionConfig
 from linkml_store.api.queries import Query, QueryResult
-from linkml_store.index.index import Index
+from linkml_store.index.indexer import Indexer
 
 if TYPE_CHECKING:
     from linkml_store.api.database import Database
@@ -24,7 +24,6 @@ IDENTIFIER = str
 FIELD_NAME = str
 
 
-@dataclass
 class Collection:
     """
     A collection is an organized set of objects of the same or similar type.
@@ -34,12 +33,67 @@ class Collection:
     - For a file system, a collection could be a single tabular file such as Parquet or CSV
     """
 
-    name: str
+    # name: str
     parent: Optional["Database"] = None
-    _indexes: Optional[Dict[str, Index]] = None
-    hidden: Optional[bool] = False
+    _indexers: Optional[Dict[str, Indexer]] = None
+    # hidden: Optional[bool] = False
 
-    def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+    metadata: Optional[CollectionConfig] = None
+
+    def __init__(self, name: str, parent: Optional["Database"] = None, metadata: Optional[CollectionConfig] = None, **kwargs):
+        self.parent = parent
+        if metadata:
+            self.metadata = metadata
+        else:
+            self.metadata = CollectionConfig(name=name, **kwargs)
+        if name is not None and self.metadata.name is not None and name != self.metadata.name:
+            raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
+
+    @property
+    def name(self) -> str:
+        return self.metadata.name
+
+    @property
+    def hidden(self) -> bool:
+        return self.metadata.hidden
+
+    @property
+    def _target_class_name(self):
+        """
+        Return the name of the class that this collection represents
+
+        This MUST be a LinkML class name
+
+        :return:
+        """
+        # TODO: this is a shim layer until we can normalize on this
+        if self.metadata.type:
+            return self.metadata.type
+        return self.name
+
+    @property
+    def _alias(self):
+        """
+        Return the primary name/alias used for the collection.
+
+        This MAY be the name of the LinkML class, but it may be desirable
+        to have an alias, for example "persons" which collects all instances
+        of class Person.
+
+        The _alias SHOULD be used for Table names in SQL.
+
+        For nested data, the alias SHOULD be used as the key; e.g
+
+         ``{ "persons": [ { "name": "Alice" }, { "name": "Bob" } ] }``
+
+        :return:
+        """
+        # TODO: this is a shim layer until we can normalize on this
+        if self.metadata.alias:
+            return self.metadata.alias
+        return self.name
+
+    def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
         Add one or more objects to the collection
 
@@ -59,13 +113,15 @@ class Collection:
         """
         raise NotImplementedError
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None, **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True,
+                     **kwargs) -> int:
         """
         Delete objects that match a query
 
-        :param where:
+        :param where: where conditions
+        :param missing_ok: if True, do not raise an error if the collection does not exist
         :param kwargs:
-        :return:
+        :return: number of objects deleted (or -1 if unsupported)
         """
         raise NotImplementedError
 
@@ -80,7 +136,7 @@ class Collection:
         raise NotImplementedError
 
     def _create_query(self, **kwargs) -> Query:
-        return Query(from_table=self.name, **kwargs)
+        return Query(from_table=self._alias, **kwargs)
 
     def query(self, query: Query, **kwargs) -> QueryResult:
         """
@@ -145,12 +201,12 @@ class Collection:
         :return:
         """
         if index_name is None:
-            if len(self._indexes) == 1:
-                index_name = list(self._indexes.keys())[0]
+            if len(self._indexers) == 1:
+                index_name = list(self._indexers.keys())[0]
             else:
                 raise ValueError("Multiple indexes found. Please specify an index name.")
         ix_coll = self.parent.get_collection(self._index_collection_name(index_name))
-        ix = self._indexes.get(index_name)
+        ix = self._indexers.get(index_name)
         if not ix:
             raise ValueError(f"No index named {index_name}")
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
@@ -163,7 +219,19 @@ class Collection:
         new_qr.ranked_rows = results
         return new_qr
 
-    def attach_index(self, index: Index, auto_index=True, **kwargs):
+
+    @property
+    def is_internal(self) -> bool:
+        """
+        Check if the collection is internal
+
+        :return:
+        """
+        if not self.name:
+            raise ValueError(f"Collection has no name: {self} // {self.metadata}")
+        return self.name.startswith("internal__")
+
+    def attach_indexer(self, index: Indexer, auto_index=True, **kwargs):
         """
         Attach an index to the collection.
 
@@ -175,38 +243,74 @@ class Collection:
         index_name = index.name
         if not index_name:
             raise ValueError("Index must have a name")
-        if not self._indexes:
-            self._indexes = {}
-        self._indexes[index_name] = index
+        if not self._indexers:
+            self._indexers = {}
+        self._indexers[index_name] = index
         if auto_index:
             all_objs = self.find(limit=-1).rows
-            self.index_objects(all_objs, index_name, **kwargs)
+            self.index_objects(all_objs, index_name, replace=True, **kwargs)
 
     def _index_collection_name(self, index_name: str) -> str:
-        return f"index__{self.name}_{index_name}"
+        """
+        Create a name for a special collection that holds index data
 
-    def index_objects(self, objs: List[OBJECT], index_name: str, **kwargs):
+        :param index_name:
+        :return:
+        """
+        return f"internal__index__{self.name}__{index_name}"
+
+    def index_objects(self, objs: List[OBJECT], index_name: str, replace=False, **kwargs):
         """
         Index a list of objects
 
         :param objs:
         :param index_name:
+        :param replace:
         :param kwargs:
         :return:
         """
-        ix = self._indexes.get(index_name)
+        ix = self._indexers.get(index_name)
         if not ix:
             raise ValueError(f"No index named {index_name}")
-        ix_coll = self.parent.get_collection(self._index_collection_name(index_name), create_if_not_exists=True)
+        ix_coll_name = self._index_collection_name(index_name)
+        ix_coll = self.parent.get_collection(ix_coll_name, create_if_not_exists=True)
         vectors = [list(float(e) for e in v) for v in ix.objects_to_vectors(objs)]
         objects_with_ix = []
         index_col = ix.index_field
         for obj, vector in zip(objs, vectors):
             # TODO: id field
             objects_with_ix.append({**obj, **{index_col: vector}})
-        ix_coll.add(objects_with_ix, **kwargs)
+        if replace:
+            schema = self.parent.schema_view.schema
+            logger.info(f"Checking if {ix_coll_name} is in {schema.classes.keys()}")
+            if ix_coll_name in schema.classes:
+                ix_coll.delete_where()
+        ix_coll.insert(objects_with_ix, **kwargs)
+
+    def list_index_names(self) -> List[str]:
+        """
+        Return a list of index names
+
+        :return:
+        """
+        return list(self._indexers.keys())
+
+    @property
+    def indexers(self) -> Dict[str, Indexer]:
+        """
+        Return a list of indexers
+
+        :return:
+        """
+        return self._indexers if self._indexers else {}
 
     def peek(self, limit: Optional[int] = None) -> QueryResult:
+        """
+        Return the first N objects in the collection
+
+        :param limit:
+        :return:
+        """
         q = self._create_query()
         return self.query(q, limit=limit)
 
@@ -218,7 +322,8 @@ class Collection:
         """
         sv = self.parent.schema_view
         if sv:
-            return sv.get_class(self.name)
+            cls = sv.get_class(self._target_class_name)
+            return cls
         return None
 
     def identifier_attribute_name(self) -> Optional[str]:
@@ -245,7 +350,7 @@ class Collection:
         :param max_sample_size:
         :return:
         """
-        cd = ClassDefinition(self.name)
+        cd = ClassDefinition(self._target_class_name)
         keys = defaultdict(list)
         for obj in objs[0:max_sample_size]:
             if isinstance(obj, BaseModel):
@@ -308,7 +413,7 @@ class Collection:
                 array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
                 cd.attributes[k].array = array_expr
         sv = self.parent.schema_view
-        sv.schema.classes[self.name] = cd
+        sv.schema.classes[self._target_class_name] = cd
         sv.set_modified()
         return cd
 
@@ -331,3 +436,21 @@ class Collection:
         :return:
         """
         raise NotImplementedError
+
+    def iter_validate_collection(self, **kwargs) -> Iterator["linkml.validator.ValidationResult"]:
+        """
+        Validate the contents of the collection
+
+        :param kwargs:
+        :return: iterator over validation results
+        """
+        from linkml.validator import Validator, JsonschemaValidationPlugin
+        validation_plugins = [JsonschemaValidationPlugin(closed=True)]
+        validator = Validator(self.parent.schema_view.schema, validation_plugins=validation_plugins)
+        cd = self.class_definition()
+        if not cd:
+            raise ValueError(f"Cannot find class definition for {self._target_class_name}")
+        class_name = cd.name
+        result = self.find(**kwargs)
+        for obj in result.rows:
+            yield from validator.iter_results(obj, class_name)

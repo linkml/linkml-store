@@ -6,13 +6,14 @@
 Welcome to the linkml-store documentation!
 =========================================================
 
-Currently this is alpha, check back later for more docs
+
 
 .. toctree::
    :maxdepth: 3
    :caption: Contents:
 
-   examples/Tutorial
+   examples/Command-Line-Tutorial
+   examples/Python-Tutorial
    examples/Semantic-Search
    examples/Monarch-KG
    modules

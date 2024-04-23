@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 import sqlalchemy as sqla
@@ -9,17 +8,17 @@ from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
+from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.mappings import TMAP
 from linkml_store.utils.sql_utils import facet_count_sql
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class DuckDBCollection(Collection):
     _table_created: bool = None
 
-    def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+    def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
             objs = [objs]
         if not objs:
@@ -29,6 +28,7 @@ class DuckDBCollection(Collection):
             cd = self.induce_class_definition_from_objects(objs)
         self._create_table(cd)
         table = self._sqla_table(cd)
+        logger.info(f"Inserting into: {self._alias} // T={table.name}")
         engine = self.parent.engine
         col_names = [c.name for c in table.columns]
         objs = [{k: obj.get(k, None) for k in col_names} for obj in objs]
@@ -54,7 +54,10 @@ class DuckDBCollection(Collection):
                 conn.commit()
         return len(objs)
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None, **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
+        logger.info(f"Deleting from {self._target_class_name} where: {where}")
+        if where is None:
+            where = {}
         cd = self.class_definition()
         table = self._sqla_table(cd)
         engine = self.parent.engine
@@ -62,9 +65,12 @@ class DuckDBCollection(Collection):
             conditions = [table.c[k] == v for k, v in where.items()]
             stmt = delete(table).where(*conditions)
             stmt = stmt.compile(engine)
-            conn.execute(stmt)
+            result = conn.execute(stmt)
+            deleted_rows_count = result.rowcount
+            if deleted_rows_count == 0 and not missing_ok:
+                raise ValueError(f"No rows found for {where}")
             conn.commit()
-        return 0
+            return deleted_rows_count
 
     def query_facets(
         self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
@@ -88,9 +94,10 @@ class DuckDBCollection(Collection):
             return results
 
     def _sqla_table(self, cd: ClassDefinition) -> Table:
+        schema_view = self.parent.schema_view
         metadata_obj = sqla.MetaData()
         cols = []
-        for att in cd.attributes.values():
+        for att in schema_view.class_induced_slots(cd.name):
             typ = TMAP.get(att.range, sqla.String)
             if att.inlined:
                 typ = sqla.JSON
@@ -100,17 +107,26 @@ class DuckDBCollection(Collection):
                 typ = sqla.ARRAY(typ, dimensions=1)
             col = Column(att.name, typ)
             cols.append(col)
-        t = Table(self.name, metadata_obj, *cols)
+        t = Table(self._alias, metadata_obj, *cols)
         return t
 
     def _create_table(self, cd: ClassDefinition):
-        if self._table_created:
+        if self._table_created or self.metadata.is_prepopulated:
+            logger.info(f"Already have table for: {cd.name}")
             return
+        query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self._alias})
+        qr = self.parent.query(query)
+        if qr.num_rows > 0:
+            logger.info(f"Table already exists for {cd.name}")
+            self._table_created = True
+            self.metadata.is_prepopulated = True
+            return
+        logger.info(f"Creating table for {cd.name}")
         t = self._sqla_table(cd)
         ct = CreateTable(t)
         ddl = str(ct.compile(self.parent.engine))
         with self.parent.engine.connect() as conn:
             conn.execute(text(ddl))
             conn.commit()
-        if not self._table_created:
-            self._table_created = True
+        self._table_created = True
+        self.metadata.is_prepopulated = True
