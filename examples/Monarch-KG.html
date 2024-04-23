@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monarch-KG notebook &mdash; linkml-store  documentation</title>
+  <title>Example: Monarch-KG notebook &mdash; linkml-store  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
@@ -50,9 +50,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Python-Tutorial.html">Tutorial: LinkML-Store via Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Monarch-KG notebook</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
 </ul>
 
@@ -70,7 +71,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Monarch-KG notebook</li>
+      <li class="breadcrumb-item active">Example: Monarch-KG notebook</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/examples/Monarch-KG.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -80,10 +81,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="Monarch-KG-notebook">
-<h1>Monarch-KG notebook<a class="headerlink" href="#Monarch-KG-notebook" title="Link to this heading"></a></h1>
+  <section id="Example:-Monarch-KG-notebook">
+<h1>Example: Monarch-KG notebook<a class="headerlink" href="#Example:-Monarch-KG-notebook" title="Link to this heading"></a></h1>
+<p>Illustrates use of LinkML-Store over the Monarch-KG database (duckdb serialization)</p>
+<p>First we initialize a <code class="docutils literal notranslate"><span class="pre">Client</span></code> object:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -92,54 +95,46 @@
 </pre></div>
 </div>
 </div>
+<p>Next we download the dump (using pystow, to cache if needed)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.constants</span> <span class="kn">import</span> <span class="n">LINKML_STORE_MODULE</span>
 
 <span class="n">MONARCH_KG_DB</span> <span class="o">=</span> <span class="s2">&quot;https://data.monarchinitiative.org/monarch-kg/latest/monarch-kg.db.gz&quot;</span>
 
-
 <span class="n">path</span> <span class="o">=</span> <span class="n">LINKML_STORE_MODULE</span><span class="o">.</span><span class="n">ensure_gunzip</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">MONARCH_KG_DB</span><span class="p">,</span> <span class="n">autoclean</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<br/></pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">database</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;duckdb:///</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;monarch-kg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">edges_coll</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;denormalized_edges&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:181: DuckDBEngineWarning: duckdb-engine doesn&#39;t yet support reflection on indices
+  warnings.warn(
+</pre></div></div>
+</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">edges_coll</span><span class="o">.</span><span class="n">find</span><span class="p">()</span>
@@ -147,330 +142,179 @@ PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "182b69dcd1fa463abdf10c1d9c1bc6b0"}</script></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">CatalogException</span>                          Traceback (most recent call last)
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1971</span>, in <span class="ansi-cyan-fg">Connection._exec_single_context</span><span class="ansi-blue-fg">(self, dialect, context, statement, parameters)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1970</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> evt_handled:
+<span class="ansi-green-fg">-&gt; 1971</span>         <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">dialect</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">do_execute</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1972</span> <span class="ansi-yellow-bg">            </span><span class="ansi-yellow-bg">cursor</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">str_statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">effective_parameters</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">context</span>
+<span class="ansi-green-intense-fg ansi-bold">   1973</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1975</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_has_events <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>engine<span style="color: rgb(98,98,98)">.</span>_has_events:
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/default.py:919</span>, in <span class="ansi-cyan-fg">DefaultDialect.do_execute</span><span class="ansi-blue-fg">(self, cursor, statement, parameters, context)</span>
+<span class="ansi-green-intense-fg ansi-bold">    918</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">do_execute</span>(<span style="color: rgb(0,135,0)">self</span>, cursor, statement, parameters, context<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">--&gt; 919</span>     <span class="ansi-yellow-bg">cursor</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execute</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">parameters</span><span class="ansi-yellow-bg">)</span>
 
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>aggregator_knowledge_source</th>
-      <th>category</th>
-      <th>evidence</th>
-      <th>frequency_qualifier</th>
-      <th>has_evidence</th>
-      <th>id</th>
-      <th>knowledge_source</th>
-      <th>negated</th>
-      <th>object</th>
-      <th>object_category</th>
-      <th>...</th>
-      <th>qualifiers</th>
-      <th>relation</th>
-      <th>sex_qualifier</th>
-      <th>stage_qualifier</th>
-      <th>subject</th>
-      <th>subject_category</th>
-      <th>subject_closure</th>
-      <th>subject_closure_label</th>
-      <th>subject_label</th>
-      <th>subject_namespace</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:9d3db3b3-0e55-462f-9876-b125014e7a63</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:100147</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:62070</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:35757|CHEBI:62070</td>
-      <td>monocarboxylic acid anion|nalidixic acid anion</td>
-      <td>nalidixic acid anion</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:fbc60452-f951-4f81-8dcf-bcc20834e7ab</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:100241</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:192484</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:27369|CHEBI:192484</td>
-      <td>ciprofloxacin zwitterion|zwitterion</td>
-      <td>ciprofloxacin zwitterion</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:fe862fe6-0ae3-4f83-97ec-39f1d7683a87</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:100241</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:192486</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:137419|CHEBI:192486</td>
-      <td>secondary ammonium ion|ciprofloxacin(1+)</td>
-      <td>ciprofloxacin(1+)</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:773f1b21-bf81-4208-ab59-448545ffe46b</td>
-      <td>Graph</td>
-      <td></td>
-      <td>CHEBI:10545</td>
-      <td>biolink:ChemicalSubstance</td>
-      <td>...</td>
-      <td></td>
-      <td>BFO:0000051</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:33250</td>
-      <td>biolink:ChemicalEntity</td>
-      <td>CHEBI:24431|CHEBI:33250</td>
-      <td>chemical entity|atom</td>
-      <td>atom</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:83584793-1852-4166-9723-24287c85f136</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:10642</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:27405</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:24436|CHEBI:61689|CHEBI:27405</td>
-      <td>guanidines|streptidine|amino cyclitol</td>
-      <td>streptidine</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>95</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:2e2135d0-f67b-4f18-bf6d-363e2a70a42f</td>
-      <td>Graph</td>
-      <td></td>
-      <td>CHEBI:133135</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>rdfs:subClassOf</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:72579</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:133135|CHEBI:72579</td>
-      <td>chromenochromene|tetrahydrochromenochromene</td>
-      <td>tetrahydrochromenochromene</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>96</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:d93f9e52-2825-436b-91fb-97ea82d01a83</td>
-      <td>Graph</td>
-      <td></td>
-      <td>CHEBI:133251</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>rdfs:subClassOf</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:17325</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:133251|CHEBI:17325</td>
-      <td>3-hydroxydicarboxylate(2-)|3-hydroxy-3-methylg...</td>
-      <td>3-hydroxy-3-methylglutarate(2-)</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>97</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:e1d4dc4d-3142-48cf-ba4d-1946638d61eb</td>
-      <td>Graph</td>
-      <td></td>
-      <td>CHEBI:133291</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>rdfs:subClassOf</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:15792</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:133291|CHEBI:15792</td>
-      <td>saturated dicarboxylic acid dianion(2-)|malona...</td>
-      <td>malonate(2-)</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>98</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:341fe57a-f81c-4e50-83d7-c755e74f48a1</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:133294</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:36145</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:35692|CHEBI:25754|CHEBI:36145</td>
-      <td>oxo carboxylic acid|dicarboxylic acid|oxo dica...</td>
-      <td>oxo dicarboxylic acid</td>
-      <td>CHEBI</td>
-    </tr>
-    <tr>
-      <th>99</th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>urn:uuid:40cd5ad8-e276-4e68-905a-0776fff6cb52</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:133538</td>
-      <td>biolink:MolecularEntity</td>
-      <td>...</td>
-      <td></td>
-      <td>OBO:chebi</td>
-      <td></td>
-      <td></td>
-      <td>CHEBI:18019</td>
-      <td>biolink:MolecularEntity</td>
-      <td>CHEBI:25094|CHEBI:22658|CHEBI:18019</td>
-      <td>L-lysine|aspartate family amino acid|lysine</td>
-      <td>L-lysine</td>
-      <td>CHEBI</td>
-    </tr>
-  </tbody>
-</table>
-<p>100 rows × 31 columns</p>
-</div></div>
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:163</span>, in <span class="ansi-cyan-fg">ConnectionWrapper.execute</span><span class="ansi-blue-fg">(self, statement, parameters, context)</span>
+<span class="ansi-green-intense-fg ansi-bold">    162</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 163</span>         <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">__c</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execute</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">parameters</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    164</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">RuntimeError</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> e:
+
+<span class="ansi-red-fg">CatalogException</span>: Catalog Error: Table with name tables does not exist!
+Did you mean &#34;temp.information_schema.tables&#34;?
+LINE 2: FROM information_schema.tables
+             ^
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">ProgrammingError</span>                          Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[8], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> qr <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">edges_coll</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">find</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> qr<span style="color: rgb(98,98,98)">.</span>rows_dataframe
+
+File <span class="ansi-green-fg">~/repos/linkml-store/src/linkml_store/api/collection.py:183</span>, in <span class="ansi-cyan-fg">Collection.find</span><span class="ansi-blue-fg">(self, where, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    181</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">find</span>(<span style="color: rgb(0,135,0)">self</span>, where: Optional[Any] <span style="color: rgb(98,98,98)">=</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs) <span style="color: rgb(98,98,98)">-</span><span style="color: rgb(98,98,98)">&gt;</span> QueryResult:
+<span class="ansi-green-intense-fg ansi-bold">    182</span>     query <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_create_query(where_clause<span style="color: rgb(98,98,98)">=</span>where)
+<span class="ansi-green-fg">--&gt; 183</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">query</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/repos/linkml-store/src/linkml_store/api/collection.py:149</span>, in <span class="ansi-cyan-fg">Collection.query</span><span class="ansi-blue-fg">(self, query, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    141</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">query</span>(<span style="color: rgb(0,135,0)">self</span>, query: Query, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs) <span style="color: rgb(98,98,98)">-</span><span style="color: rgb(98,98,98)">&gt;</span> QueryResult:
+<span class="ansi-green-intense-fg ansi-bold">    142</span> <span style="color: rgb(188,188,188)">    </span><span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    143</span> <span style="color: rgb(175,0,0)">    Run a query against the collection</span>
+<span class="ansi-green-intense-fg ansi-bold">    144</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">    147</span> <span style="color: rgb(175,0,0)">    :return:</span>
+<span class="ansi-green-intense-fg ansi-bold">    148</span> <span style="color: rgb(175,0,0)">    &#34;&#34;&#34;</span>
+<span class="ansi-green-fg">--&gt; 149</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">parent</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">query</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">query</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/repos/linkml-store/src/linkml_store/api/stores/duckdb/duckdb_database.py:93</span>, in <span class="ansi-cyan-fg">DuckDBDatabase.query</span><span class="ansi-blue-fg">(self, query, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     89</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> query<span style="color: rgb(98,98,98)">.</span>from_table<span style="color: rgb(98,98,98)">.</span>startswith(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">information_schema</span><span style="color: rgb(175,0,0)">&#34;</span>):
+<span class="ansi-green-intense-fg ansi-bold">     90</span>     meta_query <span style="color: rgb(98,98,98)">=</span> Query(
+<span class="ansi-green-intense-fg ansi-bold">     91</span>         from_table<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">information_schema.tables</span><span style="color: rgb(175,0,0)">&#34;</span>, where_clause<span style="color: rgb(98,98,98)">=</span>{<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">table_name</span><span style="color: rgb(175,0,0)">&#34;</span>: query<span style="color: rgb(98,98,98)">.</span>from_table}
+<span class="ansi-green-intense-fg ansi-bold">     92</span>     )
+<span class="ansi-green-fg">---&gt; 93</span>     qr <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">query</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">meta_query</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     94</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> qr<span style="color: rgb(98,98,98)">.</span>num_rows <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(98,98,98)">0</span>:
+<span class="ansi-green-intense-fg ansi-bold">     95</span>         logger<span style="color: rgb(98,98,98)">.</span>debug(<span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Table </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>query<span style="color: rgb(98,98,98)">.</span>from_table<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> not created yet</span><span style="color: rgb(175,0,0)">&#34;</span>)
+
+File <span class="ansi-green-fg">~/repos/linkml-store/src/linkml_store/api/stores/duckdb/duckdb_database.py:110</span>, in <span class="ansi-cyan-fg">DuckDBDatabase.query</span><span class="ansi-blue-fg">(self, query, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    108</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>engine<span style="color: rgb(98,98,98)">.</span>connect() <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> conn:
+<span class="ansi-green-intense-fg ansi-bold">    109</span>     count_query_str <span style="color: rgb(98,98,98)">=</span> text(query_to_sql(query, count<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">True</span>))
+<span class="ansi-green-fg">--&gt; 110</span>     num_rows <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">list</span>(<span class="ansi-yellow-bg">conn</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execute</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">count_query_str</span><span class="ansi-yellow-bg">)</span>)[<span style="color: rgb(98,98,98)">0</span>][<span style="color: rgb(98,98,98)">0</span>]
+<span class="ansi-green-intense-fg ansi-bold">    111</span>     logger<span style="color: rgb(98,98,98)">.</span>debug(<span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">num_rows: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>num_rows<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">    112</span>     query_str <span style="color: rgb(98,98,98)">=</span> query_to_sql(query, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)  <span style="color: rgb(95,135,135)"># include offset, limit</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1422</span>, in <span class="ansi-cyan-fg">Connection.execute</span><span class="ansi-blue-fg">(self, statement, parameters, execution_options)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1420</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> exc<span style="color: rgb(98,98,98)">.</span>ObjectNotExecutableError(statement) <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">err</span>
+<span class="ansi-green-intense-fg ansi-bold">   1421</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">-&gt; 1422</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">meth</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1423</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1424</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">distilled_parameters</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1425</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">execution_options</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">NO_OPTIONS</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1426</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/sql/elements.py:514</span>, in <span class="ansi-cyan-fg">ClauseElement._execute_on_connection</span><span class="ansi-blue-fg">(self, connection, distilled_params, execution_options)</span>
+<span class="ansi-green-intense-fg ansi-bold">    512</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> TYPE_CHECKING:
+<span class="ansi-green-intense-fg ansi-bold">    513</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> <span style="color: rgb(0,135,0)">isinstance</span>(<span style="color: rgb(0,135,0)">self</span>, Executable)
+<span class="ansi-green-fg">--&gt; 514</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">connection</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_execute_clauseelement</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">    515</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">distilled_params</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">execution_options</span>
+<span class="ansi-green-intense-fg ansi-bold">    516</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    517</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">    518</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> exc<span style="color: rgb(98,98,98)">.</span>ObjectNotExecutableError(<span style="color: rgb(0,135,0)">self</span>)
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1644</span>, in <span class="ansi-cyan-fg">Connection._execute_clauseelement</span><span class="ansi-blue-fg">(self, elem, distilled_parameters, execution_options)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1632</span> compiled_cache: Optional[CompiledCacheType] <span style="color: rgb(98,98,98)">=</span> execution_options<span style="color: rgb(98,98,98)">.</span>get(
+<span class="ansi-green-intense-fg ansi-bold">   1633</span>     <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">compiled_cache</span><span style="color: rgb(175,0,0)">&#34;</span>, <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>engine<span style="color: rgb(98,98,98)">.</span>_compiled_cache
+<span class="ansi-green-intense-fg ansi-bold">   1634</span> )
+<span class="ansi-green-intense-fg ansi-bold">   1636</span> compiled_sql, extracted_params, cache_hit <span style="color: rgb(98,98,98)">=</span> elem<span style="color: rgb(98,98,98)">.</span>_compile_w_cache(
+<span class="ansi-green-intense-fg ansi-bold">   1637</span>     dialect<span style="color: rgb(98,98,98)">=</span>dialect,
+<span class="ansi-green-intense-fg ansi-bold">   1638</span>     compiled_cache<span style="color: rgb(98,98,98)">=</span>compiled_cache,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1642</span>     linting<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>dialect<span style="color: rgb(98,98,98)">.</span>compiler_linting <span style="color: rgb(98,98,98)">|</span> compiler<span style="color: rgb(98,98,98)">.</span>WARN_LINTING,
+<span class="ansi-green-intense-fg ansi-bold">   1643</span> )
+<span class="ansi-green-fg">-&gt; 1644</span> ret <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_execute_context</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1645</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">dialect</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1646</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">dialect</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execution_ctx_cls</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_init_compiled</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1647</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">compiled_sql</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1648</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">distilled_parameters</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1649</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">execution_options</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1650</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">compiled_sql</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1651</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">distilled_parameters</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1652</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">elem</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1653</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">extracted_params</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1654</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">cache_hit</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">cache_hit</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1655</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1656</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> has_events:
+<span class="ansi-green-intense-fg ansi-bold">   1657</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>dispatch<span style="color: rgb(98,98,98)">.</span>after_execute(
+<span class="ansi-green-intense-fg ansi-bold">   1658</span>         <span style="color: rgb(0,135,0)">self</span>,
+<span class="ansi-green-intense-fg ansi-bold">   1659</span>         elem,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1663</span>         ret,
+<span class="ansi-green-intense-fg ansi-bold">   1664</span>     )
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1850</span>, in <span class="ansi-cyan-fg">Connection._execute_context</span><span class="ansi-blue-fg">(self, dialect, constructor, statement, parameters, execution_options, *args, **kw)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1848</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_exec_insertmany_context(dialect, context)
+<span class="ansi-green-intense-fg ansi-bold">   1849</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">-&gt; 1850</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_exec_single_context</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1851</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">dialect</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">context</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">parameters</span>
+<span class="ansi-green-intense-fg ansi-bold">   1852</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1990</span>, in <span class="ansi-cyan-fg">Connection._exec_single_context</span><span class="ansi-blue-fg">(self, dialect, context, statement, parameters)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1987</span>     result <span style="color: rgb(98,98,98)">=</span> context<span style="color: rgb(98,98,98)">.</span>_setup_result_proxy()
+<span class="ansi-green-intense-fg ansi-bold">   1989</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">BaseException</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> e:
+<span class="ansi-green-fg">-&gt; 1990</span>     <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_handle_dbapi_exception</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1991</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">e</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">str_statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">effective_parameters</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">cursor</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">context</span>
+<span class="ansi-green-intense-fg ansi-bold">   1992</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1994</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> result
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:2357</span>, in <span class="ansi-cyan-fg">Connection._handle_dbapi_exception</span><span class="ansi-blue-fg">(self, e, statement, parameters, cursor, context, is_sub_exec)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2355</span> <span class="ansi-bold" style="color: rgb(0,135,0)">elif</span> should_wrap:
+<span class="ansi-green-intense-fg ansi-bold">   2356</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> sqlalchemy_exception <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
+<span class="ansi-green-fg">-&gt; 2357</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> sqlalchemy_exception<span style="color: rgb(98,98,98)">.</span>with_traceback(exc_info[<span style="color: rgb(98,98,98)">2</span>]) <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">e</span>
+<span class="ansi-green-intense-fg ansi-bold">   2358</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">   2359</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> exc_info[<span style="color: rgb(98,98,98)">1</span>] <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1971</span>, in <span class="ansi-cyan-fg">Connection._exec_single_context</span><span class="ansi-blue-fg">(self, dialect, context, statement, parameters)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1969</span>                 <span class="ansi-bold" style="color: rgb(0,135,0)">break</span>
+<span class="ansi-green-intense-fg ansi-bold">   1970</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> evt_handled:
+<span class="ansi-green-fg">-&gt; 1971</span>         <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">dialect</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">do_execute</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   1972</span> <span class="ansi-yellow-bg">            </span><span class="ansi-yellow-bg">cursor</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">str_statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">effective_parameters</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">context</span>
+<span class="ansi-green-intense-fg ansi-bold">   1973</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1975</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_has_events <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>engine<span style="color: rgb(98,98,98)">.</span>_has_events:
+<span class="ansi-green-intense-fg ansi-bold">   1976</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>dispatch<span style="color: rgb(98,98,98)">.</span>after_cursor_execute(
+<span class="ansi-green-intense-fg ansi-bold">   1977</span>         <span style="color: rgb(0,135,0)">self</span>,
+<span class="ansi-green-intense-fg ansi-bold">   1978</span>         cursor,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1982</span>         context<span style="color: rgb(98,98,98)">.</span>executemany,
+<span class="ansi-green-intense-fg ansi-bold">   1983</span>     )
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sqlalchemy/engine/default.py:919</span>, in <span class="ansi-cyan-fg">DefaultDialect.do_execute</span><span class="ansi-blue-fg">(self, cursor, statement, parameters, context)</span>
+<span class="ansi-green-intense-fg ansi-bold">    918</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">do_execute</span>(<span style="color: rgb(0,135,0)">self</span>, cursor, statement, parameters, context<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">--&gt; 919</span>     <span class="ansi-yellow-bg">cursor</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execute</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">parameters</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:163</span>, in <span class="ansi-cyan-fg">ConnectionWrapper.execute</span><span class="ansi-blue-fg">(self, statement, parameters, context)</span>
+<span class="ansi-green-intense-fg ansi-bold">    161</span>         <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>__c<span style="color: rgb(98,98,98)">.</span>execute(statement)
+<span class="ansi-green-intense-fg ansi-bold">    162</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-fg">--&gt; 163</span>         <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">__c</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">execute</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">statement</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">parameters</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    164</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">RuntimeError</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> e:
+<span class="ansi-green-intense-fg ansi-bold">    165</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> e<span style="color: rgb(98,98,98)">.</span>args[<span style="color: rgb(98,98,98)">0</span>]<span style="color: rgb(98,98,98)">.</span>startswith(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Not implemented Error</span><span style="color: rgb(175,0,0)">&#34;</span>):
+
+<span class="ansi-red-fg">ProgrammingError</span>: (duckdb.duckdb.CatalogException) Catalog Error: Table with name tables does not exist!
+Did you mean &#34;temp.information_schema.tables&#34;?
+LINE 2: FROM information_schema.tables
+             ^
+[SQL: SELECT COUNT(*)
+FROM information_schema.tables
+WHERE table_name = &#39;denormalized_edges&#39;]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+</pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;subject_category&quot;</span><span class="p">,</span> <span class="s2">&quot;object_category&quot;</span><span class="p">)</span>
@@ -478,14 +322,8 @@ PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "a3fbf5b3441b41749f262ee384a41030"}</script></div>
-</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
@@ -513,19 +351,12 @@ PosixPath(&#39;/Users/cjm/.data/linkml/store/monarch-kg.db&#39;)
 <br/></pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">facets</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/examples_Monarch-KG_9_0.png" src="../_images/examples_Monarch-KG_9_0.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">

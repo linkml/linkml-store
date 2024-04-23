@@ -44,9 +44,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Python-Tutorial.html">Tutorial: LinkML-Store via Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Monarch-KG notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">linkml_store</a></li>
 </ul>
 
@@ -101,18 +102,8 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.add">add() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.add">(linkml_store.api.collection.Collection method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
-</li>
-      </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config.arbitrary_types_allowed">arbitrary_types_allowed (linkml_store.api.queries.QueryResult.Config attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="linkml_store.api.html#linkml_store.api.Client.attach_database">attach_database() (linkml_store.api.Client method)</a>
 
       <ul>
@@ -121,10 +112,12 @@
         <li><a href="linkml_store.html#linkml_store.Client.attach_database">(linkml_store.Client method)</a>
 </li>
       </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.attach_index">attach_index() (linkml_store.api.Collection method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.attach_indexer">attach_indexer() (linkml_store.api.Collection method)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.attach_index">(linkml_store.api.collection.Collection method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.attach_indexer">(linkml_store.api.collection.Collection method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -132,6 +125,16 @@
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="linkml_store.api.html#linkml_store.api.Client.base_dir">base_dir (linkml_store.api.Client property)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.base_dir">(linkml_store.api.client.Client property)</a>
+</li>
+        <li><a href="linkml_store.html#linkml_store.Client.base_dir">(linkml_store.Client property)</a>
+</li>
+      </ul></li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.Between">Between (class in linkml_store.api.queries)</a>
 </li>
@@ -171,6 +174,14 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="linkml_store.api.html#linkml_store.api.Database.collection_class">collection_class (linkml_store.api.Database attribute)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.collection_class">(linkml_store.api.database.Database attribute)</a>
+</li>
+        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.collection_class">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase attribute)</a>
+</li>
+      </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.Database.commit">commit() (linkml_store.api.Database method)</a>
 
       <ul>
@@ -179,20 +190,10 @@
         <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.commit">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
 </li>
       </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.config">config (linkml_store.api.Client attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.config">(linkml_store.api.client.Client attribute)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.config">(linkml_store.Client attribute)</a>
-</li>
-      </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.Database.create_collection">create_collection() (linkml_store.api.Database method)</a>
 
       <ul>
         <li><a href="linkml_store.api.html#linkml_store.api.database.Database.create_collection">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -319,24 +320,24 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.handle">handle (linkml_store.api.Client attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.Client.handle">handle (linkml_store.api.Client property)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.handle">(linkml_store.api.client.Client attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.handle">(linkml_store.api.client.Client property)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.handle">(linkml_store.api.Database attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.Database.handle">(linkml_store.api.Database property)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.handle">(linkml_store.api.database.Database attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.handle">(linkml_store.api.database.Database property)</a>
 </li>
-        <li><a href="linkml_store.html#linkml_store.Client.handle">(linkml_store.Client attribute)</a>
+        <li><a href="linkml_store.html#linkml_store.Client.handle">(linkml_store.Client property)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.hidden">hidden (linkml_store.api.Collection attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.hidden">hidden (linkml_store.api.Collection property)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.hidden">(linkml_store.api.collection.Collection attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.hidden">(linkml_store.api.collection.Collection property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -365,8 +366,12 @@
         <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.index_objects">(linkml_store.api.collection.Collection method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.indexers">indexers (linkml_store.api.Collection property)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.indexers">(linkml_store.api.collection.Collection property)</a>
+</li>
+      </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.Collection.induce_class_definition_from_objects">induce_class_definition_from_objects() (linkml_store.api.Collection method)</a>
 
       <ul>
@@ -381,12 +386,40 @@
         <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.induce_schema_view">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="linkml_store.api.html#linkml_store.api.Database.init_collections">init_collections() (linkml_store.api.Database method)</a>
 
       <ul>
         <li><a href="linkml_store.api.html#linkml_store.api.database.Database.init_collections">(linkml_store.api.database.Database method)</a>
 </li>
         <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.init_collections">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.insert">insert() (linkml_store.api.Collection method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.insert">(linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.insert">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.is_internal">is_internal (linkml_store.api.Collection property)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.is_internal">(linkml_store.api.collection.Collection property)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.iter_validate_collection">iter_validate_collection() (linkml_store.api.Collection method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.iter_validate_collection">(linkml_store.api.collection.Collection method)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Database.iter_validate_database">iter_validate_database() (linkml_store.api.Database method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.iter_validate_database">(linkml_store.api.database.Database method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -433,21 +466,12 @@
 </li>
       </ul></li>
       <li>
-    linkml_store.api.metadata
-
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.metadata">module</a>
-</li>
-      </ul></li>
-      <li>
     linkml_store.api.queries
 
       <ul>
         <li><a href="linkml_store.api.html#module-linkml_store.api.queries">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     linkml_store.api.stores
 
@@ -462,6 +486,8 @@
         <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     linkml_store.api.stores.duckdb.duckdb_collection
 
@@ -490,10 +516,28 @@
         <li><a href="linkml_store.html#module-linkml_store.constants">module</a>
 </li>
       </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Database.list_collection_names">list_collection_names() (linkml_store.api.Database method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collection_names">(linkml_store.api.database.Database method)</a>
+</li>
+      </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.Database.list_collections">list_collections() (linkml_store.api.Database method)</a>
 
       <ul>
         <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collections">(linkml_store.api.database.Database method)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.list_index_names">list_index_names() (linkml_store.api.Collection method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.list_index_names">(linkml_store.api.collection.Collection method)</a>
+</li>
+      </ul></li>
+      <li><a href="linkml_store.api.html#linkml_store.api.Database.load_schema_view">load_schema_view() (linkml_store.api.Database method)</a>
+
+      <ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.load_schema_view">(linkml_store.api.database.Database method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -504,41 +548,39 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.max">max (linkml_store.api.queries.Between attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.MetaData">MetaData (class in linkml_store.api)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.Client.metadata">metadata (linkml_store.api.Client attribute)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.metadata.MetaData">(class in linkml_store.api.metadata)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.metadata">(linkml_store.api.client.Client attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.Collection.metadata">(linkml_store.api.Collection attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.metadata">(linkml_store.api.collection.Collection attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.Database.metadata">(linkml_store.api.Database attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.metadata">(linkml_store.api.database.Database attribute)</a>
+</li>
+        <li><a href="linkml_store.html#linkml_store.Client.metadata">(linkml_store.Client attribute)</a>
 </li>
       </ul></li>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.min">min (linkml_store.api.queries.Between attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.MetaData.model_computed_fields">model_computed_fields (linkml_store.api.MetaData attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_computed_fields">model_computed_fields (linkml_store.api.queries.Query attribute)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.metadata.MetaData.model_computed_fields">(linkml_store.api.metadata.MetaData attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_computed_fields">(linkml_store.api.queries.Query attribute)</a>
-</li>
         <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_computed_fields">(linkml_store.api.queries.QueryResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.MetaData.model_config">model_config (linkml_store.api.MetaData attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_config">model_config (linkml_store.api.queries.Query attribute)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.metadata.MetaData.model_config">(linkml_store.api.metadata.MetaData attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_config">(linkml_store.api.queries.Query attribute)</a>
-</li>
         <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_config">(linkml_store.api.queries.QueryResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.MetaData.model_fields">model_fields (linkml_store.api.MetaData attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_fields">model_fields (linkml_store.api.queries.Query attribute)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.metadata.MetaData.model_fields">(linkml_store.api.metadata.MetaData attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_fields">(linkml_store.api.queries.Query attribute)</a>
-</li>
         <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_fields">(linkml_store.api.queries.QueryResult attribute)</a>
 </li>
       </ul></li>
@@ -559,8 +601,6 @@
         <li><a href="linkml_store.api.html#module-linkml_store.api.collection">linkml_store.api.collection</a>
 </li>
         <li><a href="linkml_store.api.html#module-linkml_store.api.database">linkml_store.api.database</a>
-</li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.metadata">linkml_store.api.metadata</a>
 </li>
         <li><a href="linkml_store.api.html#module-linkml_store.api.queries">linkml_store.api.queries</a>
 </li>
@@ -583,10 +623,10 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.name">name (linkml_store.api.Collection attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.Collection.name">name (linkml_store.api.Collection property)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.name">(linkml_store.api.collection.Collection attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.name">(linkml_store.api.collection.Collection property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -615,6 +655,10 @@
 
       <ul>
         <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.parent">(linkml_store.api.collection.Collection attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.Database.parent">(linkml_store.api.Database attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.parent">(linkml_store.api.database.Database attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -669,10 +713,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.ranked_rows">ranked_rows (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.recreate_if_exists">recreate_if_exists (linkml_store.api.Database attribute)</a>
+      <li><a href="linkml_store.api.html#linkml_store.api.Database.recreate_if_exists">recreate_if_exists (linkml_store.api.Database property)</a>
 
       <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.recreate_if_exists">(linkml_store.api.database.Database attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.recreate_if_exists">(linkml_store.api.database.Database property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -680,8 +724,6 @@
       <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows">rows (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
       <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows_dataframe">rows_dataframe (linkml_store.api.queries.QueryResult property)</a>
-</li>
-      <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.run_query">run_query() (in module linkml_store.api.stores.duckdb.duckdb_database)</a>
 </li>
   </ul></td>
 </tr></table>

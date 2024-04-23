@@ -22,7 +22,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="LinkML-Store Tutorial" href="examples/Tutorial.html" /> 
+    <link rel="next" title="Tutorial: Using LinkML-Store using the Command Line Interface" href="examples/Command-Line-Tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,9 +46,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Python-Tutorial.html">Tutorial: LinkML-Store via Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Monarch-KG notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">linkml_store</a></li>
 </ul>
 
@@ -78,24 +79,35 @@
              
   <section id="welcome-to-the-linkml-store-documentation">
 <h1>Welcome to the linkml-store documentation!<a class="headerlink" href="#welcome-to-the-linkml-store-documentation" title="Link to this heading"></a></h1>
-<p>Currently this is alpha, check back later for more docs</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Create-a-Client-object">Create a Client object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Querying">Querying</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Faceting">Faceting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Plotting">Plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Complex-objects">Complex objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Schemas">Schemas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Asserting-schemas">Asserting schemas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/Tutorial.html#Other-adapters">Other adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Top-level-command">Top level command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Inserting-objects-from-a-file">Inserting objects from a file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Querying">Querying</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Facet-Counts">Facet Counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Search">Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Indexing-using-an-LLM">Indexing using an LLM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Introspecting-schemas">Introspecting schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Configuration-Files-and-Explicit-Schemas">Configuration Files and Explicit Schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Command-Line-Tutorial.html#Validation">Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Python-Tutorial.html">Tutorial: LinkML-Store via Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Create-a-Client-object">Create a Client object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Querying">Querying</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Faceting">Faceting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Complex-objects">Complex objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Schemas">Schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Asserting-schemas">Asserting schemas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Python-Tutorial.html#Other-adapters">Other adapters</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Monarch-KG notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">linkml_store</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.html">linkml_store package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.html#linkml_store.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
@@ -122,7 +134,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="examples/Tutorial.html" class="btn btn-neutral float-right" title="LinkML-Store Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="examples/Command-Line-Tutorial.html" class="btn btn-neutral float-right" title="Tutorial: Using LinkML-Store using the Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

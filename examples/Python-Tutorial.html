@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkML-Store Tutorial &mdash; linkml-store  documentation</title>
+  <title>Tutorial: LinkML-Store via Python &mdash; linkml-store  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Semantic Search tutorial" href="Semantic-Search.html" />
-    <link rel="prev" title="Welcome to the linkml-store documentation!" href="../index.html" /> 
+    <link rel="prev" title="Tutorial: Using LinkML-Store using the Command Line Interface" href="Command-Line-Tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,7 +50,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">LinkML-Store Tutorial</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial: LinkML-Store via Python</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Create-a-Client-object">Create a Client object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Querying">Querying</a></li>
@@ -63,7 +64,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Monarch-KG.html">Monarch-KG notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Monarch-KG.html">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
 </ul>
 
@@ -81,9 +82,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">LinkML-Store Tutorial</li>
+      <li class="breadcrumb-item active">Tutorial: LinkML-Store via Python</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/examples/Tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/examples/Python-Tutorial.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -91,8 +92,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="LinkML-Store-Tutorial">
-<h1>LinkML-Store Tutorial<a class="headerlink" href="#LinkML-Store-Tutorial" title="Link to this heading"></a></h1>
+  <section id="Tutorial:-LinkML-Store-via-Python">
+<h1>Tutorial: LinkML-Store via Python<a class="headerlink" href="#Tutorial:-LinkML-Store-via-Python" title="Link to this heading"></a></h1>
 <p>This tutorial walks through the basics of using the LinkML-Store API. It uses the DuckDB adapter.</p>
 <section id="Create-a-Client-object">
 <h2>Create a Client object<a class="headerlink" href="#Create-a-Client-object" title="Link to this heading"></a></h2>
@@ -123,7 +124,7 @@
 <p>Next we’ll create a <a class="reference external" href="linkml_store.api.collection.rst">Collection</a> and add some objects to it. For the duckdb adapter, a collection corresponds to a table, but linkml-store does not dictate any particular behavior and different adapters may implement differently. But in general a collection should be a list of entities of a similar type.</p>
 <p>When creating a collection we can also optionally pass an alias, in addition to the type of objects stored in it. Conventionally, this might be the name of the key in an overall container object.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
@@ -132,10 +133,10 @@
 </div>
 <p>Now we can add some objects to the collection. We can add them one at a time, or in a batch.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">add</span><span class="p">([</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">insert</span><span class="p">([</span>
     <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jie&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;StuntDouble&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
     <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ann&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Welder&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Io&quot;</span><span class="p">},</span>
     <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P3&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Joe&quot;</span><span class="p">,</span> <span class="s2">&quot;occupation&quot;</span><span class="p">:</span> <span class="s2">&quot;Welder&quot;</span><span class="p">,</span>  <span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">},</span>
@@ -152,7 +153,7 @@
 <h2>Querying<a class="headerlink" href="#Querying" title="Link to this heading"></a></h2>
 <p>We can query the collection methods such as <code class="docutils literal notranslate"><span class="pre">find</span></code>, <code class="docutils literal notranslate"><span class="pre">query</span></code>. Queries are generally mongodb-style key-value pairs. Currently only exact matches are supported. The query language is independent of the underlying database, e.g. this will work for mongodb, triplestores, etc later on.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;moon&quot;</span><span class="p">:</span> <span class="s2">&quot;Europa&quot;</span><span class="p">})</span>
@@ -161,7 +162,7 @@
 </div>
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">QueryResult</span></code> object can be interrogated to get overall row count, actual rows, etc. It is designed to support windowing over larger payloads than the toy example here.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span>
@@ -169,7 +170,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -178,7 +179,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span>
@@ -186,7 +187,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -197,7 +198,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -205,7 +206,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -264,7 +265,7 @@
 <h2>Faceting<a class="headerlink" href="#Faceting" title="Link to this heading"></a></h2>
 <p>We can also perform faceted queries. Again, behind the scenes, the adapter figures the best way to do this. For a SQL database this may involve multiple queries and may be less performant than Solr/ES.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;occupation&quot;</span><span class="p">])</span>
@@ -272,7 +273,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -285,7 +286,7 @@
 </div>
 <p>We can also facet on multiple columns, or specify a combinatorial facet. Here we will get facet counts for different occupations on different moons.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pc</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;occupation&quot;</span><span class="p">,</span> <span class="s2">&quot;moon&quot;</span><span class="p">)])</span>
@@ -293,17 +294,17 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 {(&#39;occupation&#39;, &#39;moon&#39;): [(&#39;Plumber&#39;, &#39;Europa&#39;, 2),
   (&#39;Welder&#39;, &#39;Io&#39;, 1),
-  (&#39;StuntDouble&#39;, &#39;Io&#39;, 1),
-  (&#39;Mechanic&#39;, &#39;Io&#39;, 1),
   (&#39;Welder&#39;, &#39;Europa&#39;, 1),
-  (&#39;Plumber&#39;, &#39;Io&#39;, 1)]}
+  (&#39;Plumber&#39;, &#39;Io&#39;, 1),
+  (&#39;StuntDouble&#39;, &#39;Io&#39;, 1),
+  (&#39;Mechanic&#39;, &#39;Io&#39;, 1)]}
 </pre></div></div>
 </div>
 </section>
@@ -311,7 +312,7 @@
 <h2>Plotting<a class="headerlink" href="#Plotting" title="Link to this heading"></a></h2>
 <p>Although it doesn’t really make sense for such a small dataset we will plot the facet counts. First we will pivot the data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -340,7 +341,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -395,7 +396,7 @@
 </div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -403,7 +404,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_stacked_counts</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
@@ -434,7 +435,7 @@
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Tutorial_22_0.png" src="../_images/examples_Tutorial_22_0.png" />
+<img alt="../_images/examples_Python-Tutorial_22_0.png" src="../_images/examples_Python-Tutorial_22_0.png" />
 </div>
 </div>
 </section>
@@ -444,7 +445,7 @@
 <p>For the duckdb adapter, we explicitly do not use the standard linkml relmodel transform; instead we put top level objects in individual collections, and behind the scenes duckdb will use lists and json objects for nesting, rather than rewriting these to normalized tables.</p>
 <p>Here we will create a top level json objects that lists persons and organizations. Persons can have histories that are lists of event objects:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="p">{</span>
@@ -465,7 +466,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">)</span>
@@ -473,7 +474,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
@@ -481,7 +482,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -489,7 +490,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -542,7 +543,7 @@
 <p>Every Database has a <strong>schema</strong>. These can be provided explicitly via a LinkML specification, or they can be <em>induced</em> from data.</p>
 <p>In the first example, the schema is induced. We can query it:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_runtime.dumpers</span> <span class="kn">import</span> <span class="n">yaml_dumper</span>
@@ -562,24 +563,32 @@ attributes:
     name: id
     from_schema: http://example.org/test-schema
     multivalued: false
+    domain_of:
+    - Person
     range: string
     inlined: false
   name:
     name: name
     from_schema: http://example.org/test-schema
     multivalued: false
+    domain_of:
+    - Person
     range: string
     inlined: false
   occupation:
     name: occupation
     from_schema: http://example.org/test-schema
     multivalued: false
+    domain_of:
+    - Person
     range: string
     inlined: false
   moon:
     name: moon
     from_schema: http://example.org/test-schema
     multivalued: false
+    domain_of:
+    - Person
     range: string
     inlined: false
 </pre></div></div>
@@ -594,7 +603,7 @@ attributes:
 <h2>Other adapters<a class="headerlink" href="#Other-adapters" title="Link to this heading"></a></h2>
 <p><strong>TODO</strong></p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
@@ -608,7 +617,7 @@ attributes:
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to the linkml-store documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Command-Line-Tutorial.html" class="btn btn-neutral float-left" title="Tutorial: Using LinkML-Store using the Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Semantic-Search.html" class="btn btn-neutral float-right" title="Semantic Search tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

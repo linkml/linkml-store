@@ -47,9 +47,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="examples/Tutorial.html">LinkML-Store Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Python-Tutorial.html">Tutorial: LinkML-Store via Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Monarch-KG notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Example: Monarch-KG notebook</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">linkml_store</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="linkml_store.html">linkml_store package</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.html#linkml_store.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
@@ -102,9 +103,9 @@
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_collection">linkml_store.api.stores.duckdb.duckdb_collection module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.add"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection.add()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection.delete()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection.delete_where()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.insert"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection.insert()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">DuckDBCollection.query_facets()</span></code></a></li>
 </ul>
 </li>
@@ -113,15 +114,14 @@
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_database">linkml_store.api.stores.duckdb.duckdb_database module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.close"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.collection_class"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.collection_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.commit"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.commit()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.create_collection"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.create_collection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.engine"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.engine</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.induce_schema_view"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.induce_schema_view()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.init_collections"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.init_collections()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.query"><code class="docutils literal notranslate"><span class="pre">DuckDBDatabase.query()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.run_query"><code class="docutils literal notranslate"><span class="pre">run_query()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.mappings">linkml_store.api.stores.duckdb.mappings module</a></li>
