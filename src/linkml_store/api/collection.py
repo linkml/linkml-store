@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TextIO, Type, Union, Iterator
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, TextIO, Type, Union
 
 import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
@@ -444,7 +444,7 @@ class Collection:
         :param kwargs:
         :return: iterator over validation results
         """
-        from linkml.validator import Validator, JsonschemaValidationPlugin
+        from linkml.validator import JsonschemaValidationPlugin, Validator
 
         validation_plugins = [JsonschemaValidationPlugin(closed=True)]
         validator = Validator(self.parent.schema_view.schema, validation_plugins=validation_plugins)

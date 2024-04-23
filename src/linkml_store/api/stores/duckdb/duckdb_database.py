@@ -6,9 +6,9 @@ import pandas as pd
 import sqlalchemy
 from duckdb import DuckDBPyConnection
 from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model import SlotDefinition, ClassDefinition
+from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-from sqlalchemy import text, NullPool
+from sqlalchemy import NullPool, text
 
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult

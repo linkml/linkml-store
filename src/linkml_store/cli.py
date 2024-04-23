@@ -5,15 +5,15 @@ from typing import Optional
 
 import click
 import yaml
-from linkml_runtime.dumpers import yaml_dumper, json_dumper
+from linkml_runtime.dumpers import json_dumper, yaml_dumper
 from pydantic import BaseModel
 
 from linkml_store import Client
-from linkml_store.api import Database, Collection
+from linkml_store.api import Collection, Database
 from linkml_store.api.queries import Query
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.utils.format_utils import load_objects, render_output, Format
+from linkml_store.utils.format_utils import Format, load_objects, render_output
 
 index_type_option = click.option("--index-type", "-t")
 

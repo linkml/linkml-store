@@ -2,13 +2,13 @@ import logging
 from abc import ABC
 from copy import copy
 from pathlib import Path
-from typing import Dict, Optional, Sequence, Iterator, Union, Type, ClassVar
+from typing import ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
 
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SchemaDefinition
 
 from linkml_store.api.collection import Collection
-from linkml_store.api.config import DatabaseConfig, CollectionConfig
+from linkml_store.api.config import CollectionConfig, DatabaseConfig
 from linkml_store.api.queries import Query, QueryResult
 
 logger = logging.getLogger(__name__)

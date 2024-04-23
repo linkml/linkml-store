@@ -17,7 +17,7 @@ from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.sql_utils import introspect_schema
 
-from tests import INPUT_DIR, OUTPUT_DIR, COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA
+from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
 TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
