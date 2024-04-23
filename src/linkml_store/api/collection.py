@@ -8,6 +8,11 @@ from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
+try:
+    from linkml.validator.report import ValidationResult
+except ImportError:
+    ValidationResult = None
+
 from linkml_store.api.config import CollectionConfig
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.index.indexer import Indexer
@@ -437,7 +442,7 @@ class Collection:
         """
         raise NotImplementedError
 
-    def iter_validate_collection(self, **kwargs) -> Iterator["linkml.validator.ValidationResult"]:
+    def iter_validate_collection(self, **kwargs) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the collection
 

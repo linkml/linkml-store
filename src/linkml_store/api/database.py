@@ -2,7 +2,12 @@ import logging
 from abc import ABC
 from copy import copy
 from pathlib import Path
-from typing import ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
+
+try:
+    from linkml.validator.report import ValidationResult
+except ImportError:
+    ValidationResult = None
 
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SchemaDefinition
@@ -10,6 +15,9 @@ from linkml_runtime.linkml_model import ClassDefinition, SchemaDefinition
 from linkml_store.api.collection import Collection
 from linkml_store.api.config import CollectionConfig, DatabaseConfig
 from linkml_store.api.queries import Query, QueryResult
+
+if TYPE_CHECKING:
+    from linkml_store.api.client import Client
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +111,7 @@ class Database(ABC):
                 name = typ
             if not collection_config.name:
                 collection_config.name = name
-            collection = self.create_collection(name, alias=alias, metadata=collection_config)
+            _collection = self.create_collection(name, alias=alias, metadata=collection_config)
             if collection_config.attributes:
                 sv = self.schema_view
                 cd = ClassDefinition(name, attributes=collection_config.attributes)
@@ -350,7 +358,7 @@ class Database(ABC):
         """
         raise NotImplementedError()
 
-    def iter_validate_database(self, **kwargs) -> Iterator["linkml.validator.ValidationResult"]:
+    def iter_validate_database(self, **kwargs) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the database.
 
