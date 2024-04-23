@@ -4,7 +4,6 @@ from copy import copy
 from pathlib import Path
 from typing import Dict, Optional, Sequence, Iterator, Union, Type, ClassVar
 
-from linkml.utils.schema_builder import SchemaBuilder
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SchemaDefinition
 
@@ -91,22 +90,20 @@ class Database(ABC):
         for name, collection_config in self.metadata.collections.items():
             alias = collection_config.alias
             typ = collection_config.type
-            #if typ and alias is None:
+            # if typ and alias is None:
             #    alias = name
-            #if typ is None:
+            # if typ is None:
             #    typ = name
-            #collection = self.create_collection(
+            # collection = self.create_collection(
             #    typ, alias=alias, metadata=collection_config.metadata
-            #)
+            # )
             if False and typ is not None:
                 if not alias:
                     alias = name
                 name = typ
             if not collection_config.name:
                 collection_config.name = name
-            collection = self.create_collection(
-                name, alias=alias, metadata=collection_config
-            )
+            collection = self.create_collection(name, alias=alias, metadata=collection_config)
             if collection_config.attributes:
                 sv = self.schema_view
                 cd = ClassDefinition(name, attributes=collection_config.attributes)
@@ -153,7 +150,6 @@ class Database(ABC):
     def _collection_class(self) -> Type[Collection]:
         raise NotImplementedError()
 
-
     def create_collection(
         self, name: str, alias: Optional[str] = None, metadata: Optional[CollectionConfig] = None, **kwargs
     ) -> Collection:
@@ -174,7 +170,7 @@ class Database(ABC):
         """
         if not name:
             raise ValueError(f"Collection name must be provided: alias: {alias} metadata: {metadata}")
-        #collection_cls = self._collection_class
+        # collection_cls = self._collection_class
         collection_cls = self.collection_class
         collection = collection_cls(name=name, alias=alias, parent=self, metadata=metadata)
         if metadata and metadata.attributes:
@@ -363,4 +359,3 @@ class Database(ABC):
         """
         for collection in self.list_collections():
             yield from collection.iter_validate_collection(**kwargs)
-

@@ -7,6 +7,7 @@ from linkml_store.index.indexer import INDEX_ITEM, Indexer
 
 logger = logging.getLogger(__name__)
 
+
 class SimpleIndexer(Indexer):
     """
     A implementations index that uses a hash function to generate an index from text.

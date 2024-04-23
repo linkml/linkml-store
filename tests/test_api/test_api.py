@@ -29,8 +29,10 @@ SCHEMES = [
 
 DEFAULT_DB = "default"
 
+
 def is_persistent(handle: str) -> bool:
     return ".db" in handle
+
 
 def remove_none(d: dict, additional_keys=None):
     """
@@ -166,6 +168,7 @@ def test_store_nested(handle):
     assert qr.num_rows == 2
     assert remove_none(qr.rows[0]) == obj["organizations"][0]
 
+
 @pytest.mark.parametrize("handle", SCHEMES)
 @pytest.mark.parametrize(
     "name_alias",
@@ -207,7 +210,9 @@ def test_induced_schema(handle, name_alias):
     assert collection.parent.schema_view.schema.classes, "expected single class to be initialized from data"
     assert len(collection.parent.schema_view.schema.classes) == 1, "expected single class to be initialized from data"
     assert collection.parent.schema_view.schema.classes[name], "name of class is collection name by default"
-    assert collection.parent.schema_view.schema.classes[name].name == collection.name, "name of class is collection name by default"
+    assert (
+        collection.parent.schema_view.schema.classes[name].name == collection.name
+    ), "name of class is collection name by default"
     assert collection.parent.schema_view.get_class(name), "schema view should work"
     assert collection.class_definition() is not None, "expected class definition to be created"
     assert len(database.list_collections()) == 1, "collections should be unmodified"
@@ -220,9 +225,9 @@ def test_induced_schema(handle, name_alias):
     assert dummy_collection.class_definition() is None, "new collection has no schema"
     with pytest.raises(KeyError):
         database.get_collection("dummy2", create_if_not_exists=False)
-    #if alias:
+    # if alias:
     #    collection = database.get_collection(alias, create_if_not_exists=True)
-    #else:
+    # else:
     #    collection = database.get_collection(name, create_if_not_exists=True)
     sv = database.schema_view
     cd = sv.get_class(name)
@@ -328,7 +333,6 @@ def test_induced_multivalued(handle):
     collection.delete_where(qr.rows[0])
     qr = collection.find()
     assert qr.num_rows == 0, "expected 0 rows after deleting final object"
-
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
@@ -447,7 +451,9 @@ def test_validation(countries_schema_view, handle):
     collection.insert(objects)
     vrs = list(collection.iter_validate_collection())
     assert vrs == []
-    collection.insert({"name": "Foo", "code": "SPACES NOT VALID", "capital": "Zog", "continent": "Europe", "languages": ["English"]})
+    collection.insert(
+        {"name": "Foo", "code": "SPACES NOT VALID", "capital": "Zog", "continent": "Europe", "languages": ["English"]}
+    )
     vrs = list(collection.iter_validate_collection())
     for vr in vrs:
         print(yaml_dumper.dumps(vr))

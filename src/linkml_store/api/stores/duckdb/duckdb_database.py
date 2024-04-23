@@ -1,7 +1,5 @@
 import json
 import logging
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Optional
 
 import pandas as pd
@@ -13,7 +11,6 @@ from linkml_runtime.utils.schema_builder import SchemaBuilder
 from sqlalchemy import text, NullPool
 
 from linkml_store.api import Database
-from linkml_store.api.config import CollectionConfig
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
 from linkml_store.utils.sql_utils import introspect_schema, query_to_sql

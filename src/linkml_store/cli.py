@@ -26,6 +26,7 @@ class ContextSettings(BaseModel):
     """
     Context object for CLI commands.
     """
+
     client: Client
     database_name: Optional[str] = None
     # database: Optional[Database] = None
@@ -40,7 +41,7 @@ class ContextSettings(BaseModel):
         """
         name = self.database_name
         if name is None:
-            #if len(self.client.databases) > 1:
+            # if len(self.client.databases) > 1:
             #    raise ValueError("Database must be specified if there are multiple databases.")
             if not self.client.databases:
                 return None
@@ -55,7 +56,7 @@ class ContextSettings(BaseModel):
         """
         name = self.collection_name
         if name is None:
-            #if len(self.database.list_collections()) > 1:
+            # if len(self.database.list_collections()) > 1:
             #    raise ValueError("Collection must be specified if there are multiple collections.")
             if not self.database.list_collections():
                 return None
@@ -66,8 +67,9 @@ class ContextSettings(BaseModel):
         arbitrary_types_allowed = True
 
 
-#format_choice = click.Choice(["json", "yaml", "tsv"])
+# format_choice = click.Choice(["json", "yaml", "tsv"])
 format_choice = click.Choice([f.value for f in Format])
+
 
 @click.group()
 @click.option("--database", "-d", help="Database name")
@@ -112,24 +114,22 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
             collection_obj = db.get_collection(collection)
             ctx.obj["collection_obj"] = collection_obj
     if not settings.database_name:
-        #if len(client.databases) != 1:
+        # if len(client.databases) != 1:
         #    raise ValueError("Database must be specified if there are multiple databases.")
         if client.databases:
             settings.database_name = list(client.databases.keys())[0]
     if not settings.collection_name:
-        #if len(settings.database.list_collections()) != 1:
+        # if len(settings.database.list_collections()) != 1:
         #    raise ValueError("Collection must be specified if there are multiple collections.")
         if settings.database and settings.database.list_collections():
             collection = settings.database.list_collections()[0]
             settings.collection_name = collection.name
 
 
-
 @cli.command()
 @click.argument("files", type=click.Path(exists=True), nargs=-1)
 @click.option("--format", "-f", type=format_choice, help="Input format")
-@click.option("--object", "-i",
-                multiple=True, help="Input object as YAML")
+@click.option("--object", "-i", multiple=True, help="Input object as YAML")
 @click.pass_context
 def insert(ctx, files, object, format):
     """Insert objects from files (JSON, YAML, TSV) into the specified collection."""
@@ -184,6 +184,7 @@ def list_collections(ctx):
     for collection in db.list_collections():
         click.echo(collection.name)
         click.echo(render_output(collection.metadata))
+
 
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")

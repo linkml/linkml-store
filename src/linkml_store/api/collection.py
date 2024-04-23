@@ -40,7 +40,9 @@ class Collection:
 
     metadata: Optional[CollectionConfig] = None
 
-    def __init__(self, name: str, parent: Optional["Database"] = None, metadata: Optional[CollectionConfig] = None, **kwargs):
+    def __init__(
+        self, name: str, parent: Optional["Database"] = None, metadata: Optional[CollectionConfig] = None, **kwargs
+    ):
         self.parent = parent
         if metadata:
             self.metadata = metadata
@@ -113,8 +115,7 @@ class Collection:
         """
         raise NotImplementedError
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True,
-                     **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
         """
         Delete objects that match a query
 
@@ -218,7 +219,6 @@ class Collection:
         new_qr = QueryResult(num_rows=len(results))
         new_qr.ranked_rows = results
         return new_qr
-
 
     @property
     def is_internal(self) -> bool:
@@ -445,6 +445,7 @@ class Collection:
         :return: iterator over validation results
         """
         from linkml.validator import Validator, JsonschemaValidationPlugin
+
         validation_plugins = [JsonschemaValidationPlugin(closed=True)]
         validator = Validator(self.parent.schema_view.schema, validation_plugins=validation_plugins)
         cd = self.class_definition()
