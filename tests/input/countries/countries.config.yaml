@@ -1,0 +1,7 @@
+databases:
+  countries_db:
+    handle: "duckdb:///{base_dir}/countries.db"
+    schema_location: "{base_dir}/countries.linkml.yaml"
+    collections:
+      countries:
+        type: Country

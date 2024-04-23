@@ -1,11 +1,14 @@
 import hashlib
+import logging
 
 import numpy as np
 
-from linkml_store.index.index import INDEX_ITEM, Index
+from linkml_store.index.indexer import INDEX_ITEM, Indexer
+
+logger = logging.getLogger(__name__)
 
 
-class SimpleIndex(Index):
+class SimpleIndexer(Indexer):
     """
     A implementations index that uses a hash function to generate an index from text.
 
@@ -36,5 +39,5 @@ class SimpleIndex(Index):
 
             # Increment the count at the computed index
             vector[index] += 1.0
-
+        logger.info(f"Indexed text: {text} as {vector}")
         return vector

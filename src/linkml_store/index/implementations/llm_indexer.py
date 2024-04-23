@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING, List
 
 import numpy as np
 
-from linkml_store.index.index import INDEX_ITEM, Index
+from linkml_store.index.indexer import INDEX_ITEM, Indexer
 
 if TYPE_CHECKING:
     import llm
 
 
-class LLMIndex(Index):
+class LLMIndexer(Indexer):
     """
     A implementations index wraps the llm library
     """

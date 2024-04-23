@@ -1,0 +1,49 @@
+id: https://example.org/countries
+name: countries
+description: A schema for representing countries
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  countries: https://example.org/countries/
+  linkml: https://w3id.org/linkml/
+
+default_prefix: countries
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  Country:
+    description: A sovereign state
+    slots:
+      - name
+      - code
+      - capital
+      - continent
+      - languages
+
+slots:
+  name:
+    description: The name of the country
+    required: true
+    identifier: true
+  code:
+    description: The ISO 3166-1 alpha-2 code of the country
+    required: true
+    pattern: '^[A-Z]{2}$'
+  capital:
+    description: The capital city of the country
+    required: true
+  continent:
+    description: The continent where the country is located
+    required: true
+  languages:
+    description: The main languages spoken in the country
+    range: Language
+    multivalued: true
+
+types:
+  Language:
+    typeof: string
+    description: A human language

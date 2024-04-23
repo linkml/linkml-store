@@ -41,10 +41,12 @@ def test_help_option(cli_runner):
 
 def test_insert_and_query_command(cli_runner, config_file, test_files, output_dir):
     """Ensures insert and query commands work together."""
+    add_dupes = False
     output_file = os.path.join(output_dir, "query_results.json")
     # db = "duckdb:///:memory:"
     db_path = f"{output_dir}/test.db"
     db_name = f"duckdb:///{db_path}"
+    collection_name = "test_collection"
     Path(db_path).unlink(missing_ok=True)
     # Insert objects
     result = cli_runner.invoke(
@@ -53,7 +55,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             "--database",
             db_name,
             "--collection",
-            "test_collection",
+            collection_name,
             "insert",
             *test_files,
         ],
@@ -64,6 +66,25 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
         print(f"ALL: {result.output}")
     assert result.exit_code == 0
 
+    if add_dupes:
+        # dupes
+        result = cli_runner.invoke(
+            cli,
+            [
+                "--database",
+                db_name,
+                "--collection",
+                collection_name,
+                "insert",
+                *test_files,
+            ],
+        )
+        if result.exit_code != 0:
+            print(f"zzERR: {result.stderr}")
+            print(f"zzOUT: {result.stdout}")
+            print(f"zzALL: {result.output}")
+        assert result.exit_code == 0
+
     # Query objects
     result = cli_runner.invoke(
         cli,
@@ -71,7 +92,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             "--database",
             db_name,
             "--collection",
-            "test_collection",
+            collection_name,
             "query",
             "--where",
             "name: John",
@@ -94,8 +115,9 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
     # client = Client().from_config(config_file)
     if db_name != "duckdb:///:memory:":
         client = Client()
+        print(f"Getting db {db_name}")
         database = client.get_database(db_name)
-        collection = database.get_collection("test_collection")
+        collection = database.get_collection(collection_name)
         objects = collection.find({"name": "John"}).rows
         assert len(objects) == 1  # Assuming only one object matches the query
 
@@ -107,7 +129,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             "--database",
             db_name,
             "--collection",
-            "test_collection",
+            collection_name,
             "search",
             "John",
             "--where",

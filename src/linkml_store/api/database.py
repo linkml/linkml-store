@@ -1,17 +1,27 @@
+import logging
 from abc import ABC
-from dataclasses import dataclass
-from typing import Dict, Optional, Sequence
+from copy import copy
+from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
+
+try:
+    from linkml.validator.report import ValidationResult
+except ImportError:
+    ValidationResult = None
 
 from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model import ClassDefinition
+from linkml_runtime.linkml_model import ClassDefinition, SchemaDefinition
 
 from linkml_store.api.collection import Collection
-from linkml_store.api.config import DatabaseConfig
-from linkml_store.api.metadata import MetaData
+from linkml_store.api.config import CollectionConfig, DatabaseConfig
 from linkml_store.api.queries import Query, QueryResult
 
+if TYPE_CHECKING:
+    from linkml_store.api.client import Client
 
-@dataclass
+logger = logging.getLogger(__name__)
+
+
 class Database(ABC):
     """
     A Database provides access to named collections of data.
@@ -29,7 +39,7 @@ class Database(ABC):
     >>> db.get_collection("Person") == collection
     True
     >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
-    >>> collection.add(objs)
+    >>> collection.insert(objs)
     >>> qr = collection.find()
     >>> len(qr.rows)
     2
@@ -45,10 +55,77 @@ class Database(ABC):
 
     """
 
-    handle: Optional[str] = None
-    recreate_if_exists: Optional[bool] = False
     _schema_view: Optional[SchemaView] = None
     _collections: Optional[Dict[str, Collection]] = None
+    parent: Optional["Client"] = None
+    metadata: Optional[DatabaseConfig] = None
+    collection_class: ClassVar[Optional[Type[Collection]]] = None
+
+    def __init__(self, handle: Optional[str] = None, metadata: Optional[DatabaseConfig] = None, **kwargs):
+        if metadata:
+            self.metadata = metadata
+        else:
+            self.metadata = DatabaseConfig(handle=handle, **kwargs)
+        if handle is not None and self.metadata.handle is not None and handle != self.metadata.handle:
+            raise ValueError(f"Handle mismatch: {handle} != {self.metadata.handle}")
+        self._initialize_collections()
+
+    def from_config(self, db_config: DatabaseConfig, **kwargs):
+        """
+        Initialize a database from a configuration.
+
+        TODO: DEPRECATE
+
+        :param db_config: database configuration
+        :param kwargs: additional arguments
+        """
+        self.metadata = db_config
+        if db_config.schema_location:
+            schema_location = db_config.schema_location.format(base_dir=self.parent.metadata.base_dir)
+            logger.info(f"Loading schema from: {schema_location}")
+            self.load_schema_view(schema_location)
+        if db_config.schema_dict:
+            schema_dict = copy(db_config.schema_dict)
+            if "id" not in schema_dict:
+                schema_dict["id"] = "tmp"
+            if "name" not in schema_dict:
+                schema_dict["name"] = "tmp"
+            self.set_schema_view(SchemaView(SchemaDefinition(**schema_dict)))
+        self._initialize_collections()
+        return self
+
+    def _initialize_collections(self):
+        for name, collection_config in self.metadata.collections.items():
+            alias = collection_config.alias
+            typ = collection_config.type
+            # if typ and alias is None:
+            #    alias = name
+            # if typ is None:
+            #    typ = name
+            # collection = self.create_collection(
+            #    typ, alias=alias, metadata=collection_config.metadata
+            # )
+            if False and typ is not None:
+                if not alias:
+                    alias = name
+                name = typ
+            if not collection_config.name:
+                collection_config.name = name
+            _collection = self.create_collection(name, alias=alias, metadata=collection_config)
+            if collection_config.attributes:
+                sv = self.schema_view
+                cd = ClassDefinition(name, attributes=collection_config.attributes)
+                sv.schema.classes[cd.name] = cd
+                sv.set_modified()
+                # assert collection.class_definition() is not None
+
+    @property
+    def recreate_if_exists(self) -> bool:
+        return self.metadata.recreate_if_exists
+
+    @property
+    def handle(self) -> str:
+        return self.metadata.handle
 
     def store(self, obj: Dict[str, str], **kwargs):
         """
@@ -63,7 +140,7 @@ class Database(ABC):
             if not v:
                 continue
             collection = self.get_collection(k, create_if_not_exists=True)
-            collection.add(v)
+            collection.insert(v)
 
     def commit(self, **kwargs):
         """
@@ -77,8 +154,12 @@ class Database(ABC):
         """
         raise NotImplementedError()
 
+    @property
+    def _collection_class(self) -> Type[Collection]:
+        raise NotImplementedError()
+
     def create_collection(
-        self, name: str, alias: Optional[str] = None, metadata: Optional[MetaData] = None, **kwargs
+        self, name: str, alias: Optional[str] = None, metadata: Optional[CollectionConfig] = None, **kwargs
     ) -> Collection:
         """
         Create a new collection
@@ -95,9 +176,24 @@ class Database(ABC):
         :param metadata: metadata for the collection
         :param kwargs: additional arguments
         """
-        raise NotImplementedError()
+        if not name:
+            raise ValueError(f"Collection name must be provided: alias: {alias} metadata: {metadata}")
+        # collection_cls = self._collection_class
+        collection_cls = self.collection_class
+        collection = collection_cls(name=name, alias=alias, parent=self, metadata=metadata)
+        if metadata and metadata.attributes:
+            sv = self.schema_view
+            schema = sv.schema
+            cd = ClassDefinition(name=metadata.type, attributes=metadata.attributes)
+            schema.classes[cd.name] = cd
+        if not self._collections:
+            self._collections = {}
+        if not alias:
+            alias = name
+        self._collections[alias] = collection
+        return collection
 
-    def list_collections(self) -> Sequence[Collection]:
+    def list_collections(self, include_internal=False) -> Sequence[Collection]:
         """
         List all collections.
 
@@ -114,10 +210,32 @@ class Database(ABC):
         >>> [c.name for c in collections]
         ['Person', 'Product']
 
+        :param include_internal: include internal collections
+        :return: list of collections
         """
         if not self._collections:
             self.init_collections()
-        return list(self._collections.values())
+        return [c for c in self._collections.values() if include_internal or not c.is_internal]
+
+    def list_collection_names(self, **kwargs) -> Sequence[str]:
+        """
+        List all collection names.
+
+        Examples
+        --------
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> c1 = db.create_collection("Person")
+        >>> c2 = db.create_collection("Product")
+        >>> collection_names = db.list_collection_names()
+        >>> len(collection_names)
+        2
+        >>> collection_names
+        ['Person', 'Product']
+
+        """
+        return [c.name for c in self.list_collections(**kwargs)]
 
     def get_collection(self, name: str, create_if_not_exists=True, **kwargs) -> "Collection":
         """
@@ -169,7 +287,7 @@ class Database(ABC):
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
         >>> collection = db.create_collection("Person")
-        >>> collection.add([{"id": "P1", "name": "John"}, {"id": "P2", "name": "Alice"}])
+        >>> collection.insert([{"id": "P1", "name": "John"}, {"id": "P2", "name": "Alice"}])
         >>> query = Query(from_table="Person", where_clause={"name": "John"})
         >>> result = db.query(query)
         >>> len(result.rows)
@@ -194,7 +312,29 @@ class Database(ABC):
         return self._schema_view
 
     def set_schema_view(self, schema_view: SchemaView):
+        """
+        Set the schema view for the database.
+
+        :param schema_view:
+        :return:
+        """
         self._schema_view = schema_view
+
+    def load_schema_view(self, path: Union[str, Path]):
+        """
+        Load a schema view from a file.
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.load_schema_view("tests/input/countries/countries.linkml.yaml")
+
+        :param path:
+        :return:
+        """
+        if isinstance(path, Path):
+            path = str(path)
+        self.set_schema_view(SchemaView(path))
 
     def induce_schema_view(self) -> SchemaView:
         """
@@ -205,34 +345,25 @@ class Database(ABC):
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
         >>> collection = db.create_collection("Person")
-        >>> collection.add([{"id": "P1", "name": "John", "age_in_years": 25},
+        >>> collection.insert([{"id": "P1", "name": "John", "age_in_years": 25},
         ...                 {"id": "P2", "name": "Alice", "age_in_years": 25}])
         >>> schema_view = db.induce_schema_view()
         >>> cd = schema_view.get_class("Person")
         >>> cd.attributes["id"].range
         'string'
+        >>> cd.attributes["age_in_years"].range
+        'integer'
 
         :return: A schema view
         """
         raise NotImplementedError()
 
-    def from_config(self, db_config: DatabaseConfig, **kwargs):
+    def iter_validate_database(self, **kwargs) -> Iterator["ValidationResult"]:
         """
-        Initialize a database from a configuration
+        Validate the contents of the database.
 
-        :param db_config: database configuration
-        :param kwargs: additional arguments
+        :param kwargs:
+        :return: iterator over validation results
         """
-        self.handle = db_config.handle
-        self.recreate_if_exists = db_config.recreate_if_exists
-        for name, collection_config in db_config.collections.items():
-            collection = self.create_collection(
-                name, alias=collection_config.alias, metadata=collection_config.metadata
-            )
-            if collection_config.attributes:
-                sv = self.schema_view
-                cd = ClassDefinition(name, attributes=collection_config.attributes)
-                sv.schema.classes[cd.name] = cd
-                sv.set_modified()
-                assert collection.class_definition() is not None
-        return self
+        for collection in self.list_collections():
+            yield from collection.iter_validate_collection(**kwargs)

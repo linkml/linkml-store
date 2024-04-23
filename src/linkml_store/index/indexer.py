@@ -13,7 +13,7 @@ def cosine_similarity(vector1, vector2):
     return dot_product / (norm1 * norm2)
 
 
-class Index(BaseModel):
+class Indexer(BaseModel):
     """
     An index operates on a collection in order to search for objects.
     """

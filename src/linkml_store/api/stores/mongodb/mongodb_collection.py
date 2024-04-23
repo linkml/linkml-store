@@ -11,7 +11,7 @@ class MongoDBCollection(Collection):
     A wrapper around a MongoDB collection
     """
 
-    def add(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+    def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
             objs = [objs]
         if not objs:
