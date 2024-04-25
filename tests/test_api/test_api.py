@@ -12,6 +12,7 @@ from linkml_store.api.client import Client
 from linkml_store.api.config import ClientConfig
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
+from linkml_store.api.stores.solr.solr_database import SolrDatabase
 from linkml_store.constants import LINKML_STORE_MODULE
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
@@ -626,6 +627,38 @@ def test_integration_store():
         print(f"Results for {case}")
         for score, r in results[0:3]:
             print(f"  * {score} :: {r['id']} :: {r['lbl']}")
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "collection_name,where,has_data",
+    [
+        ("annotation", None, True),
+        ("annotation", {"isa_partof_closure": "GO:0005634"}, True),
+        ("annotation", {"taxon_closure": "NCBITaxon:83333"}, True),
+        ("annotation", {"taxon_closure": "NCBITaxon:9606"}, True),
+        ("annotation", {"taxon_closure": "NCBITaxon:9606", "isa_partof_closure": "GO:0005634"}, True),
+        ("annotation", {"taxon_closure": "NCBITaxon:83333", "isa_partof_closure": "GO:0060174"}, False),
+        ("bioentity", None, True),
+        ("ontology_class", None, True),
+        ("no_such_collection", None, False),
+    ],
+)
+def test_integration_solr(collection_name, where, has_data):
+    handle = "https://golr.geneontology.org/solr"
+    database = SolrDatabase(handle)
+    database.metadata.collection_type_slot = "document_category"
+    collection = database.get_collection(collection_name)
+    assert collection.parent.metadata.collection_type_slot == "document_category"
+    qr = collection.find(where)
+    print(qr.num_rows)
+    for row in qr.rows:
+        print(row)
+    if has_data:
+        assert qr.num_rows > 0, f"expected data in {collection_name}"
+    else:
+        assert qr.num_rows == 0, f"expected no data in {collection_name}"
+    qr = collection.query_facets(where, facet_columns=["taxon_closure"])
 
 
 def test_sql_utils():

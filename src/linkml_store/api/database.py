@@ -159,7 +159,12 @@ class Database(ABC):
         raise NotImplementedError()
 
     def create_collection(
-        self, name: str, alias: Optional[str] = None, metadata: Optional[CollectionConfig] = None, **kwargs
+        self,
+        name: str,
+        alias: Optional[str] = None,
+        metadata: Optional[CollectionConfig] = None,
+        recreate_if_exists=False,
+        **kwargs,
     ) -> Collection:
         """
         Create a new collection
@@ -174,6 +179,7 @@ class Database(ABC):
         :param name: name of the collection
         :param alias: alias for the collection
         :param metadata: metadata for the collection
+        :param recreate_if_exists: recreate the collection if it already exists
         :param kwargs: additional arguments
         """
         if not name:
@@ -191,6 +197,8 @@ class Database(ABC):
         if not alias:
             alias = name
         self._collections[alias] = collection
+        if recreate_if_exists:
+            collection.delete_where({}, missing_ok=True)
         return collection
 
     def list_collections(self, include_internal=False) -> Sequence[Collection]:

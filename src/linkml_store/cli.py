@@ -14,6 +14,7 @@ from linkml_store.api.queries import Query
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
 from linkml_store.utils.format_utils import Format, load_objects, render_output
+from linkml_store.utils.object_utils import object_path_update
 
 index_type_option = click.option("--index-type", "-t")
 
@@ -75,6 +76,7 @@ format_choice = click.Choice([f.value for f in Format])
 @click.option("--database", "-d", help="Database name")
 @click.option("--collection", "-c", help="Collection name")
 @click.option("--config", "-C", type=click.Path(exists=True), help="Path to the configuration file")
+@click.option("--set", help="Metadata settings in the form PATHEXPR=value", multiple=True)
 @click.option("-v", "--verbose", count=True)
 @click.option("-q", "--quiet/--no-quiet")
 @click.option(
@@ -84,7 +86,7 @@ format_choice = click.Choice([f.value for f in Format])
     help="If set then show full stacktrace on error",
 )
 @click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config):
+def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set):
     """A CLI for interacting with the linkml-store."""
     if not stacktrace:
         sys.tracebacklimit = 0
@@ -107,6 +109,12 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     ctx.obj["collection"] = collection
     if settings.database_name:
         db = client.get_database(database)
+        if set:
+            for expr in set:
+                path, val = expr.split("=", 1)
+                val = yaml.safe_load(val)
+                logger.info(f"Setting {path} to {val}")
+                db.metadata = object_path_update(db.metadata, path, val)
         # settings.database = db
         # DEPRECATED
         ctx.obj["database_obj"] = db
@@ -191,7 +199,7 @@ def list_collections(ctx):
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--columns", "-S")
+@click.option("--columns", "-S", help="Columns to facet on")
 @click.pass_context
 def fq(ctx, where, limit, columns, output_type, output):
     """
@@ -207,11 +215,23 @@ def fq(ctx, where, limit, columns, output_type, output):
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
-    count_dict = collection.query_facets(
-        where_clause, facet_columns=columns.split(",") if columns else None, limit=limit
-    )
-    for key, value in count_dict.items():
-        count_dict[key] = dict(value)
+    columns = columns.split(",") if columns else None
+    if columns:
+        columns = [col.strip() for col in columns]
+        columns = [(tuple(col.split("+")) if "+" in col else col) for col in columns]
+    logger.info(f"Faceting on columns: {columns}")
+    results = collection.query_facets(where_clause, facet_columns=columns, limit=limit)
+    logger.info(f"Facet results: {results}")
+
+    def _untuple(key):
+        if isinstance(key, tuple):
+            return "+".join(key)
+        return key
+
+    count_dict = {}
+    for key, value in results.items():
+        value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}
+        count_dict[_untuple(key)] = value_as_dict
     output_data = render_output(count_dict, output_type)
     if output:
         with open(output, "w") as f:
