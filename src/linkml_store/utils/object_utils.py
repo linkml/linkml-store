@@ -6,9 +6,7 @@ from pydantic import BaseModel
 
 
 def object_path_update(
-        obj: Union[BaseModel, Dict[str, Any]],
-        path: str,
-        value: Any
+    obj: Union[BaseModel, Dict[str, Any]], path: str, value: Any
 ) -> Union[BaseModel, Dict[str, Any]]:
     """
     Updates a nested object based on a path description and a value. The path to the
@@ -36,12 +34,12 @@ def object_path_update(
         return typ(**obj)
     obj = deepcopy(obj)
     ret_obj = obj
-    parts = path.split('.')
+    parts = path.split(".")
     for part in parts[:-1]:
-        if '[' in part:
-            key, index = part[:-1].split('[')
+        if "[" in part:
+            key, index = part[:-1].split("[")
             index = int(index)
-            #obj = obj.setdefault(key, [{} for _ in range(index+1)])
+            # obj = obj.setdefault(key, [{} for _ in range(index+1)])
             obj = obj.setdefault(key, [])
             while len(obj) <= index:
                 obj.append({})
@@ -49,15 +47,16 @@ def object_path_update(
         else:
             obj = obj.setdefault(part, {})
     last_part = parts[-1]
-    if '[' in last_part:
-        key, index = last_part[:-1].split('[')
+    if "[" in last_part:
+        key, index = last_part[:-1].split("[")
         index = int(index)
         if key not in obj or not isinstance(obj[key], list):
-            obj[key] = [{} for _ in range(index+1)]
+            obj[key] = [{} for _ in range(index + 1)]
         obj[key][index] = value
     else:
         obj[last_part] = value
     return ret_obj
+
 
 def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
     """
@@ -67,7 +66,7 @@ def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
     :return:
     """
     try:
-        path, val = expr.split('=', 1)
+        path, val = expr.split("=", 1)
         val = json.loads(val)
     except ValueError:
         return None

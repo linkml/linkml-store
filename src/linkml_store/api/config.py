@@ -65,10 +65,12 @@ class DatabaseConfig(BaseModel):
     )
     collection_type_slot: Optional[str] = Field(
         default=None,
-        description=("For databases that combine multiple collections into a single space, this field"
-                     "specifies the field that contains the collection type. An example of this is a Solr"
-                     "index that does not use cores for collections, and instead uses a single global"
-                     "document space; if this has a field 'document_type', then this field should be set"),
+        description=(
+            "For databases that combine multiple collections into a single space, this field"
+            "specifies the field that contains the collection type. An example of this is a Solr"
+            "index that does not use cores for collections, and instead uses a single global"
+            "document space; if this has a field 'document_type', then this field should be set"
+        ),
     )
     searchable_slots: Optional[List[str]] = Field(
         default=None,

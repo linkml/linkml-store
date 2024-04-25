@@ -630,7 +630,8 @@ def test_integration_store():
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("collection_name,where,has_data",
+@pytest.mark.parametrize(
+    "collection_name,where,has_data",
     [
         ("annotation", None, True),
         ("annotation", {"isa_partof_closure": "GO:0005634"}, True),
@@ -641,7 +642,8 @@ def test_integration_store():
         ("bioentity", None, True),
         ("ontology_class", None, True),
         ("no_such_collection", None, False),
-    ])
+    ],
+)
 def test_integration_solr(collection_name, where, has_data):
     handle = "https://golr.geneontology.org/solr"
     database = SolrDatabase(handle)

@@ -23,12 +23,12 @@ class SolrCollection(Collection):
         return base_url
 
     def search(
-            self,
-            query: str,
-            where: Optional[Any] = None,
-            index_name: Optional[str] = None,
-            limit: Optional[int] = None,
-            **kwargs,
+        self,
+        query: str,
+        where: Optional[Any] = None,
+        index_name: Optional[str] = None,
+        limit: Optional[int] = None,
+        **kwargs,
     ) -> QueryResult:
         if index_name is None:
             index_name = "edismax"
@@ -83,10 +83,7 @@ class SolrCollection(Collection):
         return results
 
     def _build_solr_query(
-            self,
-            query: Union[Query, Dict],
-            search_term="*:*",
-            extra: Optional[Dict] = None
+        self, query: Union[Query, Dict], search_term="*:*", extra: Optional[Dict] = None
     ) -> Dict[str, Any]:
         solr_query = {}
         if query is None:

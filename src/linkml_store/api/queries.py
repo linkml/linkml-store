@@ -34,7 +34,9 @@ class FacetCountResult(BaseModel):
     """
     A facet count result
     """
+
     as_dict: Dict[FACET_GROUP, List[Tuple[FACET_GROUP, int]]]
+
 
 class QueryResult(BaseModel):
     """

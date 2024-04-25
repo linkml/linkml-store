@@ -111,7 +111,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         db = client.get_database(database)
         if set:
             for expr in set:
-                path, val = expr.split('=', 1)
+                path, val = expr.split("=", 1)
                 val = yaml.safe_load(val)
                 logger.info(f"Setting {path} to {val}")
                 db.metadata = object_path_update(db.metadata, path, val)
@@ -220,14 +220,14 @@ def fq(ctx, where, limit, columns, output_type, output):
         columns = [col.strip() for col in columns]
         columns = [(tuple(col.split("+")) if "+" in col else col) for col in columns]
     logger.info(f"Faceting on columns: {columns}")
-    results = collection.query_facets(
-        where_clause, facet_columns=columns, limit=limit
-    )
+    results = collection.query_facets(where_clause, facet_columns=columns, limit=limit)
     logger.info(f"Facet results: {results}")
+
     def _untuple(key):
         if isinstance(key, tuple):
             return "+".join(key)
         return key
+
     count_dict = {}
     for key, value in results.items():
         value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}

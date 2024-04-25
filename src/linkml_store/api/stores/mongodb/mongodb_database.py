@@ -22,6 +22,7 @@ class MongoDBDatabase(Database):
 
     The LinkML-Store Database abstraction combines mongodb Client and Database.
     """
+
     _native_client: MongoClient = None
     _native_db = None
     collection_class = MongoDBCollection
@@ -97,4 +98,3 @@ class MongoDBDatabase(Database):
                     schema.classes[cls.name] = cls
 
         return SchemaView(schema)
-
