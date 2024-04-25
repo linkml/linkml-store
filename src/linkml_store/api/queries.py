@@ -30,12 +30,19 @@ class Query(BaseModel):
     facet_slots: Optional[List[str]] = None
 
 
+class FacetCountResult(BaseModel):
+    """
+    A facet count result
+    """
+    as_dict: Dict[FACET_GROUP, List[Tuple[FACET_GROUP, int]]]
+
 class QueryResult(BaseModel):
     """
     A query result
     """
 
     query: Optional[Query] = None
+    search_term: Optional[str] = None
     num_rows: int
     offset: Optional[int] = 0
     rows: Optional[List[Dict[str, Any]]] = None

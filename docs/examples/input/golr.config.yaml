@@ -1,0 +1,6 @@
+databases:
+  golr:
+    handle: "solr:https://golr.geneontology.org/solr"
+    description: "Gene Ontology Solr instance"
+    collection_type_slot: document_category
+    searchable_slots: [entity_label_searchable, general_blob_searchable, annotation_class_label_searchable]

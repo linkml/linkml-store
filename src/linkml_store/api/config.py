@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -62,6 +62,17 @@ class DatabaseConfig(BaseModel):
     recreate_if_exists: bool = Field(
         default=False,
         description="Whether to recreate the database if it already exists",
+    )
+    collection_type_slot: Optional[str] = Field(
+        default=None,
+        description=("For databases that combine multiple collections into a single space, this field"
+                     "specifies the field that contains the collection type. An example of this is a Solr"
+                     "index that does not use cores for collections, and instead uses a single global"
+                     "document space; if this has a field 'document_type', then this field should be set"),
+    )
+    searchable_slots: Optional[List[str]] = Field(
+        default=None,
+        description="Optional configuration for search fields",
     )
 
 
