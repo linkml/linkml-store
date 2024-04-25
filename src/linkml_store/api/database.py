@@ -159,7 +159,11 @@ class Database(ABC):
         raise NotImplementedError()
 
     def create_collection(
-        self, name: str, alias: Optional[str] = None, metadata: Optional[CollectionConfig] = None, recreate_if_exists=False, **kwargs
+        self, name: str,
+            alias: Optional[str] = None,
+            metadata: Optional[CollectionConfig] = None,
+            recreate_if_exists=False,
+            **kwargs
     ) -> Collection:
         """
         Create a new collection

@@ -82,7 +82,12 @@ class SolrCollection(Collection):
 
         return results
 
-    def _build_solr_query(self, query: Union[Query, Dict], search_term="*:*", extra: Optional[Dict] = None) -> Dict[str, Any]:
+    def _build_solr_query(
+            self,
+            query: Union[Query, Dict],
+            search_term="*:*",
+            extra: Optional[Dict] = None
+    ) -> Dict[str, Any]:
         solr_query = {}
         if query is None:
             query = {}

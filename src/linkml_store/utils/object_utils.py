@@ -1,10 +1,15 @@
+import json
 from copy import deepcopy
 from typing import Any, Dict, Union
 
 from pydantic import BaseModel
 
 
-def object_path_update(obj: Union[BaseModel, Dict[str, Any]], path: str, value: Any) -> Union[BaseModel, Dict[str, Any]]:
+def object_path_update(
+        obj: Union[BaseModel, Dict[str, Any]],
+        path: str,
+        value: Any
+) -> Union[BaseModel, Dict[str, Any]]:
     """
     Updates a nested object based on a path description and a value. The path to the
     desired field is given in dot and bracket notation (e.g., 'a[0].b.c[1]').
@@ -55,6 +60,12 @@ def object_path_update(obj: Union[BaseModel, Dict[str, Any]], path: str, value: 
     return ret_obj
 
 def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
+    """
+    Parse a string expression of the form 'path.to.field=value' into a path and a value.
+
+    :param expr:
+    :return:
+    """
     try:
         path, val = expr.split('=', 1)
         val = json.loads(val)
