@@ -1,10 +1,8 @@
 # test_mongodb_adapter.py
 
 import pytest
-from pymongo import MongoClient
-
-from linkml_store import Client
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
+from pymongo import MongoClient
 
 
 @pytest.fixture(scope="module")
