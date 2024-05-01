@@ -6,12 +6,16 @@ from linkml_runtime import SchemaView
 
 from linkml_store.api import Database
 from linkml_store.api.config import ClientConfig
+from linkml_store.api.stores.chromadb.chromadb_database import ChromaDBDatabase
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
+from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from linkml_store.api.stores.solr.solr_database import SolrDatabase
 
 HANDLE_MAP = {
     "duckdb": DuckDBDatabase,
     "solr": SolrDatabase,
+    "mongodb": MongoDBDatabase,
+    "chromadb": ChromaDBDatabase,
 }
 
 
@@ -219,3 +223,30 @@ class Client:
         if not self._databases:
             self._databases = {}
         return self._databases
+
+    def drop_database(self, name: str, missing_ok=False, **kwargs):
+        """
+        Drop a database.
+
+        :param name:
+        :param missing_ok:
+        :return:
+        """
+        if name in self._databases:
+            db = self._databases[name]
+            db.drop(**kwargs)
+            del self._databases[name]
+        else:
+            if not missing_ok:
+                raise ValueError(f"Database {name} not found")
+
+    def drop_all_databases(self, **kwargs):
+        """
+        Drop all databases.
+
+        :param missing_ok:
+        :return:
+        """
+        for name in list(self._databases.keys()):
+            self.drop_database(name, missing_ok=False, **kwargs)
+        self._databases = {}

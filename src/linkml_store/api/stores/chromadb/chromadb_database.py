@@ -1,61 +1,47 @@
-# mongodb_database.py
+# chromadb_database.py
 
 import logging
 from typing import Optional
 
+import chromadb
+from chromadb.config import Settings
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-from pymongo import MongoClient
-from pymongo.database import Database as NativeDatabase
 
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
-from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
+from linkml_store.api.stores.chromadb.chromadb_collection import ChromaDBCollection
 
 logger = logging.getLogger(__name__)
 
 
-class MongoDBDatabase(Database):
-    """
-    An adapter for MongoDB databases.
-
-    The LinkML-Store Database abstraction combines mongodb Client and Database.
-    """
-
-    _native_client: MongoClient = None
-    _native_db = None
-    collection_class = MongoDBCollection
+class ChromaDBDatabase(Database):
+    _client: chromadb.Client = None
+    collection_class = ChromaDBCollection
 
     def __init__(self, handle: Optional[str] = None, **kwargs):
         if handle is None:
-            handle = "mongodb://localhost:27017"
+            handle = ".chromadb"
         super().__init__(handle=handle, **kwargs)
 
     @property
-    def native_client(self) -> MongoClient:
-        if self._native_client is None:
-            self._native_client = MongoClient(self.handle)
-        return self._native_client
-
-    @property
-    def native_db(self) -> NativeDatabase:
-        if self._native_db is None:
-            alias = self.metadata.alias
-            if not alias:
-                alias = "default"
-            self._native_db = self.native_client[alias]
-        return self._native_db
+    def client(self) -> chromadb.Client:
+        if self._client is None:
+            self._client = chromadb.Client(
+                Settings(
+                    chroma_db_impl="duckdb+parquet",
+                    persist_directory=self.handle,
+                )
+            )
+        return self._client
 
     def commit(self, **kwargs):
         pass
 
     def close(self, **kwargs):
-        if self._native_client:
-            self._native_client.close()
-
-    def drop(self, **kwargs):
-        self.native_client.drop_database(self.metadata.alias)
+        if self._client:
+            self._client.close()
 
     def query(self, query: Query, **kwargs) -> QueryResult:
         if query.from_table:
@@ -66,9 +52,9 @@ class MongoDBDatabase(Database):
         if self._collections is None:
             self._collections = {}
 
-        for collection_name in self.native_db.list_collection_names():
+        for collection_name in self.client.list_collections():
             if collection_name not in self._collections:
-                collection = MongoDBCollection(name=collection_name, parent=self)
+                collection = ChromaDBCollection(name=collection_name, parent=self)
                 self._collections[collection_name] = collection
 
     def induce_schema_view(self) -> SchemaView:
@@ -76,12 +62,12 @@ class MongoDBDatabase(Database):
         sb = SchemaBuilder()
         schema = sb.schema
 
-        for collection_name in self.native_db.list_collection_names():
+        for collection_name in self.client.list_collections():
             sb.add_class(collection_name)
-            mongo_collection = self.native_db[collection_name]
-            sample_doc = mongo_collection.find_one()
+            chroma_collection = self.client.get_collection(collection_name)
+            sample_doc = chroma_collection.peek(1)
             if sample_doc:
-                for field, value in sample_doc.items():
+                for field, value in sample_doc[0].items():
                     if field == "_id":
                         continue
                     sd = SlotDefinition(field)

@@ -65,7 +65,10 @@ class Indexer(BaseModel):
 
     def object_to_text(self, obj: Dict[str, Any]) -> str:
         """
-        Create a text from an object suitable for indexing.
+        Convert an object to a text representation
+
+        :param obj:
+        :return:
         """
         if self.index_attributes:
             obj = {k: v for k, v in obj.items() if k in self.index_attributes}

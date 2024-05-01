@@ -1,0 +1,11 @@
+about:
+  name: foo
+  description: bar
+persons:
+  - id: p1
+    name: p1
+  - id: p2
+    name: p2
+organizations:
+  - id: org1
+    name: org    

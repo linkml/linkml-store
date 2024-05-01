@@ -26,6 +26,7 @@ TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
 SCHEMES = [
     "duckdb",
     f"duckdb:///{TEMP_DB_PATH}",
+    # "mongodb://localhost:27017/test_db",
 ]
 
 DEFAULT_DB = "default"
@@ -90,6 +91,8 @@ def create_client(handle: str, recreate_if_exists=True) -> Client:
             print(f"UNLINKING: {path}")
             Path(path).unlink(missing_ok=True)
             assert not Path(path).exists()
+    if handle.startswith("mongodb:"):
+        client.drop_all_databases()
     client.attach_database(handle, alias=DEFAULT_DB)
     print(f"ATTACHED: {handle}")
     return client

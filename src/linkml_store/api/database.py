@@ -68,18 +68,11 @@ class Database(ABC):
             self.metadata = DatabaseConfig(handle=handle, **kwargs)
         if handle is not None and self.metadata.handle is not None and handle != self.metadata.handle:
             raise ValueError(f"Handle mismatch: {handle} != {self.metadata.handle}")
+        self._initialize_schema()
         self._initialize_collections()
 
-    def from_config(self, db_config: DatabaseConfig, **kwargs):
-        """
-        Initialize a database from a configuration.
-
-        TODO: DEPRECATE
-
-        :param db_config: database configuration
-        :param kwargs: additional arguments
-        """
-        self.metadata = db_config
+    def _initialize_schema(self, **kwargs):
+        db_config = self.metadata
         if db_config.schema_location:
             schema_location = db_config.schema_location.format(base_dir=self.parent.metadata.base_dir)
             logger.info(f"Loading schema from: {schema_location}")
@@ -91,6 +84,18 @@ class Database(ABC):
             if "name" not in schema_dict:
                 schema_dict["name"] = "tmp"
             self.set_schema_view(SchemaView(SchemaDefinition(**schema_dict)))
+
+    def from_config(self, db_config: DatabaseConfig, **kwargs):
+        """
+        Initialize a database from a configuration.
+
+        TODO: DEPRECATE
+
+        :param db_config: database configuration
+        :param kwargs: additional arguments
+        """
+        self.metadata = db_config
+        self._initialize_schema()
         self._initialize_collections()
         return self
 
@@ -134,13 +139,28 @@ class Database(ABC):
         :param obj: object to store
         :param kwargs: additional arguments
         """
+        sv = self.schema_view
+        roots = [c for c in sv.all_classes().values() if c.tree_root]
+        root = roots[0] if roots else None
         for k, v in obj.items():
+            if root:
+                slot = sv.induced_slot(k, root.name)
+                if not slot:
+                    raise ValueError(f"Cannot determine type for {k}")
+            else:
+                slot = None
+            if isinstance(v, dict):
+                logger.debug(f"Coercing dict to list: {v}")
+                v = [v]
             if not isinstance(v, list):
                 continue
             if not v:
                 continue
-            collection = self.get_collection(k, create_if_not_exists=True)
-            collection.insert(v)
+            if slot:
+                collection = self.get_collection(slot.range, create_if_not_exists=True)
+            else:
+                collection = self.get_collection(k, create_if_not_exists=True)
+            collection.replace(v)
 
     def commit(self, **kwargs):
         """
@@ -316,6 +336,8 @@ class Database(ABC):
         Return a schema view for the named collection
         """
         if not self._schema_view:
+            self._initialize_schema()
+        if not self._schema_view:
             self._schema_view = self.induce_schema_view()
         return self._schema_view
 
@@ -375,3 +397,9 @@ class Database(ABC):
         """
         for collection in self.list_collections():
             yield from collection.iter_validate_collection(**kwargs)
+
+    def drop(self, **kwargs):
+        """
+        Drop the database and all collections
+        """
+        raise NotImplementedError()

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from sqlalchemy import Column, Table, delete, insert, text
+from sqlalchemy import Column, Table, delete, insert, inspect, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
@@ -59,8 +59,16 @@ class DuckDBCollection(Collection):
         if where is None:
             where = {}
         cd = self.class_definition()
+        if not cd:
+            logger.info(f"No class definition found for {self._target_class_name}, assuming not prepopulated")
+            return 0
         table = self._sqla_table(cd)
         engine = self.parent.engine
+        inspector = inspect(engine)
+        table_exists = table.name in inspector.get_table_names()
+        if not table_exists:
+            logger.info(f"Table {table.name} does not exist, assuming no data")
+            return 0
         with engine.connect() as conn:
             conditions = [table.c[k] == v for k, v in where.items()]
             stmt = delete(table).where(*conditions)
