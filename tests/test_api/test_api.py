@@ -26,7 +26,7 @@ TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
 SCHEMES = [
     "duckdb",
     f"duckdb:///{TEMP_DB_PATH}",
-#    "mongodb://localhost:27017/test_db",
+    # "mongodb://localhost:27017/test_db",
 ]
 
 DEFAULT_DB = "default"
