@@ -1,5 +1,6 @@
 import csv
 import json
+import sys
 from enum import Enum
 from io import StringIO
 from pathlib import Path
@@ -31,25 +32,29 @@ def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None)
     if isinstance(file_path, Path):
         file_path = str(file_path)
 
+    if file_path == "-":
+        # set file_path to be a stream from stdin
+        f = sys.stdin
+    else:
+        f = open(file_path)
+
     if format == Format.JSON or (not format and file_path.endswith(".json")):
-        with open(file_path) as f:
-            return json.load(f)
+        objs = json.load(f)
     elif format == Format.JSONL or (not format and file_path.endswith(".jsonl")):
-        with open(file_path) as f:
-            return [json.loads(line) for line in f]
+        objs = [json.loads(line) for line in f]
     elif format == Format.YAML or (not format and (file_path.endswith(".yaml") or file_path.endswith(".yml"))):
-        with open(file_path) as f:
-            return yaml.safe_load(f)
+        objs = yaml.safe_load(f)
     elif format == Format.TSV or (not format and file_path.endswith(".tsv")):
-        with open(file_path) as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            return list(reader)
+        reader = csv.DictReader(f, delimiter="\t")
+        objs = list(reader)
     elif format == Format.CSV or (not format and file_path.endswith(".csv")):
-        with open(file_path) as f:
-            reader = csv.DictReader(f)
-            return list(reader)
+        reader = csv.DictReader(f)
+        objs = list(reader)
     else:
         raise ValueError(f"Unsupported file format: {file_path}")
+    if not isinstance(objs, list):
+        objs = [objs]
+    return objs
 
 
 def render_output(data: List[Dict[str, Any]], format: Union[Format, str] = Format.YAML) -> str:

@@ -30,9 +30,7 @@ class ContextSettings(BaseModel):
 
     client: Client
     database_name: Optional[str] = None
-    # database: Optional[Database] = None
     collection_name: Optional[str] = None
-    # collection: Optional[Collection] = None
 
     @property
     def database(self) -> Optional[Database]:
@@ -111,6 +109,8 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         db = client.get_database(database)
         if set:
             for expr in set:
+                if "=" not in expr:
+                    raise ValueError(f"Expression must be of form PARAM=VALUE. Got: {expr}")
                 path, val = expr.split("=", 1)
                 val = yaml.safe_load(val)
                 logger.info(f"Setting {path} to {val}")
@@ -143,17 +143,17 @@ def insert(ctx, files, object, format):
     """Insert objects from files (JSON, YAML, TSV) into the specified collection."""
     settings = ctx.obj["settings"]
     collection = settings.collection
+    if not collection:
+        raise ValueError("Collection must be specified.")
     objects = []
+    if not files and not object:
+        files = ["-"]
     for file_path in files:
         if format:
-            if format == "json":
-                objects = load_objects(file_path, format="json")
-            elif format == "yaml":
-                objects = load_objects(file_path, format="yaml")
-            elif format == "tsv":
-                objects = load_objects(file_path, format="tsv")
+            objects = load_objects(file_path, format=format)
         else:
             objects = load_objects(file_path)
+        logger.info(f"Inserting {len(objects)} objects from {file_path} into collection '{collection.name}'.")
         collection.insert(objects)
         click.echo(f"Inserted {len(objects)} objects from {file_path} into collection '{collection.name}'.")
     if object:
@@ -162,6 +162,35 @@ def insert(ctx, files, object, format):
             objects = yaml.safe_load(object_str)
             collection.insert(objects)
             click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{collection.name}'.")
+
+
+@cli.command()
+@click.argument("files", type=click.Path(exists=True), nargs=-1)
+@click.option("--format", "-f", type=format_choice, help="Input format")
+@click.option("--object", "-i", multiple=True, help="Input object as YAML")
+@click.pass_context
+def store(ctx, files, object, format):
+    """Store objects from files (JSON, YAML, TSV) into the specified collection."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    if not files and not object:
+        files = ["-"]
+    for file_path in files:
+        if format:
+            objects = load_objects(file_path, format=format)
+        else:
+            objects = load_objects(file_path)
+        logger.info(f"Inserting {len(objects)} objects from {file_path} into database '{db}'.")
+        for obj in objects:
+            db.store(obj)
+        click.echo(f"Inserted {len(objects)} objects from {file_path} into database '{db}'.")
+    if object:
+        for object_str in object:
+            logger.info(f"Parsing: {object_str}")
+            objects = yaml.safe_load(object_str)
+            for obj in objects:
+                db.store(obj)
+            click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{db.name}'.")
 
 
 @cli.command()
@@ -266,7 +295,9 @@ def index(ctx, index_type):
 
 @cli.command()
 @click.pass_context
-def schema(ctx):
+@click.option("--output-type", "-O", type=format_choice, default="yaml", help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+def schema(ctx, output_type, output):
     """
     Show the schema for a database
 
@@ -275,7 +306,15 @@ def schema(ctx):
     :return:
     """
     db = ctx.obj["settings"].database
-    print(yaml_dumper.dumps(db.schema_view.schema))
+    schema_dict = json_dumper.to_dict(db.schema_view.schema)
+    output_data = render_output(schema_dict, output_type)
+    if output:
+        with open(output, "w") as f:
+            f.write(output_data)
+        click.echo(f"Schema saved to {output}")
+    else:
+        click.echo(output_data)
+
 
 
 @cli.command()

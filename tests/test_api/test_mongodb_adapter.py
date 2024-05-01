@@ -29,11 +29,15 @@ def test_insert_and_query(mongodb_database):
 
     # Insert a few documents
     documents = [
-        {"name": "Alice", "age": 25},
-        {"name": "Bob", "age": 30},
-        {"name": "Charlie", "age": 35},
+        {"name": "Alice", "age": 25, "occupation": "Architect"},
+        {"name": "Bob", "age": 30, "occupation": "Builder"},
+        {"name": "Charlie", "age": 35, "occupation": "Lawyer"},
+        {"name": "Jie", "age": 27, "occupation": "Architect"},
     ]
     collection.insert(documents)
+
+    query_result = collection.find()
+    assert query_result.num_rows == len(documents)
 
     # Query the collection
     query_result = collection.find({"age": {"$gte": 30}})
@@ -43,3 +47,13 @@ def test_insert_and_query(mongodb_database):
     assert len(query_result.rows) == 2
     assert query_result.rows[0]["name"] == "Bob"
     assert query_result.rows[1]["name"] == "Charlie"
+    cases = [
+        ({}, "occupation", {('Architect', 2), ('Lawyer', 1), ('Builder', 1)}),
+        ({"occupation": "Architect"}, "occupation", {('Architect', 2)}),
+    ]
+    for where, fc, expected in cases:
+        fr = collection.query_facets(where, facet_columns=[fc])
+        results = set(fr[fc])
+        assert results == expected
+
+

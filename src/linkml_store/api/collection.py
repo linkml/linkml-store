@@ -1,3 +1,4 @@
+import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
@@ -7,6 +8,8 @@ import numpy as np
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
+
+from linkml_store.index import get_indexer
 
 try:
     from linkml.validator.report import ValidationResult
@@ -100,6 +103,17 @@ class Collection:
             return self.metadata.alias
         return self.name
 
+    def replace(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+        """
+        Replace entire collection with objects.
+
+        :param objs:
+        :param kwargs:
+        :return:
+        """
+        self.delete_where({})
+        self.insert(objs, **kwargs)
+
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
         Add one or more objects to the collection
@@ -180,11 +194,25 @@ class Collection:
         raise NotImplementedError
 
     def get(self, ids: Optional[IDENTIFIER], **kwargs) -> QueryResult:
+        """
+        Get one or more objects by ID.
+
+        :param ids:
+        :param kwargs:
+        :return:
+        """
         id_field = self.identifier_field
         q = self._create_query(where_clause={id_field: ids})
         return self.query(q, **kwargs)
 
     def find(self, where: Optional[Any] = None, **kwargs) -> QueryResult:
+        """
+        Find objects in the collection using a where query.
+
+        :param where:
+        :param kwargs:
+        :return:
+        """
         query = self._create_query(where_clause=where)
         return self.query(query, **kwargs)
 
@@ -236,15 +264,22 @@ class Collection:
             raise ValueError(f"Collection has no name: {self} // {self.metadata}")
         return self.name.startswith("internal__")
 
-    def attach_indexer(self, index: Indexer, auto_index=True, **kwargs):
+    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str]=True, auto_index=True, **kwargs):
         """
         Attach an index to the collection.
 
         :param index:
+        :param name:
         :param auto_index: Automatically index all objects in the collection
         :param kwargs:
         :return:
         """
+        if isinstance(index, str):
+            index = get_indexer(index)
+        if name:
+            index.name = name
+        if not index.name:
+            index.name = type(index).__name__.lower()
         index_name = index.name
         if not index_name:
             raise ValueError("Index must have a name")
@@ -335,6 +370,8 @@ class Collection:
         """
         Return the name of the identifier attribute for the collection.
 
+        AKA the primary key.
+
         :return: The name of the identifier attribute, if one exists.
         """
         cd = self.class_definition()
@@ -343,6 +380,26 @@ class Collection:
                 if att.identifier:
                     return att.name
         return None
+
+    def object_identifier(self, obj: OBJECT, auto=True) -> Optional[IDENTIFIER]:
+        """
+        Return the identifier for an object.
+
+        :param obj:
+        :param auto: If True, generate an identifier if one does not exist.
+        :return:
+        """
+        pk = self.identifier_attribute_name
+        if pk in obj:
+            return obj[pk]
+        elif auto:
+            # TODO: use other unique keys if no primary key
+            as_str = str(obj)
+            md5 = hashlib.md5(as_str.encode()).hexdigest()
+            return md5
+        else:
+            return None
+
 
     def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size=10) -> ClassDefinition:
         """

@@ -54,6 +54,8 @@ class QueryResult(BaseModel):
 
     @property
     def rows_dataframe(self) -> pd.DataFrame:
+        if self.ranked_rows is not None:
+            self._rows_dataframe = pd.DataFrame([{"score": score, **row} for score, row in self.ranked_rows])
         if self._rows_dataframe is None and self.rows:
             self._rows_dataframe = pd.DataFrame(self.rows)
         return self._rows_dataframe

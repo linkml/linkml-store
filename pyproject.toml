@@ -14,7 +14,7 @@ linkml-runtime = "^1.7.5"
 streamlit = { version = "^1.32.2", optional = true }
 sqlalchemy = "*"
 duckdb = "^0.10.1"
-duckdb-engine = "^0.11.2"
+duckdb-engine = ">=0.11.2"
 matplotlib = { version = "*", optional = true }
 seaborn = { version = "*", optional = true }
 plotly = { version = "*", optional = true }
@@ -22,8 +22,10 @@ pystow = "^0.5.4"
 black = { version=">=24.0.0", optional = true }
 llm = { version="*", optional = true }
 pymongo = { version="*", optional = true }
+chromadb = { version="*", optional = true }
 linkml = { version="*", optional = true }
-pandas = "^2.2.1"
+linkml_map = { version="*", optional = true }
+pandas = ">=2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = {version = ">=7.1.2"}
@@ -34,6 +36,7 @@ sphinx-rtd-theme = {version = ">=1.0.0"}
 sphinx-autodoc-typehints = {version = "<2.0.0"}
 sphinx-click = {version = ">=4.3.0"}
 myst-parser = {version = ">=0.18.1"}
+furo = {version = "*"}
 nbsphinx = "*"
 jupyter = "*"
 
@@ -51,7 +54,9 @@ app = ["streamlit"]
 tests = ["black"]
 llm = ["llm"]
 mongodb = ["pymongo"]
+chromadb = ["chromadb"]
 validation = ["linkml"]
+map = ["linkml_map"]
 
 [tool.poetry.scripts]
 linkml-store = "linkml_store.cli:cli"

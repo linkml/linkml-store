@@ -1,10 +1,11 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
+from linkml_runtime.linkml_model import SlotDefinition
 from pymongo.collection import Collection as MongoCollection
 
 from linkml_store.api import Collection
-from linkml_store.api.collection import OBJECT
+from linkml_store.api.collection import OBJECT, DEFAULT_FACET_LIMIT
 from linkml_store.api.queries import Query, QueryResult
 
 logger = logging.getLogger(__name__)
@@ -37,9 +38,46 @@ class MongoDBCollection(Collection):
 
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}
-        for field, value in where_clause.items():
-            mongo_filter[field] = value
+        if where_clause:
+            for field, value in where_clause.items():
+                mongo_filter[field] = value
         return mongo_filter
+
+    def query_facets(
+            self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
+    ) -> Dict[str, List[Tuple[Any, int]]]:
+        results = {}
+        cd = self.class_definition()
+        if not facet_columns:
+            facet_columns = list(self.class_definition().attributes.keys())
+
+        for col in facet_columns:
+            logger.debug(f"Faceting on {col}")
+            if isinstance(col, tuple):
+                sd = SlotDefinition(name="PLACEHOLDER")
+            else:
+                sd = cd.attributes[col]
+
+            if sd.multivalued:
+                facet_pipeline = [
+                    {"$match": where} if where else {"$match": {}},
+                    {"$unwind": f"${col}"},
+                    {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
+                    {"$sort": {"count": -1}},
+                    {"$limit": facet_limit}
+                ]
+            else:
+                facet_pipeline = [
+                    {"$match": where} if where else {"$match": {}},
+                    {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
+                    {"$sort": {"count": -1}},
+                    {"$limit": facet_limit}
+                ]
+
+            facet_results = list(self.mongo_collection.aggregate(facet_pipeline))
+            results[col] = [(result["_id"], result["count"]) for result in facet_results]
+
+        return results
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
         if not isinstance(objs, list):

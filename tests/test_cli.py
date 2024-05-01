@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import pytest
+import yaml
 from click.testing import CliRunner
 from linkml_store import Client
 from linkml_store.cli import cli
@@ -144,3 +145,76 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
     )
     assert result.exit_code == 0
     assert os.path.exists(output_file)
+
+
+def test_store(cli_runner, output_dir):
+    """Ensures store command works."""
+    db_path = f"{output_dir}/test.db"
+    Path(db_path).unlink(missing_ok=True)
+    database_handle = f"duckdb:///{db_path}"
+    input_path = INPUT_DIR / "nested.yaml"
+    result = cli_runner.invoke(
+        cli,
+        [
+            "-d",
+            database_handle,
+            "store",
+            str(input_path),
+        ],
+    )
+    assert result.exit_code == 0
+    schema_output_path = os.path.join(output_dir, "schema_output.yaml")
+    result = cli_runner.invoke(
+        cli,
+        [
+            "-d",
+            database_handle,
+            "schema",
+            "-o",
+            schema_output_path,
+        ],
+    )
+    assert result.exit_code == 0
+    schema_dict = yaml.safe_load(Path(schema_output_path).read_text())
+    classes = schema_dict["classes"]
+    assert len(classes) == 3
+    assert set(classes.keys()) == {"about", "persons", "organizations"}
+
+
+def test_store_explicit_schema(cli_runner, output_dir):
+    """Ensures store command works, using explicit schema."""
+    db_path = f"{output_dir}/test.store.db"
+    Path(db_path).unlink(missing_ok=True)
+    database_handle = f"duckdb:///{db_path}"
+    input_path = INPUT_DIR / "nested.yaml"
+    input_schema_path = INPUT_DIR / "nested.schema.yaml"
+    result = cli_runner.invoke(
+        cli,
+        [
+            "-d",
+            database_handle,
+            "--set",
+            f"schema_location={input_schema_path}",
+            "store",
+            str(input_path),
+        ],
+    )
+    assert result.exit_code == 0
+    schema_output_path = os.path.join(output_dir, "schema_output.yaml")
+    result = cli_runner.invoke(
+        cli,
+        [
+            "-d",
+            database_handle,
+            "schema",
+            "-o",
+            schema_output_path,
+        ],
+    )
+    assert result.exit_code == 0
+    schema_dict = yaml.safe_load(Path(schema_output_path).read_text())
+    classes = schema_dict["classes"]
+    # note we have intentionally "lost" the original containerx
+    assert len(classes) == 3
+    assert set(classes.keys()) == {"About", "Person", "Organization"}
+
