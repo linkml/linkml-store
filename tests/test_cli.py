@@ -217,4 +217,3 @@ def test_store_explicit_schema(cli_runner, output_dir):
     # note we have intentionally "lost" the original containerx
     assert len(classes) == 3
     assert set(classes.keys()) == {"About", "Person", "Organization"}
-

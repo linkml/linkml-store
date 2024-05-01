@@ -48,12 +48,10 @@ def test_insert_and_query(mongodb_database):
     assert query_result.rows[0]["name"] == "Bob"
     assert query_result.rows[1]["name"] == "Charlie"
     cases = [
-        ({}, "occupation", {('Architect', 2), ('Lawyer', 1), ('Builder', 1)}),
-        ({"occupation": "Architect"}, "occupation", {('Architect', 2)}),
+        ({}, "occupation", {("Architect", 2), ("Lawyer", 1), ("Builder", 1)}),
+        ({"occupation": "Architect"}, "occupation", {("Architect", 2)}),
     ]
     for where, fc, expected in cases:
         fr = collection.query_facets(where, facet_columns=[fc])
         results = set(fr[fc])
         assert results == expected
-
-
