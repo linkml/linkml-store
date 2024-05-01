@@ -1,11 +1,11 @@
 import logging
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from linkml_runtime.linkml_model import SlotDefinition
 from pymongo.collection import Collection as MongoCollection
 
 from linkml_store.api import Collection
-from linkml_store.api.collection import OBJECT, DEFAULT_FACET_LIMIT
+from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.queries import Query, QueryResult
 
 logger = logging.getLogger(__name__)

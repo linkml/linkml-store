@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 import pytest
-
 from linkml_store.index import get_indexer
 
 INDEX_CLASSES = ["simple", "llm"]

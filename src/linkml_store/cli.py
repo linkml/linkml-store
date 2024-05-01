@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 import yaml
-from linkml_runtime.dumpers import json_dumper, yaml_dumper
+from linkml_runtime.dumpers import json_dumper
 from pydantic import BaseModel
 
 from linkml_store import Client

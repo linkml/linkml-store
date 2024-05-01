@@ -1,9 +1,9 @@
-from typing import Any, Dict, List, Union, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from chromadb.api.models.Collection import Collection as ChromaCollection
 
 from linkml_store.api import Collection
-from linkml_store.api.collection import OBJECT, DEFAULT_FACET_LIMIT
+from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.index import Indexer
 
