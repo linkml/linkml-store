@@ -1,0 +1,65 @@
+name: test-schema
+id: http://example.org/test-schema
+imports:
+- linkml:types
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  test_schema:
+    prefix_prefix: test_schema
+    prefix_reference: http://example.org/test-schema/
+default_prefix: test_schema
+default_range: string
+classes:
+  Container:
+    tree_root: true
+    attributes:
+      about:
+        range: About
+        inlined: true
+      organizations:
+        range: Organization
+        multivalued: true
+        inlined_as_list: true
+      persons:
+        range: Person
+        multivalued: true
+        inlined_as_list: true
+      
+  About:
+    attributes:
+      name:
+        name: name
+        multivalued: false
+        range: string
+        required: false
+      description:
+        name: description
+        multivalued: false
+        range: string
+        required: false
+  Organization:
+    attributes:
+      id:
+        name: id
+        multivalued: false
+        range: string
+        required: false
+      name:
+        name: name
+        multivalued: false
+        range: string
+        required: false
+  Person:
+    attributes:
+      id:
+        name: id
+        multivalued: false
+        range: string
+        required: false
+      name:
+        name: name
+        multivalued: false
+        range: string
+        required: false
