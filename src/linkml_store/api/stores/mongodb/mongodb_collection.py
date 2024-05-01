@@ -44,7 +44,7 @@ class MongoDBCollection(Collection):
         return mongo_filter
 
     def query_facets(
-            self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
+        self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
     ) -> Dict[str, List[Tuple[Any, int]]]:
         results = {}
         cd = self.class_definition()
@@ -64,14 +64,14 @@ class MongoDBCollection(Collection):
                     {"$unwind": f"${col}"},
                     {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
                     {"$sort": {"count": -1}},
-                    {"$limit": facet_limit}
+                    {"$limit": facet_limit},
                 ]
             else:
                 facet_pipeline = [
                     {"$match": where} if where else {"$match": {}},
                     {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
                     {"$sort": {"count": -1}},
-                    {"$limit": facet_limit}
+                    {"$limit": facet_limit},
                 ]
 
             facet_results = list(self.mongo_collection.aggregate(facet_pipeline))

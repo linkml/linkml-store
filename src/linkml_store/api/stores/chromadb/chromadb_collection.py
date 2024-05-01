@@ -11,6 +11,7 @@ from linkml_store.index import Indexer
 
 logger = logging.getLogger(__name__)
 
+
 class ChromaDBCollection(Collection):
 
     @property
@@ -89,7 +90,7 @@ class ChromaDBCollection(Collection):
                         {"$unwind": f"${col}"},
                         {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
                         {"$sort": {"count": -1}},
-                        {"$limit": facet_limit}
+                        {"$limit": facet_limit},
                     ]
                 )
             else:
@@ -98,7 +99,7 @@ class ChromaDBCollection(Collection):
                         {"$match": where} if where else {"$match": {}},
                         {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
                         {"$sort": {"count": -1}},
-                        {"$limit": facet_limit}
+                        {"$limit": facet_limit},
                     ]
                 )
 

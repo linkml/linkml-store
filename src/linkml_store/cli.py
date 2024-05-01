@@ -316,7 +316,6 @@ def schema(ctx, output_type, output):
         click.echo(output_data)
 
 
-
 @cli.command()
 @click.argument("search_term")
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the search")

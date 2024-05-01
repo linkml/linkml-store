@@ -264,7 +264,7 @@ class Collection:
             raise ValueError(f"Collection has no name: {self} // {self.metadata}")
         return self.name.startswith("internal__")
 
-    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str]=True, auto_index=True, **kwargs):
+    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = True, auto_index=True, **kwargs):
         """
         Attach an index to the collection.
 
@@ -399,7 +399,6 @@ class Collection:
             return md5
         else:
             return None
-
 
     def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size=10) -> ClassDefinition:
         """

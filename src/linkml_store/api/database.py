@@ -71,7 +71,6 @@ class Database(ABC):
         self._initialize_schema()
         self._initialize_collections()
 
-
     def _initialize_schema(self, **kwargs):
         db_config = self.metadata
         if db_config.schema_location:
