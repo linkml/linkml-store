@@ -1,830 +1,687 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; linkml-store  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="about.html" /><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
 
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 --><title>Index - linkml-store documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=437aa6ec" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
-</head>
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            linkml-store
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">linkml-store  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="https://linkml.io/uploads/linkml-logo_color.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">linkml-store  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Python-Tutorial.html">Tutorial: LinkML-Store via Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/MongoDB-Example.html">Using MongoDB</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Semantic-Search.html">Semantic Search tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/Monarch-KG.html">Example: Monarch-KG notebook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">linkml_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/Solr-CLI.html">Example of querying a Solr backend on the Command Line</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">linkml_store</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of linkml_store</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="linkml_store.html">linkml_store package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of linkml_store package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="linkml_store.api.html">linkml_store.api package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of linkml_store.api package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="linkml_store.api.stores.html">linkml_store.api.stores package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="linkml_store.api.stores.duckdb.html">linkml_store.api.stores.duckdb package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
-        </div>
+</div>
+</div>
+
       </div>
-    </nav>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config.arbitrary_types_allowed">arbitrary_types_allowed (linkml_store.api.queries.QueryResult.Config attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.as_dict">as_dict (linkml_store.api.queries.FacetCountResult attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.attach_indexer">attach_indexer() (linkml_store.api.collection.Collection method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">linkml-store</a>
-      </nav>
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Between">Between (class in linkml_store.api.queries)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Index</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.class_definition">class_definition() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.close">close() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection">Collection (class in linkml_store.api.collection)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.collection_class">collection_class (linkml_store.api.database.Database attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.commit">commit() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.create_collection">create_collection() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h1 id="index">Index</h1>
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database">Database (class in linkml_store.api.database)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.delete">delete() (linkml_store.api.collection.Collection method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.delete_where">delete_where() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.drop">drop() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
- | <a href="#B"><strong>B</strong></a>
- | <a href="#C"><strong>C</strong></a>
- | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
- | <a href="#G"><strong>G</strong></a>
- | <a href="#H"><strong>H</strong></a>
- | <a href="#I"><strong>I</strong></a>
- | <a href="#L"><strong>L</strong></a>
- | <a href="#M"><strong>M</strong></a>
- | <a href="#N"><strong>N</strong></a>
- | <a href="#O"><strong>O</strong></a>
- | <a href="#P"><strong>P</strong></a>
- | <a href="#Q"><strong>Q</strong></a>
- | <a href="#R"><strong>R</strong></a>
- | <a href="#S"><strong>S</strong></a>
- | <a href="#U"><strong>U</strong></a>
- | <a href="#W"><strong>W</strong></a>
- 
-</div>
-<h2 id="A">A</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config.arbitrary_types_allowed">arbitrary_types_allowed (linkml_store.api.queries.QueryResult.Config attribute)</a>
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.export_data">export_data() (linkml_store.api.collection.Collection method)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.as_dict">as_dict (linkml_store.api.queries.FacetCountResult attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.attach_database">attach_database() (linkml_store.api.Client method)</a>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.attach_database">(linkml_store.api.client.Client method)</a>
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.facet_counts">facet_counts (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-        <li><a href="linkml_store.html#linkml_store.Client.attach_database">(linkml_store.Client method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.facet_slots">facet_slots (linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.attach_indexer">attach_indexer() (linkml_store.api.Collection method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult">FacetCountResult (class in linkml_store.api.queries)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.find">find() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.from_config">from_config() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.from_table">from_table (linkml_store.api.queries.Query attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.attach_indexer">(linkml_store.api.collection.Collection method)</a>
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.get">get() (linkml_store.api.collection.Collection method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-</tr></table>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.get_collection">get_collection() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h2 id="B">B</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.base_dir">base_dir (linkml_store.api.Client property)</a>
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.handle">handle (linkml_store.api.database.Database property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.hidden">hidden (linkml_store.api.collection.Collection property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.base_dir">(linkml_store.api.client.Client property)</a>
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.identifier_attribute_name">identifier_attribute_name() (linkml_store.api.collection.Collection method)</a>
 </li>
-        <li><a href="linkml_store.html#linkml_store.Client.base_dir">(linkml_store.Client property)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.import_data">import_data() (linkml_store.api.collection.Collection method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Between">Between (class in linkml_store.api.queries)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.include_facet_counts">include_facet_counts (linkml_store.api.queries.Query attribute)</a>
 </li>
-  </ul></td>
-</tr></table>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.index_objects">index_objects() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.indexers">indexers (linkml_store.api.collection.Collection property)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.induce_class_definition_from_objects">induce_class_definition_from_objects() (linkml_store.api.collection.Collection method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.induce_schema_view">induce_schema_view() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.init_collections">init_collections() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.insert">insert() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.is_internal">is_internal (linkml_store.api.collection.Collection property)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.iter_validate_collection">iter_validate_collection() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.iter_validate_database">iter_validate_database() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.class_definition">class_definition() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.class_definition">(linkml_store.api.collection.Collection method)</a>
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.limit">limit (linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="linkml_store.html#linkml_store.Client">Client (class in linkml_store)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.Client">(class in linkml_store.api)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client">(class in linkml_store.api.client)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.close">close() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.close">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.close">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection">Collection (class in linkml_store.api)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection">(class in linkml_store.api.collection)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.collection_class">collection_class (linkml_store.api.Database attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.collection_class">(linkml_store.api.database.Database attribute)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.collection_class">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.commit">commit() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.commit">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.commit">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.create_collection">create_collection() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.create_collection">(linkml_store.api.database.Database method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="D">D</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database">Database (class in linkml_store.api)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database">(class in linkml_store.api.database)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.databases">databases (linkml_store.api.Client property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.databases">(linkml_store.api.client.Client property)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.databases">(linkml_store.Client property)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.delete">delete() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.delete">(linkml_store.api.collection.Collection method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.delete_where">delete_where() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.delete_where">(linkml_store.api.collection.Collection method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.delete_where">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection">DuckDBCollection (class in linkml_store.api.stores.duckdb.duckdb_collection)</a>
-</li>
-      <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase">DuckDBDatabase (class in linkml_store.api.stores.duckdb.duckdb_database)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.engine">engine (linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase property)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.export_data">export_data() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.export_data">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.facet_counts">facet_counts (linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.facet_slots">facet_slots (linkml_store.api.queries.Query attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult">FacetCountResult (class in linkml_store.api.queries)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.find">find() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.find">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.from_config">from_config() (linkml_store.api.Client method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.from_config">(linkml_store.api.client.Client method)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.from_config">(linkml_store.api.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.from_config">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.from_config">(linkml_store.Client method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.from_table">from_table (linkml_store.api.queries.Query attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="G">G</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.get">get() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.get">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.get_collection">get_collection() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.get_collection">(linkml_store.api.database.Database method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.get_database">get_database() (linkml_store.api.Client method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.get_database">(linkml_store.api.client.Client method)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.get_database">(linkml_store.Client method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="H">H</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.handle">handle (linkml_store.api.Client property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.handle">(linkml_store.api.client.Client property)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.handle">(linkml_store.api.Database property)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.handle">(linkml_store.api.database.Database property)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.handle">(linkml_store.Client property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.hidden">hidden (linkml_store.api.Collection property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.hidden">(linkml_store.api.collection.Collection property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.identifier_attribute_name">identifier_attribute_name() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.identifier_attribute_name">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.import_data">import_data() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.import_data">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.include_facet_counts">include_facet_counts (linkml_store.api.queries.Query attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.index_objects">index_objects() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.index_objects">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.indexers">indexers (linkml_store.api.Collection property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.indexers">(linkml_store.api.collection.Collection property)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.induce_class_definition_from_objects">induce_class_definition_from_objects() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.induce_class_definition_from_objects">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.induce_schema_view">induce_schema_view() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.induce_schema_view">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.induce_schema_view">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.init_collections">init_collections() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.init_collections">(linkml_store.api.database.Database method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.init_collections">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.insert">insert() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.insert">(linkml_store.api.collection.Collection method)</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.insert">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.is_internal">is_internal (linkml_store.api.Collection property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.is_internal">(linkml_store.api.collection.Collection property)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.iter_validate_collection">iter_validate_collection() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.iter_validate_collection">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.iter_validate_database">iter_validate_database() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.iter_validate_database">(linkml_store.api.database.Database method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="L">L</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.limit">limit (linkml_store.api.queries.Query attribute)</a>
-</li>
-      <li>
-    linkml_store
-
-      <ul>
-        <li><a href="linkml_store.html#module-linkml_store">module</a>
-</li>
-      </ul></li>
-      <li>
-    linkml_store.api
-
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api">module</a>
-</li>
-      </ul></li>
-      <li>
-    linkml_store.api.client
-
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.client">module</a>
-</li>
-      </ul></li>
-      <li>
+        <li>
     linkml_store.api.collection
 
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.collection">module</a>
+        <ul>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.collection">module</a>
 </li>
-      </ul></li>
-      <li>
+        </ul></li>
+        <li>
     linkml_store.api.database
 
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.database">module</a>
+        <ul>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.database">module</a>
 </li>
-      </ul></li>
-      <li>
+        </ul></li>
+        <li>
     linkml_store.api.queries
 
-      <ul>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.queries">module</a>
+        <ul>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.queries">module</a>
 </li>
-      </ul></li>
-      <li>
+        </ul></li>
+        <li>
     linkml_store.api.stores
 
-      <ul>
-        <li><a href="linkml_store.api.stores.html#module-linkml_store.api.stores">module</a>
+        <ul>
+          <li><a href="linkml_store.api.stores.html#module-linkml_store.api.stores">module</a>
 </li>
-      </ul></li>
-      <li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
     linkml_store.api.stores.duckdb
 
-      <ul>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb">module</a>
+        <ul>
+          <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb">module</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    linkml_store.api.stores.duckdb.duckdb_collection
-
-      <ul>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_collection">module</a>
-</li>
-      </ul></li>
-      <li>
-    linkml_store.api.stores.duckdb.duckdb_database
-
-      <ul>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_database">module</a>
-</li>
-      </ul></li>
-      <li>
+        </ul></li>
+        <li>
     linkml_store.api.stores.duckdb.mappings
 
-      <ul>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.mappings">module</a>
+        <ul>
+          <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.mappings">module</a>
 </li>
-      </ul></li>
-      <li>
-    linkml_store.constants
+        </ul></li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collection_names">list_collection_names() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collections">list_collections() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.list_index_names">list_index_names() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.load_schema_view">load_schema_view() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.html#module-linkml_store.constants">module</a>
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.max">max (linkml_store.api.queries.Between attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.list_collection_names">list_collection_names() (linkml_store.api.Database method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.metadata">metadata (linkml_store.api.collection.Collection attribute)</a>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collection_names">(linkml_store.api.database.Database method)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.database.Database.metadata">(linkml_store.api.database.Database attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.list_collections">list_collections() (linkml_store.api.Database method)</a>
+        </ul></li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.min">min (linkml_store.api.queries.Between attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_computed_fields">model_computed_fields (linkml_store.api.queries.FacetCountResult attribute)</a>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.list_collections">(linkml_store.api.database.Database method)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_computed_fields">(linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.list_index_names">list_index_names() (linkml_store.api.Collection method)</a>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_computed_fields">(linkml_store.api.queries.QueryResult attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_config">model_config (linkml_store.api.queries.FacetCountResult attribute)</a>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.list_index_names">(linkml_store.api.collection.Collection method)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_config">(linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.load_schema_view">load_schema_view() (linkml_store.api.Database method)</a>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_config">(linkml_store.api.queries.QueryResult attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_fields">model_fields (linkml_store.api.queries.FacetCountResult attribute)</a>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.load_schema_view">(linkml_store.api.database.Database method)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_fields">(linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.max">max (linkml_store.api.queries.Between attribute)</a>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_fields">(linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Client.metadata">metadata (linkml_store.api.Client attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.client.Client.metadata">(linkml_store.api.client.Client attribute)</a>
+        </ul></li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_post_init">model_post_init() (linkml_store.api.queries.QueryResult method)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Collection.metadata">(linkml_store.api.Collection attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.metadata">(linkml_store.api.collection.Collection attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.metadata">(linkml_store.api.Database attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.metadata">(linkml_store.api.database.Database attribute)</a>
-</li>
-        <li><a href="linkml_store.html#linkml_store.Client.metadata">(linkml_store.Client attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Between.min">min (linkml_store.api.queries.Between attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_computed_fields">model_computed_fields (linkml_store.api.queries.FacetCountResult attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_computed_fields">(linkml_store.api.queries.Query attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_computed_fields">(linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_config">model_config (linkml_store.api.queries.FacetCountResult attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_config">(linkml_store.api.queries.Query attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_config">(linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.FacetCountResult.model_fields">model_fields (linkml_store.api.queries.FacetCountResult attribute)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.model_fields">(linkml_store.api.queries.Query attribute)</a>
-</li>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_fields">(linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.model_post_init">model_post_init() (linkml_store.api.queries.QueryResult method)</a>
-</li>
-      <li>
+        <li>
     module
 
-      <ul>
-        <li><a href="linkml_store.html#module-linkml_store">linkml_store</a>
+        <ul>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.collection">linkml_store.api.collection</a>
 </li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api">linkml_store.api</a>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.database">linkml_store.api.database</a>
 </li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.client">linkml_store.api.client</a>
+          <li><a href="linkml_store.api.html#module-linkml_store.api.queries">linkml_store.api.queries</a>
 </li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.collection">linkml_store.api.collection</a>
+          <li><a href="linkml_store.api.stores.html#module-linkml_store.api.stores">linkml_store.api.stores</a>
 </li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.database">linkml_store.api.database</a>
+          <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb">linkml_store.api.stores.duckdb</a>
 </li>
-        <li><a href="linkml_store.api.html#module-linkml_store.api.queries">linkml_store.api.queries</a>
+          <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.mappings">linkml_store.api.stores.duckdb.mappings</a>
 </li>
-        <li><a href="linkml_store.api.stores.html#module-linkml_store.api.stores">linkml_store.api.stores</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb">linkml_store.api.stores.duckdb</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_collection">linkml_store.api.stores.duckdb.duckdb_collection</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.duckdb_database">linkml_store.api.stores.duckdb.duckdb_database</a>
-</li>
-        <li><a href="linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb.mappings">linkml_store.api.stores.duckdb.mappings</a>
-</li>
-        <li><a href="linkml_store.html#module-linkml_store.constants">linkml_store.constants</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h2 id="N">N</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.name">name (linkml_store.api.Collection property)</a>
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.name">name (linkml_store.api.collection.Collection property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.num_rows">num_rows (linkml_store.api.queries.QueryResult attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.name">(linkml_store.api.collection.Collection property)</a>
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.object_identifier">object_identifier() (linkml_store.api.collection.Collection method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.num_rows">num_rows (linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.offset">offset (linkml_store.api.queries.Query attribute)</a>
 
-<h2 id="O">O</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.offset">offset (linkml_store.api.queries.Query attribute)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.offset">(linkml_store.api.queries.QueryResult attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.offset">(linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.parent">parent (linkml_store.api.collection.Collection attribute)</a>
 
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.parent">parent (linkml_store.api.Collection attribute)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.database.Database.parent">(linkml_store.api.database.Database attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.peek">peek() (linkml_store.api.collection.Collection method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.parent">(linkml_store.api.collection.Collection attribute)</a>
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query">Query (class in linkml_store.api.queries)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.parent">(linkml_store.api.Database attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.query">query (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.parent">(linkml_store.api.database.Database attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.peek">peek() (linkml_store.api.Collection method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.query">query() (linkml_store.api.collection.Collection method)</a>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.peek">(linkml_store.api.collection.Collection method)</a>
+        <ul>
+          <li><a href="linkml_store.api.html#linkml_store.api.database.Database.query">(linkml_store.api.database.Database method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-</tr></table>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.query_facets">query_facets() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult">QueryResult (class in linkml_store.api.queries)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config">QueryResult.Config (class in linkml_store.api.queries)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h2 id="Q">Q</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query">Query (class in linkml_store.api.queries)</a>
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.ranked_rows">ranked_rows (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.query">query (linkml_store.api.queries.QueryResult attribute)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.recreate_if_exists">recreate_if_exists (linkml_store.api.database.Database property)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.query">query() (linkml_store.api.Collection method)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.replace">replace() (linkml_store.api.collection.Collection method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows">rows (linkml_store.api.queries.QueryResult attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows_dataframe">rows_dataframe (linkml_store.api.queries.QueryResult property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.query">(linkml_store.api.collection.Collection method)</a>
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.schema_view">schema_view (linkml_store.api.database.Database property)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.Database.query">(linkml_store.api.Database method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.search">search() (linkml_store.api.collection.Collection method)</a>
 </li>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.query">(linkml_store.api.database.Database method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.search_term">search_term (linkml_store.api.queries.QueryResult attribute)</a>
 </li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase.query">(linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase method)</a>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.select_cols">select_cols (linkml_store.api.queries.Query attribute)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.query_facets">query_facets() (linkml_store.api.Collection method)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.set_rows">set_rows() (linkml_store.api.queries.QueryResult method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.set_schema_view">set_schema_view() (linkml_store.api.database.Database method)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.sort_by">sort_by (linkml_store.api.queries.Query attribute)</a>
+</li>
+        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.store">store() (linkml_store.api.database.Database method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
 
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.query_facets">(linkml_store.api.collection.Collection method)</a>
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.update">update() (linkml_store.api.collection.Collection method)</a>
 </li>
-        <li><a href="linkml_store.api.stores.duckdb.html#linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection.query_facets">(linkml_store.api.stores.duckdb.duckdb_collection.DuckDBCollection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult">QueryResult (class in linkml_store.api.queries)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.Config">QueryResult.Config (class in linkml_store.api.queries)</a>
-</li>
-  </ul></td>
-</tr></table>
+    </ul></td>
+  </tr></table>
+</section>
 
-<h2 id="R">R</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.ranked_rows">ranked_rows (linkml_store.api.queries.QueryResult attribute)</a>
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.where_clause">where_clause (linkml_store.api.queries.Query attribute)</a>
 </li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.recreate_if_exists">recreate_if_exists (linkml_store.api.Database property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.recreate_if_exists">(linkml_store.api.database.Database property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows">rows (linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.rows_dataframe">rows_dataframe (linkml_store.api.queries.QueryResult property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="S">S</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.schema_view">schema_view (linkml_store.api.Database property)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.schema_view">(linkml_store.api.database.Database property)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.search">search() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.search">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.search_term">search_term (linkml_store.api.queries.QueryResult attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.select_cols">select_cols (linkml_store.api.queries.Query attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.QueryResult.set_rows">set_rows() (linkml_store.api.queries.QueryResult method)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.set_schema_view">set_schema_view() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.set_schema_view">(linkml_store.api.database.Database method)</a>
-</li>
-      </ul></li>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.sort_by">sort_by (linkml_store.api.queries.Query attribute)</a>
-</li>
-      <li><a href="linkml_store.api.html#linkml_store.api.Database.store">store() (linkml_store.api.Database method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.database.Database.store">(linkml_store.api.database.Database method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.Collection.update">update() (linkml_store.api.Collection method)</a>
-
-      <ul>
-        <li><a href="linkml_store.api.html#linkml_store.api.collection.Collection.update">(linkml_store.api.collection.Collection method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="linkml_store.api.html#linkml_store.api.queries.Query.where_clause">where_clause (linkml_store.api.queries.Query attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
+    </ul></td>
+  </tr></table>
+</section>
 
 
-
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Author 1 &lt;author@org.org&gt;.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+        </article>
       </div>
-    </section>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Author 1 &lt;author@org.org&gt;
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div><script src="_static/jquery.js?v=5d32c60e"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=4e2eecee"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
 </html>

@@ -31,8 +31,8 @@
    "id": "initial_id",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.369825Z",
-     "start_time": "2024-04-22T20:18:36.736353Z"
+     "end_time": "2024-04-27T19:14:09.094370Z",
+     "start_time": "2024-04-27T19:14:08.117406Z"
     }
    },
    "outputs": [],
@@ -67,8 +67,8 @@
    "id": "9fa5723c-50f1-451f-8c7e-0e507ab735e2",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.370030Z",
-     "start_time": "2024-04-22T20:18:37.322530Z"
+     "end_time": "2024-04-27T19:14:09.097540Z",
+     "start_time": "2024-04-27T19:14:09.094555Z"
     }
    },
    "outputs": [],
@@ -94,8 +94,8 @@
    "id": "3602c288-e060-4848-8c5d-9f5a893cbecc",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.370088Z",
-     "start_time": "2024-04-22T20:18:37.324740Z"
+     "end_time": "2024-04-27T19:14:09.100373Z",
+     "start_time": "2024-04-27T19:14:09.097144Z"
     }
    },
    "outputs": [],
@@ -119,8 +119,8 @@
    "id": "853d83b2-c2c6-4d41-ad70-693041def8a3",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.427389Z",
-     "start_time": "2024-04-22T20:18:37.329015Z"
+     "end_time": "2024-04-27T19:14:09.166995Z",
+     "start_time": "2024-04-27T19:14:09.101236Z"
     }
    },
    "outputs": [],
@@ -155,8 +155,8 @@
    "id": "39d1317a-4cd9-4be4-97c1-4c82bad97da4",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.427587Z",
-     "start_time": "2024-04-22T20:18:37.402545Z"
+     "end_time": "2024-04-27T19:14:09.175814Z",
+     "start_time": "2024-04-27T19:14:09.168265Z"
     }
    },
    "outputs": [],
@@ -180,8 +180,8 @@
    "id": "313fe0e0-8636-48e6-b963-13d4aae5fe24",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.427952Z",
-     "start_time": "2024-04-22T20:18:37.413521Z"
+     "end_time": "2024-04-27T19:14:09.182943Z",
+     "start_time": "2024-04-27T19:14:09.177970Z"
     }
    },
    "outputs": [
@@ -204,8 +204,8 @@
    "id": "746e22af-9e34-45de-98d3-c0113ca78b00",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.428129Z",
-     "start_time": "2024-04-22T20:18:37.417694Z"
+     "end_time": "2024-04-27T19:14:09.186015Z",
+     "start_time": "2024-04-27T19:14:09.181861Z"
     }
    },
    "outputs": [
@@ -228,8 +228,8 @@
    "id": "8862a1f7-a57b-45a8-80d4-8cb296700df1",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.428458Z",
-     "start_time": "2024-04-22T20:18:37.419984Z"
+     "end_time": "2024-04-27T19:14:09.223782Z",
+     "start_time": "2024-04-27T19:14:09.185471Z"
     }
    },
    "outputs": [
@@ -265,14 +265,14 @@
    "id": "b492ee84-7ef3-413a-bceb-5ba3bca18028",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.431699Z",
-     "start_time": "2024-04-22T20:18:37.427668Z"
+     "end_time": "2024-04-27T19:14:09.224545Z",
+     "start_time": "2024-04-27T19:14:09.191890Z"
     }
    },
    "outputs": [
     {
      "data": {
-      "text/plain": "{'occupation': [('Plumber', 3),\n  ('Welder', 2),\n  ('Mechanic', 1),\n  ('StuntDouble', 1)]}"
+      "text/plain": "{'occupation': [('Plumber', 3),\n  ('Welder', 2),\n  ('StuntDouble', 1),\n  ('Mechanic', 1)]}"
      },
      "execution_count": 9,
      "metadata": {},
@@ -299,14 +299,14 @@
    "id": "755905dc-ac35-4d96-9062-64d9835b5d2e",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.436976Z",
-     "start_time": "2024-04-22T20:18:37.430968Z"
+     "end_time": "2024-04-27T19:14:09.224836Z",
+     "start_time": "2024-04-27T19:14:09.196088Z"
     }
    },
    "outputs": [
     {
      "data": {
-      "text/plain": "{('occupation', 'moon'): [('Plumber', 'Europa', 2),\n  ('Welder', 'Io', 1),\n  ('Welder', 'Europa', 1),\n  ('Plumber', 'Io', 1),\n  ('StuntDouble', 'Io', 1),\n  ('Mechanic', 'Io', 1)]}"
+      "text/plain": "{('occupation', 'moon'): [('Plumber', 'Europa', 2),\n  ('Welder', 'Io', 1),\n  ('Mechanic', 'Io', 1),\n  ('Welder', 'Europa', 1),\n  ('Plumber', 'Io', 1),\n  ('StuntDouble', 'Io', 1)]}"
      },
      "execution_count": 10,
      "metadata": {},
@@ -335,8 +335,8 @@
    "id": "b81f9be7-c26b-43a4-a5bb-9c278596472a",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.448573Z",
-     "start_time": "2024-04-22T20:18:37.436244Z"
+     "end_time": "2024-04-27T19:14:09.225117Z",
+     "start_time": "2024-04-27T19:14:09.201684Z"
     }
    },
    "outputs": [
@@ -381,8 +381,8 @@
    "id": "0eb956fc-94d9-4972-ac32-b9dc614ca0fa",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.685384Z",
-     "start_time": "2024-04-22T20:18:37.445735Z"
+     "end_time": "2024-04-27T19:14:09.473040Z",
+     "start_time": "2024-04-27T19:14:09.216479Z"
     }
    },
    "outputs": [],
@@ -396,8 +396,8 @@
    "id": "256aa004-57ce-4ebb-8f0e-30ce2c6a4a75",
    "metadata": {
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.806959Z",
-     "start_time": "2024-04-22T20:18:37.688013Z"
+     "end_time": "2024-04-27T19:14:09.654882Z",
+     "start_time": "2024-04-27T19:14:09.476443Z"
     }
    },
    "outputs": [
@@ -474,8 +474,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.813397Z",
-     "start_time": "2024-04-22T20:18:37.806700Z"
+     "end_time": "2024-04-27T19:14:09.660971Z",
+     "start_time": "2024-04-27T19:14:09.658674Z"
     }
    },
    "id": "5bed277dc3ce17e8"
@@ -490,8 +490,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.819967Z",
-     "start_time": "2024-04-22T20:18:37.808934Z"
+     "end_time": "2024-04-27T19:14:09.664082Z",
+     "start_time": "2024-04-27T19:14:09.661449Z"
     }
    },
    "id": "615928abbaa186e6"
@@ -506,8 +506,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.910747Z",
-     "start_time": "2024-04-22T20:18:37.819092Z"
+     "end_time": "2024-04-27T19:14:09.750659Z",
+     "start_time": "2024-04-27T19:14:09.667771Z"
     }
    },
    "id": "d215e964cff92ce"
@@ -532,8 +532,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.929401Z",
-     "start_time": "2024-04-22T20:18:37.911645Z"
+     "end_time": "2024-04-27T19:14:09.761909Z",
+     "start_time": "2024-04-27T19:14:09.747308Z"
     }
    },
    "id": "756d8ef2eb3745fe"
@@ -606,8 +606,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.946618Z",
-     "start_time": "2024-04-22T20:18:37.925357Z"
+     "end_time": "2024-04-27T19:14:09.766522Z",
+     "start_time": "2024-04-27T19:14:09.762558Z"
     }
    },
    "id": "c08cd780-5b8e-4b98-a631-e7c71136ce3e"
@@ -639,18 +639,160 @@
    "id": "46a5786c72d7009b"
   },
   {
+   "cell_type": "markdown",
+   "source": [
+    "## Indexing\n",
+    "\n"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "e0d396d24808dfbe"
+  },
+  {
    "cell_type": "code",
-   "execution_count": 18,
+   "execution_count": 19,
    "outputs": [],
-   "source": [],
+   "source": [
+    "from linkml_store.utils.format_utils import load_objects\n",
+    "\n",
+    "COUNTRIES = \"../../tests/input/countries/countries.jsonl\"\n",
+    "objects = load_objects(COUNTRIES)"
+   ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:18:37.946815Z",
-     "start_time": "2024-04-22T20:18:37.933093Z"
+     "end_time": "2024-04-27T19:27:13.682753Z",
+     "start_time": "2024-04-27T19:27:13.666978Z"
     }
    },
-   "id": "d65b4d209b701dd7"
+   "id": "1fdceaf8bd64bd6a"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "outputs": [],
+   "source": [
+    "db = client.attach_database(\"duckdb\", \"CountryDB\")\n",
+    "collection = db.create_collection(\"Country\", alias=\"countries\")"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:27:56.893498Z",
+     "start_time": "2024-04-27T19:27:56.882161Z"
+    }
+   },
+   "id": "8665a9f513a8ccfb"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "outputs": [],
+   "source": [
+    "collection.insert(objects)"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:28:00.248635Z",
+     "start_time": "2024-04-27T19:28:00.206828Z"
+    }
+   },
+   "id": "3d9d17d525711c41"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "outputs": [
+    {
+     "data": {
+      "text/plain": "{'continent': [('Europe', 5),\n  ('Asia', 5),\n  ('North America', 3),\n  ('Africa', 3),\n  ('South America', 2),\n  ('Oceania', 2)]}"
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "collection.query_facets(facet_columns=[\"continent\"])"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:28:06.153359Z",
+     "start_time": "2024-04-27T19:28:06.132649Z"
+    }
+   },
+   "id": "66904d8281f6a30"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "outputs": [],
+   "source": [
+    "collection.attach_indexer(\"simple\")"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:29:09.039813Z",
+     "start_time": "2024-04-27T19:29:08.970934Z"
+    }
+   },
+   "id": "b7fa297572dd61fa"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "outputs": [],
+   "source": [
+    "sr = collection.search(\"Countries in the North that speak english and french\")"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:29:40.100441Z",
+     "start_time": "2024-04-27T19:29:40.075753Z"
+    }
+   },
+   "id": "28a2c7e2822acf11"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "outputs": [
+    {
+     "data": {
+      "text/plain": "       score            name code           capital      continent  \\\n0   0.151858          Canada   CA            Ottawa  North America   \n1   0.139609   United States   US  Washington, D.C.  North America   \n2   0.128295    South Africa   ZA          Pretoria         Africa   \n3   0.101139  United Kingdom   GB            London         Europe   \n4   0.096154          Mexico   MX       Mexico City  North America   \n5   0.095924     New Zealand   NZ        Wellington        Oceania   \n6   0.091025          France   FR             Paris         Europe   \n7   0.087383       Argentina   AR      Buenos Aires  South America   \n8   0.079243       Australia   AU          Canberra        Oceania   \n9   0.077674          Brazil   BR          Brasília  South America   \n10  0.070797         Nigeria   NG             Abuja         Africa   \n11  0.066827           India   IN         New Delhi           Asia   \n12  0.061174     South Korea   KR             Seoul           Asia   \n13  0.057554           China   CN           Beijing           Asia   \n14  0.040782           Spain   ES            Madrid         Europe   \n15  0.040782           Japan   JP             Tokyo           Asia   \n16  0.040564           Egypt   EG             Cairo         Africa   \n17  0.040032         Germany   DE            Berlin         Europe   \n18  0.028916       Indonesia   ID           Jakarta           Asia   \n19  0.027985           Italy   IT              Rome         Europe   \n\n                                            languages  \n0                                   [English, French]  \n1                                           [English]  \n2   [Zulu, Xhosa, Afrikaans, English, Northern Sot...  \n3                                           [English]  \n4                                           [Spanish]  \n5                                    [English, Māori]  \n6                                            [French]  \n7                                           [Spanish]  \n8                                           [English]  \n9                                        [Portuguese]  \n10                                          [English]  \n11                                   [Hindi, English]  \n12                                           [Korean]  \n13                                 [Standard Chinese]  \n14                                          [Spanish]  \n15                                         [Japanese]  \n16                                           [Arabic]  \n17                                           [German]  \n18                                       [Indonesian]  \n19                                          [Italian]  ",
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>score</th>\n      <th>name</th>\n      <th>code</th>\n      <th>capital</th>\n      <th>continent</th>\n      <th>languages</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0.151858</td>\n      <td>Canada</td>\n      <td>CA</td>\n      <td>Ottawa</td>\n      <td>North America</td>\n      <td>[English, French]</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>0.139609</td>\n      <td>United States</td>\n      <td>US</td>\n      <td>Washington, D.C.</td>\n      <td>North America</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>0.128295</td>\n      <td>South Africa</td>\n      <td>ZA</td>\n      <td>Pretoria</td>\n      <td>Africa</td>\n      <td>[Zulu, Xhosa, Afrikaans, English, Northern Sot...</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>0.101139</td>\n      <td>United Kingdom</td>\n      <td>GB</td>\n      <td>London</td>\n      <td>Europe</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>0.096154</td>\n      <td>Mexico</td>\n      <td>MX</td>\n      <td>Mexico City</td>\n      <td>North America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>0.095924</td>\n      <td>New Zealand</td>\n      <td>NZ</td>\n      <td>Wellington</td>\n      <td>Oceania</td>\n      <td>[English, Māori]</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>0.091025</td>\n      <td>France</td>\n      <td>FR</td>\n      <td>Paris</td>\n      <td>Europe</td>\n      <td>[French]</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>0.087383</td>\n      <td>Argentina</td>\n      <td>AR</td>\n      <td>Buenos Aires</td>\n      <td>South America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>0.079243</td>\n      <td>Australia</td>\n      <td>AU</td>\n      <td>Canberra</td>\n      <td>Oceania</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>0.077674</td>\n      <td>Brazil</td>\n      <td>BR</td>\n      <td>Brasília</td>\n      <td>South America</td>\n      <td>[Portuguese]</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>0.070797</td>\n      <td>Nigeria</td>\n      <td>NG</td>\n      <td>Abuja</td>\n      <td>Africa</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>0.066827</td>\n      <td>India</td>\n      <td>IN</td>\n      <td>New Delhi</td>\n      <td>Asia</td>\n      <td>[Hindi, English]</td>\n    </tr>\n    <tr>\n      <th>12</th>\n      <td>0.061174</td>\n      <td>South Korea</td>\n      <td>KR</td>\n      <td>Seoul</td>\n      <td>Asia</td>\n      <td>[Korean]</td>\n    </tr>\n    <tr>\n      <th>13</th>\n      <td>0.057554</td>\n      <td>China</td>\n      <td>CN</td>\n      <td>Beijing</td>\n      <td>Asia</td>\n      <td>[Standard Chinese]</td>\n    </tr>\n    <tr>\n      <th>14</th>\n      <td>0.040782</td>\n      <td>Spain</td>\n      <td>ES</td>\n      <td>Madrid</td>\n      <td>Europe</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>15</th>\n      <td>0.040782</td>\n      <td>Japan</td>\n      <td>JP</td>\n      <td>Tokyo</td>\n      <td>Asia</td>\n      <td>[Japanese]</td>\n    </tr>\n    <tr>\n      <th>16</th>\n      <td>0.040564</td>\n      <td>Egypt</td>\n      <td>EG</td>\n      <td>Cairo</td>\n      <td>Africa</td>\n      <td>[Arabic]</td>\n    </tr>\n    <tr>\n      <th>17</th>\n      <td>0.040032</td>\n      <td>Germany</td>\n      <td>DE</td>\n      <td>Berlin</td>\n      <td>Europe</td>\n      <td>[German]</td>\n    </tr>\n    <tr>\n      <th>18</th>\n      <td>0.028916</td>\n      <td>Indonesia</td>\n      <td>ID</td>\n      <td>Jakarta</td>\n      <td>Asia</td>\n      <td>[Indonesian]</td>\n    </tr>\n    <tr>\n      <th>19</th>\n      <td>0.027985</td>\n      <td>Italy</td>\n      <td>IT</td>\n      <td>Rome</td>\n      <td>Europe</td>\n      <td>[Italian]</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sr.rows_dataframe"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T19:29:44.474226Z",
+     "start_time": "2024-04-27T19:29:44.455816Z"
+    }
+   },
+   "id": "5a24b063d63a2cdf"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "outputs": [],
+   "source": [],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "dcb2b02adb9fe5d3"
   }
  ],
  "metadata": {

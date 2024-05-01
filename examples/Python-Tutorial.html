@@ -1,98 +1,222 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Using MongoDB" href="MongoDB-Example.html" /><link rel="prev" title="Tutorial: Using LinkML-Store using the Command Line Interface" href="Command-Line-Tutorial.html" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial: LinkML-Store via Python &mdash; linkml-store  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
+        <title>Tutorial: LinkML-Store via Python - linkml-store documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=437aa6ec" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
 
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Semantic Search tutorial" href="Semantic-Search.html" />
-    <link rel="prev" title="Tutorial: Using LinkML-Store using the Command Line Interface" href="Command-Line-Tutorial.html" /> 
-</head>
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a href="../index.html" class="icon icon-home">
-            linkml-store
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">linkml-store  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="https://linkml.io/uploads/linkml-logo_color.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">linkml-store  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Command-Line-Tutorial.html">Tutorial: Using LinkML-Store using the Command Line Interface</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial: LinkML-Store via Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Create-a-Client-object">Create a Client object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Querying">Querying</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Faceting">Faceting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Plotting">Plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Complex-objects">Complex objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Schemas">Schemas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Asserting-schemas">Asserting schemas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Other-adapters">Other adapters</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Tutorial: LinkML-Store via Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MongoDB-Example.html">Using MongoDB</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Semantic-Search.html">Semantic Search tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Monarch-KG.html">Example: Monarch-KG notebook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules.html">linkml_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Solr-CLI.html">Example of querying a Solr backend on the Command Line</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../modules.html">linkml_store</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of linkml_store</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../linkml_store.html">linkml_store package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of linkml_store package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../linkml_store.api.html">linkml_store.api package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of linkml_store.api package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../linkml_store.api.stores.html">linkml_store.api.stores package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../linkml_store.api.stores.duckdb.html">linkml_store.api.stores.duckdb package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">linkml-store</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Tutorial: LinkML-Store via Python</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/examples/Python-Tutorial.ipynb.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="Tutorial:-LinkML-Store-via-Python">
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="Tutorial:-LinkML-Store-via-Python">
 <h1>Tutorial: LinkML-Store via Python<a class="headerlink" href="#Tutorial:-LinkML-Store-via-Python" title="Link to this heading"></a></h1>
 <p>This tutorial walks through the basics of using the LinkML-Store API. It uses the DuckDB adapter.</p>
 <section id="Create-a-Client-object">
@@ -280,8 +404,8 @@
 <div class="highlight"><pre>
 {&#39;occupation&#39;: [(&#39;Plumber&#39;, 3),
   (&#39;Welder&#39;, 2),
-  (&#39;Mechanic&#39;, 1),
-  (&#39;StuntDouble&#39;, 1)]}
+  (&#39;StuntDouble&#39;, 1),
+  (&#39;Mechanic&#39;, 1)]}
 </pre></div></div>
 </div>
 <p>We can also facet on multiple columns, or specify a combinatorial facet. Here we will get facet counts for different occupations on different moons.</p>
@@ -301,10 +425,10 @@
 <div class="highlight"><pre>
 {(&#39;occupation&#39;, &#39;moon&#39;): [(&#39;Plumber&#39;, &#39;Europa&#39;, 2),
   (&#39;Welder&#39;, &#39;Io&#39;, 1),
+  (&#39;Mechanic&#39;, &#39;Io&#39;, 1),
   (&#39;Welder&#39;, &#39;Europa&#39;, 1),
   (&#39;Plumber&#39;, &#39;Io&#39;, 1),
-  (&#39;StuntDouble&#39;, &#39;Io&#39;, 1),
-  (&#39;Mechanic&#39;, &#39;Io&#39;, 1)]}
+  (&#39;StuntDouble&#39;, &#39;Io&#39;, 1)]}
 </pre></div></div>
 </div>
 </section>
@@ -602,8 +726,301 @@ attributes:
 <section id="Other-adapters">
 <h2>Other adapters<a class="headerlink" href="#Other-adapters" title="Link to this heading"></a></h2>
 <p><strong>TODO</strong></p>
+</section>
+<section id="Indexing">
+<h2>Indexing<a class="headerlink" href="#Indexing" title="Link to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">load_objects</span>
+
+<span class="n">COUNTRIES</span> <span class="o">=</span> <span class="s2">&quot;../../tests/input/countries/countries.jsonl&quot;</span>
+<span class="n">objects</span> <span class="o">=</span> <span class="n">load_objects</span><span class="p">(</span><span class="n">COUNTRIES</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="s2">&quot;CountryDB&quot;</span><span class="p">)</span>
+<span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Country&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;countries&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;continent&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;continent&#39;: [(&#39;Europe&#39;, 5),
+  (&#39;Asia&#39;, 5),
+  (&#39;North America&#39;, 3),
+  (&#39;Africa&#39;, 3),
+  (&#39;South America&#39;, 2),
+  (&#39;Oceania&#39;, 2)]}
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="s2">&quot;simple&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;Countries in the North that speak english and french&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sr</span><span class="o">.</span><span class="n">rows_dataframe</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>score</th>
+      <th>name</th>
+      <th>code</th>
+      <th>capital</th>
+      <th>continent</th>
+      <th>languages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.151858</td>
+      <td>Canada</td>
+      <td>CA</td>
+      <td>Ottawa</td>
+      <td>North America</td>
+      <td>[English, French]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.139609</td>
+      <td>United States</td>
+      <td>US</td>
+      <td>Washington, D.C.</td>
+      <td>North America</td>
+      <td>[English]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.128295</td>
+      <td>South Africa</td>
+      <td>ZA</td>
+      <td>Pretoria</td>
+      <td>Africa</td>
+      <td>[Zulu, Xhosa, Afrikaans, English, Northern Sot...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.101139</td>
+      <td>United Kingdom</td>
+      <td>GB</td>
+      <td>London</td>
+      <td>Europe</td>
+      <td>[English]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.096154</td>
+      <td>Mexico</td>
+      <td>MX</td>
+      <td>Mexico City</td>
+      <td>North America</td>
+      <td>[Spanish]</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.095924</td>
+      <td>New Zealand</td>
+      <td>NZ</td>
+      <td>Wellington</td>
+      <td>Oceania</td>
+      <td>[English, Māori]</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.091025</td>
+      <td>France</td>
+      <td>FR</td>
+      <td>Paris</td>
+      <td>Europe</td>
+      <td>[French]</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.087383</td>
+      <td>Argentina</td>
+      <td>AR</td>
+      <td>Buenos Aires</td>
+      <td>South America</td>
+      <td>[Spanish]</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.079243</td>
+      <td>Australia</td>
+      <td>AU</td>
+      <td>Canberra</td>
+      <td>Oceania</td>
+      <td>[English]</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.077674</td>
+      <td>Brazil</td>
+      <td>BR</td>
+      <td>Brasília</td>
+      <td>South America</td>
+      <td>[Portuguese]</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.070797</td>
+      <td>Nigeria</td>
+      <td>NG</td>
+      <td>Abuja</td>
+      <td>Africa</td>
+      <td>[English]</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>0.066827</td>
+      <td>India</td>
+      <td>IN</td>
+      <td>New Delhi</td>
+      <td>Asia</td>
+      <td>[Hindi, English]</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0.061174</td>
+      <td>South Korea</td>
+      <td>KR</td>
+      <td>Seoul</td>
+      <td>Asia</td>
+      <td>[Korean]</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0.057554</td>
+      <td>China</td>
+      <td>CN</td>
+      <td>Beijing</td>
+      <td>Asia</td>
+      <td>[Standard Chinese]</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>0.040782</td>
+      <td>Spain</td>
+      <td>ES</td>
+      <td>Madrid</td>
+      <td>Europe</td>
+      <td>[Spanish]</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>0.040782</td>
+      <td>Japan</td>
+      <td>JP</td>
+      <td>Tokyo</td>
+      <td>Asia</td>
+      <td>[Japanese]</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>0.040564</td>
+      <td>Egypt</td>
+      <td>EG</td>
+      <td>Cairo</td>
+      <td>Africa</td>
+      <td>[Arabic]</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>0.040032</td>
+      <td>Germany</td>
+      <td>DE</td>
+      <td>Berlin</td>
+      <td>Europe</td>
+      <td>[German]</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>0.028916</td>
+      <td>Indonesia</td>
+      <td>ID</td>
+      <td>Jakarta</td>
+      <td>Asia</td>
+      <td>[Indonesian]</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>0.027985</td>
+      <td>Italy</td>
+      <td>IT</td>
+      <td>Rome</td>
+      <td>Europe</td>
+      <td>[Italian]</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
@@ -613,35 +1030,91 @@ attributes:
 </section>
 </section>
 
-
-           </div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="MongoDB-Example.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Using MongoDB</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Command-Line-Tutorial.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Tutorial: Using LinkML-Store using the Command Line Interface</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Author 1 &lt;author@org.org&gt;
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Command-Line-Tutorial.html" class="btn btn-neutral float-left" title="Tutorial: Using LinkML-Store using the Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Semantic-Search.html" class="btn btn-neutral float-right" title="Semantic Search tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Tutorial: LinkML-Store via Python</a><ul>
+<li><a class="reference internal" href="#Create-a-Client-object">Create a Client object</a></li>
+<li><a class="reference internal" href="#Attach-and-populate-a-DuckDB-in-memory-database">Attach and populate a DuckDB in-memory database</a></li>
+<li><a class="reference internal" href="#Querying">Querying</a></li>
+<li><a class="reference internal" href="#Faceting">Faceting</a></li>
+<li><a class="reference internal" href="#Plotting">Plotting</a></li>
+<li><a class="reference internal" href="#Complex-objects">Complex objects</a></li>
+<li><a class="reference internal" href="#Schemas">Schemas</a></li>
+<li><a class="reference internal" href="#Asserting-schemas">Asserting schemas</a></li>
+<li><a class="reference internal" href="#Other-adapters">Other adapters</a></li>
+<li><a class="reference internal" href="#Indexing">Indexing</a></li>
+</ul>
+</li>
+</ul>
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Author 1 &lt;author@org.org&gt;.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </div>
         </div>
       </div>
-    </section>
+      
+      
+    </aside>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div><script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
 </html>

@@ -127,8 +127,50 @@
   {
    "cell_type": "markdown",
    "source": [
-    "We'll insert a small test file (in JSON Lines format) into a fresh database.\n",
-    "\n",
+    "We'll insert a small test file (in JSON Lines format) into a fresh database."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "8cf50fcf5f257fdd"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\"name\": \"United States\", \"code\": \"US\", \"capital\": \"Washington, D.C.\", \"continent\": \"North America\", \"languages\": [\"English\"]}\n",
+      "{\"name\": \"Canada\", \"code\": \"CA\", \"capital\": \"Ottawa\", \"continent\": \"North America\", \"languages\": [\"English\", \"French\"]}\n",
+      "{\"name\": \"Mexico\", \"code\": \"MX\", \"capital\": \"Mexico City\", \"continent\": \"North America\", \"languages\": [\"Spanish\"]}\n",
+      "{\"name\": \"Brazil\", \"code\": \"BR\", \"capital\": \"Brasília\", \"continent\": \"South America\", \"languages\": [\"Portuguese\"]}\n",
+      "{\"name\": \"Argentina\", \"code\": \"AR\", \"capital\": \"Buenos Aires\", \"continent\": \"South America\", \"languages\": [\"Spanish\"]}\n",
+      "{\"name\": \"United Kingdom\", \"code\": \"GB\", \"capital\": \"London\", \"continent\": \"Europe\", \"languages\": [\"English\"]}\n",
+      "{\"name\": \"France\", \"code\": \"FR\", \"capital\": \"Paris\", \"continent\": \"Europe\", \"languages\": [\"French\"]}\n",
+      "{\"name\": \"Germany\", \"code\": \"DE\", \"capital\": \"Berlin\", \"continent\": \"Europe\", \"languages\": [\"German\"]}\n",
+      "{\"name\": \"Italy\", \"code\": \"IT\", \"capital\": \"Rome\", \"continent\": \"Europe\", \"languages\": [\"Italian\"]}\n",
+      "{\"name\": \"Spain\", \"code\": \"ES\", \"capital\": \"Madrid\", \"continent\": \"Europe\", \"languages\": [\"Spanish\"]}\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "head ../../tests/input/countries/countries.jsonl"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T22:11:07.912832Z",
+     "start_time": "2024-04-27T22:11:07.897955Z"
+    }
+   },
+   "id": "afc4bfb1ecf80cc4"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
     "To make sure we have a fresh setup, we'll create a temporary directory `tmp` (if it doesn't already exist),\n",
     "and be sure to remove any copy of the database we intend to create.\n",
     "\n",
@@ -137,7 +179,7 @@
    "metadata": {
     "collapsed": false
    },
-   "id": "8cf50fcf5f257fdd"
+   "id": "8ec898e12ac5c6ea"
   },
   {
    "cell_type": "code",
@@ -377,11 +419,11 @@
   {
    "cell_type": "markdown",
    "source": [
-    "## Introspecting schemas\n",
+    "## Schemas\n",
     "\n",
     "Note in the above we did not explicitly specify a schema; instead it is *induced*.\n",
     "\n",
-    "We can use the `schema` command to see the induced schema in LinkML YAML:"
+    "We can use the `schema` command to see the induced schema in [LinkML YAML](https://linkml.github.io/linkml/)."
    ],
    "metadata": {
     "collapsed": false
