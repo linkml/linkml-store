@@ -64,7 +64,7 @@ map = ["linkml_map"]
 linkml-store = "linkml_store.cli:cli"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 
