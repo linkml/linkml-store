@@ -47,6 +47,7 @@ def test_insert_and_query(mongodb_database):
     assert len(query_result.rows) == 2
     assert query_result.rows[0]["name"] == "Bob"
     assert query_result.rows[1]["name"] == "Charlie"
+    assert set(query_result.rows[0].keys()) == {"name", "age", "occupation"}
     cases = [
         ({}, "occupation", {("Architect", 2), ("Lawyer", 1), ("Builder", 1)}),
         ({"occupation": "Architect"}, "occupation", {("Architect", 2)}),

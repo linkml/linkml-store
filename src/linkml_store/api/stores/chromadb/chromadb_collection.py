@@ -1,3 +1,7 @@
+"""
+ChromaDB Collection
+"""
+
 import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -13,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class ChromaDBCollection(Collection):
+    """
+    A wrapper for ChromaDB collections.
+    """
 
     @property
     def native_collection(self) -> ChromaCollection:
@@ -50,7 +57,7 @@ class ChromaDBCollection(Collection):
         return len(ids)
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
-        logger.info(f"Deleting from {self._target_class_name} where: {where}")
+        logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
         results = self.native_collection.get(where=where)

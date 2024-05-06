@@ -1,11 +1,12 @@
 import logging
 from abc import ABC
+from collections import defaultdict
 from copy import copy
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
 
 try:
-    from linkml.validator.report import ValidationResult
+    from linkml.validator.report import Severity, ValidationResult
 except ImportError:
     ValidationResult = None
 
@@ -204,7 +205,6 @@ class Database(ABC):
         """
         if not name:
             raise ValueError(f"Collection name must be provided: alias: {alias} metadata: {metadata}")
-        # collection_cls = self._collection_class
         collection_cls = self.collection_class
         collection = collection_cls(name=name, alias=alias, parent=self, metadata=metadata)
         if metadata and metadata.attributes:
@@ -341,14 +341,42 @@ class Database(ABC):
             self._schema_view = self.induce_schema_view()
         return self._schema_view
 
-    def set_schema_view(self, schema_view: SchemaView):
+    def set_schema_view(self, schema_view: Union[str, Path, SchemaView]):
         """
         Set the schema view for the database.
 
         :param schema_view:
         :return:
         """
+        if isinstance(schema_view, Path):
+            schema_view = str(schema_view)
+        if isinstance(schema_view, str):
+            schema_view = SchemaView(schema_view)
         self._schema_view = schema_view
+        if not self._collections:
+            return
+        # align with induced schema
+        roots = [c for c in schema_view.all_classes().values() if c.tree_root]
+        if len(roots) == 0:
+            all_ranges = set()
+            for cn in schema_view.all_classes():
+                for slot in schema_view.class_induced_slots(cn):
+                    if slot.range:
+                        all_ranges.add(slot.range)
+            roots = [
+                c
+                for c in schema_view.all_classes().values()
+                if not all_ranges.intersection(schema_view.class_ancestors(c.name, reflexive=True))
+            ]
+        if len(roots) == 1:
+            root = roots[0]
+            for slot in schema_view.class_induced_slots(root.name):
+                inlined = slot.inlined or slot.inlined_as_list
+                if inlined and slot.range:
+                    if slot.name in self._collections:
+                        coll = self._collections[slot.name]
+                        if not coll.metadata.type:
+                            coll.metadata.type = slot.range
 
     def load_schema_view(self, path: Union[str, Path]):
         """
@@ -397,6 +425,52 @@ class Database(ABC):
         """
         for collection in self.list_collections():
             yield from collection.iter_validate_collection(**kwargs)
+        if self.metadata.ensure_referential_integrity:
+            yield from self._validate_referential_integrity(**kwargs)
+
+    def _validate_referential_integrity(self, **kwargs) -> Iterator["ValidationResult"]:
+        """
+        Validate referential integrity of the database.
+
+        :param kwargs:
+        :return: iterator over validation results
+        """
+        sv = self.schema_view
+        cmap = defaultdict(list)
+        for collection in self.list_collections():
+            if not collection.target_class_name:
+                raise ValueError(f"Collection {collection.name} has no target class")
+            cmap[collection.target_class_name].append(collection)
+        for collection in self.list_collections():
+            cd = collection.class_definition()
+            induced_slots = sv.class_induced_slots(cd.name)
+            slot_map = {s.name: s for s in induced_slots}
+            # rmap = {s.name: s.range for s in induced_slots}
+            sr_to_coll = {s.name: cmap.get(s.range, []) for s in induced_slots if s.range}
+            for obj in collection.find_iter():
+                for k, v in obj.items():
+                    if k not in sr_to_coll:
+                        continue
+                    ref_colls = sr_to_coll[k]
+                    if not ref_colls:
+                        continue
+                    if not isinstance(v, (str, int)):
+                        continue
+                    slot = slot_map[k]
+                    found = False
+                    for ref_coll in ref_colls:
+                        ref_obj = ref_coll.get_one(v)
+                        if ref_obj:
+                            found = True
+                            break
+                    if not found:
+                        yield ValidationResult(
+                            type="ReferentialIntegrity",
+                            severity=Severity.ERROR,
+                            message=f"Referential integrity error: {slot.range} not found",
+                            instantiates=slot.range,
+                            instance=v,
+                        )
 
     def drop(self, **kwargs):
         """

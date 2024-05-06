@@ -22,16 +22,22 @@ classes:
       - capital
       - continent
       - languages
+  Route:
+    slots:
+      - origin
+      - destination
+      - method
 
 slots:
   name:
     description: The name of the country
     required: true
-    identifier: true
+    # identifier: true
   code:
     description: The ISO 3166-1 alpha-2 code of the country
     required: true
     pattern: '^[A-Z]{2}$'
+    identifier: true
   capital:
     description: The capital city of the country
     required: true
@@ -42,6 +48,19 @@ slots:
     description: The main languages spoken in the country
     range: Language
     multivalued: true
+  origin:
+    range: Country
+  destination:
+    range: Country
+  method:
+    range: MethodEnum
+
+enums:
+  MethodEnum:
+    permissible_values:
+      rail:
+      air:
+      road:
 
 types:
   Language:

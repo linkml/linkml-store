@@ -21,7 +21,11 @@ HANDLE_MAP = {
 
 class Client:
     """
-    A client provides access to named collections.
+    A client is the top-level object for interacting with databases.
+
+    A client has access to one or more :class:`Database` objects.
+
+    Each database consists of a number of :class:`.Collection` objects.
 
     Examples
     --------

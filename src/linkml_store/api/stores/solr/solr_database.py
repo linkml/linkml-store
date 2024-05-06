@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 import requests
+
 from linkml_store.api import Collection, Database
 from linkml_store.api.config import CollectionConfig
 from linkml_store.api.queries import Query, QueryResult

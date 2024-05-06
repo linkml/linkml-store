@@ -5,6 +5,7 @@ from copy import copy
 from typing import Any, Dict, List, Optional, Union
 
 import requests
+
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT
 from linkml_store.api.queries import Query, QueryResult
@@ -119,7 +120,7 @@ class SolrCollection(Collection):
         conditions = []
         if self.parent.metadata.collection_type_slot:
             where_clause = copy(where_clause)
-            where_clause[self.parent.metadata.collection_type_slot] = self._alias
+            where_clause[self.parent.metadata.collection_type_slot] = self.alias
         for field, value in where_clause.items():
             if not isinstance(value, (list, tuple)):
                 value = [value]

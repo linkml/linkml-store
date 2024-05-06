@@ -1,4 +1,5 @@
 import logging
+from copy import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from linkml_runtime.linkml_model import SlotDefinition
@@ -31,7 +32,12 @@ class MongoDBCollection(Collection):
         else:
             cursor = self.mongo_collection.find(mongo_filter)
 
-        rows = list(cursor)
+        def _as_row(row: dict):
+            row = copy(row)
+            del row["_id"]
+            return row
+
+        rows = [_as_row(row) for row in cursor]
         count = self.mongo_collection.count_documents(mongo_filter)
 
         return QueryResult(query=query, num_rows=count, rows=rows)
@@ -92,7 +98,7 @@ class MongoDBCollection(Collection):
         return result.deleted_count
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
-        logger.info(f"Deleting from {self._target_class_name} where: {where}")
+        logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
         result = self.mongo_collection.delete_many(where)

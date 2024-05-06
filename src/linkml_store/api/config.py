@@ -76,6 +76,10 @@ class DatabaseConfig(BaseModel):
         default=None,
         description="Optional configuration for search fields",
     )
+    ensure_referential_integrity: bool = Field(
+        default=False,
+        description="Whether to ensure referential integrity",
+    )
 
 
 class ClientConfig(BaseModel):

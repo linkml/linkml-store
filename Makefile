@@ -33,7 +33,7 @@ app:
 #	$(RUN) streamlit run $(CODE)/app.py --logger.level=debug
 
 apidoc:
-	$(RUN) sphinx-apidoc -f -M -o docs/ src/linkml_store/ && cd docs && $(RUN) make html
+	$(RUN) sphinx-apidoc -f -M -o docs/reference/ src/linkml_store/ && cd docs && $(RUN) make html
 
 sphinx-%:
 	cd docs &&  $(RUN) make $*

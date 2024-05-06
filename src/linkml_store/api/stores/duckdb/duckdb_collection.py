@@ -28,7 +28,7 @@ class DuckDBCollection(Collection):
             cd = self.induce_class_definition_from_objects(objs)
         self._create_table(cd)
         table = self._sqla_table(cd)
-        logger.info(f"Inserting into: {self._alias} // T={table.name}")
+        logger.info(f"Inserting into: {self.alias} // T={table.name}")
         engine = self.parent.engine
         col_names = [c.name for c in table.columns]
         objs = [{k: obj.get(k, None) for k in col_names} for obj in objs]
@@ -55,12 +55,12 @@ class DuckDBCollection(Collection):
         return len(objs)
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
-        logger.info(f"Deleting from {self._target_class_name} where: {where}")
+        logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
         cd = self.class_definition()
         if not cd:
-            logger.info(f"No class definition found for {self._target_class_name}, assuming not prepopulated")
+            logger.info(f"No class definition found for {self.target_class_name}, assuming not prepopulated")
             return 0
         table = self._sqla_table(cd)
         engine = self.parent.engine
@@ -115,7 +115,7 @@ class DuckDBCollection(Collection):
                 typ = sqla.ARRAY(typ, dimensions=1)
             col = Column(att.name, typ)
             cols.append(col)
-        t = Table(self._alias, metadata_obj, *cols)
+        t = Table(self.alias, metadata_obj, *cols)
         return t
 
     def _create_table(self, cd: ClassDefinition):
@@ -123,7 +123,7 @@ class DuckDBCollection(Collection):
             logger.info(f"Already have table for: {cd.name}")
             return
         query = Query(
-            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self._alias}
+            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
         )
         qr = self.parent.query(query)
         if qr.num_rows > 0:

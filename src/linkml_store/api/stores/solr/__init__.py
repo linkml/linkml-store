@@ -1,0 +1,3 @@
+"""
+Wrapper for Solr endpoints.
+"""
