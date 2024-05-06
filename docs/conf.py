@@ -13,18 +13,33 @@ project = "linkml-store"
 copyright = f"{date.today().year}, Author 1 <author@org.org>"
 author = "Author 1 <author@org.org>"
 
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+# from https://github.com/cthoyt/ontoportal-client/blob/9862e26f8e374c3aef8707e3d5d69526c4d0fcd5/docs/source/conf.py
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
+
+# A list of prefixes that are ignored when creating the module index. (new in Sphinx 0.6)
+modindex_common_prefix = ["linkml_store."]
+
 extensions = [
+    "sphinx.ext.autosummary",
     "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
     "sphinx_rtd_theme",
     "sphinx_click",
+    "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
     "myst_parser",
     "nbsphinx",
 ]
+
+
 
 # generate autosummary pages
 autosummary_generate = True
@@ -53,6 +68,15 @@ html_theme = "furo"
 html_logo = 'https://linkml.io/uploads/linkml-logo_color.png'
 html_favicon = 'https://linkml.io/uploads/linkml-logo_color-no-words.png'
 html_static_path = ["_static"]
+
+# https://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.

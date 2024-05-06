@@ -73,12 +73,12 @@ class DuckDBDatabase(Database):
             if sv:
                 cd = None
                 for c in self._collections.values():
-                    if c.name == query.from_table:
+                    if c.name == query.from_table or c.metadata.alias == query.from_table:
                         cd = c.class_definition()
                         break
                 if cd:
-                    for att in cd.attributes.values():
-                        if att.inlined:
+                    for att in sv.class_induced_slots(cd.name):
+                        if att.inlined or att.inlined_as_list:
                             json_encoded_cols.append(att.name)
         with self.engine.connect() as conn:
             count_query_str = text(query_to_sql(query, count=True))

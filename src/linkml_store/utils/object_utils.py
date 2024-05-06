@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 
 from pydantic import BaseModel
 
@@ -71,3 +71,15 @@ def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
     except ValueError:
         return None
     return path, val
+
+
+def clean_empties(value: Union[Dict, List]) -> Any:
+    if isinstance(value, dict):
+        value = {
+            k: v
+            for k, v in ((k, clean_empties(v)) for k, v in value.items())
+            if v is not None
+        }
+    elif isinstance(value, list):
+        value = [v for v in (clean_empties(v) for v in value) if v is not None]
+    return value

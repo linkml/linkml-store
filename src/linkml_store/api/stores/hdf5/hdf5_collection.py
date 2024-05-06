@@ -46,7 +46,7 @@ class HDF5Collection(Collection):
         return count
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
-        logger.info(f"Deleting from {self._target_class_name} where: {where}")
+        logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
         results = self.query(Query(where_clause=where)).rows

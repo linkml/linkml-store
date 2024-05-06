@@ -10,6 +10,7 @@ from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
 from linkml_store.index import get_indexer
+from linkml_store.utils.object_utils import clean_empties
 
 try:
     from linkml.validator.report import ValidationResult
@@ -61,14 +62,27 @@ class Collection:
 
     @property
     def name(self) -> str:
+        """
+        Return the name of the collection
+
+        :return:
+        """
         return self.metadata.name
 
     @property
     def hidden(self) -> bool:
+        """
+        True if the collection is hidden.
+
+        An example of a hidden collection is a collection that indexes another
+        collection
+
+        :return: True if the collection is hidden
+        """
         return self.metadata.hidden
 
     @property
-    def _target_class_name(self):
+    def target_class_name(self):
         """
         Return the name of the class that this collection represents
 
@@ -82,7 +96,7 @@ class Collection:
         return self.name
 
     @property
-    def _alias(self):
+    def alias(self):
         """
         Return the primary name/alias used for the collection.
 
@@ -156,7 +170,7 @@ class Collection:
         raise NotImplementedError
 
     def _create_query(self, **kwargs) -> Query:
-        return Query(from_table=self._alias, **kwargs)
+        return Query(from_table=self.alias, **kwargs)
 
     def query(self, query: Query, **kwargs) -> QueryResult:
         """
@@ -201,9 +215,28 @@ class Collection:
         :param kwargs:
         :return:
         """
-        id_field = self.identifier_field
-        q = self._create_query(where_clause={id_field: ids})
-        return self.query(q, **kwargs)
+        # TODO
+        id_field = self.identifier_attribute_name
+        return self.find({id_field: ids})
+
+    def get_one(self, id: IDENTIFIER, **kwargs) -> Optional[OBJECT]:
+        """
+        Get one object by ID.
+
+        :param id:
+        :param kwargs:
+        :return:
+        """
+        if not id:
+            raise ValueError("Must pass an ID")
+        id_field = self.identifier_attribute_name
+        if not id_field:
+            raise ValueError(f"No identifier for {self.name}")
+        w = {id_field: id}
+        qr = self.find(w)
+        if qr.num_rows == 1:
+            return qr.rows[0]
+        return None
 
     def find(self, where: Optional[Any] = None, **kwargs) -> QueryResult:
         """
@@ -215,6 +248,19 @@ class Collection:
         """
         query = self._create_query(where_clause=where)
         return self.query(query, **kwargs)
+
+    def find_iter(self, where: Optional[Any] = None, **kwargs) -> Iterator[OBJECT]:
+        """
+        Find objects in the collection using a where query.
+
+        :param where:
+        :param kwargs:
+        :return:
+        """
+        qr = self.find(where=where, limit=-1, **kwargs)
+        for row in qr.rows:
+            yield row
+
 
     def search(
         self,
@@ -362,10 +408,11 @@ class Collection:
         """
         sv = self.parent.schema_view
         if sv:
-            cls = sv.get_class(self._target_class_name)
+            cls = sv.get_class(self.target_class_name)
             return cls
         return None
 
+    @property
     def identifier_attribute_name(self) -> Optional[str]:
         """
         Return the name of the identifier attribute for the collection.
@@ -376,7 +423,7 @@ class Collection:
         """
         cd = self.class_definition()
         if cd:
-            for att in cd.attributes.values():
+            for att in self.parent.schema_view.class_induced_slots(cd.name):
                 if att.identifier:
                     return att.name
         return None
@@ -411,7 +458,7 @@ class Collection:
         :param max_sample_size:
         :return:
         """
-        cd = ClassDefinition(self._target_class_name)
+        cd = ClassDefinition(self.target_class_name)
         keys = defaultdict(list)
         for obj in objs[0:max_sample_size]:
             if isinstance(obj, BaseModel):
@@ -474,7 +521,7 @@ class Collection:
                 array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
                 cd.attributes[k].array = array_expr
         sv = self.parent.schema_view
-        sv.schema.classes[self._target_class_name] = cd
+        sv.schema.classes[self.target_class_name] = cd
         sv.set_modified()
         return cd
 
@@ -511,8 +558,9 @@ class Collection:
         validator = Validator(self.parent.schema_view.schema, validation_plugins=validation_plugins)
         cd = self.class_definition()
         if not cd:
-            raise ValueError(f"Cannot find class definition for {self._target_class_name}")
+            raise ValueError(f"Cannot find class definition for {self.target_class_name}")
         class_name = cd.name
         result = self.find(**kwargs)
         for obj in result.rows:
+            obj = clean_empties(obj)
             yield from validator.iter_results(obj, class_name)

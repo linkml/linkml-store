@@ -18,7 +18,7 @@ from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.sql_utils import introspect_schema
 
-from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR
+from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR, PERSONINFO_SCHEMA
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
 TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
@@ -30,6 +30,29 @@ SCHEMES = [
 ]
 
 DEFAULT_DB = "default"
+
+PERSONS = [
+            {
+                "id": 1,
+                "name": "n1",
+                "history": [
+                    {"event": "birth", "date": "2021-01-01"},
+                    {"event": "death", "date": "2021-02-01"},
+                    {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
+                ],
+            },
+            {"id": 2, "name": "n2", "age_in_years": 30},
+        ]
+
+ORGANIZATIONS = [
+            {"id": "Org1", "name": "org1"},
+            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
+        ]
+
+EMPLOYED_AT = [
+    {"person": 1, "organization": "Org1"},
+    {"person": 2, "organization": "Org2"},
+]
 
 
 def is_persistent(handle: str) -> bool:
@@ -75,6 +98,15 @@ def countries_schema_view() -> SchemaView:
     """
     return SchemaView(COUNTRIES_SCHEMA)
 
+
+@pytest.fixture()
+def personinfo_schema_view() -> SchemaView:
+    """
+    Nested personinfo schema
+
+    :return:
+    """
+    return SchemaView(PERSONINFO_SCHEMA)
 
 def create_client(handle: str, recreate_if_exists=True) -> Client:
     """
@@ -123,6 +155,10 @@ def test_store(handle):
     qr = persons_coll.find()
     assert qr.num_rows == 2
     assert remove_none(qr.rows[0]) == obj["persons"][0]
+    qr = persons_coll.find({"id": 1})
+    assert qr.num_rows == 1
+    #qr = persons_coll.find({"id": [1, 2]})
+    #assert qr.num_rows == 2
     orgs_coll = database.get_collection("organizations")
     qr = orgs_coll.find()
     assert qr.num_rows == 2
@@ -140,22 +176,9 @@ def test_store_nested(handle):
     client = create_client(handle)
     database = client.get_database()
     obj = {
-        "persons": [
-            {
-                "id": 1,
-                "name": "n1",
-                "history": [
-                    {"event": "birth", "date": "2021-01-01"},
-                    {"event": "death", "date": "2021-02-01"},
-                    {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
-                ],
-            },
-            {"id": 2, "name": "n2", "age_in_years": 30},
-        ],
-        "organizations": [
-            {"id": "Org1", "name": "org1"},
-            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
-        ],
+        "persons": PERSONS,
+        "organizations": ORGANIZATIONS,
+        "employed_at": EMPLOYED_AT,
     }
     database.store(obj)
     database.commit()
@@ -165,6 +188,8 @@ def test_store_nested(handle):
     p1 = qr.rows[0]
     p1events = p1["history"]
     assert all(isinstance(e, dict) for e in p1events)
+    events = {e["event"] for e in p1events}
+    assert events == {"birth", "death", "hired"}
     ignore = ["history"]
     assert remove_none(qr.rows[0], ignore) == remove_none(obj["persons"][0], ignore)
     orgs_coll = database.get_collection("organizations")
@@ -464,6 +489,38 @@ def test_validation(countries_schema_view, handle):
     assert len(vrs) == 1
 
 
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_validate_referential_integrity(personinfo_schema_view, handle):
+    """
+    Test validating where one collection references another
+
+    :param handle:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    database.metadata.ensure_referential_integrity = True
+    obj = {
+        "persons": PERSONS,
+        "organizations": ORGANIZATIONS,
+        "employed_at": EMPLOYED_AT + [
+            {"person": 3, "organization": "Org1"},
+            {"person": 1, "organization": "Org3"},
+        ],
+    }
+    database.store(obj)
+    database.commit()
+    database.set_schema_view(personinfo_schema_view)
+    objs = database.get_collection("persons").find().rows
+    for obj in objs:
+        if obj["history"]:
+            assert isinstance(obj["history"][0], dict)
+    results = list(database.iter_validate_database())
+    for vr in results:
+        print(yaml_dumper.dumps(vr))
+    assert len(results) == 2
+
+
 def test_from_config_object():
     """
     Test creating a client from a configuration
@@ -560,7 +617,7 @@ def test_from_config_file(name, inserts):
         assert collection is not None
         assert collection.name == coll_name
         collection.insert(objs)
-        print(f"Searching in {coll_name}; TC={collection._target_class_name}, ALIAS={collection._alias}")
+        print(f"Searching in {coll_name}; TC={collection.target_class_name}, ALIAS={collection.alias}")
         qr = collection.find()
         assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_name} I= {insert}"
 
