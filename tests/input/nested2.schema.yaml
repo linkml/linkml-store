@@ -1,0 +1,111 @@
+id: http://example.org
+name: nested
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ex: http://example.org/
+default_prefix: ex
+slots:
+  event:
+    examples:
+    - value: hired
+    range: string
+  date:
+    examples:
+    - value: '2021-02-01'
+    range: string
+  organization:
+    examples:
+    - value: Org1
+    range: Organization
+  id:
+    examples:
+    - value: '2'
+    range: Any
+    identifier: true
+  name:
+    examples:
+    - value: n2
+    range: string
+  history:
+    examples:
+    - value: '[''$ref:History'', ''$ref:History'', ''$ref:History'']'
+    multivalued: true
+    range: History
+    inlined_as_list: true
+  age_in_years:
+    examples:
+    - value: '30'
+    range: integer
+  found_date:
+    examples:
+    - value: '2021-01-01'
+    range: string
+  person:
+    examples:
+    - value: '2'
+    range: Person
+  persons:
+    examples:
+    - value: '[''$ref:Persons'', ''$ref:Persons'']'
+    multivalued: true
+    range: Person
+    inlined_as_list: true
+  organizations:
+    examples:
+    - value: '[''$ref:Organizations'', ''$ref:Organizations'']'
+    multivalued: true
+    range: Organization
+    inlined_as_list: true
+  employed_at:
+    examples:
+    - value: '[''$ref:EmployedAt'', ''$ref:EmployedAt'']'
+    multivalued: true
+    range: EmployedAt
+    inlined_as_list: true
+  about:
+    range: About
+    inlined: true
+classes:
+  Any:
+    class_uri: linkml:Any
+  History:
+    slots:
+    - event
+    - date
+    - organization
+  Person:
+    slots:
+    - id
+    - name
+    - history
+    - age_in_years
+  Organization:
+    slots:
+    - id
+    - name
+    - found_date
+  EmployedAt:
+    slots:
+    - person
+    - organization
+  Container:
+    slots:
+    - about
+    - persons
+    - organizations
+    - employed_at
+    tree_root: true
+  About:
+    attributes:
+       name:
+         name: name
+         multivalued: false
+         range: string
+         required: false
+       description:
+         name: description
+         multivalued: false
+         range: string
+         required: false
