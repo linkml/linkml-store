@@ -5,6 +5,7 @@ from copy import copy
 from typing import Any, Dict, List, Optional, Union
 
 import requests
+
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT
 from linkml_store.api.queries import Query, QueryResult

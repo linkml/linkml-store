@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
 
 try:
-    from linkml.validator.report import ValidationResult, Severity
+    from linkml.validator.report import Severity, ValidationResult
 except ImportError:
     ValidationResult = None
 

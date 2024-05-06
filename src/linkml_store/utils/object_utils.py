@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel
 
