@@ -1,0 +1,1051 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "source": [
+    "# Tutorial: Using the Command Line Interface\n",
+    "\n",
+    "This tutorial walks through usage of LinkML-Store via the Command Line Interface (CLI)\n",
+    "\n",
+    "This tutorial is a Jupyter notebook: it can be executed in a command line environment,\n",
+    "or you can try it for yourself by running commands directly.\n",
+    "\n",
+    "Note the `%%bash` is a directive for Jupyter itself, you don't need to type this"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "92e124c26a2d83da"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Top level command\n",
+    "\n",
+    "The top level command is `linkml-store`. This command doesn't do anything itself, instead there are various *subcommands*.\n",
+    "\n",
+    "The store command has a few *global options* to specify configuration/database/collection"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "9ae24f91d65fdda0"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store [OPTIONS] COMMAND [ARGS]...\n",
+      "\n",
+      "  A CLI for interacting with the linkml-store.\n",
+      "\n",
+      "Options:\n",
+      "  -d, --database TEXT             Database name\n",
+      "  -c, --collection TEXT           Collection name\n",
+      "  -C, --config PATH               Path to the configuration file\n",
+      "  -v, --verbose\n",
+      "  -q, --quiet / --no-quiet\n",
+      "  --stacktrace / --no-stacktrace  If set then show full stacktrace on error\n",
+      "                                  [default: no-stacktrace]\n",
+      "  --help                          Show this message and exit.\n",
+      "\n",
+      "Commands:\n",
+      "  fq                Query facets from the specified collection.\n",
+      "  index             Create an index over a collection.\n",
+      "  indexes\n",
+      "  insert            Insert objects from files (JSON, YAML, TSV) into the...\n",
+      "  list-collections\n",
+      "  query             Query objects from the specified collection.\n",
+      "  schema            Show the schema for a database\n",
+      "  search            Search objects in the specified collection.\n",
+      "  validate          Validate objects in the specified collection.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:19.909688Z",
+     "start_time": "2024-04-22T20:49:18.752673Z"
+    }
+   },
+   "id": "f367252f5e8857b4"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Inserting objects from a file\n",
+    "\n",
+    "Next we'll explore the ``insert`` command:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "684ee59be469e12"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store insert [OPTIONS] [FILES]...\n",
+      "\n",
+      "  Insert objects from files (JSON, YAML, TSV) into the specified collection.\n",
+      "\n",
+      "Options:\n",
+      "  -f, --format [json|jsonl|yaml|tsv|csv]\n",
+      "                                  Input format\n",
+      "  -i, --object TEXT               Input object as YAML\n",
+      "  --help                          Show this message and exit.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --stacktrace insert --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:20.684538Z",
+     "start_time": "2024-04-22T20:49:19.911234Z"
+    }
+   },
+   "id": "cfe24edc122b04e7"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "We'll insert a small test file (in JSON Lines format) into a fresh database."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "8cf50fcf5f257fdd"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\"name\": \"United States\", \"code\": \"US\", \"capital\": \"Washington, D.C.\", \"continent\": \"North America\", \"languages\": [\"English\"]}\n",
+      "{\"name\": \"Canada\", \"code\": \"CA\", \"capital\": \"Ottawa\", \"continent\": \"North America\", \"languages\": [\"English\", \"French\"]}\n",
+      "{\"name\": \"Mexico\", \"code\": \"MX\", \"capital\": \"Mexico City\", \"continent\": \"North America\", \"languages\": [\"Spanish\"]}\n",
+      "{\"name\": \"Brazil\", \"code\": \"BR\", \"capital\": \"Brasília\", \"continent\": \"South America\", \"languages\": [\"Portuguese\"]}\n",
+      "{\"name\": \"Argentina\", \"code\": \"AR\", \"capital\": \"Buenos Aires\", \"continent\": \"South America\", \"languages\": [\"Spanish\"]}\n",
+      "{\"name\": \"United Kingdom\", \"code\": \"GB\", \"capital\": \"London\", \"continent\": \"Europe\", \"languages\": [\"English\"]}\n",
+      "{\"name\": \"France\", \"code\": \"FR\", \"capital\": \"Paris\", \"continent\": \"Europe\", \"languages\": [\"French\"]}\n",
+      "{\"name\": \"Germany\", \"code\": \"DE\", \"capital\": \"Berlin\", \"continent\": \"Europe\", \"languages\": [\"German\"]}\n",
+      "{\"name\": \"Italy\", \"code\": \"IT\", \"capital\": \"Rome\", \"continent\": \"Europe\", \"languages\": [\"Italian\"]}\n",
+      "{\"name\": \"Spain\", \"code\": \"ES\", \"capital\": \"Madrid\", \"continent\": \"Europe\", \"languages\": [\"Spanish\"]}\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "head ../../tests/input/countries/countries.jsonl"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-27T22:11:07.912832Z",
+     "start_time": "2024-04-27T22:11:07.897955Z"
+    }
+   },
+   "id": "afc4bfb1ecf80cc4"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "To make sure we have a fresh setup, we'll create a temporary directory `tmp` (if it doesn't already exist),\n",
+    "and be sure to remove any copy of the database we intend to create.\n",
+    "\n",
+    "We'll then insert the objects:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "8ec898e12ac5c6ea"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 20 objects from ../../tests/input/countries/countries.jsonl into collection 'countries'.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "mkdir -p tmp\n",
+    "rm -rf tmp/countries.db\n",
+    "linkml-store --database duckdb:///tmp/countries.db --collection countries insert ../../tests/input/countries/countries.jsonl"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:21.654004Z",
+     "start_time": "2024-04-22T20:49:20.688743Z"
+    }
+   },
+   "id": "be9cebbea43d03a8"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Note that the `--database` and `--collection` options come *before* the `insert` subcommand.\n",
+    "\n",
+    "With LinkML-Store, everything must go into a collection, so we specified `countries` as the name"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "9c4c6c201c6c3188"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Querying\n",
+    "\n",
+    "Let's query for all objects that have `code=\"GB\"`, and get the results back as a CSV"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "4550b33d68b04a8d"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "name,code,capital,continent,languages\r\n",
+      "United Kingdom,GB,London,Europe,['English']\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --database duckdb:///tmp/countries.db -c countries query -w \"code: GB\" -O csv"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:22.845249Z",
+     "start_time": "2024-04-22T20:49:21.658897Z"
+    }
+   },
+   "id": "225613b70b0d57fc"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Facet Counts\n",
+    "\n",
+    "You can combine any query (including an empty query, for fetching the whole database) with a *facet query* which fetches counts for\n",
+    "numbers of objects broken down by some specified slot or slots."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "91fcaf45c7c8c95a"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "  \"continent\": {\n",
+      "    \"Asia\": 5,\n",
+      "    \"Europe\": 5,\n",
+      "    \"Africa\": 3,\n",
+      "    \"North America\": 3,\n",
+      "    \"Oceania\": 2,\n",
+      "    \"South America\": 2\n",
+      "  }\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries fq -S continent"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:23.811016Z",
+     "start_time": "2024-04-22T20:49:22.846688Z"
+    }
+   },
+   "id": "6d8152d20290120c"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Remember this is a test dataset deliberately reduced so we don't expect to see all countries there!"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "b5a1d7cf536cc60e"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Search\n",
+    "\n",
+    "LinkML-Store is intended to allow for a flexible range of *search strategies*. Some of these may come from the underlying data store\n",
+    "(for example, SOLr or ES is backed by Lucene indexing). Or they may be integrated orthogonally.\n",
+    "\n",
+    "A key search mechanism that is supported is *text embedding* via *Large Language Models (LLMs)*. Note these are not enabled by default.\n",
+    "\n",
+    "Currently the default mechanism (which works regardless of the underlying store) is a highly naive trigram-based vector embedding. This requires\n",
+    "no external model. It is intended primarily for demonstration purposes, and should be swapped out for something else."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "1fd37a3fabafcac4"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "score,name,code,capital,continent,languages\r\n",
+      "0.15670402880167877,Canada,CA,Ottawa,North America,\"['English', 'French']\"\r\n",
+      "0.14806601565681218,South Africa,ZA,Pretoria,Africa,\"['Zulu', 'Xhosa', 'Afrikaans', 'English', 'Northern Sotho', 'Tswana', 'Southern Sotho', 'Tsonga', 'Swazi', 'Venda', 'Southern Ndebele']\"\r\n",
+      "0.13749236361227862,United States,US,\"Washington, D.C.\",North America,['English']\r\n",
+      "0.09860812114511587,Argentina,AR,Buenos Aires,South America,['Spanish']\r\n",
+      "0.09765536333140983,Mexico,MX,Mexico City,North America,['Spanish']\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries index\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries search \"countries in the North where both english and french spoken\" --limit 5 -O csv"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:25.742841Z",
+     "start_time": "2024-04-22T20:49:23.811732Z"
+    }
+   },
+   "id": "8fce64c44a6aae21"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "By default, all fields in the object are indexed. Canada comes out top as the strings for English and France are present (or rather trigrams from those words). But remember the default method is just for illustration!"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "f69630e05da3bd6b"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Indexing using an LLM\n",
+    "\n",
+    "Note for this to work, you need to have installed this package with the `llm` extra, like this:\n",
+    "\n",
+    "```bash\n",
+    "pip install linkml-store[llm]\n",
+    "```\n",
+    "\n",
+    "Or if you have this repo checked out and are using Poetry:\n",
+    "\n",
+    "```bash\n",
+    "poetry install --all-extras\n",
+    "```\n",
+    "\n",
+    "You will also need an OpenAI account.\n",
+    "\n",
+    "If this is too much, you can just skip this section!\n",
+    "\n",
+    "__TODO__"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "a59443d06387db90"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "outputs": [],
+   "source": [],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:25.746994Z",
+     "start_time": "2024-04-22T20:49:25.743003Z"
+    }
+   },
+   "id": "180b3f44075c0291"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Schemas\n",
+    "\n",
+    "Note in the above we did not explicitly specify a schema; instead it is *induced*.\n",
+    "\n",
+    "We can use the `schema` command to see the induced schema in [LinkML YAML](https://linkml.github.io/linkml/)."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "2661d59e4e665823"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "name: test-schema\n",
+      "id: http://example.org/test-schema\n",
+      "imports:\n",
+      "- linkml:types\n",
+      "prefixes:\n",
+      "  linkml:\n",
+      "    prefix_prefix: linkml\n",
+      "    prefix_reference: https://w3id.org/linkml/\n",
+      "  test_schema:\n",
+      "    prefix_prefix: test_schema\n",
+      "    prefix_reference: http://example.org/test-schema/\n",
+      "default_prefix: test_schema\n",
+      "default_range: string\n",
+      "classes:\n",
+      "  countries:\n",
+      "    name: countries\n",
+      "    attributes:\n",
+      "      name:\n",
+      "        name: name\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      code:\n",
+      "        name: code\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      capital:\n",
+      "        name: capital\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      continent:\n",
+      "        name: continent\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      languages:\n",
+      "        name: languages\n",
+      "        multivalued: true\n",
+      "        range: string\n",
+      "        required: false\n",
+      "  internal__index__countries__test:\n",
+      "    name: internal__index__countries__test\n",
+      "    attributes:\n",
+      "      name:\n",
+      "        name: name\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      code:\n",
+      "        name: code\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      capital:\n",
+      "        name: capital\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      continent:\n",
+      "        name: continent\n",
+      "        multivalued: false\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      languages:\n",
+      "        name: languages\n",
+      "        multivalued: true\n",
+      "        range: string\n",
+      "        required: false\n",
+      "      __index__:\n",
+      "        name: __index__\n",
+      "        multivalued: true\n",
+      "        range: string\n",
+      "        required: false\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db schema"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:26.700077Z",
+     "start_time": "2024-04-22T20:49:25.746884Z"
+    }
+   },
+   "id": "f36b8ae0c4325d2"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Configuration Files and Explicit Schemas\n",
+    "\n",
+    "Rather than repeat `--database` and `--collection` each time, we can make use of YAML config files.\n",
+    "\n",
+    "These can also package useful information and schemas.\n",
+    "\n",
+    "First we will create a fresh copy of a directory with both configuration files and schemas:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "78696f002f28d51d"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "outputs": [],
+   "source": [
+    "%%bash\n",
+    "cp -pr ../../tests/input/countries tmp\n",
+    "rm tmp/countries/countries.db"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:26.716620Z",
+     "start_time": "2024-04-22T20:49:26.701056Z"
+    }
+   },
+   "id": "dad98c3579f24bbd"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "The configuration YAML is fairly minimal - it specifies a single database with a single collection, and a pointer to a schema"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "9a9be08dcc572a7f"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "databases:\n",
+      "  countries_db:\n",
+      "    handle: \"duckdb:///{base_dir}/countries.db\"\n",
+      "    schema_location: \"{base_dir}/countries.linkml.yaml\"\n",
+      "    collections:\n",
+      "      countries:\n",
+      "        type: Country\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "cat tmp/countries/countries.config.yaml"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:26.732213Z",
+     "start_time": "2024-04-22T20:49:26.719217Z"
+    }
+   },
+   "id": "bfde580a0ec64091"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "The schema itself is fairly basic - a single class (whose name matches the `type`) in the configuration,\n",
+    "with some slots. Note the slots have some constraints, e.g. regexps"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "9242b8942af6f976"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "id: https://example.org/countries\n",
+      "name: countries\n",
+      "description: A schema for representing countries\n",
+      "license: https://creativecommons.org/publicdomain/zero/1.0/\n",
+      "\n",
+      "prefixes:\n",
+      "  countries: https://example.org/countries/\n",
+      "  linkml: https://w3id.org/linkml/\n",
+      "\n",
+      "default_prefix: countries\n",
+      "default_range: string\n",
+      "\n",
+      "imports:\n",
+      "  - linkml:types\n",
+      "\n",
+      "classes:\n",
+      "  Country:\n",
+      "    description: A sovereign state\n",
+      "    slots:\n",
+      "      - name\n",
+      "      - code\n",
+      "      - capital\n",
+      "      - continent\n",
+      "      - languages\n",
+      "\n",
+      "slots:\n",
+      "  name:\n",
+      "    description: The name of the country\n",
+      "    required: true\n",
+      "    identifier: true\n",
+      "  code:\n",
+      "    description: The ISO 3166-1 alpha-2 code of the country\n",
+      "    required: true\n",
+      "    pattern: '^[A-Z]{2}$'\n",
+      "  capital:\n",
+      "    description: The capital city of the country\n",
+      "    required: true\n",
+      "  continent:\n",
+      "    description: The continent where the country is located\n",
+      "    required: true\n",
+      "  languages:\n",
+      "    description: The main languages spoken in the country\n",
+      "    range: Language\n",
+      "    multivalued: true\n",
+      "\n",
+      "types:\n",
+      "  Language:\n",
+      "    typeof: string\n",
+      "    description: A human language"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "cat tmp/countries/countries.linkml.yaml"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:26.783983Z",
+     "start_time": "2024-04-22T20:49:26.732313Z"
+    }
+   },
+   "id": "cebbfe0d134749e7"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 77,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 20 objects from tmp/countries/countries.jsonl into collection 'countries'.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store  -C tmp/countries/countries.config.yaml insert tmp/countries/countries.jsonl"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:27.523764Z",
+     "start_time": "2024-04-22T20:49:26.761709Z"
+    }
+   },
+   "id": "f0db6bd8db3ed955"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "countries\n",
+      "name: countries\n",
+      "alias: null\n",
+      "type: Country\n",
+      "metadata: null\n",
+      "attributes: null\n",
+      "indexers: null\n",
+      "hidden: false\n",
+      "is_prepopulated: false\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml list-collections"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:28.238748Z",
+     "start_time": "2024-04-22T20:49:27.523066Z"
+    }
+   },
+   "id": "722706dd4ac509b4"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[\n",
+      "  {\n",
+      "    \"name\": \"United Kingdom\",\n",
+      "    \"code\": \"GB\",\n",
+      "    \"capital\": \"London\",\n",
+      "    \"continent\": \"Europe\",\n",
+      "    \"languages\": [\n",
+      "      \"English\"\n",
+      "    ]\n",
+      "  }\n",
+      "]\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --stacktrace -C tmp/countries/countries.config.yaml -c countries query -w \"code: GB\" "
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:29.056403Z",
+     "start_time": "2024-04-22T20:49:28.240180Z"
+    }
+   },
+   "id": "b831b4012a6c03a3"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Validation\n",
+    "\n",
+    "LinkML-Store is designed to allow for rich validation, regardless of the underlying database store used.\n",
+    "\n",
+    "For validation to work, we need to specify an explicit schema, as we have done with the configuration above.\n",
+    "\n",
+    "To test it, we will insert some fake data:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "5f94d882bd97cb78"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 3 objects from {name: Foolandia, code: \"X Y\", languages: [\"Fooish\"]} into collection 'countries'.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml insert --object '{name: Foolandia, code: \"X Y\", languages: [\"Fooish\"]}'"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:29.882322Z",
+     "start_time": "2024-04-22T20:49:29.058144Z"
+    }
+   },
+   "id": "9d81c524271eddfc"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "countries\n",
+      "name: countries\n",
+      "alias: null\n",
+      "type: Country\n",
+      "metadata: null\n",
+      "attributes: null\n",
+      "indexers: null\n",
+      "hidden: false\n",
+      "is_prepopulated: false\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml list-collections"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:30.603602Z",
+     "start_time": "2024-04-22T20:49:29.883325Z"
+    }
+   },
+   "id": "2901f8fabe4e44c4"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[\n",
+      "  {\n",
+      "    \"name\": \"Foolandia\",\n",
+      "    \"code\": \"X Y\",\n",
+      "    \"capital\": null,\n",
+      "    \"continent\": null,\n",
+      "    \"languages\": [\n",
+      "      \"Fooish\"\n",
+      "    ]\n",
+      "  }\n",
+      "]\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml query -w 'name: Foolandia'"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:31.369509Z",
+     "start_time": "2024-04-22T20:49:30.604751Z"
+    }
+   },
+   "id": "bc79b2c4af397111"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 83,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "name: countries\n",
+      "description: A schema for representing countries\n",
+      "id: https://example.org/countries\n",
+      "imports:\n",
+      "- linkml:types\n",
+      "license: https://creativecommons.org/publicdomain/zero/1.0/\n",
+      "prefixes:\n",
+      "  countries:\n",
+      "    prefix_prefix: countries\n",
+      "    prefix_reference: https://example.org/countries/\n",
+      "  linkml:\n",
+      "    prefix_prefix: linkml\n",
+      "    prefix_reference: https://w3id.org/linkml/\n",
+      "default_prefix: countries\n",
+      "default_range: string\n",
+      "types:\n",
+      "  Language:\n",
+      "    name: Language\n",
+      "    description: A human language\n",
+      "    typeof: string\n",
+      "slots:\n",
+      "  name:\n",
+      "    name: name\n",
+      "    description: The name of the country\n",
+      "    identifier: true\n",
+      "    required: true\n",
+      "  code:\n",
+      "    name: code\n",
+      "    description: The ISO 3166-1 alpha-2 code of the country\n",
+      "    required: true\n",
+      "    pattern: ^[A-Z]{2}$\n",
+      "  capital:\n",
+      "    name: capital\n",
+      "    description: The capital city of the country\n",
+      "    required: true\n",
+      "  continent:\n",
+      "    name: continent\n",
+      "    description: The continent where the country is located\n",
+      "    required: true\n",
+      "  languages:\n",
+      "    name: languages\n",
+      "    description: The main languages spoken in the country\n",
+      "    multivalued: true\n",
+      "    range: Language\n",
+      "classes:\n",
+      "  Country:\n",
+      "    name: Country\n",
+      "    description: A sovereign state\n",
+      "    slots:\n",
+      "    - name\n",
+      "    - code\n",
+      "    - capital\n",
+      "    - continent\n",
+      "    - languages\n",
+      "source_file: tmp/countries/countries.linkml.yaml\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml schema"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:32.031074Z",
+     "start_time": "2024-04-22T20:49:31.370194Z"
+    }
+   },
+   "id": "ba9a72c20c4f9f8"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "type,severity,message,instance,instance_index,instantiates\r\n",
+      "jsonschema validation,ERROR,'X Y' does not match '^[A-Z]{2}$' in /code,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n",
+      "jsonschema validation,ERROR,None is not of type 'string' in /capital,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n",
+      "jsonschema validation,ERROR,None is not of type 'string' in /continent,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -C tmp/countries/countries.config.yaml validate -O csv"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:33.223230Z",
+     "start_time": "2024-04-22T20:49:32.032060Z"
+    }
+   },
+   "id": "597b805524772921"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Here we can see 3 issues with the data we added:\n",
+    "\n",
+    "* the code doesn't match the regexp we provided (it has a space)\n",
+    "* the capital is missing\n",
+    "* the continent is missing\n",
+    "   "
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "e411262d116ec17d"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "outputs": [],
+   "source": [],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-04-22T20:49:33.226848Z",
+     "start_time": "2024-04-22T20:49:33.223340Z"
+    }
+   },
+   "id": "935911ccc9e2cd8f"
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
