@@ -36,6 +36,7 @@ class MongoDBCollection(Collection):
             row = copy(row)
             del row["_id"]
             return row
+
         rows = [_as_row(row) for row in cursor]
         count = self.mongo_collection.count_documents(mongo_filter)
 

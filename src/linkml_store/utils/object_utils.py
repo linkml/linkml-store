@@ -75,11 +75,7 @@ def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
 
 def clean_empties(value: Union[Dict, List]) -> Any:
     if isinstance(value, dict):
-        value = {
-            k: v
-            for k, v in ((k, clean_empties(v)) for k, v in value.items())
-            if v is not None
-        }
+        value = {k: v for k, v in ((k, clean_empties(v)) for k, v in value.items()) if v is not None}
     elif isinstance(value, list):
         value = [v for v in (clean_empties(v) for v in value) if v is not None]
     return value

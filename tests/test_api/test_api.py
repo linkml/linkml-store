@@ -32,22 +32,22 @@ SCHEMES = [
 DEFAULT_DB = "default"
 
 PERSONS = [
-            {
-                "id": 1,
-                "name": "n1",
-                "history": [
-                    {"event": "birth", "date": "2021-01-01"},
-                    {"event": "death", "date": "2021-02-01"},
-                    {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
-                ],
-            },
-            {"id": 2, "name": "n2", "age_in_years": 30},
-        ]
+    {
+        "id": 1,
+        "name": "n1",
+        "history": [
+            {"event": "birth", "date": "2021-01-01"},
+            {"event": "death", "date": "2021-02-01"},
+            {"event": "hired", "date": "2021-02-01", "organization": "Org1"},
+        ],
+    },
+    {"id": 2, "name": "n2", "age_in_years": 30},
+]
 
 ORGANIZATIONS = [
-            {"id": "Org1", "name": "org1"},
-            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
-        ]
+    {"id": "Org1", "name": "org1"},
+    {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
+]
 
 EMPLOYED_AT = [
     {"person": 1, "organization": "Org1"},
@@ -108,6 +108,7 @@ def personinfo_schema_view() -> SchemaView:
     """
     return SchemaView(PERSONINFO_SCHEMA)
 
+
 def create_client(handle: str, recreate_if_exists=True) -> Client:
     """
     Create a client with a database attached
@@ -157,8 +158,8 @@ def test_store(handle):
     assert remove_none(qr.rows[0]) == obj["persons"][0]
     qr = persons_coll.find({"id": 1})
     assert qr.num_rows == 1
-    #qr = persons_coll.find({"id": [1, 2]})
-    #assert qr.num_rows == 2
+    # qr = persons_coll.find({"id": [1, 2]})
+    # assert qr.num_rows == 2
     orgs_coll = database.get_collection("organizations")
     qr = orgs_coll.find()
     assert qr.num_rows == 2
@@ -503,7 +504,8 @@ def test_validate_referential_integrity(personinfo_schema_view, handle):
     obj = {
         "persons": PERSONS,
         "organizations": ORGANIZATIONS,
-        "employed_at": EMPLOYED_AT + [
+        "employed_at": EMPLOYED_AT
+        + [
             {"person": 3, "organization": "Org1"},
             {"person": 1, "organization": "Org3"},
         ],

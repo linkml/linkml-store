@@ -364,7 +364,8 @@ class Database(ABC):
                     if slot.range:
                         all_ranges.add(slot.range)
             roots = [
-                c for c in schema_view.all_classes().values()
+                c
+                for c in schema_view.all_classes().values()
                 if not all_ranges.intersection(schema_view.class_ancestors(c.name, reflexive=True))
             ]
         if len(roots) == 1:
@@ -376,7 +377,6 @@ class Database(ABC):
                         coll = self._collections[slot.name]
                         if not coll.metadata.type:
                             coll.metadata.type = slot.range
-
 
     def load_schema_view(self, path: Union[str, Path]):
         """

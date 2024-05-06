@@ -261,7 +261,6 @@ class Collection:
         for row in qr.rows:
             yield row
 
-
     def search(
         self,
         query: str,
