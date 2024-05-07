@@ -12,5 +12,6 @@ How-To Guides
    Use-Semantic-Search
    Query-the-Monarch-KG
    Query-Solr-using-CLI
+   Check-Referential-Integrity
    Store-an-Ontology
 
