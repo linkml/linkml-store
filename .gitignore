@@ -3,6 +3,7 @@ db/
 .idea
 tests/output/
 tests/input/integration/
+tmp/
 
 
 # Byte-compiled / optimized / DLL files

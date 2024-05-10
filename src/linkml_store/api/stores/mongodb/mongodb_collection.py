@@ -62,24 +62,31 @@ class MongoDBCollection(Collection):
             if isinstance(col, tuple):
                 sd = SlotDefinition(name="PLACEHOLDER")
             else:
-                sd = cd.attributes[col]
-
-            if sd.multivalued:
+                if col in cd.attributes:
+                    sd = cd.attributes[col]
+                else:
+                    logger.info(f"No schema metadata for {col}")
+                    sd = SlotDefinition(name=col)
+            group = {"$group": {"_id": f"${col}", "count": {"$sum": 1}}}
+            if isinstance(col, tuple):
+                q = {k.replace('.', ''): f"${k}" for k in col}
+                group["$group"]["_id"] = q
+            if sd and sd.multivalued:
                 facet_pipeline = [
                     {"$match": where} if where else {"$match": {}},
                     {"$unwind": f"${col}"},
-                    {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
+                    group,
                     {"$sort": {"count": -1}},
                     {"$limit": facet_limit},
                 ]
             else:
                 facet_pipeline = [
                     {"$match": where} if where else {"$match": {}},
-                    {"$group": {"_id": f"${col}", "count": {"$sum": 1}}},
+                    group,
                     {"$sort": {"count": -1}},
                     {"$limit": facet_limit},
                 ]
-
+            logger.info(f"Facet pipeline: {facet_pipeline}")
             facet_results = list(self.mongo_collection.aggregate(facet_pipeline))
             results[col] = [(result["_id"], result["count"]) for result in facet_results]
 

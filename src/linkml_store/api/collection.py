@@ -1,3 +1,4 @@
+"""A structure for representing collections of similar objects."""
 import hashlib
 import logging
 from collections import defaultdict
@@ -39,7 +40,17 @@ class Collection:
 
     - For relational databases, a collection is typically a table
     - For document databases such as MongoDB, a collection is the native type
-    - For a file system, a collection could be a single tabular file such as Parquet or CSV
+    - For a file system, a collection could be a single tabular file such as Parquet or CSV.
+
+    Collection objects are typically not created directly - instead they are generated
+    from a parent :class:`.Database` object:
+
+    >>> from linkml_store import Client
+    >>> client = Client()
+    >>> db = client.attach_database("duckdb", alias="test")
+    >>> collection = db.create_collection("Person")
+    >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+    >>> collection.insert(objs)
     """
 
     # name: str
@@ -63,7 +74,7 @@ class Collection:
     @property
     def name(self) -> str:
         """
-        Return the name of the collection
+        Return the name of the collection.
 
         :return:
         """
@@ -88,7 +99,14 @@ class Collection:
 
         This MUST be a LinkML class name
 
-        :return:
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person", alias="persons")
+        >>> collection.target_class_name
+        'Person'
+
+        :return: name of the class which members of this collection instantiate
         """
         # TODO: this is a shim layer until we can normalize on this
         if self.metadata.type:
@@ -104,7 +122,23 @@ class Collection:
         to have an alias, for example "persons" which collects all instances
         of class Person.
 
-        The _alias SHOULD be used for Table names in SQL.
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person", alias="persons")
+        >>> collection.alias
+        'persons'
+
+        If no explicit alias is provided, then the target class name is used:
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> collection.alias
+        'Person'
+
+        The alias SHOULD be used for Table names in SQL.
 
         For nested data, the alias SHOULD be used as the key; e.g
 
@@ -120,6 +154,13 @@ class Collection:
     def replace(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
         Replace entire collection with objects.
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.insert(objs)
 
         :param objs:
         :param kwargs:
@@ -207,7 +248,7 @@ class Collection:
         """
         raise NotImplementedError
 
-    def get(self, ids: Optional[IDENTIFIER], **kwargs) -> QueryResult:
+    def get(self, ids: Optional[List[IDENTIFIER]], **kwargs) -> QueryResult:
         """
         Get one or more objects by ID.
 
@@ -217,6 +258,8 @@ class Collection:
         """
         # TODO
         id_field = self.identifier_attribute_name
+        if not id_field:
+            raise ValueError(f"No identifier for {self.name}")
         return self.find({id_field: ids})
 
     def get_one(self, id: IDENTIFIER, **kwargs) -> Optional[OBJECT]:
@@ -290,6 +333,7 @@ class Collection:
             raise ValueError(f"No index named {index_name}")
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
         index_col = ix.index_field
+        # TODO: optimize this for large indexes
         vector_pairs = [(row, np.array(row[index_col], dtype=float)) for row in qr.rows]
         results = ix.search(query, vector_pairs, limit=limit)
         for r in results:
@@ -309,7 +353,7 @@ class Collection:
             raise ValueError(f"Collection has no name: {self} // {self.metadata}")
         return self.name.startswith("internal__")
 
-    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = True, auto_index=True, **kwargs):
+    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
         Attach an index to the collection.
 
@@ -340,6 +384,7 @@ class Collection:
         Create a name for a special collection that holds index data
 
         :param index_name:
+        :param indexer:
         :return:
         """
         return f"internal__index__{self.name}__{index_name}"
@@ -370,6 +415,7 @@ class Collection:
             logger.info(f"Checking if {ix_coll_name} is in {schema.classes.keys()}")
             if ix_coll_name in schema.classes:
                 ix_coll.delete_where()
+
         ix_coll.insert(objects_with_ix, **kwargs)
 
     def list_index_names(self) -> List[str]:

@@ -5,6 +5,8 @@ from copy import copy
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
 
+from linkml_store.utils.format_utils import load_objects
+
 try:
     from linkml.validator.report import Severity, ValidationResult
 except ImportError:
@@ -475,5 +477,28 @@ class Database(ABC):
     def drop(self, **kwargs):
         """
         Drop the database and all collections
+        """
+        raise NotImplementedError()
+
+    def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
+        """
+        Import a database from a file.
+
+        :param location: location of the file
+        :param source_format: source format
+        :param kwargs: additional arguments
+        """
+        objects = load_objects(self, location, format=source_format)
+        for obj in objects:
+            self.store(obj)
+
+
+    def export_database(self, location: str, target_format: Optional[str] = None, **kwargs):
+        """
+        Export a database to a file.
+
+        :param location: location of the file
+        :param target_format: target format
+        :param kwargs: additional arguments
         """
         raise NotImplementedError()

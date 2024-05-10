@@ -3,8 +3,11 @@ import os
 import numpy as np
 import pytest
 from linkml_store.index import get_indexer
+from tests import INPUT_DIR
 
 INDEX_CLASSES = ["simple", "llm"]
+
+LLM_CACHE = INPUT_DIR / "llm_cache.db"
 
 
 @pytest.mark.parametrize("index_class", INDEX_CLASSES)
@@ -33,6 +36,9 @@ def test_index(index_class, texts):
     if os.environ.get("GITHUB_ACTIONS") == "true" and index_class == "llm":
         pytest.skip("Skipping LLMIndex test in GitHub Actions")
     index = get_indexer(index_class)
+    if index_class == "llm":
+        index.cached_embeddings_database = str(LLM_CACHE)
+        index.cache_queries = True
     vectors = index.texts_to_vectors(texts.values())
     id_vector_tuples = list(zip(texts.keys(), vectors))
     for text_id, text in texts.items():
