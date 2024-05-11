@@ -17,11 +17,13 @@ from linkml_store.index.indexer import Indexer
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output
 from linkml_store.utils.object_utils import object_path_update
 
-index_type_option = click.option("--index-type", "-t",
-                                 default="simple",
-                                 show_default=True,
-                                 help="Type of index to create. Values: simple, llm",
-                                 )
+index_type_option = click.option(
+    "--index-type",
+    "-t",
+    default="simple",
+    show_default=True,
+    help="Type of index to create. Values: simple, llm",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +101,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     logger = logging.getLogger()
     # Set handler for the root logger to output to the console
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    console_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
     # Clear existing handlers to avoid duplicate messages if function runs multiple times
     logger.handlers = []
@@ -225,11 +227,8 @@ def import_database(ctx, files, format):
 
 
 @cli.command()
-@click.option("--output-type", "-O",
-              type=format_choice, default="json", help="Output format")
-@click.option("--output", "-o",
-              required=True,
-              type=click.Path(), help="Output file path")
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o", required=True, type=click.Path(), help="Output file path")
 @click.pass_context
 def export(ctx, output_type, output):
     """Exports a database to a dump."""
@@ -329,12 +328,8 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 
 @cli.command()
 @index_type_option
-@click.option("--cached-embeddings-database",
-              "-E",
-                help="Path to the database where embeddings are cached")
-@click.option("--text-template",
-                "-T",
-                help="Template for text embeddings")
+@click.option("--cached-embeddings-database", "-E", help="Path to the database where embeddings are cached")
+@click.option("--text-template", "-T", help="Template for text embeddings")
 @click.pass_context
 def index(ctx, index_type, **kwargs):
     """
@@ -378,10 +373,9 @@ def schema(ctx, output_type, output):
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of search results")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--auto-index/--no-auto-index",
-              default=False,
-              show_default=True,
-              help="Automatically index the collection")
+@click.option(
+    "--auto-index/--no-auto-index", default=False, show_default=True, help="Automatically index the collection"
+)
 @index_type_option
 @click.pass_context
 def search(ctx, search_term, where, limit, index_type, output_type, output, auto_index):

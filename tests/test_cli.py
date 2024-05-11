@@ -134,7 +134,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             "search",
             "--auto-index",
             "John",
-            #"--where",
+            # "--where",
             #'{"occupation": "Engineer"}',
             "--limit",
             "5",

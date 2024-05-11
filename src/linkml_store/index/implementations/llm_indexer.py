@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class LLMIndexer(Indexer):
     """
     An indexer that wraps the llm library.
@@ -70,6 +71,7 @@ class LLMIndexer(Indexer):
             if not coll_name:
                 coll_name = "all_embeddings"
             from linkml_store import Client
+
             embeddings_client = Client()
             config = CollectionConfig(
                 name=coll_name,
@@ -78,16 +80,14 @@ class LLMIndexer(Indexer):
                     "text": {"range": "string"},
                     "model_id": {"range": "string"},
                     "embedding": {"range": "float", "array": {}},
-                }
+                },
             )
             embeddings_db = embeddings_client.get_database(f"duckdb:///{db_path}")
             if coll_name in embeddings_db.list_collection_names():
                 # Load existing collection and use its model
                 embeddings_collection = embeddings_db.create_collection(coll_name, metadata=config)
             else:
-                embeddings_collection = embeddings_db.create_collection(
-                    coll_name,
-                    metadata=config)
+                embeddings_collection = embeddings_db.create_collection(coll_name, metadata=config)
             texts = list(texts)
             embeddings = list([None] * len(texts))
             uncached_texts = []
@@ -113,9 +113,9 @@ class LLMIndexer(Indexer):
                 for i, index in enumerate(uncached_indices):
                     logger.debug(f"Indexing text at {i}")
                     embeddings[index] = uncached_embeddings[i]
-                    embeddings_collection.insert({"text": uncached_texts[i],
-                                                  "embedding": embeddings[index],
-                                                  "model_id": model_id})
+                    embeddings_collection.insert(
+                        {"text": uncached_texts[i], "embedding": embeddings[index], "model_id": model_id}
+                    )
         else:
             logger.info(f"Embedding {len(texts)} texts")
             embeddings = model.embed_multi(texts)

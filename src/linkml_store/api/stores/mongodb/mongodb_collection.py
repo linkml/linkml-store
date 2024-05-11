@@ -77,7 +77,7 @@ class MongoDBCollection(Collection):
                     sd = SlotDefinition(name=col)
             group = {"$group": {"_id": f"${col}", "count": {"$sum": 1}}}
             if isinstance(col, tuple):
-                q = {k.replace('.', ''): f"${k}" for k in col}
+                q = {k.replace(".", ""): f"${k}" for k in col}
                 group["$group"]["_id"] = q
             if sd and sd.multivalued:
                 facet_pipeline = [

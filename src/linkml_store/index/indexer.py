@@ -9,6 +9,7 @@ INDEX_ITEM = np.ndarray
 
 logger = logging.getLogger(__name__)
 
+
 class TemplateSyntaxEnum(str, Enum):
     jinja2 = "jinja2"
     fstring = "fstring"

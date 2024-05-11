@@ -14,6 +14,7 @@ class Format(Enum):
     """
     Supported generic file formats for loading and rendering objects.
     """
+
     JSON = "json"
     JSONL = "jsonl"
     YAML = "yaml"

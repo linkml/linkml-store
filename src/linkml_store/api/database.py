@@ -633,7 +633,6 @@ class Database(ABC):
         for obj in objects:
             self.store(obj)
 
-
     def export_database(self, location: str, target_format: Optional[str] = None, **kwargs):
         """
         Export a database to a file or location.
@@ -649,4 +648,3 @@ class Database(ABC):
         logger.info(f"Exporting object with {len(obj)} collections to {location} in {target_format} format")
         with open(location, "w", encoding="utf-8") as stream:
             stream.write(render_output(obj, format=target_format))
-

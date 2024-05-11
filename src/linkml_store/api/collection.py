@@ -1,4 +1,5 @@
 """A structure for representing collections of similar objects."""
+
 import hashlib
 import logging
 from collections import defaultdict

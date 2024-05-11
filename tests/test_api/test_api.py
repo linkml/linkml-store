@@ -167,10 +167,8 @@ def test_store(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
-@pytest.mark.parametrize("location,export_format", [
-    (OUTPUT_DIR / "export.yaml", "yaml")
-])
-def test_export(handle,location, export_format):
+@pytest.mark.parametrize("location,export_format", [(OUTPUT_DIR / "export.yaml", "yaml")])
+def test_export(handle, location, export_format):
     """
     Tests export and re-import
 
@@ -218,9 +216,9 @@ def test_collections_of_same_type(handle):
     client = create_client(handle)
     database = client.get_database()
     persons_a = [
-            {"id": 1, "name": "n1", "employed_by": "Org1"},
-            {"id": 2, "name": "n2", "age_in_years": 30},
-        ]
+        {"id": 1, "name": "n1", "employed_by": "Org1"},
+        {"id": 2, "name": "n2", "age_in_years": 30},
+    ]
     persons_b = [
         {"id": 3, "name": "n3", "employed_by": "Org1"},
         {"id": 4, "name": "n4", "age_in_years": 30},
