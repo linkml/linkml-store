@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="How to query the Monarch-KG" href="Query-the-Monarch-KG.html" /><link rel="prev" title="How to use MongoDB with LinkML-Store" href="Use-MongoDB.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
         <title>How to use Semantic Search - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=437aa6ec" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -70,7 +70,7 @@
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
       <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -85,7 +85,7 @@
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
     </svg>
@@ -93,7 +93,7 @@
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
       <path d="M13 12h5" />
@@ -101,6 +101,60 @@
       <path d="M13 18h1" />
       <path d="M13 9h4" />
       <path d="M13 6h1" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" /
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
     </svg>
   </symbol>
 </svg>
@@ -133,12 +187,13 @@
       <div class="theme-toggle-container theme-toggle-header">
         <button class="theme-toggle">
           <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -176,6 +231,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Query-Solr-using-CLI.html">How to query Solr using the Command Line</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Check-Referential-Integrity.html">How to Check Referential Integrity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Store-an-Ontology.html">Example: Storing an ontology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -203,16 +259,22 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/how-to/Use-Semantic-Search.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
 <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -221,25 +283,38 @@
           <section id="How-to-use-Semantic-Search">
 <h1>How to use Semantic Search<a class="headerlink" href="#How-to-use-Semantic-Search" title="Link to this heading"></a></h1>
 <p>This tutorial will show you how to use indexing and semantic search.</p>
+<section id="Background">
+<h2>Background<a class="headerlink" href="#Background" title="Link to this heading"></a></h2>
+<p>LinkML-Store allows you to <em>compose</em> different indexing strategies with any backend. Currently there are two indexing strategies:</p>
+<ul class="simple">
+<li><p>Simple trigram-based</p></li>
+<li><p>LLM text or image embedding based (using models from OpenAI, HuggingFace, and others)</p></li>
+</ul>
+<p>These indexes can be added into any backend (duckdb, mongo, …)</p>
+<p>Additionally, some backends may have their own indexing strategy</p>
+<ul class="simple">
+<li><p>Solr has a number of text-based indexing strategies</p></li>
+<li><p>ChromaDB can use text-based vector embeddings</p></li>
+</ul>
+<p>LinkML-Store allows for maximum flexibility.</p>
+<p>This tutorial shows how to use an OpenAI-based embedding strategy in combination with DuckDB.</p>
+</section>
+<section id="Obtaining-upstream-files">
+<h2>Obtaining upstream files<a class="headerlink" href="#Obtaining-upstream-files" title="Link to this heading"></a></h2>
+<p>We will use the OBO Graphs encoding of the Enzyme Commission (EC) database, via <a class="reference external" href="https://w3id.org/biopragmatics">biogragmatics</a></p>
+<p>We will use the pystow library to cache the upstream file.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">pystow</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pystow</span>
+<span class="n">path</span><span class="o">=</span><span class="n">pystow</span><span class="o">.</span><span class="n">ensure</span><span class="p">(</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;eccode.json&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/biopragmatics/resources/eccode/eccode.json&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>Let’s examining the structure of the JSON. There is a top level <code class="docutils literal notranslate"><span class="pre">graphs</span></code> index, each of which holds a set of <code class="docutils literal notranslate"><span class="pre">nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">edges</span></code>:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">path</span><span class="o">=</span><span class="n">pystow</span><span class="o">.</span><span class="n">ensure</span><span class="p">(</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;eccode.json&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://w3id.org/biopragmatics/resources/eccode/eccode.json&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
@@ -250,7 +325,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;nodes&quot;</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;edges&quot;</span><span class="p">])</span>
@@ -258,7 +333,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -266,75 +341,136 @@
 (7177, 506022)
 </pre></div></div>
 </div>
+</section>
+<section id="Storing-the-JSON">
+<h2>Storing the JSON<a class="headerlink" href="#Storing-the-JSON" title="Link to this heading"></a></h2>
+<p>We will create a duckdb database to insert the JSON objects. We’ll put this in a <code class="docutils literal notranslate"><span class="pre">tmp/</span></code> folder</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>rm<span class="w"> </span>-f<span class="w"> </span>/tmp/eccode.db
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>mkdir<span class="w"> </span>-p<span class="w"> </span>tmp
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:////tmp/eccode.db&quot;</span><span class="p">,</span> <span class="s2">&quot;eccode&quot;</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///tmp/eccode.db&quot;</span><span class="p">,</span> <span class="s2">&quot;eccode&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>We will create an index for nodes. (we could make a separate collection for edges, but this is less relevant for this tutorial)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">,</span> <span class="s2">&quot;nodes&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<p>For demonstration purposes we’ll only store the first 200 entries (it can be slow to index everything via the OpenAI API)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;nodes&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_index</span> <span class="kn">import</span> <span class="n">LLMIndex</span>
-
-<span class="n">index</span> <span class="o">=</span> <span class="n">LLMIndex</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">attach_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;nodes&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">200</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">nodes_collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;sugar transporters&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">rows</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/RO_0002327&#39;,
+  &#39;lbl&#39;: &#39;enables&#39;,
+  &#39;type&#39;: &#39;PROPERTY&#39;,
+  &#39;meta&#39;: None},
+ {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/RO_0002351&#39;,
+  &#39;lbl&#39;: &#39;has member&#39;,
+  &#39;type&#39;: &#39;PROPERTY&#39;,
+  &#39;meta&#39;: None},
+ {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1&#39;,
+  &#39;lbl&#39;: &#39;Oxidoreductases&#39;,
+  &#39;type&#39;: &#39;CLASS&#39;,
+  &#39;meta&#39;: None},
+ {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1&#39;,
+  &#39;lbl&#39;: &#39;Acting on the CH-OH group of donors&#39;,
+  &#39;type&#39;: &#39;CLASS&#39;,
+  &#39;meta&#39;: None},
+ {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1.1&#39;,
+  &#39;lbl&#39;: &#39;With NAD(+) or NADP(+) as acceptor&#39;,
+  &#39;type&#39;: &#39;CLASS&#39;,
+  &#39;meta&#39;: None},
+ {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1.1.1&#39;,
+  &#39;lbl&#39;: &#39;alcohol dehydrogenase&#39;,
+  &#39;type&#39;: &#39;CLASS&#39;,
+  &#39;meta&#39;: [&#39;synonyms&#39;]}]
+</pre></div></div>
+</div>
+</section>
+<section id="Creating-an-LLMIndexer">
+<h2>Creating an LLMIndexer<a class="headerlink" href="#Creating-an-LLMIndexer" title="Link to this heading"></a></h2>
+<p>We will create an indexer, and configure it to cache calls. This means that the 2nd time we run this notebook it will be much faster, since all the embeddings will be cached.</p>
+<p>The indexer will index using the <code class="docutils literal notranslate"><span class="pre">lbl</span></code> field. In OBO Graphs JSON, this is the name/label of the concept.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_indexer</span> <span class="kn">import</span> <span class="n">LLMIndexer</span>
+
+<span class="n">index</span> <span class="o">=</span> <span class="n">LLMIndexer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">cached_embeddings_database</span><span class="o">=</span><span class="s2">&quot;tmp/llm_cache.db&quot;</span><span class="p">,</span> <span class="n">index_attributes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lbl&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "57e7e6483f4a44d480d2b33d20d52534"}</script></div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:580: SAWarning: Did not recognize type &#39;list&#39; of column &#39;embedding&#39;
+  columns = self._get_columns_info(rows, domains, enums, schema)  # type: ignore[attr-defined]
+/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:173: DuckDBEngineWarning: duckdb-engine doesn&#39;t yet support reflection on indices
+  warnings.warn(
+</pre></div></div>
+</div>
+</section>
+<section id="Searching-using-the-index">
+<h2>Searching using the index<a class="headerlink" href="#Searching-using-the-index" title="Link to this heading"></a></h2>
+<p>Now we have attached an index, we can use it in semantic search. We’ll search our EC subset nodes collection for a string <code class="docutils literal notranslate"><span class="pre">sugar</span> <span class="pre">transporters</span></code>. Note that this string doesn’t occur precisely in the index but we can still rank closeness in semantic space.</p>
+<p>When using <code class="docutils literal notranslate"><span class="pre">search</span></code> the field <code class="docutils literal notranslate"><span class="pre">ranked_rows</span></code> is populated in the result object. This is a list of <code class="docutils literal notranslate"><span class="pre">(score,</span> <span class="pre">object)</span></code> tuples, which we will look at by translating into a pandas DataFrame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">nodes_collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;sugar transporters&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sim&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;lbl&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">]</span>
@@ -342,7 +478,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -351,7 +487,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
@@ -359,7 +495,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -389,33 +525,33 @@
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.797146</td>
-      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.2</td>
-      <td>ABC-type oligosaccharide transporter</td>
+      <td>0.811244</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.22</td>
+      <td>UDP-glucose 6-dehydrogenase</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.792401</td>
-      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.1</td>
-      <td>ABC-type maltose transporter</td>
+      <td>0.811244</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.22</td>
+      <td>UDP-glucose 6-dehydrogenase</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.791971</td>
-      <td>http://purl.obolibrary.org/obo/eccode_7.3.2.3</td>
-      <td>ABC-type sulfate transporter</td>
+      <td>0.809951</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.124</td>
+      <td>fructose 5-dehydrogenase (NADP(+))</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.791232</td>
-      <td>http://purl.obolibrary.org/obo/eccode_7.5.2.11</td>
-      <td>ABC-type D-galactose transporter</td>
+      <td>0.809951</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.124</td>
+      <td>fructose 5-dehydrogenase (NADP(+))</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.789132</td>
-      <td>http://purl.obolibrary.org/obo/eccode_7.6.2.12</td>
-      <td>ABC-type capsular-polysaccharide transporter</td>
+      <td>0.808296</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.10</td>
+      <td>L-xylulose reductase</td>
     </tr>
     <tr>
       <th>...</th>
@@ -424,48 +560,383 @@
       <td>...</td>
     </tr>
     <tr>
-      <th>7172</th>
-      <td>0.673991</td>
-      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.57</td>
-      <td>caspase-4</td>
+      <th>395</th>
+      <td>0.738170</td>
+      <td>http://purl.obolibrary.org/obo/RO_0002351</td>
+      <td>has member</td>
     </tr>
     <tr>
-      <th>7173</th>
-      <td>0.673331</td>
-      <td>http://purl.obolibrary.org/obo/eccode_3.4.22.63</td>
-      <td>caspase-10</td>
+      <th>396</th>
+      <td>0.730031</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.104</td>
+      <td>4-oxoproline reductase</td>
     </tr>
     <tr>
-      <th>7174</th>
-      <td>0.670908</td>
-      <td>http://purl.obolibrary.org/obo/eccode_1.14.99</td>
-      <td>Miscellaneous</td>
+      <th>397</th>
+      <td>0.730031</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.104</td>
+      <td>4-oxoproline reductase</td>
     </tr>
     <tr>
-      <th>7175</th>
-      <td>0.668042</td>
-      <td>http://purl.obolibrary.org/obo/eccode_3.4.24.4</td>
-      <td>3.4.24.30, 3.4.24.31, 3.4.24.32, 3.4.24.39 and...</td>
+      <th>398</th>
+      <td>0.722299</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.223</td>
+      <td>isopiperitenol dehydrogenase</td>
     </tr>
     <tr>
-      <th>7176</th>
-      <td>0.663048</td>
-      <td>http://www.geneontology.org/formats/oboInOwl#h...</td>
-      <td>has_obo_format_version</td>
+      <th>399</th>
+      <td>0.722299</td>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.223</td>
+      <td>isopiperitenol dehydrogenase</td>
     </tr>
   </tbody>
 </table>
-<p>7177 rows × 3 columns</p>
+<p>400 rows × 3 columns</p>
 </div></div>
 </div>
+<p>Even though our dataset had no actual sugar transporters, there are still ranked results, with the top 3 ranked highly by virtue of concerning sugars (even if they are not transporters).</p>
+<p>Note if we had indexed all of EC we would see sugar transporters.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">nodes_collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;sugar transporters&quot;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;CLASS&quot;</span><span class="p">})</span>
+<span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(0.8111048198475599,
+  {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1.1.22&#39;,
+   &#39;lbl&#39;: &#39;UDP-glucose 6-dehydrogenase&#39;,
+   &#39;type&#39;: &#39;CLASS&#39;,
+   &#39;meta&#39;: None}),
+ (0.8111048198475599,
+  {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1.1.22&#39;,
+   &#39;lbl&#39;: &#39;UDP-glucose 6-dehydrogenase&#39;,
+   &#39;type&#39;: &#39;CLASS&#39;,
+   &#39;meta&#39;: None}),
+ (0.8098110004639347,
+  {&#39;id&#39;: &#39;http://purl.obolibrary.org/obo/eccode_1.1.1.124&#39;,
+   &#39;lbl&#39;: &#39;fructose 5-dehydrogenase (NADP(+))&#39;,
+   &#39;type&#39;: &#39;CLASS&#39;,
+   &#39;meta&#39;: [&#39;synonyms&#39;]})]
+</pre></div></div>
+</div>
+</section>
+<section id="How-it-works">
+<h2>How it works<a class="headerlink" href="#How-it-works" title="Link to this heading"></a></h2>
+<p>Let’s peek under the hood into the duckdb instance to see how this is all implemented in DuckDB.</p>
+<p>To do this we’ll connect to the duckdb instance directly using the <code class="docutils literal notranslate"><span class="pre">sql</span></code> extension in Jupyter</p>
+<p>Load extension:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> sql
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The sql extension is already loaded. To reload it, use:
+  %reload_ext sql
+</pre></div></div>
+</div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">config</span> SqlMagic.autopandas = True
+<span class="o">%</span><span class="k">config</span> SqlMagic.feedback = False
+<span class="o">%</span><span class="k">config</span> SqlMagic.displaycon = False
+</pre></div>
+</div>
+</div>
+<p>Connect to the duckdb database</p>
+<p><strong>NOTE</strong> in general you don’t need to do this - we are just doing this here to show the internals.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">sql</span> duckdb:///tmp/eccode.db
+</pre></div>
+</div>
+</div>
+<p>Query the <code class="docutils literal notranslate"><span class="pre">nodes</span></code> table (no index)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">nodes</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>lbl</th>
+      <th>type</th>
+      <th>meta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>http://purl.obolibrary.org/obo/RO_0002327</td>
+      <td>enables</td>
+      <td>PROPERTY</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>http://purl.obolibrary.org/obo/RO_0002351</td>
+      <td>has member</td>
+      <td>PROPERTY</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1</td>
+      <td>Oxidoreductases</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1</td>
+      <td>Acting on the CH-OH group of donors</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1</td>
+      <td>With NAD(+) or NADP(+) as acceptor</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>195</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.284</td>
+      <td>S-(hydroxymethyl)glutathione dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+    </tr>
+    <tr>
+      <th>196</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.285</td>
+      <td>3''-deamino-3''-oxonicotianamine reductase</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>197</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.286</td>
+      <td>isocitrate--homoisocitrate dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+    </tr>
+    <tr>
+      <th>198</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.287</td>
+      <td>D-arabinitol dehydrogenase (NADP(+))</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+    </tr>
+    <tr>
+      <th>199</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.288</td>
+      <td>xanthoxin dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+    </tr>
+  </tbody>
+</table>
+<p>200 rows × 4 columns</p>
+</div></div>
+</div>
+<p>Query the index. Behind the scenes, linkml-store will create a table to cache each index for each collection. These currently start with <code class="docutils literal notranslate"><span class="pre">internal__index__</span></code> and are followed by the type of the objects, followed by the name of the index.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">internal__index__Node__test</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>lbl</th>
+      <th>type</th>
+      <th>meta</th>
+      <th>__index__</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>http://purl.obolibrary.org/obo/RO_0002327</td>
+      <td>enables</td>
+      <td>PROPERTY</td>
+      <td>NaN</td>
+      <td>[-0.021716245, -0.024930306, -0.015913868, -0....</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>http://purl.obolibrary.org/obo/RO_0002351</td>
+      <td>has member</td>
+      <td>PROPERTY</td>
+      <td>NaN</td>
+      <td>[-0.03492431, -0.015462456, 0.002913293, -0.02...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1</td>
+      <td>Oxidoreductases</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+      <td>[-0.031664208, -0.026391044, 8.377296e-05, -0....</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1</td>
+      <td>Acting on the CH-OH group of donors</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+      <td>[-0.023240522, -0.019391688, -0.006624823, -0....</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1</td>
+      <td>With NAD(+) or NADP(+) as acceptor</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+      <td>[0.00993415, -0.039508518, 0.023213472, -0.016...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>195</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.284</td>
+      <td>S-(hydroxymethyl)glutathione dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+      <td>[-0.020920139, -0.0042932644, 0.0039249077, -0...</td>
+    </tr>
+    <tr>
+      <th>196</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.285</td>
+      <td>3''-deamino-3''-oxonicotianamine reductase</td>
+      <td>CLASS</td>
+      <td>NaN</td>
+      <td>[-0.02360331, -0.025488937, -0.010397324, -0.0...</td>
+    </tr>
+    <tr>
+      <th>197</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.286</td>
+      <td>isocitrate--homoisocitrate dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+      <td>[-0.019758105, -0.016041763, 0.017833093, -0.0...</td>
+    </tr>
+    <tr>
+      <th>198</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.287</td>
+      <td>D-arabinitol dehydrogenase (NADP(+))</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+      <td>[-0.012204822, -0.034410186, 0.007919805, -0.0...</td>
+    </tr>
+    <tr>
+      <th>199</th>
+      <td>http://purl.obolibrary.org/obo/eccode_1.1.1.288</td>
+      <td>xanthoxin dehydrogenase</td>
+      <td>CLASS</td>
+      <td>[synonyms]</td>
+      <td>[-0.012760352, -0.016459865, 0.011843718, -0.0...</td>
+    </tr>
+  </tbody>
+</table>
+<p>200 rows × 5 columns</p>
+</div></div>
+</div>
+<p>We can see that the index duplicates the content of the main table, and adds an additional vector column with the embedding.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 
         </article>
@@ -511,8 +982,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to use Semantic Search</a><ul>
+<li><a class="reference internal" href="#Background">Background</a></li>
+<li><a class="reference internal" href="#Obtaining-upstream-files">Obtaining upstream files</a></li>
+<li><a class="reference internal" href="#Storing-the-JSON">Storing the JSON</a></li>
+<li><a class="reference internal" href="#Creating-an-LLMIndexer">Creating an LLMIndexer</a></li>
+<li><a class="reference internal" href="#Searching-using-the-index">Searching using the index</a></li>
+<li><a class="reference internal" href="#How-it-works">How it works</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
