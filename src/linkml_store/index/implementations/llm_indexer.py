@@ -113,7 +113,9 @@ class LLMIndexer(Indexer):
                 for i, index in enumerate(uncached_indices):
                     logger.debug(f"Indexing text at {i}")
                     embeddings[index] = uncached_embeddings[i]
-                    embeddings_collection.insert({"text": uncached_texts[i], "embedding": embeddings[index], "model_id": model_id})
+                    embeddings_collection.insert({"text": uncached_texts[i],
+                                                  "embedding": embeddings[index],
+                                                  "model_id": model_id})
         else:
             logger.info(f"Embedding {len(texts)} texts")
             embeddings = model.embed_multi(texts)

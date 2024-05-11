@@ -26,7 +26,8 @@ def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None)
     Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
 
     >>> load_objects("tests/input/test_data/data.csv")
-    [{'id': '1', 'name': 'John', 'age': '30'}, {'id': '2', 'name': 'Alice', 'age': '25'}, {'id': '3', 'name': 'Bob', 'age': '35'}]
+    [{'id': '1', 'name': 'John', 'age': '30'},
+     {'id': '2', 'name': 'Alice', 'age': '25'}, {'id': '3', 'name': 'Bob', 'age': '35'}]
 
     :param file_path: The path to the file.
     :param format: The format of the file. Can be a Format enum or a string value.
