@@ -4,13 +4,16 @@ import sys
 from enum import Enum
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 import yaml
 from pydantic import BaseModel
 
 
 class Format(Enum):
+    """
+    Supported generic file formats for loading and rendering objects.
+    """
     JSON = "json"
     JSONL = "jsonl"
     YAML = "yaml"
@@ -21,6 +24,9 @@ class Format(Enum):
 def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None) -> List[Dict[str, Any]]:
     """
     Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
+
+    >>> load_objects("tests/input/test_data/data.csv")
+    [{'id': '1', 'name': 'John', 'age': '30'}, {'id': '2', 'name': 'Alice', 'age': '25'}, {'id': '3', 'name': 'Bob', 'age': '35'}]
 
     :param file_path: The path to the file.
     :param format: The format of the file. Can be a Format enum or a string value.
@@ -57,9 +63,22 @@ def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None)
     return objs
 
 
-def render_output(data: List[Dict[str, Any]], format: Union[Format, str] = Format.YAML) -> str:
+def render_output(data: Union[List[Dict[str, Any]], Dict[str, Any]], format: Union[Format, str] = Format.YAML) -> str:
     """
     Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
+
+    >>> print(render_output([{"a": 1, "b": 2}, {"a": 3, "b": 4}], Format.JSON))
+    [
+      {
+        "a": 1,
+        "b": 2
+      },
+      {
+        "a": 3,
+        "b": 4
+      }
+    ]
+
 
     :param data: The data to be rendered.
     :param format: The desired output format. Can be a Format enum or a string value.
@@ -91,3 +110,32 @@ def render_output(data: List[Dict[str, Any]], format: Union[Format, str] = Forma
         return output.getvalue()
     else:
         raise ValueError(f"Unsupported output format: {format}")
+
+
+def guess_format(path: str) -> Optional[Format]:
+    """
+    Guess the format of a file based on its extension.
+
+    >>> guess_format("data.json")
+    <Format.JSON: 'json'>
+    >>> guess_format("data.jsonl")
+    <Format.JSONL: 'jsonl'>
+    >>> guess_format("data.yaml")
+    <Format.YAML: 'yaml'>
+    >>> assert not guess_format("data")
+
+    :param path: The path to the file.
+    :return: The guessed format.
+    """
+    if path.endswith(".json"):
+        return Format.JSON
+    elif path.endswith(".jsonl"):
+        return Format.JSONL
+    elif path.endswith(".yaml") or path.endswith(".yml"):
+        return Format.YAML
+    elif path.endswith(".tsv"):
+        return Format.TSV
+    elif path.endswith(".csv"):
+        return Format.CSV
+    else:
+        return None

@@ -37,7 +37,7 @@ class DuckDBCollection(Collection):
                 conn.execute(insert(table), objs)
             conn.commit()
 
-    def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
+    def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         if not isinstance(objs, list):
             objs = [objs]
         cd = self.class_definition()
@@ -52,9 +52,9 @@ class DuckDBCollection(Collection):
                 stmt = stmt.compile(engine)
                 conn.execute(stmt)
                 conn.commit()
-        return len(objs)
+        return
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> Optional[int]:
         logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
@@ -78,7 +78,7 @@ class DuckDBCollection(Collection):
             if deleted_rows_count == 0 and not missing_ok:
                 raise ValueError(f"No rows found for {where}")
             conn.commit()
-            return deleted_rows_count
+            return deleted_rows_count if deleted_rows_count > -1 else None
 
     def query_facets(
         self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs

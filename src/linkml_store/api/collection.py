@@ -76,7 +76,9 @@ class Collection:
         """
         Return the name of the collection.
 
-        :return:
+        TODO: deprecate in favor of Type
+
+        :return: name of the collection
         """
         return self.metadata.name
 
@@ -142,7 +144,9 @@ class Collection:
 
         For nested data, the alias SHOULD be used as the key; e.g
 
-         ``{ "persons": [ { "name": "Alice" }, { "name": "Bob" } ] }``
+        .. code-block:: json
+
+           { "persons": [ { "name": "Alice" }, { "name": "Bob" } ] }
 
         :return:
         """
@@ -171,7 +175,14 @@ class Collection:
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
-        Add one or more objects to the collection
+        Add one or more objects to the collection.
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.insert(objs)
 
         :param objs:
         :param kwargs:
@@ -179,9 +190,32 @@ class Collection:
         """
         raise NotImplementedError
 
-    def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
+    def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
-        Delete one or more objects from the collection
+        Delete one or more objects from the collection.
+
+        First let's set up a collection:
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.insert(objs)
+        >>> collection.find({}).num_rows
+        2
+
+        Now let's delete an object:
+
+        >>> collection.delete(objs[0])
+        >>> collection.find({}).num_rows
+        1
+
+        Deleting the same object again should have no effect:
+
+        >>> collection.delete(objs[0])
+        >>> collection.find({}).num_rows
+        1
 
         :param objs:
         :param kwargs:
@@ -189,9 +223,30 @@ class Collection:
         """
         raise NotImplementedError
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> Optional[int]:
         """
-        Delete objects that match a query
+        Delete objects that match a query.
+
+        First let's set up a collection:
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.insert(objs)
+
+        Now let's delete an object:
+
+        >>> collection.delete_where({"id": "P1"})
+        >>> collection.find({}).num_rows
+        1
+
+        Match everything:
+
+        >>> collection.delete_where({})
+        >>> collection.find({}).num_rows
+        0
 
         :param where: where conditions
         :param missing_ok: if True, do not raise an error if the collection does not exist
@@ -202,7 +257,7 @@ class Collection:
 
     def update(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
-        Update one or more objects in the collection
+        Update one or more objects in the collection.
 
         :param objs:
         :param kwargs:
@@ -215,7 +270,21 @@ class Collection:
 
     def query(self, query: Query, **kwargs) -> QueryResult:
         """
-        Run a query against the collection
+        Run a query against the collection.
+
+        First let's load a collection:
+
+        >>> from linkml_store import Client
+        >>> from linkml_store.utils.format_utils import load_objects
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb")
+        >>> collection = db.create_collection("Country")
+        >>> objs = load_objects("tests/input/countries/countries.jsonl")
+        >>> collection.insert(objs)
+
+        Now let's run a query:
+
+        TODO
 
         :param query:
         :param kwargs:
@@ -284,6 +353,31 @@ class Collection:
     def find(self, where: Optional[Any] = None, **kwargs) -> QueryResult:
         """
         Find objects in the collection using a where query.
+
+        As an example, first load a collection:
+
+        >>> from linkml_store import Client
+        >>> from linkml_store.utils.format_utils import load_objects
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb")
+        >>> collection = db.create_collection("Country")
+        >>> objs = load_objects("tests/input/countries/countries.jsonl")
+        >>> collection.insert(objs)
+
+        Now let's find all objects:
+
+        >>> qr = collection.find({})
+        >>> qr.num_rows
+        20
+
+        We can do a more restrictive query:
+
+        >>> qr = collection.find({"code": "FR"})
+        >>> qr.num_rows
+        1
+        >>> qr.rows[0]["name"]
+        'France'
+
 
         :param where:
         :param kwargs:
@@ -377,6 +471,7 @@ class Collection:
         self._indexers[index_name] = index
         if auto_index:
             all_objs = self.find(limit=-1).rows
+            logger.info(f"Auto-indexing {len(all_objs)} objects")
             self.index_objects(all_objs, index_name, replace=True, **kwargs)
 
     def _index_collection_name(self, index_name: str) -> str:

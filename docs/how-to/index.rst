@@ -14,4 +14,5 @@ How-To Guides
    Query-Solr-using-CLI
    Check-Referential-Integrity
    Store-an-Ontology
+   Index-Phenopackets
 

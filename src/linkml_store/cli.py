@@ -14,7 +14,7 @@ from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.utils.format_utils import Format, load_objects, render_output
+from linkml_store.utils.format_utils import Format, load_objects, render_output, guess_format
 from linkml_store.utils.object_utils import object_path_update
 
 index_type_option = click.option("--index-type", "-t",
@@ -73,6 +73,9 @@ class ContextSettings(BaseModel):
 
 # format_choice = click.Choice(["json", "yaml", "tsv"])
 format_choice = click.Choice([f.value for f in Format])
+
+
+include_internal_option = click.option("--include-internal/--no-include-internal", default=False, show_default=True)
 
 
 @click.group()
@@ -207,6 +210,38 @@ def store(ctx, files, object, format):
             click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{db.name}'.")
 
 
+@cli.command(name="import")
+@click.argument("files", type=click.Path(exists=True), nargs=-1)
+@click.option("--format", "-f", help="Input format")
+@click.pass_context
+def import_database(ctx, files, format):
+    """Imports a database from a dump."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    if not files and not object:
+        files = ["-"]
+    for file_path in files:
+        db.import_database(file_path, source_format=format)
+
+
+@cli.command()
+@click.option("--output-type", "-O",
+              type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o",
+              required=True,
+              type=click.Path(), help="Output file path")
+@click.pass_context
+def export(ctx, output_type, output):
+    """Exports a database to a dump."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    if output_type is None:
+        output_type = guess_format(output)
+    if output_type is None:
+        raise ValueError(f"Output format must be specified can't be inferred from {output}.")
+    db.export_database(output, target_format=output_type)
+
+
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
@@ -230,7 +265,7 @@ def query(ctx, where, limit, output_type, output):
 
 @cli.command()
 @click.pass_context
-@click.option("--include-internal/--no-include-internal", default=False, show_default=True)
+@include_internal_option
 def list_collections(ctx, **kwargs):
     db = ctx.obj["settings"].database
     for collection in db.list_collections(**kwargs):
@@ -297,6 +332,9 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 @click.option("--cached-embeddings-database",
               "-E",
                 help="Path to the database where embeddings are cached")
+@click.option("--text-template",
+                "-T",
+                help="Template for text embeddings")
 @click.pass_context
 def index(ctx, index_type, **kwargs):
     """

@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -6,6 +7,7 @@ from pydantic import BaseModel
 
 INDEX_ITEM = np.ndarray
 
+logger = logging.getLogger(__name__)
 
 class TemplateSyntaxEnum(str, Enum):
     jinja2 = "jinja2"
@@ -48,9 +50,9 @@ class Indexer(BaseModel):
         Convert a list of objects to indexable objects
 
         :param objs:
-        :return:
+        :return: list of vectors
         """
-        return [self.object_to_vector(obj) for obj in objs]
+        return self.texts_to_vectors([self.object_to_text(obj) for obj in objs])
 
     def texts_to_vectors(self, texts: List[str], cache: bool = None, **kwargs) -> List[INDEX_ITEM]:
         """
@@ -85,7 +87,12 @@ class Indexer(BaseModel):
         if self.filter_nulls:
             obj = {k: v for k, v in obj.items() if v is not None}
         if self.text_template:
-            if self.text_template_syntax and self.text_template_syntax == TemplateSyntaxEnum.jinja2:
+            syntax = self.text_template_syntax
+            if not syntax:
+                if "{%" in self.text_template or "{{" in self.text_template:
+                    logger.info("Detected Jinja2 syntax in text template")
+                    syntax = TemplateSyntaxEnum.jinja2
+            if syntax and syntax == TemplateSyntaxEnum.jinja2:
                 from jinja2 import Template
 
                 template = Template(self.text_template)

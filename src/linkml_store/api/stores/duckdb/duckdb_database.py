@@ -128,7 +128,7 @@ class DuckDBDatabase(Database):
     def induce_schema_view(self) -> SchemaView:
         # TODO: unify schema introspection
         # TODO: handle case where schema is provided in advance
-        logger.info(f"Inducing schema view for {self.metadata.handle}")
+        logger.info(f"Inducing schema view for {self.metadata.handle} // {self}")
         sb = SchemaBuilder()
         schema = sb.schema
         query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})

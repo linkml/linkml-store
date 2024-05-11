@@ -15,7 +15,12 @@ logger = logging.getLogger(__name__)
 
 class LLMIndexer(Indexer):
     """
-    A implementations index wraps the llm library
+    An indexer that wraps the llm library.
+
+    This indexer is used to convert text to vectors using the llm library.
+
+    >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+    >>> vector = indexer.text_to_vector("hello")
     """
 
     embedding_model_name: str = "ada-002"
@@ -36,6 +41,9 @@ class LLMIndexer(Indexer):
         """
         Convert a text to an indexable object
 
+        >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+        >>> vector = indexer.text_to_vector("hello")
+
         :param text:
         :return:
         """
@@ -45,9 +53,13 @@ class LLMIndexer(Indexer):
         """
         Use LLM to embed
 
+        >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+        >>> vectors = indexer.texts_to_vectors(["hello", "goodbye"])
+
         :param texts:
         :return:
         """
+        logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
         if self.cached_embeddings_database and (cache is None or cache or self.cache_queries):
             model_id = model.model_id
@@ -59,7 +71,6 @@ class LLMIndexer(Indexer):
                 coll_name = "all_embeddings"
             from linkml_store import Client
             embeddings_client = Client()
-            embeddings_db = embeddings_client.get_database(f"duckdb:///{db_path}")
             config = CollectionConfig(
                 name=coll_name,
                 type="Embeddings",
@@ -69,6 +80,7 @@ class LLMIndexer(Indexer):
                     "embedding": {"range": "float", "array": {}},
                 }
             )
+            embeddings_db = embeddings_client.get_database(f"duckdb:///{db_path}")
             if coll_name in embeddings_db.list_collection_names():
                 # Load existing collection and use its model
                 embeddings_collection = embeddings_db.create_collection(coll_name, metadata=config)
@@ -81,13 +93,17 @@ class LLMIndexer(Indexer):
             uncached_texts = []
             n = 0
             for i in range(len(texts)):
+                # TODO: optimize this
                 text = texts[i]
+                logger.info(f"Looking for cached embedding for {text}")
                 r = embeddings_collection.find({"text": text, "model_id": model_id})
                 if r.num_rows:
                     embeddings[i] = r.rows[0]["embedding"]
                     n += 1
+                    logger.info(f"Found")
                 else:
                     uncached_texts.append((text, i))
+                    logger.info(f"NOT Found")
             logger.info(f"Found {n} cached embeddings")
             if uncached_texts:
                 logger.info(f"Embedding {len(uncached_texts)} uncached texts")

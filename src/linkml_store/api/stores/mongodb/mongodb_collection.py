@@ -13,6 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class MongoDBCollection(Collection):
+    """
+    Adapter for collections in a MongoDB database.
+
+    .. note::
+
+        You should not use or manipulate this class directly.
+        Instead, use the general :class:`linkml_store.api.Collection`
+    """
 
     @property
     def mongo_collection(self) -> MongoCollection:

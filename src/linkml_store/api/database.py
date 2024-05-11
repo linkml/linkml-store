@@ -3,9 +3,9 @@ from abc import ABC
 from collections import defaultdict
 from copy import copy
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union, Any
 
-from linkml_store.utils.format_utils import load_objects
+from linkml_store.utils.format_utils import load_objects, render_output
 
 try:
     from linkml.validator.report import Severity, ValidationResult
@@ -129,15 +129,42 @@ class Database(ABC):
 
     @property
     def recreate_if_exists(self) -> bool:
+        """
+        Return whether to recreate the database if it already exists.
+
+        :return:
+        """
         return self.metadata.recreate_if_exists
 
     @property
     def handle(self) -> str:
+        """
+        Return the database handle.
+
+        Examples:
+
+        - ``duckdb:///:memory:``
+        - ``duckdb:///tmp/test.db``
+        - ``mongodb://localhost:27017/``
+
+        :return:
+        """
         return self.metadata.handle
 
-    def store(self, obj: Dict[str, str], **kwargs):
+    def store(self, obj: Dict[str, Any], **kwargs):
         """
-        Store an object in the database
+        Store an object in the database.
+
+        The object is assumed to be a Dictionary of Collections.
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.store({"persons": [{"id": "P1", "name": "John", "age_in_years": 30}]})
+        >>> collection = db.get_collection("persons")
+        >>> qr = collection.find()
+        >>> qr.num_rows
+        1
 
         :param obj: object to store
         :param kwargs: additional arguments
@@ -146,6 +173,7 @@ class Database(ABC):
         roots = [c for c in sv.all_classes().values() if c.tree_root]
         root = roots[0] if roots else None
         for k, v in obj.items():
+            logger.info(f"Storing collection {k}")
             if root:
                 slot = sv.induced_slot(k, root.name)
                 if not slot:
@@ -167,13 +195,19 @@ class Database(ABC):
 
     def commit(self, **kwargs):
         """
-        Commit any pending changes to the database
+        Commit pending changes to the database.
+
+        :param kwargs:
+        :return:
         """
         raise NotImplementedError()
 
     def close(self, **kwargs):
         """
-        Close the database and all connection objects
+        Close the database.
+
+        :param kwargs:
+        :return:
         """
         raise NotImplementedError()
 
@@ -190,14 +224,26 @@ class Database(ABC):
         **kwargs,
     ) -> Collection:
         """
-        Create a new collection
+        Create a new collection in the current database.
+
+        The collection must have a *Type*, and may have an *Alias*.
+
+        Examples:
 
         >>> from linkml_store.api.client import Client
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
-        >>> collection = db.create_collection("Person")
-        >>> collection.name
+        >>> collection = db.create_collection("Person", alias="persons")
+        >>> collection.alias
+        'persons'
+        >>> collection.target_class_name
         'Person'
+
+        If alias is not provided, it defaults to the name of the type.
+
+        >>> collection = db.create_collection("Organization")
+        >>> collection.alias
+        'Organization'
 
         :param name: name of the collection
         :param alias: alias for the collection
@@ -335,7 +381,29 @@ class Database(ABC):
     @property
     def schema_view(self) -> SchemaView:
         """
-        Return a schema view for the named collection
+        Return a schema view for the named collection.
+
+        If no explicit schema is provided, this will generalize one
+
+        Induced schema example:
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person", alias="persons")
+        >>> collection.insert([{"id": "P1", "name": "John", "age_in_years": 25}])
+        >>> schema_view = db.schema_view
+        >>> cd = schema_view.get_class("Person")
+        >>> cd.attributes["id"].range
+        'string'
+        >>> cd.attributes["age_in_years"].range
+        'integer'
+
+        We can reuse the same class:
+
+        >>> collection2 = db.create_collection("Person", alias="other_persons")
+        >>> collection2.class_definition().attributes["age_in_years"].range
+        'integer'
         """
         if not self._schema_view:
             self._initialize_schema()
@@ -346,6 +414,26 @@ class Database(ABC):
     def set_schema_view(self, schema_view: Union[str, Path, SchemaView]):
         """
         Set the schema view for the database.
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> sv = SchemaView("tests/input/countries/countries.linkml.yaml")
+        >>> db.set_schema_view(sv)
+        >>> cd = db.schema_view.schema.classes["Country"]
+        >>> sorted(cd.slots)
+        ['capital', 'code', 'continent', 'languages', 'name']
+        >>> induced_slots = {s.name: s for s in sv.class_induced_slots("Country")}
+        >>> sorted(induced_slots.keys())
+        ['capital', 'code', 'continent', 'languages', 'name']
+        >>> induced_slots["code"].identifier
+        True
+
+        Creating a new collection will align with the schema view:
+
+        >>> collection = db.create_collection("Country", "all_countries")
+        >>> sorted(collection.class_definition().slots)
+        ['capital', 'code', 'continent', 'languages', 'name']
 
         :param schema_view:
         :return:
@@ -388,6 +476,21 @@ class Database(ABC):
         >>> client = Client()
         >>> db = client.attach_database("duckdb", alias="test")
         >>> db.load_schema_view("tests/input/countries/countries.linkml.yaml")
+        >>> sv = db.schema_view
+        >>> cd = sv.schema.classes["Country"]
+        >>> sorted(cd.slots)
+        ['capital', 'code', 'continent', 'languages', 'name']
+        >>> induced_slots = {s.name: s for s in sv.class_induced_slots("Country")}
+        >>> sorted(induced_slots.keys())
+        ['capital', 'code', 'continent', 'languages', 'name']
+        >>> induced_slots["code"].identifier
+        True
+
+        Creating a new collection will align with the schema view:
+
+        >>> collection = db.create_collection("Country", "all_countries")
+        >>> sorted(collection.class_definition().slots)
+        ['capital', 'code', 'continent', 'languages', 'name']
 
         :param path:
         :return:
@@ -421,6 +524,41 @@ class Database(ABC):
     def iter_validate_database(self, **kwargs) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the database.
+
+        An an example, let's create a database with a predefined schema
+        from the countries.linkml.yaml file:
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.load_schema_view("tests/input/countries/countries.linkml.yaml")
+
+        Let's introspet the schema to see what slots are applicable for the class "Country":
+
+        >>> sv = db.schema_view
+        >>> for slot in sv.class_induced_slots("Country"):
+        ...     print(slot.name, slot.range, slot.required)
+        name string True
+        code string True
+        capital string True
+        continent string True
+        languages Language None
+
+        Next we'll create a collection, binding it to the target class "Country", and insert
+        valid data:
+
+        >>> collection = db.create_collection("Country", "all_countries")
+        >>> collection.insert([{"code": "US", "name": "United States", "continent": "North America", "capital": "Washington, D.C."}])
+        >>> list(db.iter_validate_database())
+        []
+
+        Now let's insert some invalid data (missing required fields)
+
+        >>> collection.insert([{"code": "FR", "name": "France"}])
+        >>> for r in db.iter_validate_database():
+        ...    print(r.message[0:32])
+        'capital' is a required property
+        'continent' is a required proper
 
         :param kwargs:
         :return: iterator over validation results
@@ -476,29 +614,38 @@ class Database(ABC):
 
     def drop(self, **kwargs):
         """
-        Drop the database and all collections
+        Drop the database and all collections.
+
+        :param kwargs: additional arguments
         """
         raise NotImplementedError()
 
     def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
         """
-        Import a database from a file.
+        Import a database from a file or location.
 
         :param location: location of the file
         :param source_format: source format
         :param kwargs: additional arguments
         """
-        objects = load_objects(self, location, format=source_format)
+        objects = load_objects(location, format=source_format)
         for obj in objects:
             self.store(obj)
 
 
     def export_database(self, location: str, target_format: Optional[str] = None, **kwargs):
         """
-        Export a database to a file.
+        Export a database to a file or location.
 
         :param location: location of the file
         :param target_format: target format
         :param kwargs: additional arguments
         """
-        raise NotImplementedError()
+        obj = {}
+        for coll in self.list_collections():
+            qr = coll.find({}, limit=-1)
+            obj[coll.alias] = qr.rows
+        logger.info(f"Exporting object with {len(obj)} collections to {location} in {target_format} format")
+        with open(location, "w", encoding="utf-8") as stream:
+            stream.write(render_output(obj, format=target_format))
+

@@ -39,5 +39,5 @@ class SimpleIndexer(Indexer):
 
             # Increment the count at the computed index
             vector[index] += 1.0
-        logger.info(f"Indexed text: {text} as {vector}")
+        logger.debug(f"Indexed text: {text} as {vector}")
         return vector
