@@ -42,7 +42,7 @@ class LLMIndexer(Indexer):
         """
         Convert a text to an indexable object
 
-        >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+        >>> indexer = LLMIndexer(cached_embeddings_database="tests/input/llm_cache.db")
         >>> vector = indexer.text_to_vector("hello")
 
         :param text:
@@ -54,7 +54,7 @@ class LLMIndexer(Indexer):
         """
         Use LLM to embed
 
-        >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+        >>> indexer = LLMIndexer(cached_embeddings_database="tests/input/llm_cache.db")
         >>> vectors = indexer.texts_to_vectors(["hello", "goodbye"])
 
         :param texts:
