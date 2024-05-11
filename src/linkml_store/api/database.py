@@ -548,7 +548,8 @@ class Database(ABC):
         valid data:
 
         >>> collection = db.create_collection("Country", "all_countries")
-        >>> collection.insert([{"code": "US", "name": "United States", "continent": "North America", "capital": "Washington, D.C."}])
+        >>> obj = {"code": "US", "name": "United States", "continent": "North America", "capital": "Washington, D.C."}
+        >>> collection.insert([obj])
         >>> list(db.iter_validate_database())
         []
 

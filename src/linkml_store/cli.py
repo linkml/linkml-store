@@ -378,7 +378,10 @@ def schema(ctx, output_type, output):
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of search results")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--auto-index/--no-auto-index", default=False, show_default=True, help="Automatically index the collection")
+@click.option("--auto-index/--no-auto-index",
+              default=False,
+              show_default=True,
+              help="Automatically index the collection")
 @index_type_option
 @click.pass_context
 def search(ctx, search_term, where, limit, index_type, output_type, output, auto_index):
