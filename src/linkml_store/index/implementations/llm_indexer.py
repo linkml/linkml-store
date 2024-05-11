@@ -20,7 +20,7 @@ class LLMIndexer(Indexer):
 
     This indexer is used to convert text to vectors using the llm library.
 
-    >>> indexer = LLMIndexer(cached_embeddings_database="tests/output/llm_cache.db")
+    >>> indexer = LLMIndexer(cached_embeddings_database="tests/input/llm_cache.db")
     >>> vector = indexer.text_to_vector("hello")
     """
 
