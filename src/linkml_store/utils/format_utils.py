@@ -4,7 +4,7 @@ import sys
 from enum import Enum
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import yaml
 from pydantic import BaseModel

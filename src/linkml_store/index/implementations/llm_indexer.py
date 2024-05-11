@@ -100,10 +100,10 @@ class LLMIndexer(Indexer):
                 if r.num_rows:
                     embeddings[i] = r.rows[0]["embedding"]
                     n += 1
-                    logger.info(f"Found")
+                    logger.info("Found")
                 else:
                     uncached_texts.append((text, i))
-                    logger.info(f"NOT Found")
+                    logger.info("NOT Found")
             logger.info(f"Found {n} cached embeddings")
             if uncached_texts:
                 logger.info(f"Embedding {len(uncached_texts)} uncached texts")

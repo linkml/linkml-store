@@ -3,7 +3,7 @@ from abc import ABC
 from collections import defaultdict
 from copy import copy
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union, Any
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
 
 from linkml_store.utils.format_utils import load_objects, render_output
 

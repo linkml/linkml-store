@@ -14,7 +14,7 @@ from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.utils.format_utils import Format, load_objects, render_output, guess_format
+from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output
 from linkml_store.utils.object_utils import object_path_update
 
 index_type_option = click.option("--index-type", "-t",
