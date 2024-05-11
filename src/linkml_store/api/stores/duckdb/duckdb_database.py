@@ -1,5 +1,6 @@
 import json
 import logging
+from pathlib import Path
 from typing import Optional
 
 import pandas as pd
@@ -22,6 +23,7 @@ TYPE_MAP = {
     "DATE": "date",
     "DOUBLE": "float",
     "INTEGER": "integer",
+    "JSON": "Any",
 }
 
 
@@ -33,9 +35,13 @@ class DuckDBDatabase(Database):
     _engine: sqlalchemy.Engine = None
     collection_class = DuckDBCollection
 
-    def __init__(self, handle: Optional[str] = None, **kwargs):
+    def __init__(self, handle: Optional[str] = None, recreate_if_exists: bool = False, **kwargs):
         if handle is None:
             handle = "duckdb:///:memory:"
+        if recreate_if_exists:
+            path = Path(handle.replace("duckdb:///", ""))
+            if path.exists():
+                path.unlink()
         super().__init__(handle=handle, **kwargs)
 
     @property
@@ -69,7 +75,10 @@ class DuckDBDatabase(Database):
                 if qr.num_rows == 0:
                     logger.debug(f"Table {query.from_table} not created yet")
                     return QueryResult(query=query, num_rows=0, rows=[])
-            sv = self._schema_view
+            if not query.from_table.startswith("information_schema"):
+                sv = self.schema_view
+            else:
+                sv = None
             if sv:
                 cd = None
                 for c in self._collections.values():
@@ -119,7 +128,7 @@ class DuckDBDatabase(Database):
     def induce_schema_view(self) -> SchemaView:
         # TODO: unify schema introspection
         # TODO: handle case where schema is provided in advance
-        logger.info(f"Inducing schema view for {self.metadata.handle}")
+        logger.info(f"Inducing schema view for {self.metadata.handle} // {self}")
         sb = SchemaBuilder()
         schema = sb.schema
         query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
@@ -144,8 +153,10 @@ class DuckDBDatabase(Database):
             sd = SlotDefinition(
                 row["column_name"], required=row["is_nullable"] == "NO", multivalued=multivalued, range=rng
             )
+            if dt == "JSON":
+                sd.inlined_as_list = True
             sb.schema.classes[tbl_name].attributes[sd.name] = sd
-            logger.info(f"Introspected slot: {tbl_name}.{sd.name}: {sd.range}")
+            logger.info(f"Introspected slot: {tbl_name}.{sd.name}: {sd.range} FROM {dt}")
         sb.add_defaults()
         for cls_name in schema.classes:
             if cls_name in self.metadata.collections:

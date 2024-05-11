@@ -15,7 +15,7 @@ class SimpleIndexer(Indexer):
     This uses a naive method to generate an index from text. It is not suitable for production use.
     """
 
-    def text_to_vector(self, text: str) -> INDEX_ITEM:
+    def text_to_vector(self, text: str, cache: bool = None, **kwargs) -> INDEX_ITEM:
         """
         This is a naive method purely for testing
 
@@ -39,5 +39,5 @@ class SimpleIndexer(Indexer):
 
             # Increment the count at the computed index
             vector[index] += 1.0
-        logger.info(f"Indexed text: {text} as {vector}")
+        logger.debug(f"Indexed text: {text} as {vector}")
         return vector

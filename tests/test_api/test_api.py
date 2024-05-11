@@ -167,6 +167,78 @@ def test_store(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
+@pytest.mark.parametrize("location,export_format", [(OUTPUT_DIR / "export.yaml", "yaml")])
+def test_export(handle, location, export_format):
+    """
+    Tests export and re-import
+
+    :param handle:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    obj = {
+        "persons": [
+            {"id": 1, "name": "n1", "employed_by": "Org1"},
+            {"id": 2, "name": "n2", "age_in_years": 30},
+        ],
+        "organizations": [
+            {"id": "Org1", "name": "org1"},
+            {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
+        ],
+    }
+    database.store(obj)
+    database.export_database(location, export_format)
+    database = client.attach_database("duckdb")
+    database.import_database(location, export_format)
+    persons_coll = database.get_collection("persons")
+    qr = persons_coll.find()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == obj["persons"][0]
+    qr = persons_coll.find({"id": 1})
+    assert qr.num_rows == 1
+    # qr = persons_coll.find({"id": [1, 2]})
+    # assert qr.num_rows == 2
+    orgs_coll = database.get_collection("organizations")
+    qr = orgs_coll.find()
+    assert qr.num_rows == 2
+    assert remove_none(qr.rows[0]) == obj["organizations"][0]
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_collections_of_same_type(handle):
+    """
+    Tests storing of objects in collections of the same type
+
+    :param handle:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    persons_a = [
+        {"id": 1, "name": "n1", "employed_by": "Org1"},
+        {"id": 2, "name": "n2", "age_in_years": 30},
+    ]
+    persons_b = [
+        {"id": 3, "name": "n3", "employed_by": "Org1"},
+        {"id": 4, "name": "n4", "age_in_years": 30},
+        {"id": 5, "name": "n5", "age_in_years": 33},
+    ]
+    collection_a = database.create_collection("Person", alias="persons_a")
+    collection_b = database.create_collection("Person", alias="persons_b")
+    qr_a = collection_a.find()
+    assert qr_a.num_rows == 0
+    qr_b = collection_b.find()
+    assert qr_b.num_rows == 0
+    collection_a.insert(persons_a)
+    collection_b.insert(persons_b)
+    qr_a = collection_a.find()
+    assert qr_a.num_rows == 2
+    qr_b = collection_b.find()
+    assert qr_b.num_rows == 3
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
 def test_store_nested(handle):
     """
     Test storing of nested objects
@@ -271,7 +343,7 @@ def test_induced_schema(handle, name_alias):
     qr = collection.find()
     assert qr.num_rows == 1, "expected 1 row after delete"
     assert remove_none(qr.rows[0]) == objs[1], "expected second object to be first after delete"
-    assert collection.delete_where({"age_in_years": 99}) <= 0, "expected 0 rows to be deleted"
+    assert not collection.delete_where({"age_in_years": 99}), "expected 0 rows to be deleted"
     qr = collection.find()
     assert qr.num_rows == 1, "delete with no matching conditions should have no effect"
     collection.delete_where({"age_in_years": 30})

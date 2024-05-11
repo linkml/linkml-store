@@ -1,9 +1,18 @@
+import logging
+from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from pydantic import BaseModel
 
 INDEX_ITEM = np.ndarray
+
+logger = logging.getLogger(__name__)
+
+
+class TemplateSyntaxEnum(str, Enum):
+    jinja2 = "jinja2"
+    fstring = "fstring"
 
 
 def cosine_similarity(vector1, vector2):
@@ -21,8 +30,9 @@ class Indexer(BaseModel):
     name: Optional[str] = None
     index_function: Optional[Callable] = None
     distance_function: Optional[Callable] = None
-    index_attributes: Optional[str] = None
+    index_attributes: Optional[List[str]] = None
     text_template: Optional[str] = None
+    text_template_syntax: Optional[TemplateSyntaxEnum] = None
     filter_nulls: Optional[bool] = True
     vector_default_length: Optional[int] = 1000
     index_field: Optional[str] = "__index__"
@@ -41,24 +51,25 @@ class Indexer(BaseModel):
         Convert a list of objects to indexable objects
 
         :param objs:
-        :return:
+        :return: list of vectors
         """
-        return [self.object_to_vector(obj) for obj in objs]
+        return self.texts_to_vectors([self.object_to_text(obj) for obj in objs])
 
-    def texts_to_vectors(self, texts: List[str]) -> List[INDEX_ITEM]:
+    def texts_to_vectors(self, texts: List[str], cache: bool = None, **kwargs) -> List[INDEX_ITEM]:
         """
         Convert a list of texts to indexable objects
 
         :param texts:
         :return:
         """
-        return [self.text_to_vector(text) for text in texts]
+        return [self.text_to_vector(text, cache=cache, **kwargs) for text in texts]
 
-    def text_to_vector(self, text: str) -> INDEX_ITEM:
+    def text_to_vector(self, text: str, cache: bool = None, **kwargs) -> INDEX_ITEM:
         """
         Convert a text to an indexable object
 
         :param text:
+        :param cache:
         :return:
         """
         raise NotImplementedError
@@ -71,11 +82,24 @@ class Indexer(BaseModel):
         :return:
         """
         if self.index_attributes:
+            if len(self.index_attributes) == 1 and not self.text_template:
+                return str(obj[self.index_attributes[0]])
             obj = {k: v for k, v in obj.items() if k in self.index_attributes}
         if self.filter_nulls:
             obj = {k: v for k, v in obj.items() if v is not None}
         if self.text_template:
-            return self.text_template.format(**obj)
+            syntax = self.text_template_syntax
+            if not syntax:
+                if "{%" in self.text_template or "{{" in self.text_template:
+                    logger.info("Detected Jinja2 syntax in text template")
+                    syntax = TemplateSyntaxEnum.jinja2
+            if syntax and syntax == TemplateSyntaxEnum.jinja2:
+                from jinja2 import Template
+
+                template = Template(self.text_template)
+                return template.render(**obj)
+            else:
+                return self.text_template.format(**obj)
         return str(obj)
 
     def search(
@@ -91,7 +115,7 @@ class Indexer(BaseModel):
         """
 
         # Convert the query string to a vector
-        query_vector = self.text_to_vector(query)
+        query_vector = self.text_to_vector(query, cache=False)
 
         distances = []
 

@@ -11,12 +11,19 @@ from pydantic import BaseModel
 from linkml_store import Client
 from linkml_store.api import Collection, Database
 from linkml_store.api.queries import Query
+from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.utils.format_utils import Format, load_objects, render_output
+from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output
 from linkml_store.utils.object_utils import object_path_update
 
-index_type_option = click.option("--index-type", "-t")
+index_type_option = click.option(
+    "--index-type",
+    "-t",
+    default="simple",
+    show_default=True,
+    help="Type of index to create. Values: simple, llm",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +77,9 @@ class ContextSettings(BaseModel):
 format_choice = click.Choice([f.value for f in Format])
 
 
+include_internal_option = click.option("--include-internal/--no-include-internal", default=False, show_default=True)
+
+
 @click.group()
 @click.option("--database", "-d", help="Database name")
 @click.option("--collection", "-c", help="Collection name")
@@ -89,6 +99,15 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     if not stacktrace:
         sys.tracebacklimit = 0
     logger = logging.getLogger()
+    # Set handler for the root logger to output to the console
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
+    # Clear existing handlers to avoid duplicate messages if function runs multiple times
+    logger.handlers = []
+
+    # Add the newly created console handler to the logger
+    logger.addHandler(console_handler)
     if verbose >= 2:
         logger.setLevel(logging.DEBUG)
     elif verbose == 1:
@@ -193,6 +212,35 @@ def store(ctx, files, object, format):
             click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{db.name}'.")
 
 
+@cli.command(name="import")
+@click.argument("files", type=click.Path(exists=True), nargs=-1)
+@click.option("--format", "-f", help="Input format")
+@click.pass_context
+def import_database(ctx, files, format):
+    """Imports a database from a dump."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    if not files and not object:
+        files = ["-"]
+    for file_path in files:
+        db.import_database(file_path, source_format=format)
+
+
+@cli.command()
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o", required=True, type=click.Path(), help="Output file path")
+@click.pass_context
+def export(ctx, output_type, output):
+    """Exports a database to a dump."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    if output_type is None:
+        output_type = guess_format(output)
+    if output_type is None:
+        raise ValueError(f"Output format must be specified can't be inferred from {output}.")
+    db.export_database(output, target_format=output_type)
+
+
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
@@ -216,9 +264,10 @@ def query(ctx, where, limit, output_type, output):
 
 @cli.command()
 @click.pass_context
-def list_collections(ctx):
+@include_internal_option
+def list_collections(ctx, **kwargs):
     db = ctx.obj["settings"].database
-    for collection in db.list_collections():
+    for collection in db.list_collections(**kwargs):
         click.echo(collection.name)
         click.echo(render_output(collection.metadata))
 
@@ -254,7 +303,7 @@ def fq(ctx, where, limit, columns, output_type, output):
 
     def _untuple(key):
         if isinstance(key, tuple):
-            return "+".join(key)
+            return "+".join([str(x) for x in key])
         return key
 
     count_dict = {}
@@ -279,8 +328,10 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 
 @cli.command()
 @index_type_option
+@click.option("--cached-embeddings-database", "-E", help="Path to the database where embeddings are cached")
+@click.option("--text-template", "-T", help="Template for text embeddings")
 @click.pass_context
-def index(ctx, index_type):
+def index(ctx, index_type, **kwargs):
     """
     Create an index over a collection.
 
@@ -289,7 +340,7 @@ def index(ctx, index_type):
     :return:
     """
     collection = ctx.obj["settings"].collection
-    ix = _get_index(index_type)
+    ix = get_indexer(index_type, **kwargs)
     collection.attach_indexer(ix)
 
 
@@ -322,14 +373,17 @@ def schema(ctx, output_type, output):
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of search results")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option(
+    "--auto-index/--no-auto-index", default=False, show_default=True, help="Automatically index the collection"
+)
 @index_type_option
 @click.pass_context
-def search(ctx, search_term, where, limit, index_type, output_type, output):
+def search(ctx, search_term, where, limit, index_type, output_type, output, auto_index):
     """Search objects in the specified collection."""
     collection = ctx.obj["settings"].collection
-    ix = _get_index(index_type)
+    ix = get_indexer(index_type)
     logger.info(f"Attaching index to collection {collection.name}: {ix.model_dump()}")
-    collection.attach_indexer(ix, auto_index=False)
+    collection.attach_indexer(ix, auto_index=auto_index)
     result = collection.search(search_term, where=where, limit=limit)
     output_data = render_output([{"score": row[0], **row[1]} for row in result.ranked_rows], output_type)
     if output:
