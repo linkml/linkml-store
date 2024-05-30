@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -10,6 +11,9 @@ from linkml_store.api.stores.chromadb.chromadb_database import ChromaDBDatabase
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from linkml_store.api.stores.solr.solr_database import SolrDatabase
+
+logger = logging.getLogger(__name__)
+
 
 HANDLE_MAP = {
     "duckdb": DuckDBDatabase,
@@ -151,6 +155,8 @@ class Client:
         if ":" not in handle:
             scheme = handle
             handle = None
+            if alias is None:
+                alias = scheme
         else:
             scheme, _ = handle.split(":", 1)
         if scheme not in HANDLE_MAP:
@@ -195,6 +201,7 @@ class Client:
             self._databases = {}
         if name not in self._databases:
             if create_if_not_exists:
+                logger.info(f"Creating database: {name}")
                 self.attach_database(name, **kwargs)
             else:
                 raise ValueError(f"Database {name} does not exist")
