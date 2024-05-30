@@ -59,6 +59,11 @@ class Database(ABC):
     """
 
     _schema_view: Optional[SchemaView] = None
+    """Schema for the database. May be transformed."""
+
+    _original_schema_view: Optional[SchemaView] = None
+    """If a schema must be transformed, then the original is stored here."""
+
     _collections: Optional[Dict[str, Collection]] = None
     parent: Optional["Client"] = None
     metadata: Optional[DatabaseConfig] = None
