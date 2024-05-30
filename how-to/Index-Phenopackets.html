@@ -282,14 +282,26 @@
         <article role="main" id="furo-main-content">
           <section id="How-to-index-Phenopackets-with-LinkML-Store">
 <h1>How to index Phenopackets with LinkML-Store<a class="headerlink" href="#How-to-index-Phenopackets-with-LinkML-Store" title="Link to this heading"></a></h1>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<section id="Use-pystow-to-download-phenopackets">
+<h2>Use pystow to download phenopackets<a class="headerlink" href="#Use-pystow-to-download-phenopackets" title="Link to this heading"></a></h2>
+<p>We will download from the Monarch Initiative <a class="reference external" href="https://github.com/monarch-initiative/phenopacket-store">phenopacket-store</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pystow</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">pystow</span><span class="o">.</span><span class="n">ensure_untar</span><span class="p">(</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;phenopackets&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://github.com/monarch-initiative/phenopacket-store/releases/download/0.1.8/all_phenopackets.tgz&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pystow</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">pystow</span><span class="o">.</span><span class="n">ensure_untar</span><span class="p">(</span><span class="s2">&quot;tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;phenopackets&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot; https://github.com/monarch-initiative/phenopacket-store/releases/latest/download/all_phenopackets.tgz&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "9b366f9d761d49f59047f30f10c59f8f"}</script></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -306,39 +318,25 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
                 <span class="n">obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
                 <span class="n">objs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<br/></pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-/Users/cjm/.data/tmp/phenopackets/all_phenopackets
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4293
+4876
 </pre></div></div>
 </div>
+</section>
 <section id="Creating-a-client-and-attaching-to-a-database">
 <h2>Creating a client and attaching to a database<a class="headerlink" href="#Creating-a-client-and-attaching-to-a-database" title="Link to this heading"></a></h2>
 <p>First we will create a client as normal:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -348,6 +346,8 @@
 </div>
 </div>
 <p>Next we’ll attach to a MongoDB instance. this assumes you have one running already.</p>
+<p>We will make a database called “phenopackets” and recreate it if it already exists</p>
+<p>(note for people running this notebook locally - if you happen to have a database with this name in your current mongo instance it will be deleted!)</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -369,18 +369,23 @@
 </div>
 </div>
 </section>
-<section id="Loading">
-<h2>Loading<a class="headerlink" href="#Loading" title="Link to this heading"></a></h2>
+<section id="Inserting-objects-into-the-store">
+<h2>Inserting objects into the store<a class="headerlink" href="#Inserting-objects-into-the-store" title="Link to this heading"></a></h2>
+<p>We’ll use the standard <code class="docutils literal notranslate"><span class="pre">insert</span></code> method to insert the phenopackets into the collection. At this stage there is no explicit schema.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+</section>
+<section id="Check-contents">
+<h2>Check contents<a class="headerlink" href="#Check-contents" title="Link to this heading"></a></h2>
+<p>We can check the number of rows in the collection, to ensure everything was inserted correctly:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span>
@@ -388,17 +393,25 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4293
+4876
 </pre></div></div>
 </div>
-<p>Let’s check with pandas just to make sure it looks as expected:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s check with pandas just to make sure it looks as expected; we’ll query for a specific OMIM disease:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;diseases.term.id&quot;</span><span class="p">:</span> <span class="s2">&quot;OMIM:618499&quot;</span><span class="p">},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -407,7 +420,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -469,20 +482,348 @@
 </table>
 </div></div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<p>As expected, there are three rows with the OMIM disease 618499.</p>
+</section>
+<section id="Query-faceting">
+<h2>Query faceting<a class="headerlink" href="#Query-faceting" title="Link to this heading"></a></h2>
+<p>We will now demonstrate faceted queries, allowing us to count the number of instances of different categorical values or categorical value combinations.</p>
+<p>First we’ll facet on the subject sex. We can use path notation, e.g. <code class="docutils literal notranslate"><span class="pre">subject.sex</span></code> here:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;subject.sex&#39;: [(&#39;MALE&#39;, 1807), (&#39;FEMALE&#39;, 1564), (None, 1505)]}
+</pre></div></div>
+</div>
+<p>We can also facet by the disease name/label. We’ll restrict this to the top 20</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;diseases.term.label&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;diseases.term.label&#39;: [([&#39;Developmental and epileptic encephalopathy 4&#39;],
+   463),
+  ([&#39;Developmental and epileptic encephalopathy 11&#39;], 342),
+  ([&#39;KBG syndrome&#39;], 337),
+  ([&#39;Leber congenital amaurosis 6&#39;], 191),
+  ([&#39;Glass syndrome&#39;], 158),
+  ([&#39;Holt-Oram syndrome&#39;], 103),
+  ([&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;], 95),
+  ([&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;],
+   73),
+  ([&#39;Jacobsen syndrome&#39;], 69),
+  ([&#39;Coffin-Siris syndrome 8&#39;], 65),
+  ([&#39;Kabuki Syndrome 1&#39;], 65),
+  ([&#39;Houge-Janssen syndrome 2&#39;], 60),
+  ([&#39;ZTTK SYNDROME&#39;], 52),
+  ([&#39;Greig cephalopolysyndactyly syndrome&#39;], 51),
+  ([&#39;Seizures, benign familial infantile, 3&#39;], 51),
+  ([&#39;Marfan syndrome&#39;], 50),
+  ([&#39;Mitochondrial DNA depletion syndrome 6 (hepatocerebral type)&#39;], 50),
+  ([&#39;Loeys-Dietz syndrome 3&#39;], 49),
+  ([&#39;Developmental delay, dysmorphic facies, and brain anomalies&#39;], 49),
+  ([&#39;Intellectual developmental disorder, autosomal dominant 21&#39;], 46)]}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;subject.timeAtLastEncounter.age.iso8601duration&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;subject.timeAtLastEncounter.age.iso8601duration&#39;: [(None, 2087),
+  (&#39;P4Y&#39;, 131),
+  (&#39;P3Y&#39;, 114),
+  (&#39;P6Y&#39;, 100),
+  (&#39;P5Y&#39;, 97),
+  (&#39;P2Y&#39;, 95),
+  (&#39;P7Y&#39;, 85),
+  (&#39;P10Y&#39;, 82),
+  (&#39;P9Y&#39;, 77),
+  (&#39;P8Y&#39;, 71)]}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;interpretations.diagnosis.genomicInterpretations.variantInterpretation.variationDescriptor.geneContext.symbol&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;interpretations.diagnosis.genomicInterpretations.variantInterpretation.variationDescriptor.geneContext.symbol&#39;: [([[&#39;STXBP1&#39;]],
+   463),
+  ([[&#39;SCN2A&#39;]], 393),
+  ([[&#39;ANKRD11&#39;]], 337),
+  ([[&#39;RPGRIP1&#39;]], 185),
+  ([[&#39;SATB2&#39;]], 158),
+  ([[&#39;FBN1&#39;]], 151),
+  ([[&#39;LMNA&#39;]], 127),
+  ([[&#39;TBX5&#39;]], 103),
+  ([[&#39;SPTAN1&#39;]], 85),
+  ([[&#39;GLI3&#39;]], 82)]}
+</pre></div></div>
+</div>
+<p>We can also facet on combinations:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">fqr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">,</span> <span class="s2">&quot;diseases.term.label&quot;</span><span class="p">)],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fqr</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{(&#39;subject.sex&#39;,
+  &#39;diseases.term.label&#39;): [({&#39;diseasestermlabel&#39;: [&#39;Developmental and epileptic encephalopathy 4&#39;]},
+   463), ({&#39;diseasestermlabel&#39;: [&#39;Developmental and epileptic encephalopathy 11&#39;]},
+   342), ({&#39;diseasestermlabel&#39;: [&#39;Leber congenital amaurosis 6&#39;]},
+   191), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;KBG syndrome&#39;]}, 175), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;KBG syndrome&#39;]},
+   143), ({&#39;subjectsex&#39;: &#39;MALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Glass syndrome&#39;]},
+   90), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Glass syndrome&#39;]},
+   62), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;]},
+   58), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;]},
+   54), ({&#39;diseasestermlabel&#39;: [&#39;Holt-Oram syndrome&#39;]},
+   53), ({&#39;diseasestermlabel&#39;: [&#39;Greig cephalopolysyndactyly syndrome&#39;]}, 51), ({&#39;diseasestermlabel&#39;: [&#39;Seizures, benign familial infantile, 3&#39;]},
+   51), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Jacobsen syndrome&#39;]},
+   49), ({&#39;diseasestermlabel&#39;: [&#39;Emery-Dreifuss muscular dystrophy 2, autosomal dominant&#39;]},
+   41), ({&#39;diseasestermlabel&#39;: [&#39;Cone-rod dystrophy 13&#39;]},
+   38), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;]}, 37), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;Coffin-Siris syndrome 8&#39;]},
+   37), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Kabuki Syndrome 1&#39;]},
+   35), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
+    &#39;diseasestermlabel&#39;: [&#39;Houge-Janssen syndrome 2&#39;]},
+   32), ({&#39;subjectsex&#39;: &#39;MALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Kabuki Syndrome 1&#39;]},
+   30)]}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="k">def</span> <span class="nf">fqr_as_dfs</span><span class="p">(</span><span class="n">fqr</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vs</span> <span class="ow">in</span> <span class="n">fqr</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">vs</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">rows</span><span class="p">)</span>
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfs</span>
+
+<span class="n">fqr_as_dfs</span><span class="p">(</span><span class="n">fqr</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>subject.sex</th>
+      <th>diseases.term.label</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Developmental and epileptic encephalopathy 4</td>
+      <td>NaN</td>
+      <td>463</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Developmental and epileptic encephalopathy 11</td>
+      <td>NaN</td>
+      <td>342</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Leber congenital amaurosis 6</td>
+      <td>NaN</td>
+      <td>191</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>MALE</td>
+      <td>KBG syndrome</td>
+      <td>175</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>FEMALE</td>
+      <td>KBG syndrome</td>
+      <td>143</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>MALE</td>
+      <td>Glass syndrome</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>FEMALE</td>
+      <td>Glass syndrome</td>
+      <td>62</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>MALE</td>
+      <td>Mitochondrial DNA depletion syndrome 13 (encep...</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>MALE</td>
+      <td>Neurodevelopmental disorder with coarse facies...</td>
+      <td>54</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Holt-Oram syndrome</td>
+      <td>NaN</td>
+      <td>53</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Greig cephalopolysyndactyly syndrome</td>
+      <td>NaN</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Seizures, benign familial infantile, 3</td>
+      <td>NaN</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>FEMALE</td>
+      <td>Jacobsen syndrome</td>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Emery-Dreifuss muscular dystrophy 2, autosomal...</td>
+      <td>NaN</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>Cone-rod dystrophy 13</td>
+      <td>NaN</td>
+      <td>38</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>FEMALE</td>
+      <td>Mitochondrial DNA depletion syndrome 13 (encep...</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>MALE</td>
+      <td>Coffin-Siris syndrome 8</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>FEMALE</td>
+      <td>Kabuki Syndrome 1</td>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>MALE</td>
+      <td>Houge-Janssen syndrome 2</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>MALE</td>
+      <td>Kabuki Syndrome 1</td>
+      <td>30</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
 </div>
 </section>
 <section id="Semantic-Search">
 <h2>Semantic Search<a class="headerlink" href="#Semantic-Search" title="Link to this heading"></a></h2>
 <p>We will index phenopackets using a template that extracts the subject, phenotypic features and diseases.</p>
+<p>First we will create a textualization template for a phenopacket. We will keep it minimal for simplicity - this doesn’t include treatments, families, etc.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -493,8 +834,9 @@
 </pre></div>
 </div>
 </div>
+<p>Next we will create an indexer using the template. This will use the Jinja2 syntax for templating. We will also cache LLM embedding queries, so if we want to incrementally add new phenopackets we can avoid re-running the LLM embeddings calls.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_indexer</span> <span class="kn">import</span> <span class="n">LLMIndexer</span>
@@ -508,25 +850,29 @@
 </pre></div>
 </div>
 </div>
+<p>We can test the template on the first row of the collection:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">index</span><span class="o">.</span><span class="n">object_to_text</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">object_to_text</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&#34;\nsubject: {&#39;id&#39;: &#39;Higgins-Patient-1&#39;, &#39;timeAtLastEncounter&#39;: {&#39;age&#39;: {&#39;iso8601duration&#39;: &#39;P17Y&#39;}}, &#39;sex&#39;: &#39;FEMALE&#39;}\nphenotypes: Ventricular hypertrophyHeart murmurHypertrophic cardiomyopathyShort statureHypertelorismLow-set earsPosteriorly rotated earsGlobal developmental delayCognitive impairmentCardiac arrest\ndiseases: Noonan syndrome-11&#34;
+
+subject: {&#39;id&#39;: &#39;Higgins-Patient-1&#39;, &#39;timeAtLastEncounter&#39;: {&#39;age&#39;: {&#39;iso8601duration&#39;: &#39;P17Y&#39;}}, &#39;sex&#39;: &#39;FEMALE&#39;}
+phenotypes: Ventricular hypertrophyHeart murmurHypertrophic cardiomyopathyShort statureHypertelorismLow-set earsPosteriorly rotated earsGlobal developmental delayCognitive impairmentCardiac arrest
+diseases: Noonan syndrome-11
 </pre></div></div>
 </div>
+<p>That looks as expected. We can now attach the indexer to the collection and index the collection:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -545,20 +891,20 @@
 </pre></div></div>
 </div>
 </section>
-<section id="Queries">
-<h2>Queries<a class="headerlink" href="#Queries" title="Link to this heading"></a></h2>
-<p>We can specify key-value constraints:</p>
+<section id="id1">
+<h2>Semantic Search<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>Let’s query based on text criteria:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;older males with liver disease&quot;</span><span class="p">)</span>
-<span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;patients with liver diseases&quot;</span><span class="p">)</span>
+<span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -592,7 +938,7 @@
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.794360</td>
+      <td>0.824664</td>
       <td>PMID_30658709_patient</td>
       <td>{'id': 'patient', 'timeAtLastEncounter': {'age...</td>
       <td>[{'type': {'id': 'HP:0031956', 'label': 'Eleva...</td>
@@ -602,7 +948,17 @@
     </tr>
     <tr>
       <th>1</th>
-      <td>0.786465</td>
+      <td>0.813827</td>
+      <td>PMID_36932076_Patient_1</td>
+      <td>{'id': 'Patient 1', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0000979', 'label': 'Purpu...</td>
+      <td>[{'id': 'Patient 1', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:620376', 'label': 'Auto...</td>
+      <td>{'created': '2024-04-19T06:07:57.188061952Z', ...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.804126</td>
       <td>PMID_37303127_6</td>
       <td>{'id': '6', 'timeAtLastEncounter': {'age': {'i...</td>
       <td>[{'type': {'id': 'HP:0001397', 'label': 'Hepat...</td>
@@ -611,18 +967,18 @@
       <td>{'created': '2024-03-23T17:41:42.999521017Z', ...</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>0.785974</td>
-      <td>PMID_22508010_22508010_P1</td>
-      <td>{'id': '22508010_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0006562', 'label': 'Viral...</td>
-      <td>[{'id': '22508010_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:35.860860824Z', ...</td>
+      <th>3</th>
+      <td>0.799738</td>
+      <td>PMID_36932076_Patient_3</td>
+      <td>{'id': 'Patient 3', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0001511', 'label': 'Intra...</td>
+      <td>[{'id': 'Patient 3', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:620376', 'label': 'Auto...</td>
+      <td>{'created': '2024-04-19T06:07:57.190312862Z', ...</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>0.785179</td>
+      <th>4</th>
+      <td>0.799243</td>
       <td>PMID_27536553_27536553_P3</td>
       <td>{'id': '27536553_P3', 'timeAtLastEncounter': {...</td>
       <td>[{'type': {'id': 'HP:0001396', 'label': 'Chole...</td>
@@ -630,72 +986,13 @@
       <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
       <td>{'created': '2024-03-23T19:28:35.688389062Z', ...</td>
     </tr>
-    <tr>
-      <th>4</th>
-      <td>0.781917</td>
-      <td>PMID_27536553_27536553_P2</td>
-      <td>{'id': '27536553_P2', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0001396', 'label': 'Chole...</td>
-      <td>[{'id': '27536553_P2', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:35.674263954Z', ...</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>0.778760</td>
-      <td>PMID_25129007_25129007_P1</td>
-      <td>{'id': '25129007_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0000952', 'label': 'Jaund...</td>
-      <td>[{'id': '25129007_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:36.169033050Z', ...</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>0.776784</td>
-      <td>PMID_24894789_24894789_P1</td>
-      <td>{'id': '24894789_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0000952', 'label': 'Jaund...</td>
-      <td>[{'id': '24894789_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:36.148879051Z', ...</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>0.776577</td>
-      <td>PMID_27536553_27536553_P1</td>
-      <td>{'id': '27536553_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0001396', 'label': 'Chole...</td>
-      <td>[{'id': '27536553_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:35.665367126Z', ...</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>0.776096</td>
-      <td>PMID_34023347_34023347_P1</td>
-      <td>{'id': '34023347_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0006554', 'label': 'Acute...</td>
-      <td>[{'id': '34023347_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:35.581506967Z', ...</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>0.775122</td>
-      <td>PMID_28209105_28209105_P1</td>
-      <td>{'id': '28209105_P1', 'timeAtLastEncounter': {...</td>
-      <td>[{'type': {'id': 'HP:0001508', 'label': 'Failu...</td>
-      <td>[{'id': '28209105_P1', 'progressStatus': 'SOLV...</td>
-      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
-      <td>{'created': '2024-03-23T19:28:35.655704975Z', ...</td>
-    </tr>
   </tbody>
 </table>
 </div></div>
 </div>
+<p>Let’s check the first one</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -703,12 +1000,12 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(0.7943603537606876,
+(0.8246637496927007,
  {&#39;id&#39;: &#39;PMID_30658709_patient&#39;,
   &#39;subject&#39;: {&#39;id&#39;: &#39;patient&#39;,
    &#39;timeAtLastEncounter&#39;: {&#39;age&#39;: {&#39;iso8601duration&#39;: &#39;P1Y11M&#39;}},
@@ -806,12 +1103,195 @@
      &#39;description&#39;: &#39;Novel compound heterozygote mutations of TJP2 in a Chinese child with progressive cholestatic liver disease&#39;}]}})
 </pre></div></div>
 </div>
+<p>We can combine semantic search with queries:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;patients with liver diseases&quot;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">:</span> <span class="s2">&quot;MALE&quot;</span><span class="p">})</span>
+<span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>score</th>
+      <th>id</th>
+      <th>subject</th>
+      <th>phenotypicFeatures</th>
+      <th>interpretations</th>
+      <th>diseases</th>
+      <th>metaData</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.813827</td>
+      <td>PMID_36932076_Patient_1</td>
+      <td>{'id': 'Patient 1', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0000979', 'label': 'Purpu...</td>
+      <td>[{'id': 'Patient 1', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:620376', 'label': 'Auto...</td>
+      <td>{'created': '2024-04-19T06:07:57.188061952Z', ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.799738</td>
+      <td>PMID_36932076_Patient_3</td>
+      <td>{'id': 'Patient 3', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0001511', 'label': 'Intra...</td>
+      <td>[{'id': 'Patient 3', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:620376', 'label': 'Auto...</td>
+      <td>{'created': '2024-04-19T06:07:57.190312862Z', ...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.799243</td>
+      <td>PMID_27536553_27536553_P3</td>
+      <td>{'id': '27536553_P3', 'timeAtLastEncounter': {...</td>
+      <td>[{'type': {'id': 'HP:0001396', 'label': 'Chole...</td>
+      <td>[{'id': '27536553_P3', 'progressStatus': 'SOLV...</td>
+      <td>[{'term': {'id': 'OMIM:256810', 'label': 'Mito...</td>
+      <td>{'created': '2024-03-23T19:28:35.688389062Z', ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.798670</td>
+      <td>PMID_29321044_Patient_3</td>
+      <td>{'id': 'Patient 3', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0031956', 'label': 'Eleva...</td>
+      <td>[{'id': 'Patient 3', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:616829', 'label': 'Cong...</td>
+      <td>{'created': '2024-05-11T06:05:50.632786035Z', ...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.798010</td>
+      <td>PMID_36517554_patient_1</td>
+      <td>{'id': 'patient 1', 'timeAtLastEncounter': {'a...</td>
+      <td>[{'type': {'id': 'HP:0002240', 'label': 'Hepat...</td>
+      <td>[{'id': 'patient 1', 'progressStatus': 'SOLVED...</td>
+      <td>[{'term': {'id': 'OMIM:620603', 'label': 'Immu...</td>
+      <td>{'created': '2024-03-29T11:25:36.649104833Z', ...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
 </section>
 <section id="Validation">
 <h2>Validation<a class="headerlink" href="#Validation" title="Link to this heading"></a></h2>
-<p><strong>TODO</strong></p>
+<p>Next we will demonstrate validation over a whole collection.</p>
+<p>Currently validating depends on a LinkML schema - we have previously copied this schema into the test folder. We will load the schema into the database object:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">load_schema_view</span><span class="p">(</span><span class="s2">&quot;../../tests/input/phenopackets_linkml/phenopackets.yaml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Quick sanity check to ensure that worked:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">schema_view</span><span class="o">.</span><span class="n">all_classes</span><span class="p">())[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;Age&#39;,
+ &#39;AgeRange&#39;,
+ &#39;Dictionary&#39;,
+ &#39;Evidence&#39;,
+ &#39;ExternalReference&#39;,
+ &#39;File&#39;,
+ &#39;GestationalAge&#39;,
+ &#39;OntologyClass&#39;,
+ &#39;Procedure&#39;,
+ &#39;TimeElement&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;Phenopacket&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_runtime.dumpers</span> <span class="kn">import</span> <span class="n">yaml_dumper</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">iter_validate_database</span><span class="p">():</span>
+    <span class="c1"># known issue - https://github.com/monarch-initiative/phenopacket-store/issues/97</span>
+    <span class="k">if</span> <span class="s2">&quot;is not of type &#39;integer&#39;&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">message</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected validation error&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Command-Line-Usage">
+<h2>Command Line Usage<a class="headerlink" href="#Command-Line-Usage" title="Link to this heading"></a></h2>
+<p>We can also use the command line for all of the above operations.</p>
+<p>For example, feceted queries:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>subject.sex
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;subject.sex&#34;: {
+    &#34;MALE&#34;: 1807,
+    &#34;FEMALE&#34;: 1564,
+    &#34;None&#34;: 1505
+  }
+}
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
@@ -877,12 +1357,16 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How to index Phenopackets with LinkML-Store</a><ul>
+<li><a class="reference internal" href="#Use-pystow-to-download-phenopackets">Use pystow to download phenopackets</a></li>
 <li><a class="reference internal" href="#Creating-a-client-and-attaching-to-a-database">Creating a client and attaching to a database</a></li>
 <li><a class="reference internal" href="#Creating-a-collection">Creating a collection</a></li>
-<li><a class="reference internal" href="#Loading">Loading</a></li>
+<li><a class="reference internal" href="#Inserting-objects-into-the-store">Inserting objects into the store</a></li>
+<li><a class="reference internal" href="#Check-contents">Check contents</a></li>
+<li><a class="reference internal" href="#Query-faceting">Query faceting</a></li>
 <li><a class="reference internal" href="#Semantic-Search">Semantic Search</a></li>
-<li><a class="reference internal" href="#Queries">Queries</a></li>
+<li><a class="reference internal" href="#id1">Semantic Search</a></li>
 <li><a class="reference internal" href="#Validation">Validation</a></li>
+<li><a class="reference internal" href="#Command-Line-Usage">Command Line Usage</a></li>
 </ul>
 </li>
 </ul>
