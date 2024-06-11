@@ -15,18 +15,16 @@ from linkml_store.utils.sql_utils import facet_count_sql
 logger = logging.getLogger(__name__)
 
 
-class DuckDBCollection(Collection):
+class FileSystemCollection(Collection):
     _table_created: bool = None
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
-        logger.debug(f"Inserting {len(objs)}")
         if not isinstance(objs, list):
             objs = [objs]
         if not objs:
             return
         cd = self.class_definition()
         if not cd:
-            logger.debug(f"No class definition defined for {self.alias} {self.target_class_name}; will induce")
             cd = self.induce_class_definition_from_objects(objs)
         self._create_table(cd)
         table = self._sqla_table(cd)

@@ -189,6 +189,7 @@ def test_store_explicit_schema(cli_runner, output_dir):
     database_handle = f"duckdb:///{db_path}"
     input_path = INPUT_DIR / "nested.yaml"
     input_schema_path = INPUT_DIR / "nested.schema.yaml"
+    # store the objects, using the schema
     result = cli_runner.invoke(
         cli,
         [
@@ -201,6 +202,7 @@ def test_store_explicit_schema(cli_runner, output_dir):
         ],
     )
     assert result.exit_code == 0
+    # now export the schema
     schema_output_path = os.path.join(output_dir, "schema_output.yaml")
     result = cli_runner.invoke(
         cli,
@@ -215,6 +217,6 @@ def test_store_explicit_schema(cli_runner, output_dir):
     assert result.exit_code == 0
     schema_dict = yaml.safe_load(Path(schema_output_path).read_text())
     classes = schema_dict["classes"]
-    # note we have intentionally "lost" the original containerx
+    # note we have intentionally "lost" the original container
     assert len(classes) == 3
-    assert set(classes.keys()) == {"About", "Person", "Organization"}
+    assert set(classes.keys()) == {"about", "persons", "organizations"}

@@ -9,7 +9,7 @@ from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
 from linkml_store.api.client import Client
-from linkml_store.api.config import ClientConfig
+from linkml_store.api.config import ClientConfig, CollectionConfig
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.api.stores.solr.solr_database import SolrDatabase
@@ -272,8 +272,23 @@ def test_store_nested(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
+def test_load_from_source(handle):
+    """
+    Test syncing with sources
+
+    :param handle:
+    :return:
+    """
+    pytest.skip("TODO - in progress")
+    client = create_client(handle)
+    database = client.get_database()
+    coll = database.create_collection("Country", metadata=CollectionConfig(source_location=str(COUNTRIES_DATA_JSONL)))
+    assert coll.find({}).num_rows > 0
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
 @pytest.mark.parametrize(
-    "name_alias",
+    "type_alias",
     [
         (
             "Person",
@@ -282,23 +297,23 @@ def test_store_nested(handle):
         ("Person", "persons"),
     ],
 )
-def test_induced_schema(handle, name_alias):
+def test_induced_schema(handle, type_alias):
     """
     Test induced schema and collection creation
 
     :param handle:
-    :param name_alias:
+    :param type_alias:
     :return:
     """
-    name, alias = name_alias
+    typ, alias = type_alias
     client = create_client(handle)
     assert len(client.databases) == 1
     database = client.get_database()
     assert len(database.list_collections()) == 0, "fresh database should have no collections"
     if alias:
-        collection = database.create_collection(name, alias=alias)
+        collection = database.create_collection(typ, alias=alias)
     else:
-        collection = database.create_collection(name)
+        collection = database.create_collection(typ)
     assert len(database.list_collections()) == 1, "expected collection to be created"
     assert collection.class_definition() is None, "no explicit schema and no data to induce from"
     # check is empty
@@ -311,11 +326,11 @@ def test_induced_schema(handle, name_alias):
     assert collection.parent.schema_view.schema is not None, "expected schema to be initialized from data"
     assert collection.parent.schema_view.schema.classes, "expected single class to be initialized from data"
     assert len(collection.parent.schema_view.schema.classes) == 1, "expected single class to be initialized from data"
-    assert collection.parent.schema_view.schema.classes[name], "name of class is collection name by default"
+    assert collection.parent.schema_view.schema.classes[typ], "name of class is collection name by default"
     assert (
-        collection.parent.schema_view.schema.classes[name].name == collection.name
+        collection.parent.schema_view.schema.classes[typ].name == collection.target_class_name
     ), "name of class is collection name by default"
-    assert collection.parent.schema_view.get_class(name), "schema view should work"
+    assert collection.parent.schema_view.get_class(typ), "schema view should work"
     assert collection.class_definition() is not None, "expected class definition to be created"
     assert len(database.list_collections()) == 1, "collections should be unmodified"
     assert collection.find().num_rows == len(objs), "expected no change in data"
@@ -332,9 +347,9 @@ def test_induced_schema(handle, name_alias):
     # else:
     #    collection = database.get_collection(name, create_if_not_exists=True)
     sv = database.schema_view
-    cd = sv.get_class(name)
+    cd = sv.get_class(typ)
     assert cd is not None, "class should be named using name (even if alias is set)"
-    assert cd.name == name
+    assert cd.name == typ
     assert len(cd.attributes) == 3, "expected 3 attributes induced from data"
     assert cd.attributes["id"].range == "integer", "expected id to be induced as integer"
     assert cd.attributes["name"].range == "string", "expected name to be induced as string"
@@ -382,7 +397,7 @@ def test_induced_multivalued(handle):
     assert collection.parent.schema_view.schema is not None
     assert collection.parent.schema_view.schema.classes
     assert collection.parent.schema_view.schema.classes["foo"]
-    assert collection.parent.schema_view.schema.classes["foo"].name == collection.name
+    assert collection.parent.schema_view.schema.classes["foo"].name == collection.target_class_name
     assert collection.parent.schema_view.get_class("foo")
     assert collection.class_definition() is not None
     collection.query(collection._create_query())
@@ -655,8 +670,8 @@ def test_from_config_file(name, inserts):
     """
     Test creating a client from a configuration file
 
-    :param name:
-    :param inserts:
+    :param name: configuration name
+    :param inserts: list of (db_alias, collection_alias, rows) tuples
     :return:
     """
     source_dir = INPUT_DIR / "configurations" / name
@@ -670,14 +685,14 @@ def test_from_config_file(name, inserts):
     config = client.metadata
     index = SimpleIndexer(name="test")
 
-    for db_name in config.databases:
-        print(f"DB: {db_name}")
-        db = client.get_database(db_name)
+    for db_alias in config.databases:
+        print(f"DB: {db_alias}")
+        db = client.get_database(db_alias)
         sv = db.schema_view
         print(f"SV: {sv.schema.classes.keys()}")
         for coll in db.list_collections():
-            print(f"Looking up coll: {coll.name} in {config.databases[db_name].collections.keys()}")
-            coll_config = config.databases[db_name].collections[coll.name]
+            print(f"Looking up coll: {coll.alias} in {config.databases[db_alias].collections.keys()}")
+            coll_config = config.databases[db_alias].collections[coll.alias]
             if coll_config.attributes:
                 print(f"Checking CD; expected as schema has {sv.schema.classes.keys()}")
                 cd = coll.class_definition()
@@ -685,18 +700,18 @@ def test_from_config_file(name, inserts):
                 assert cd.attributes.keys() == coll_config.attributes.keys()
 
     for insert in inserts:
-        db_name, coll_name, objs = insert
-        db = client.get_database(db_name)
-        collection = db.get_collection(coll_name)
+        db_alias, coll_alias, objs = insert
+        db = client.get_database(db_alias)
+        collection = db.get_collection(coll_alias)
         assert collection is not None
-        assert collection.name == coll_name
+        assert collection.alias == coll_alias
         collection.insert(objs)
-        print(f"Searching in {coll_name}; TC={collection.target_class_name}, ALIAS={collection.alias}")
+        print(f"Searching in {coll_alias}; TC={collection.target_class_name}, ALIAS={collection.alias}")
         qr = collection.find()
-        assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_name} I= {insert}"
+        assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_type} I= {insert}"
 
-    for db_name in config.databases:
-        db = client.get_database(db_name)
+    for db_alias in config.databases:
+        db = client.get_database(db_alias)
         for coll in db.list_collections():
             coll.attach_indexer(index)
             _results = coll.search("e")

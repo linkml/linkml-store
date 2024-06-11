@@ -6,6 +6,14 @@ About
 LinkML-Store is an early effort to provide a unifying storage layer
 over multiple different backends, unified via LinkML schemas.
 
+The overall goals are to provide:
+
+* Make it easier to work with data in different forms (tabular, JSON, columnar, RDF)
+* Expressive validation at scale, including full referential integrity validation
+* Ability to mix and match different backends (e.g. DuckDB, MongoDB, Solr, ChromaDB, HDF5)
+* Composability of different search indexes, including LLM textual embeddings
+* LAMP-like stack for LinkML
+
 Installation
 ------------
 
