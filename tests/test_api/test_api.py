@@ -708,7 +708,7 @@ def test_from_config_file(name, inserts):
         collection.insert(objs)
         print(f"Searching in {coll_alias}; TC={collection.target_class_name}, ALIAS={collection.alias}")
         qr = collection.find()
-        assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_type} I= {insert}"
+        assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_alias} I= {insert}"
 
     for db_alias in config.databases:
         db = client.get_database(db_alias)
