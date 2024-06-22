@@ -12,6 +12,7 @@ from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
 from linkml_store.index import get_indexer
+from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.object_utils import clean_empties
 
 try:
@@ -69,8 +70,12 @@ class Collection:
             self.metadata = metadata
         else:
             self.metadata = CollectionConfig(name=name, **kwargs)
-        if name is not None and self.metadata.name is not None and name != self.metadata.name:
-            raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
+            if not self.metadata.alias:
+                self.metadata.alias = name
+            if not self.metadata.type:
+                self.metadata.type = name
+        # if name is not None and self.metadata.name is not None and name != self.metadata.name:
+        #    raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
 
     @property
     def name(self) -> str:
@@ -93,7 +98,7 @@ class Collection:
 
         :return: True if the collection is hidden
         """
-        return self.metadata.hidden
+        # return self.metadata.hidden
 
     @property
     def target_class_name(self):
@@ -151,6 +156,7 @@ class Collection:
 
         :return:
         """
+        # TODO: this is a shim layer until we can normalize on this
         # TODO: this is a shim layer until we can normalize on this
         if self.metadata.alias:
             return self.metadata.alias
@@ -444,9 +450,13 @@ class Collection:
 
         :return:
         """
-        if not self.name:
-            raise ValueError(f"Collection has no name: {self} // {self.metadata}")
-        return self.name.startswith("internal__")
+        if not self.alias:
+            raise ValueError(f"Collection has no alias: {self} // {self.metadata}")
+        return self.alias.startswith("internal__")
+
+    def load_from_source(self):
+        objects = load_objects(self.metadata.source_location)
+        self.insert(objects)
 
     def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
@@ -599,6 +609,8 @@ class Collection:
         :param max_sample_size:
         :return:
         """
+        if not self.target_class_name:
+            raise ValueError(f"No target_class_name for {self.alias}")
         cd = ClassDefinition(self.target_class_name)
         keys = defaultdict(list)
         for obj in objs[0:max_sample_size]:

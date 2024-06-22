@@ -125,7 +125,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     ctx.obj["database"] = database
     ctx.obj["collection"] = collection
     if settings.database_name:
-        db = client.attach_database(database)
+        db = client.get_database(database)
         if set:
             for expr in set:
                 if "=" not in expr:

@@ -27,14 +27,27 @@ class Client:
     """
     A client is the top-level object for interacting with databases.
 
-    A client has access to one or more :class:`Database` objects.
+    * A client has access to one or more :class:`.Database` objects.
+    * Each database consists of a number of :class:`.Collection` objects.
 
-    Each database consists of a number of :class:`.Collection` objects.
-
-    Examples
-    --------
+    Creating a client
+    -----------------
     >>> client = Client()
+
+    Attaching a database
+    --------------------
     >>> db = client.attach_database("duckdb", alias="test")
+
+    Note that normally a handle would be specified by a locator such as ``duckdb:///<PATH>``, but
+    for convenience, an in-memory duckdb object can be specified without a full locator
+
+    We can check the actual handle:
+
+    >>> db.handle
+    'duckdb:///:memory:'
+
+    Creating a new collection
+    -------------------------
     >>> collection = db.create_collection("Person")
     >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
     >>> collection.insert(objs)
@@ -171,6 +184,11 @@ class Client:
             self._databases = {}
         self._databases[alias] = db
         db.parent = self
+        if db.alias:
+            if db.alias != alias:
+                raise AssertionError(f"Inconsistent alias: {db.alias} != {alias}")
+        else:
+            db.metadata.alias = alias
         return db
 
     def get_database(self, name: Optional[str] = None, create_if_not_exists=True, **kwargs) -> Database:

@@ -16,7 +16,7 @@ class CollectionConfig(BaseModel):
         default=None,
         description="The type of object in the collection. TODO; use this instead of name",
     )
-    metadata: Optional[Dict] = Field(
+    additional_properties: Optional[Dict] = Field(
         default=None,
         description="Optional metadata for the collection",
     )
@@ -35,6 +35,10 @@ class CollectionConfig(BaseModel):
     is_prepopulated: Optional[bool] = Field(
         default=False,
         description="Whether the collection is prepopulated",
+    )
+    source_location: Optional[str] = Field(
+        default=None,
+        description="Filesystem or remote URL that stores the data",
     )
 
 
@@ -55,7 +59,7 @@ class DatabaseConfig(BaseModel):
         default=None,
         description="The LinkML schema as a dictionary",
     )
-    collections: Dict[str, CollectionConfig] = Field(
+    collections: Optional[Dict[str, CollectionConfig]] = Field(
         default={},
         description="A dictionary of collection configurations",
     )

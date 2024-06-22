@@ -29,13 +29,33 @@ class Database(ABC):
     """
     A Database provides access to named collections of data.
 
-    Examples
-    --------
+    A database object is owned by a :ref:`Client`. The database
+    object uses a :ref:`handle` to know what kind of external
+    dataase system to connect to (e.g. duckdb, mongodb). The handle
+    is a string ``<DatabaseType>:<LocalLocator>``
+
+    The
+    database object may also have an :ref:`alias` that is mapped
+    to the handle.
+
+    Attaching a database
+    --------------------
     >>> from linkml_store.api.client import Client
     >>> client = Client()
-    >>> db = client.attach_database("duckdb", alias="test")
+    >>> db = client.attach_database("duckdb:///:memory:", alias="test")
+
+    We can check the value of the handle:
+
     >>> db.handle
     'duckdb:///:memory:'
+
+    The alias can be used to retrieve the database object from the client
+
+    >>> assert db == client.get_database("test")
+
+    Creating a collection
+    ---------------------
+
     >>> collection = db.create_collection("Person")
     >>> len(db.list_collections())
     1
@@ -108,6 +128,8 @@ class Database(ABC):
         return self
 
     def _initialize_collections(self):
+        if not self.metadata.collections:
+            return
         for name, collection_config in self.metadata.collections.items():
             alias = collection_config.alias
             typ = collection_config.type
@@ -156,6 +178,10 @@ class Database(ABC):
         """
         return self.metadata.handle
 
+    @property
+    def alias(self):
+        return self.metadata.alias
+
     def store(self, obj: Dict[str, Any], **kwargs):
         """
         Store an object in the database.
@@ -193,9 +219,11 @@ class Database(ABC):
             if not v:
                 continue
             if slot:
-                collection = self.get_collection(slot.range, create_if_not_exists=True)
+                logger.debug(f"Aligning to existing slot: {slot.name} range={slot.range}")
+                collection = self.get_collection(slot.name, type=slot.range, create_if_not_exists=True)
             else:
                 collection = self.get_collection(k, create_if_not_exists=True)
+            logger.debug(f"Replacing using {collection.alias} {collection.target_class_name}")
             collection.replace(v)
 
     def commit(self, **kwargs):
@@ -260,6 +288,8 @@ class Database(ABC):
             raise ValueError(f"Collection name must be provided: alias: {alias} metadata: {metadata}")
         collection_cls = self.collection_class
         collection = collection_cls(name=name, alias=alias, parent=self, metadata=metadata)
+        if metadata and metadata.source_location:
+            collection.load_from_source()
         if metadata and metadata.attributes:
             sv = self.schema_view
             schema = sv.schema
@@ -318,7 +348,9 @@ class Database(ABC):
         """
         return [c.name for c in self.list_collections(**kwargs)]
 
-    def get_collection(self, name: str, create_if_not_exists=True, **kwargs) -> "Collection":
+    def get_collection(
+        self, name: str, type: Optional[str] = None, create_if_not_exists=True, **kwargs
+    ) -> "Collection":
         """
         Get a named collection.
 
@@ -336,14 +368,19 @@ class Database(ABC):
         KeyError: 'Collection NonExistent does not exist'
 
         :param name: name of the collection
+        :param type: target class name
         :param create_if_not_exists: create the collection if it does not exist
 
         """
         if not self._collections:
+            logger.debug("Initializing collections")
             self.init_collections()
         if name not in self._collections.keys():
             if create_if_not_exists:
-                self._collections[name] = self.create_collection(name)
+                if type is None:
+                    type = name
+                logger.debug(f"Creating new collection: {name} kwargs: {kwargs}")
+                self._collections[name] = self.create_collection(type, alias=name, **kwargs)
             else:
                 raise KeyError(f"Collection {name} does not exist")
         return self._collections[name]
@@ -470,8 +507,7 @@ class Database(ABC):
                 if inlined and slot.range:
                     if slot.name in self._collections:
                         coll = self._collections[slot.name]
-                        if not coll.metadata.type:
-                            coll.metadata.type = slot.range
+                        coll.metadata.type = slot.range
 
     def load_schema_view(self, path: Union[str, Path]):
         """
@@ -538,7 +574,7 @@ class Database(ABC):
         >>> db = client.attach_database("duckdb", alias="test")
         >>> db.load_schema_view("tests/input/countries/countries.linkml.yaml")
 
-        Let's introspet the schema to see what slots are applicable for the class "Country":
+        Let's introspect the schema to see what slots are applicable for the class "Country":
 
         >>> sv = db.schema_view
         >>> for slot in sv.class_induced_slots("Country"):

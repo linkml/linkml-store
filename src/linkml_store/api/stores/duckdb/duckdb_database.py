@@ -116,7 +116,10 @@ class DuckDBDatabase(Database):
 
     def init_collections(self):
         # TODO: unify schema introspection
-        schema = introspect_schema(self.engine)
+        if not self.schema_view:
+            schema = introspect_schema(self.engine)
+        else:
+            schema = self.schema_view.schema
         table_names = schema.classes.keys()
         if self._collections is None:
             self._collections = {}
