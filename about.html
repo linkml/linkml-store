@@ -283,6 +283,14 @@
 <h1>About<a class="headerlink" href="#about" title="Link to this heading"></a></h1>
 <p>LinkML-Store is an early effort to provide a unifying storage layer
 over multiple different backends, unified via LinkML schemas.</p>
+<p>The overall goals are to provide:</p>
+<ul class="simple">
+<li><p>Make it easier to work with data in different forms (tabular, JSON, columnar, RDF)</p></li>
+<li><p>Expressive validation at scale, including full referential integrity validation</p></li>
+<li><p>Ability to mix and match different backends (e.g. DuckDB, MongoDB, Solr, ChromaDB, HDF5)</p></li>
+<li><p>Composability of different search indexes, including LLM textual embeddings</p></li>
+<li><p>LAMP-like stack for LinkML</p></li>
+</ul>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>linkml-store

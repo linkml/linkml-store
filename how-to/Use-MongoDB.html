@@ -307,12 +307,46 @@
 </pre></div>
 </div>
 </div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">handle</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;mongodb://localhost:27017&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;{&#34;handle&#34;:&#34;mongodb://localhost:27017&#34;,&#34;alias&#34;:&#34;test&#34;,&#34;schema_location&#34;:null,&#34;schema_dict&#34;:null,&#34;collections&#34;:{},&#34;recreate_if_exists&#34;:false,&#34;collection_type_slot&#34;:null,&#34;searchable_slots&#34;:null,&#34;ensure_referential_integrity&#34;:false}&#39;
+</pre></div></div>
+</div>
 </section>
 <section id="Creating-a-collection">
 <h2>Creating a collection<a class="headerlink" href="#Creating-a-collection" title="Link to this heading"></a></h2>
 <p>We’ll create a simple test collection. The concept of collection in linkml-store maps directly to mongodb collections</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -324,7 +358,7 @@
 <h2>Preparing data to load<a class="headerlink" href="#Preparing-data-to-load" title="Link to this heading"></a></h2>
 <p>Next we’ll parse an (incomplete) list of countries in JSON-Lines format:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">COUNTRIES</span> <span class="o">=</span> <span class="s2">&quot;../../tests/input/countries/countries.jsonl&quot;</span>
@@ -332,7 +366,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">load_objects</span>
@@ -343,7 +377,7 @@
 </div>
 <p>Let’s check with pandas just to make sure it looks as expected:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -352,7 +386,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -551,7 +585,7 @@
 <h2>Inserting objects<a class="headerlink" href="#Inserting-objects" title="Link to this heading"></a></h2>
 <p>We will call <code class="docutils literal notranslate"><span class="pre">insert</span></code> on the collection to add the objects. Note we haven’t specified a schema - this will be induced.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
@@ -560,7 +594,7 @@
 </div>
 <p>Let’s check this worked by querying:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">()</span>
@@ -568,7 +602,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -576,7 +610,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -775,7 +809,7 @@
 <h2>Queries<a class="headerlink" href="#Queries" title="Link to this heading"></a></h2>
 <p>We can specify key-value constraints:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;continent&quot;</span><span class="p">:</span> <span class="s2">&quot;Europe&quot;</span><span class="p">})</span>
@@ -783,7 +817,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -791,7 +825,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -871,7 +905,7 @@
 <p>We will now do a query fetching facet counts for all fields.</p>
 <p>Unlike Solr, MongoDB doesn’t facet natively but under the hood linkml-store implements the necessary logic</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">fc</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">()</span>
@@ -879,7 +913,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">fc</span><span class="p">[</span><span class="s2">&quot;continent&quot;</span><span class="p">]</span>
@@ -887,13 +921,13 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[(&#39;Asia&#39;, 5),
- (&#39;Europe&#39;, 5),
+[(&#39;Europe&#39;, 5),
+ (&#39;Asia&#39;, 5),
  (&#39;North America&#39;, 3),
  (&#39;Africa&#39;, 3),
  (&#39;South America&#39;, 2),
@@ -905,7 +939,7 @@
 <h2>Creating an LLM embedding index<a class="headerlink" href="#Creating-an-LLM-embedding-index" title="Link to this heading"></a></h2>
 <p>We will now attach an indexer. By default the <code class="docutils literal notranslate"><span class="pre">llm</span></code> indexer uses OpenAI so you will need a key:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="s2">&quot;llm&quot;</span><span class="p">)</span>
@@ -914,7 +948,7 @@
 </div>
 <p>We can now query using the index. Note that search terms need only be <em>semantically</em> related, they don’t need to contain the same lexical elements</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;countries with a King or Queen&quot;</span><span class="p">)</span>
@@ -923,7 +957,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -956,7 +990,7 @@
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.771005</td>
+      <td>0.770891</td>
       <td>United Kingdom</td>
       <td>GB</td>
       <td>London</td>
@@ -965,7 +999,7 @@
     </tr>
     <tr>
       <th>1</th>
-      <td>0.758345</td>
+      <td>0.758388</td>
       <td>Australia</td>
       <td>AU</td>
       <td>Canberra</td>
@@ -974,7 +1008,7 @@
     </tr>
     <tr>
       <th>2</th>
-      <td>0.754094</td>
+      <td>0.754203</td>
       <td>South Korea</td>
       <td>KR</td>
       <td>Seoul</td>
@@ -983,16 +1017,7 @@
     </tr>
     <tr>
       <th>3</th>
-      <td>0.750437</td>
-      <td>United States</td>
-      <td>US</td>
-      <td>Washington, D.C.</td>
-      <td>North America</td>
-      <td>[English]</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.750217</td>
+      <td>0.750652</td>
       <td>New Zealand</td>
       <td>NZ</td>
       <td>Wellington</td>
@@ -1000,8 +1025,17 @@
       <td>[English, Māori]</td>
     </tr>
     <tr>
+      <th>4</th>
+      <td>0.750419</td>
+      <td>United States</td>
+      <td>US</td>
+      <td>Washington, D.C.</td>
+      <td>North America</td>
+      <td>[English]</td>
+    </tr>
+    <tr>
       <th>5</th>
-      <td>0.748993</td>
+      <td>0.748973</td>
       <td>South Africa</td>
       <td>ZA</td>
       <td>Pretoria</td>
@@ -1010,7 +1044,7 @@
     </tr>
     <tr>
       <th>6</th>
-      <td>0.748223</td>
+      <td>0.748322</td>
       <td>Canada</td>
       <td>CA</td>
       <td>Ottawa</td>
@@ -1019,7 +1053,7 @@
     </tr>
     <tr>
       <th>7</th>
-      <td>0.746446</td>
+      <td>0.746444</td>
       <td>France</td>
       <td>FR</td>
       <td>Paris</td>
@@ -1028,7 +1062,7 @@
     </tr>
     <tr>
       <th>8</th>
-      <td>0.745456</td>
+      <td>0.745408</td>
       <td>Germany</td>
       <td>DE</td>
       <td>Berlin</td>
@@ -1037,7 +1071,7 @@
     </tr>
     <tr>
       <th>9</th>
-      <td>0.743408</td>
+      <td>0.743449</td>
       <td>Spain</td>
       <td>ES</td>
       <td>Madrid</td>
@@ -1046,7 +1080,7 @@
     </tr>
     <tr>
       <th>10</th>
-      <td>0.739835</td>
+      <td>0.739856</td>
       <td>China</td>
       <td>CN</td>
       <td>Beijing</td>
@@ -1055,7 +1089,7 @@
     </tr>
     <tr>
       <th>11</th>
-      <td>0.739585</td>
+      <td>0.739504</td>
       <td>Nigeria</td>
       <td>NG</td>
       <td>Abuja</td>
@@ -1064,7 +1098,7 @@
     </tr>
     <tr>
       <th>12</th>
-      <td>0.738728</td>
+      <td>0.738601</td>
       <td>Egypt</td>
       <td>EG</td>
       <td>Cairo</td>
@@ -1073,7 +1107,7 @@
     </tr>
     <tr>
       <th>13</th>
-      <td>0.735895</td>
+      <td>0.735424</td>
       <td>Brazil</td>
       <td>BR</td>
       <td>Brasília</td>
@@ -1082,7 +1116,7 @@
     </tr>
     <tr>
       <th>14</th>
-      <td>0.735177</td>
+      <td>0.735056</td>
       <td>Mexico</td>
       <td>MX</td>
       <td>Mexico City</td>
@@ -1091,7 +1125,7 @@
     </tr>
     <tr>
       <th>15</th>
-      <td>0.734055</td>
+      <td>0.733898</td>
       <td>Japan</td>
       <td>JP</td>
       <td>Tokyo</td>
@@ -1100,7 +1134,7 @@
     </tr>
     <tr>
       <th>16</th>
-      <td>0.731329</td>
+      <td>0.731288</td>
       <td>Argentina</td>
       <td>AR</td>
       <td>Buenos Aires</td>
@@ -1109,7 +1143,7 @@
     </tr>
     <tr>
       <th>17</th>
-      <td>0.728073</td>
+      <td>0.728014</td>
       <td>Indonesia</td>
       <td>ID</td>
       <td>Jakarta</td>
@@ -1118,7 +1152,7 @@
     </tr>
     <tr>
       <th>18</th>
-      <td>0.724353</td>
+      <td>0.724164</td>
       <td>India</td>
       <td>IN</td>
       <td>New Delhi</td>
@@ -1127,7 +1161,7 @@
     </tr>
     <tr>
       <th>19</th>
-      <td>0.723590</td>
+      <td>0.723299</td>
       <td>Italy</td>
       <td>IT</td>
       <td>Rome</td>
@@ -1140,7 +1174,7 @@
 </div>
 <p>The precise ranking could be debated, but in terms of rough semantic distance the first answer is in the right ballpark, at the time of writing.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span>
@@ -1148,7 +1182,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1157,7 +1191,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span>
@@ -1165,42 +1199,42 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[(0.7710047523911066,
+[(0.7708908770614274,
   {&#39;name&#39;: &#39;United Kingdom&#39;,
    &#39;code&#39;: &#39;GB&#39;,
    &#39;capital&#39;: &#39;London&#39;,
    &#39;continent&#39;: &#39;Europe&#39;,
    &#39;languages&#39;: [&#39;English&#39;]}),
- (0.7583452373538249,
+ (0.7583880255490492,
   {&#39;name&#39;: &#39;Australia&#39;,
    &#39;code&#39;: &#39;AU&#39;,
    &#39;capital&#39;: &#39;Canberra&#39;,
    &#39;continent&#39;: &#39;Oceania&#39;,
    &#39;languages&#39;: [&#39;English&#39;]}),
- (0.7540936603499173,
+ (0.754202745445488,
   {&#39;name&#39;: &#39;South Korea&#39;,
    &#39;code&#39;: &#39;KR&#39;,
    &#39;capital&#39;: &#39;Seoul&#39;,
    &#39;continent&#39;: &#39;Asia&#39;,
    &#39;languages&#39;: [&#39;Korean&#39;]}),
- (0.7504374327081739,
-  {&#39;name&#39;: &#39;United States&#39;,
-   &#39;code&#39;: &#39;US&#39;,
-   &#39;capital&#39;: &#39;Washington, D.C.&#39;,
-   &#39;continent&#39;: &#39;North America&#39;,
-   &#39;languages&#39;: [&#39;English&#39;]}),
- (0.7502171566966283,
+ (0.7506523769140084,
   {&#39;name&#39;: &#39;New Zealand&#39;,
    &#39;code&#39;: &#39;NZ&#39;,
    &#39;capital&#39;: &#39;Wellington&#39;,
    &#39;continent&#39;: &#39;Oceania&#39;,
    &#39;languages&#39;: [&#39;English&#39;, &#39;Māori&#39;]}),
- (0.748992841890395,
+ (0.7504190890778679,
+  {&#39;name&#39;: &#39;United States&#39;,
+   &#39;code&#39;: &#39;US&#39;,
+   &#39;capital&#39;: &#39;Washington, D.C.&#39;,
+   &#39;continent&#39;: &#39;North America&#39;,
+   &#39;languages&#39;: [&#39;English&#39;]}),
+ (0.7489726600700292,
   {&#39;name&#39;: &#39;South Africa&#39;,
    &#39;code&#39;: &#39;ZA&#39;,
    &#39;capital&#39;: &#39;Pretoria&#39;,
@@ -1216,85 +1250,85 @@
     &#39;Swazi&#39;,
     &#39;Venda&#39;,
     &#39;Southern Ndebele&#39;]}),
- (0.74822283101589,
+ (0.7483222334041403,
   {&#39;name&#39;: &#39;Canada&#39;,
    &#39;code&#39;: &#39;CA&#39;,
    &#39;capital&#39;: &#39;Ottawa&#39;,
    &#39;continent&#39;: &#39;North America&#39;,
    &#39;languages&#39;: [&#39;English&#39;, &#39;French&#39;]}),
- (0.7464458557589044,
+ (0.7464438929713734,
   {&#39;name&#39;: &#39;France&#39;,
    &#39;code&#39;: &#39;FR&#39;,
    &#39;capital&#39;: &#39;Paris&#39;,
    &#39;continent&#39;: &#39;Europe&#39;,
    &#39;languages&#39;: [&#39;French&#39;]}),
- (0.7454555562192956,
+ (0.7454078196210195,
   {&#39;name&#39;: &#39;Germany&#39;,
    &#39;code&#39;: &#39;DE&#39;,
    &#39;capital&#39;: &#39;Berlin&#39;,
    &#39;continent&#39;: &#39;Europe&#39;,
    &#39;languages&#39;: [&#39;German&#39;]}),
- (0.7434083913303983,
+ (0.7434487849009042,
   {&#39;name&#39;: &#39;Spain&#39;,
    &#39;code&#39;: &#39;ES&#39;,
    &#39;capital&#39;: &#39;Madrid&#39;,
    &#39;continent&#39;: &#39;Europe&#39;,
    &#39;languages&#39;: [&#39;Spanish&#39;]}),
- (0.7398351135651812,
+ (0.739856220599693,
   {&#39;name&#39;: &#39;China&#39;,
    &#39;code&#39;: &#39;CN&#39;,
    &#39;capital&#39;: &#39;Beijing&#39;,
    &#39;continent&#39;: &#39;Asia&#39;,
    &#39;languages&#39;: [&#39;Standard Chinese&#39;]}),
- (0.7395849105341467,
+ (0.7395038203235198,
   {&#39;name&#39;: &#39;Nigeria&#39;,
    &#39;code&#39;: &#39;NG&#39;,
    &#39;capital&#39;: &#39;Abuja&#39;,
    &#39;continent&#39;: &#39;Africa&#39;,
    &#39;languages&#39;: [&#39;English&#39;]}),
- (0.7387284972086676,
+ (0.7386007424118528,
   {&#39;name&#39;: &#39;Egypt&#39;,
    &#39;code&#39;: &#39;EG&#39;,
    &#39;capital&#39;: &#39;Cairo&#39;,
    &#39;continent&#39;: &#39;Africa&#39;,
    &#39;languages&#39;: [&#39;Arabic&#39;]}),
- (0.7358951137401105,
+ (0.7354238434740793,
   {&#39;name&#39;: &#39;Brazil&#39;,
    &#39;code&#39;: &#39;BR&#39;,
    &#39;capital&#39;: &#39;Brasília&#39;,
    &#39;continent&#39;: &#39;South America&#39;,
    &#39;languages&#39;: [&#39;Portuguese&#39;]}),
- (0.7351767098925348,
+ (0.7350558425995254,
   {&#39;name&#39;: &#39;Mexico&#39;,
    &#39;code&#39;: &#39;MX&#39;,
    &#39;capital&#39;: &#39;Mexico City&#39;,
    &#39;continent&#39;: &#39;North America&#39;,
    &#39;languages&#39;: [&#39;Spanish&#39;]}),
- (0.7340548737475453,
+ (0.733897746229655,
   {&#39;name&#39;: &#39;Japan&#39;,
    &#39;code&#39;: &#39;JP&#39;,
    &#39;capital&#39;: &#39;Tokyo&#39;,
    &#39;continent&#39;: &#39;Asia&#39;,
    &#39;languages&#39;: [&#39;Japanese&#39;]}),
- (0.7313286603399471,
+ (0.7312880542513781,
   {&#39;name&#39;: &#39;Argentina&#39;,
    &#39;code&#39;: &#39;AR&#39;,
    &#39;capital&#39;: &#39;Buenos Aires&#39;,
    &#39;continent&#39;: &#39;South America&#39;,
    &#39;languages&#39;: [&#39;Spanish&#39;]}),
- (0.7280731626046606,
+ (0.7280135748889252,
   {&#39;name&#39;: &#39;Indonesia&#39;,
    &#39;code&#39;: &#39;ID&#39;,
    &#39;capital&#39;: &#39;Jakarta&#39;,
    &#39;continent&#39;: &#39;Asia&#39;,
    &#39;languages&#39;: [&#39;Indonesian&#39;]}),
- (0.7243527809360168,
+ (0.7241642577932456,
   {&#39;name&#39;: &#39;India&#39;,
    &#39;code&#39;: &#39;IN&#39;,
    &#39;capital&#39;: &#39;New Delhi&#39;,
    &#39;continent&#39;: &#39;Asia&#39;,
    &#39;languages&#39;: [&#39;Hindi&#39;, &#39;English&#39;]}),
- (0.7235900790596334,
+ (0.7232991877572457,
   {&#39;name&#39;: &#39;Italy&#39;,
    &#39;code&#39;: &#39;IT&#39;,
    &#39;capital&#39;: &#39;Rome&#39;,
@@ -1303,7 +1337,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
