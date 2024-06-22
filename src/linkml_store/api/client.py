@@ -39,7 +39,7 @@ class Client:
     >>> db = client.attach_database("duckdb", alias="test")
 
     Note that normally a handle would be specified by a locator such as ``duckdb:///<PATH>``, but
-    for convience, an in-memory duckdb object can be specified without a full locator
+    for convenience, an in-memory duckdb object can be specified without a full locator
 
     We can check the actual handle:
 
