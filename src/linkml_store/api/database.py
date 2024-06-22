@@ -348,7 +348,9 @@ class Database(ABC):
         """
         return [c.name for c in self.list_collections(**kwargs)]
 
-    def get_collection(self, name: str, type: Optional[str] = None, create_if_not_exists=True, **kwargs) -> "Collection":
+    def get_collection(
+        self, name: str, type: Optional[str] = None, create_if_not_exists=True, **kwargs
+    ) -> "Collection":
         """
         Get a named collection.
 
@@ -366,6 +368,7 @@ class Database(ABC):
         KeyError: 'Collection NonExistent does not exist'
 
         :param name: name of the collection
+        :param type: target class name
         :param create_if_not_exists: create the collection if it does not exist
 
         """

@@ -74,7 +74,7 @@ class Collection:
                 self.metadata.alias = name
             if not self.metadata.type:
                 self.metadata.type = name
-        #if name is not None and self.metadata.name is not None and name != self.metadata.name:
+        # if name is not None and self.metadata.name is not None and name != self.metadata.name:
         #    raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
 
     @property
