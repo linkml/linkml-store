@@ -43,8 +43,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.592200Z",
-     "start_time": "2024-06-11T22:10:40.322078Z"
+     "end_time": "2024-06-23T01:28:18.350753Z",
+     "start_time": "2024-06-23T01:28:16.554178Z"
     }
    },
    "id": "initial_id"
@@ -69,8 +69,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.595610Z",
-     "start_time": "2024-06-11T22:10:41.592760Z"
+     "end_time": "2024-06-23T01:28:18.354666Z",
+     "start_time": "2024-06-23T01:28:18.351799Z"
     }
    },
    "id": "cc164c0acbe4c39d"
@@ -94,8 +94,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.599804Z",
-     "start_time": "2024-06-11T22:10:41.597005Z"
+     "end_time": "2024-06-23T01:28:18.359736Z",
+     "start_time": "2024-06-23T01:28:18.355122Z"
     }
    },
    "id": "cb437a6dd0f73ec8"
@@ -119,8 +119,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.605260Z",
-     "start_time": "2024-06-11T22:10:41.601527Z"
+     "end_time": "2024-06-23T01:28:18.364131Z",
+     "start_time": "2024-06-23T01:28:18.360436Z"
     }
    },
    "id": "4390916095bf647a"
@@ -147,8 +147,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.650477Z",
-     "start_time": "2024-06-11T22:10:41.603373Z"
+     "end_time": "2024-06-23T01:28:18.402657Z",
+     "start_time": "2024-06-23T01:28:18.366296Z"
     }
    },
    "id": "c3a79013f9359a9"
@@ -183,8 +183,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.650886Z",
-     "start_time": "2024-06-11T22:10:41.648075Z"
+     "end_time": "2024-06-23T01:28:18.407892Z",
+     "start_time": "2024-06-23T01:28:18.392332Z"
     }
    },
    "id": "5286ef4e9dd0f316"
@@ -201,8 +201,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.654343Z",
-     "start_time": "2024-06-11T22:10:41.650251Z"
+     "end_time": "2024-06-23T01:28:18.408181Z",
+     "start_time": "2024-06-23T01:28:18.394820Z"
     }
    },
    "id": "2e21988e4fc13f58"
@@ -238,8 +238,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.666716Z",
-     "start_time": "2024-06-11T22:10:41.654416Z"
+     "end_time": "2024-06-23T01:28:18.413360Z",
+     "start_time": "2024-06-23T01:28:18.400360Z"
     }
    },
    "id": "e98f9d6eb4a5e385"
@@ -266,8 +266,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.670028Z",
-     "start_time": "2024-06-11T22:10:41.665360Z"
+     "end_time": "2024-06-23T01:28:18.538479Z",
+     "start_time": "2024-06-23T01:28:18.411461Z"
     }
    },
    "id": "668e59a8f28e7bfe"
@@ -292,8 +292,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.679764Z",
-     "start_time": "2024-06-11T22:10:41.670488Z"
+     "end_time": "2024-06-23T01:28:18.545205Z",
+     "start_time": "2024-06-23T01:28:18.539041Z"
     }
    },
    "id": "9575e280dda32e41"
@@ -318,8 +318,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.710549Z",
-     "start_time": "2024-06-11T22:10:41.677982Z"
+     "end_time": "2024-06-23T01:28:18.565655Z",
+     "start_time": "2024-06-23T01:28:18.543251Z"
     }
    },
    "id": "9b65321ea7c7ee15"
@@ -346,8 +346,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.734378Z",
-     "start_time": "2024-06-11T22:10:41.680230Z"
+     "end_time": "2024-06-23T01:28:18.570709Z",
+     "start_time": "2024-06-23T01:28:18.565823Z"
     }
    },
    "id": "244378540320adcf"
@@ -372,8 +372,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.741764Z",
-     "start_time": "2024-06-11T22:10:41.688583Z"
+     "end_time": "2024-06-23T01:28:18.578140Z",
+     "start_time": "2024-06-23T01:28:18.573699Z"
     }
    },
    "id": "1ff46aef2d8abba1"
@@ -402,8 +402,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.759537Z",
-     "start_time": "2024-06-11T22:10:41.691693Z"
+     "end_time": "2024-06-23T01:28:18.650731Z",
+     "start_time": "2024-06-23T01:28:18.581128Z"
     }
    },
    "id": "df3c2afcdb8153e8"
@@ -414,7 +414,7 @@
    "outputs": [
     {
      "data": {
-      "text/plain": "[('Europe', 5),\n ('Asia', 5),\n ('North America', 3),\n ('Africa', 3),\n ('South America', 2),\n ('Oceania', 2)]"
+      "text/plain": "[('Europe', 5),\n ('Asia', 5),\n ('Africa', 3),\n ('North America', 3),\n ('Oceania', 2),\n ('South America', 2)]"
      },
      "execution_count": 15,
      "metadata": {},
@@ -427,8 +427,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:41.759951Z",
-     "start_time": "2024-06-11T22:10:41.703519Z"
+     "end_time": "2024-06-23T01:28:18.658173Z",
+     "start_time": "2024-06-23T01:28:18.607131Z"
     }
    },
    "id": "61cd37ba4849ed22"
@@ -455,8 +455,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:44.140941Z",
-     "start_time": "2024-06-11T22:10:41.707263Z"
+     "end_time": "2024-06-23T01:28:19.217982Z",
+     "start_time": "2024-06-23T01:28:18.611918Z"
     }
    },
    "id": "674607f18f83360c"
@@ -477,8 +477,8 @@
    "outputs": [
     {
      "data": {
-      "text/plain": "       score            name code           capital      continent  \\\n0   0.770891  United Kingdom   GB            London         Europe   \n1   0.758388       Australia   AU          Canberra        Oceania   \n2   0.754203     South Korea   KR             Seoul           Asia   \n3   0.750652     New Zealand   NZ        Wellington        Oceania   \n4   0.750419   United States   US  Washington, D.C.  North America   \n5   0.748973    South Africa   ZA          Pretoria         Africa   \n6   0.748322          Canada   CA            Ottawa  North America   \n7   0.746444          France   FR             Paris         Europe   \n8   0.745408         Germany   DE            Berlin         Europe   \n9   0.743449           Spain   ES            Madrid         Europe   \n10  0.739856           China   CN           Beijing           Asia   \n11  0.739504         Nigeria   NG             Abuja         Africa   \n12  0.738601           Egypt   EG             Cairo         Africa   \n13  0.735424          Brazil   BR          Brasília  South America   \n14  0.735056          Mexico   MX       Mexico City  North America   \n15  0.733898           Japan   JP             Tokyo           Asia   \n16  0.731288       Argentina   AR      Buenos Aires  South America   \n17  0.728014       Indonesia   ID           Jakarta           Asia   \n18  0.724164           India   IN         New Delhi           Asia   \n19  0.723299           Italy   IT              Rome         Europe   \n\n                                            languages  \n0                                           [English]  \n1                                           [English]  \n2                                            [Korean]  \n3                                    [English, Māori]  \n4                                           [English]  \n5   [Zulu, Xhosa, Afrikaans, English, Northern Sot...  \n6                                   [English, French]  \n7                                            [French]  \n8                                            [German]  \n9                                           [Spanish]  \n10                                 [Standard Chinese]  \n11                                          [English]  \n12                                           [Arabic]  \n13                                       [Portuguese]  \n14                                          [Spanish]  \n15                                         [Japanese]  \n16                                          [Spanish]  \n17                                       [Indonesian]  \n18                                   [Hindi, English]  \n19                                          [Italian]  ",
-      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>score</th>\n      <th>name</th>\n      <th>code</th>\n      <th>capital</th>\n      <th>continent</th>\n      <th>languages</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0.770891</td>\n      <td>United Kingdom</td>\n      <td>GB</td>\n      <td>London</td>\n      <td>Europe</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>0.758388</td>\n      <td>Australia</td>\n      <td>AU</td>\n      <td>Canberra</td>\n      <td>Oceania</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>0.754203</td>\n      <td>South Korea</td>\n      <td>KR</td>\n      <td>Seoul</td>\n      <td>Asia</td>\n      <td>[Korean]</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>0.750652</td>\n      <td>New Zealand</td>\n      <td>NZ</td>\n      <td>Wellington</td>\n      <td>Oceania</td>\n      <td>[English, Māori]</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>0.750419</td>\n      <td>United States</td>\n      <td>US</td>\n      <td>Washington, D.C.</td>\n      <td>North America</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>0.748973</td>\n      <td>South Africa</td>\n      <td>ZA</td>\n      <td>Pretoria</td>\n      <td>Africa</td>\n      <td>[Zulu, Xhosa, Afrikaans, English, Northern Sot...</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>0.748322</td>\n      <td>Canada</td>\n      <td>CA</td>\n      <td>Ottawa</td>\n      <td>North America</td>\n      <td>[English, French]</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>0.746444</td>\n      <td>France</td>\n      <td>FR</td>\n      <td>Paris</td>\n      <td>Europe</td>\n      <td>[French]</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>0.745408</td>\n      <td>Germany</td>\n      <td>DE</td>\n      <td>Berlin</td>\n      <td>Europe</td>\n      <td>[German]</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>0.743449</td>\n      <td>Spain</td>\n      <td>ES</td>\n      <td>Madrid</td>\n      <td>Europe</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>0.739856</td>\n      <td>China</td>\n      <td>CN</td>\n      <td>Beijing</td>\n      <td>Asia</td>\n      <td>[Standard Chinese]</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>0.739504</td>\n      <td>Nigeria</td>\n      <td>NG</td>\n      <td>Abuja</td>\n      <td>Africa</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>12</th>\n      <td>0.738601</td>\n      <td>Egypt</td>\n      <td>EG</td>\n      <td>Cairo</td>\n      <td>Africa</td>\n      <td>[Arabic]</td>\n    </tr>\n    <tr>\n      <th>13</th>\n      <td>0.735424</td>\n      <td>Brazil</td>\n      <td>BR</td>\n      <td>Brasília</td>\n      <td>South America</td>\n      <td>[Portuguese]</td>\n    </tr>\n    <tr>\n      <th>14</th>\n      <td>0.735056</td>\n      <td>Mexico</td>\n      <td>MX</td>\n      <td>Mexico City</td>\n      <td>North America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>15</th>\n      <td>0.733898</td>\n      <td>Japan</td>\n      <td>JP</td>\n      <td>Tokyo</td>\n      <td>Asia</td>\n      <td>[Japanese]</td>\n    </tr>\n    <tr>\n      <th>16</th>\n      <td>0.731288</td>\n      <td>Argentina</td>\n      <td>AR</td>\n      <td>Buenos Aires</td>\n      <td>South America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>17</th>\n      <td>0.728014</td>\n      <td>Indonesia</td>\n      <td>ID</td>\n      <td>Jakarta</td>\n      <td>Asia</td>\n      <td>[Indonesian]</td>\n    </tr>\n    <tr>\n      <th>18</th>\n      <td>0.724164</td>\n      <td>India</td>\n      <td>IN</td>\n      <td>New Delhi</td>\n      <td>Asia</td>\n      <td>[Hindi, English]</td>\n    </tr>\n    <tr>\n      <th>19</th>\n      <td>0.723299</td>\n      <td>Italy</td>\n      <td>IT</td>\n      <td>Rome</td>\n      <td>Europe</td>\n      <td>[Italian]</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      "text/plain": "       score            name code           capital      continent  \\\n0   0.770891  United Kingdom   GB            London         Europe   \n1   0.758388       Australia   AU          Canberra        Oceania   \n2   0.754203     South Korea   KR             Seoul           Asia   \n3   0.750652     New Zealand   NZ        Wellington        Oceania   \n4   0.750419   United States   US  Washington, D.C.  North America   \n5   0.748973    South Africa   ZA          Pretoria         Africa   \n6   0.748322          Canada   CA            Ottawa  North America   \n7   0.746444          France   FR             Paris         Europe   \n8   0.745408         Germany   DE            Berlin         Europe   \n9   0.743449           Spain   ES            Madrid         Europe   \n10  0.739726           China   CN           Beijing           Asia   \n11  0.739504         Nigeria   NG             Abuja         Africa   \n12  0.738601           Egypt   EG             Cairo         Africa   \n13  0.735424          Brazil   BR          Brasília  South America   \n14  0.735056          Mexico   MX       Mexico City  North America   \n15  0.734002           Japan   JP             Tokyo           Asia   \n16  0.731288       Argentina   AR      Buenos Aires  South America   \n17  0.728014       Indonesia   ID           Jakarta           Asia   \n18  0.724164           India   IN         New Delhi           Asia   \n19  0.723299           Italy   IT              Rome         Europe   \n\n                                            languages  \n0                                           [English]  \n1                                           [English]  \n2                                            [Korean]  \n3                                    [English, Māori]  \n4                                           [English]  \n5   [Zulu, Xhosa, Afrikaans, English, Northern Sot...  \n6                                   [English, French]  \n7                                            [French]  \n8                                            [German]  \n9                                           [Spanish]  \n10                                 [Standard Chinese]  \n11                                          [English]  \n12                                           [Arabic]  \n13                                       [Portuguese]  \n14                                          [Spanish]  \n15                                         [Japanese]  \n16                                          [Spanish]  \n17                                       [Indonesian]  \n18                                   [Hindi, English]  \n19                                          [Italian]  ",
+      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>score</th>\n      <th>name</th>\n      <th>code</th>\n      <th>capital</th>\n      <th>continent</th>\n      <th>languages</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0.770891</td>\n      <td>United Kingdom</td>\n      <td>GB</td>\n      <td>London</td>\n      <td>Europe</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>0.758388</td>\n      <td>Australia</td>\n      <td>AU</td>\n      <td>Canberra</td>\n      <td>Oceania</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>0.754203</td>\n      <td>South Korea</td>\n      <td>KR</td>\n      <td>Seoul</td>\n      <td>Asia</td>\n      <td>[Korean]</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>0.750652</td>\n      <td>New Zealand</td>\n      <td>NZ</td>\n      <td>Wellington</td>\n      <td>Oceania</td>\n      <td>[English, Māori]</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>0.750419</td>\n      <td>United States</td>\n      <td>US</td>\n      <td>Washington, D.C.</td>\n      <td>North America</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>0.748973</td>\n      <td>South Africa</td>\n      <td>ZA</td>\n      <td>Pretoria</td>\n      <td>Africa</td>\n      <td>[Zulu, Xhosa, Afrikaans, English, Northern Sot...</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>0.748322</td>\n      <td>Canada</td>\n      <td>CA</td>\n      <td>Ottawa</td>\n      <td>North America</td>\n      <td>[English, French]</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>0.746444</td>\n      <td>France</td>\n      <td>FR</td>\n      <td>Paris</td>\n      <td>Europe</td>\n      <td>[French]</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>0.745408</td>\n      <td>Germany</td>\n      <td>DE</td>\n      <td>Berlin</td>\n      <td>Europe</td>\n      <td>[German]</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>0.743449</td>\n      <td>Spain</td>\n      <td>ES</td>\n      <td>Madrid</td>\n      <td>Europe</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>0.739726</td>\n      <td>China</td>\n      <td>CN</td>\n      <td>Beijing</td>\n      <td>Asia</td>\n      <td>[Standard Chinese]</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>0.739504</td>\n      <td>Nigeria</td>\n      <td>NG</td>\n      <td>Abuja</td>\n      <td>Africa</td>\n      <td>[English]</td>\n    </tr>\n    <tr>\n      <th>12</th>\n      <td>0.738601</td>\n      <td>Egypt</td>\n      <td>EG</td>\n      <td>Cairo</td>\n      <td>Africa</td>\n      <td>[Arabic]</td>\n    </tr>\n    <tr>\n      <th>13</th>\n      <td>0.735424</td>\n      <td>Brazil</td>\n      <td>BR</td>\n      <td>Brasília</td>\n      <td>South America</td>\n      <td>[Portuguese]</td>\n    </tr>\n    <tr>\n      <th>14</th>\n      <td>0.735056</td>\n      <td>Mexico</td>\n      <td>MX</td>\n      <td>Mexico City</td>\n      <td>North America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>15</th>\n      <td>0.734002</td>\n      <td>Japan</td>\n      <td>JP</td>\n      <td>Tokyo</td>\n      <td>Asia</td>\n      <td>[Japanese]</td>\n    </tr>\n    <tr>\n      <th>16</th>\n      <td>0.731288</td>\n      <td>Argentina</td>\n      <td>AR</td>\n      <td>Buenos Aires</td>\n      <td>South America</td>\n      <td>[Spanish]</td>\n    </tr>\n    <tr>\n      <th>17</th>\n      <td>0.728014</td>\n      <td>Indonesia</td>\n      <td>ID</td>\n      <td>Jakarta</td>\n      <td>Asia</td>\n      <td>[Indonesian]</td>\n    </tr>\n    <tr>\n      <th>18</th>\n      <td>0.724164</td>\n      <td>India</td>\n      <td>IN</td>\n      <td>New Delhi</td>\n      <td>Asia</td>\n      <td>[Hindi, English]</td>\n    </tr>\n    <tr>\n      <th>19</th>\n      <td>0.723299</td>\n      <td>Italy</td>\n      <td>IT</td>\n      <td>Rome</td>\n      <td>Europe</td>\n      <td>[Italian]</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
      },
      "execution_count": 17,
      "metadata": {},
@@ -492,8 +492,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:45.513951Z",
-     "start_time": "2024-06-11T22:10:44.141727Z"
+     "end_time": "2024-06-23T01:28:19.351748Z",
+     "start_time": "2024-06-23T01:28:19.216122Z"
     }
    },
    "id": "1ddd4ac75719342d"
@@ -527,8 +527,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:45.519240Z",
-     "start_time": "2024-06-11T22:10:45.515082Z"
+     "end_time": "2024-06-23T01:28:19.354985Z",
+     "start_time": "2024-06-23T01:28:19.350505Z"
     }
    },
    "id": "fa1cdc4e62ad19a1"
@@ -539,7 +539,7 @@
    "outputs": [
     {
      "data": {
-      "text/plain": "[(0.7708908770614274,\n  {'name': 'United Kingdom',\n   'code': 'GB',\n   'capital': 'London',\n   'continent': 'Europe',\n   'languages': ['English']}),\n (0.7583880255490492,\n  {'name': 'Australia',\n   'code': 'AU',\n   'capital': 'Canberra',\n   'continent': 'Oceania',\n   'languages': ['English']}),\n (0.754202745445488,\n  {'name': 'South Korea',\n   'code': 'KR',\n   'capital': 'Seoul',\n   'continent': 'Asia',\n   'languages': ['Korean']}),\n (0.7506523769140084,\n  {'name': 'New Zealand',\n   'code': 'NZ',\n   'capital': 'Wellington',\n   'continent': 'Oceania',\n   'languages': ['English', 'Māori']}),\n (0.7504190890778679,\n  {'name': 'United States',\n   'code': 'US',\n   'capital': 'Washington, D.C.',\n   'continent': 'North America',\n   'languages': ['English']}),\n (0.7489726600700292,\n  {'name': 'South Africa',\n   'code': 'ZA',\n   'capital': 'Pretoria',\n   'continent': 'Africa',\n   'languages': ['Zulu',\n    'Xhosa',\n    'Afrikaans',\n    'English',\n    'Northern Sotho',\n    'Tswana',\n    'Southern Sotho',\n    'Tsonga',\n    'Swazi',\n    'Venda',\n    'Southern Ndebele']}),\n (0.7483222334041403,\n  {'name': 'Canada',\n   'code': 'CA',\n   'capital': 'Ottawa',\n   'continent': 'North America',\n   'languages': ['English', 'French']}),\n (0.7464438929713734,\n  {'name': 'France',\n   'code': 'FR',\n   'capital': 'Paris',\n   'continent': 'Europe',\n   'languages': ['French']}),\n (0.7454078196210195,\n  {'name': 'Germany',\n   'code': 'DE',\n   'capital': 'Berlin',\n   'continent': 'Europe',\n   'languages': ['German']}),\n (0.7434487849009042,\n  {'name': 'Spain',\n   'code': 'ES',\n   'capital': 'Madrid',\n   'continent': 'Europe',\n   'languages': ['Spanish']}),\n (0.739856220599693,\n  {'name': 'China',\n   'code': 'CN',\n   'capital': 'Beijing',\n   'continent': 'Asia',\n   'languages': ['Standard Chinese']}),\n (0.7395038203235198,\n  {'name': 'Nigeria',\n   'code': 'NG',\n   'capital': 'Abuja',\n   'continent': 'Africa',\n   'languages': ['English']}),\n (0.7386007424118528,\n  {'name': 'Egypt',\n   'code': 'EG',\n   'capital': 'Cairo',\n   'continent': 'Africa',\n   'languages': ['Arabic']}),\n (0.7354238434740793,\n  {'name': 'Brazil',\n   'code': 'BR',\n   'capital': 'Brasília',\n   'continent': 'South America',\n   'languages': ['Portuguese']}),\n (0.7350558425995254,\n  {'name': 'Mexico',\n   'code': 'MX',\n   'capital': 'Mexico City',\n   'continent': 'North America',\n   'languages': ['Spanish']}),\n (0.733897746229655,\n  {'name': 'Japan',\n   'code': 'JP',\n   'capital': 'Tokyo',\n   'continent': 'Asia',\n   'languages': ['Japanese']}),\n (0.7312880542513781,\n  {'name': 'Argentina',\n   'code': 'AR',\n   'capital': 'Buenos Aires',\n   'continent': 'South America',\n   'languages': ['Spanish']}),\n (0.7280135748889252,\n  {'name': 'Indonesia',\n   'code': 'ID',\n   'capital': 'Jakarta',\n   'continent': 'Asia',\n   'languages': ['Indonesian']}),\n (0.7241642577932456,\n  {'name': 'India',\n   'code': 'IN',\n   'capital': 'New Delhi',\n   'continent': 'Asia',\n   'languages': ['Hindi', 'English']}),\n (0.7232991877572457,\n  {'name': 'Italy',\n   'code': 'IT',\n   'capital': 'Rome',\n   'continent': 'Europe',\n   'languages': ['Italian']})]"
+      "text/plain": "[(0.7708908770614274,\n  {'name': 'United Kingdom',\n   'code': 'GB',\n   'capital': 'London',\n   'continent': 'Europe',\n   'languages': ['English']}),\n (0.7583880255490492,\n  {'name': 'Australia',\n   'code': 'AU',\n   'capital': 'Canberra',\n   'continent': 'Oceania',\n   'languages': ['English']}),\n (0.754202745445488,\n  {'name': 'South Korea',\n   'code': 'KR',\n   'capital': 'Seoul',\n   'continent': 'Asia',\n   'languages': ['Korean']}),\n (0.7506523769140084,\n  {'name': 'New Zealand',\n   'code': 'NZ',\n   'capital': 'Wellington',\n   'continent': 'Oceania',\n   'languages': ['English', 'Māori']}),\n (0.7504190890778679,\n  {'name': 'United States',\n   'code': 'US',\n   'capital': 'Washington, D.C.',\n   'continent': 'North America',\n   'languages': ['English']}),\n (0.7489726600700292,\n  {'name': 'South Africa',\n   'code': 'ZA',\n   'capital': 'Pretoria',\n   'continent': 'Africa',\n   'languages': ['Zulu',\n    'Xhosa',\n    'Afrikaans',\n    'English',\n    'Northern Sotho',\n    'Tswana',\n    'Southern Sotho',\n    'Tsonga',\n    'Swazi',\n    'Venda',\n    'Southern Ndebele']}),\n (0.7483222334041403,\n  {'name': 'Canada',\n   'code': 'CA',\n   'capital': 'Ottawa',\n   'continent': 'North America',\n   'languages': ['English', 'French']}),\n (0.7464438929713734,\n  {'name': 'France',\n   'code': 'FR',\n   'capital': 'Paris',\n   'continent': 'Europe',\n   'languages': ['French']}),\n (0.7454078196210195,\n  {'name': 'Germany',\n   'code': 'DE',\n   'capital': 'Berlin',\n   'continent': 'Europe',\n   'languages': ['German']}),\n (0.7434487849009042,\n  {'name': 'Spain',\n   'code': 'ES',\n   'capital': 'Madrid',\n   'continent': 'Europe',\n   'languages': ['Spanish']}),\n (0.7397262074302214,\n  {'name': 'China',\n   'code': 'CN',\n   'capital': 'Beijing',\n   'continent': 'Asia',\n   'languages': ['Standard Chinese']}),\n (0.7395038203235198,\n  {'name': 'Nigeria',\n   'code': 'NG',\n   'capital': 'Abuja',\n   'continent': 'Africa',\n   'languages': ['English']}),\n (0.7386007424118528,\n  {'name': 'Egypt',\n   'code': 'EG',\n   'capital': 'Cairo',\n   'continent': 'Africa',\n   'languages': ['Arabic']}),\n (0.7354238434740793,\n  {'name': 'Brazil',\n   'code': 'BR',\n   'capital': 'Brasília',\n   'continent': 'South America',\n   'languages': ['Portuguese']}),\n (0.7350558425995254,\n  {'name': 'Mexico',\n   'code': 'MX',\n   'capital': 'Mexico City',\n   'continent': 'North America',\n   'languages': ['Spanish']}),\n (0.7340019061796953,\n  {'name': 'Japan',\n   'code': 'JP',\n   'capital': 'Tokyo',\n   'continent': 'Asia',\n   'languages': ['Japanese']}),\n (0.7312880542513781,\n  {'name': 'Argentina',\n   'code': 'AR',\n   'capital': 'Buenos Aires',\n   'continent': 'South America',\n   'languages': ['Spanish']}),\n (0.7280135748889252,\n  {'name': 'Indonesia',\n   'code': 'ID',\n   'capital': 'Jakarta',\n   'continent': 'Asia',\n   'languages': ['Indonesian']}),\n (0.7241642577932456,\n  {'name': 'India',\n   'code': 'IN',\n   'capital': 'New Delhi',\n   'continent': 'Asia',\n   'languages': ['Hindi', 'English']}),\n (0.7232991877572457,\n  {'name': 'Italy',\n   'code': 'IT',\n   'capital': 'Rome',\n   'continent': 'Europe',\n   'languages': ['Italian']})]"
      },
      "execution_count": 19,
      "metadata": {},
@@ -552,8 +552,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:45.523666Z",
-     "start_time": "2024-06-11T22:10:45.521062Z"
+     "end_time": "2024-06-23T01:28:19.362351Z",
+     "start_time": "2024-06-23T01:28:19.357888Z"
     }
    },
    "id": "9509d574fd222a72"
@@ -566,8 +566,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-06-11T22:10:45.527045Z",
-     "start_time": "2024-06-11T22:10:45.524024Z"
+     "end_time": "2024-06-23T01:28:19.364582Z",
+     "start_time": "2024-06-23T01:28:19.360366Z"
     }
    },
    "id": "cdd3d5bb25673310"

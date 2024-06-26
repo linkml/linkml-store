@@ -33,7 +33,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 67,
+   "execution_count": 1,
    "outputs": [
     {
      "name": "stdout",
@@ -47,6 +47,7 @@
       "  -d, --database TEXT             Database name\n",
       "  -c, --collection TEXT           Collection name\n",
       "  -C, --config PATH               Path to the configuration file\n",
+      "  --set TEXT                      Metadata settings in the form PATHEXPR=value\n",
       "  -v, --verbose\n",
       "  -q, --quiet / --no-quiet\n",
       "  --stacktrace / --no-stacktrace  If set then show full stacktrace on error\n",
@@ -54,14 +55,20 @@
       "  --help                          Show this message and exit.\n",
       "\n",
       "Commands:\n",
+      "  apply             Apply a patch to a collection.\n",
+      "  describe          Describe the collection schema.\n",
+      "  diff              Diffs two collectoons to create a patch.\n",
+      "  export            Exports a database to a dump.\n",
       "  fq                Query facets from the specified collection.\n",
+      "  import            Imports a database from a dump.\n",
       "  index             Create an index over a collection.\n",
-      "  indexes\n",
+      "  indexes           Show the indexes for a collection.\n",
       "  insert            Insert objects from files (JSON, YAML, TSV) into the...\n",
       "  list-collections\n",
       "  query             Query objects from the specified collection.\n",
       "  schema            Show the schema for a database\n",
       "  search            Search objects in the specified collection.\n",
+      "  store             Store objects from files (JSON, YAML, TSV) into the...\n",
       "  validate          Validate objects in the specified collection.\n"
      ]
     }
@@ -73,8 +80,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:19.909688Z",
-     "start_time": "2024-04-22T20:49:18.752673Z"
+     "end_time": "2024-06-25T15:08:18.145877Z",
+     "start_time": "2024-06-25T15:08:15.829611Z"
     }
    },
    "id": "f367252f5e8857b4"
@@ -93,7 +100,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 68,
+   "execution_count": 2,
    "outputs": [
     {
      "name": "stdout",
@@ -104,7 +111,7 @@
       "  Insert objects from files (JSON, YAML, TSV) into the specified collection.\n",
       "\n",
       "Options:\n",
-      "  -f, --format [json|jsonl|yaml|tsv|csv]\n",
+      "  -f, --format [json|jsonl|yaml|tsv|csv|parquet|formatted]\n",
       "                                  Input format\n",
       "  -i, --object TEXT               Input object as YAML\n",
       "  --help                          Show this message and exit.\n"
@@ -118,8 +125,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:20.684538Z",
-     "start_time": "2024-04-22T20:49:19.911234Z"
+     "end_time": "2024-06-25T15:08:19.687123Z",
+     "start_time": "2024-06-25T15:08:18.146287Z"
     }
    },
    "id": "cfe24edc122b04e7"
@@ -136,7 +143,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 3,
    "outputs": [
     {
      "name": "stdout",
@@ -162,8 +169,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-27T22:11:07.912832Z",
-     "start_time": "2024-04-27T22:11:07.897955Z"
+     "end_time": "2024-06-25T15:08:20.815369Z",
+     "start_time": "2024-06-25T15:08:20.792716Z"
     }
    },
    "id": "afc4bfb1ecf80cc4"
@@ -183,7 +190,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 69,
+   "execution_count": 4,
    "outputs": [
     {
      "name": "stdout",
@@ -202,8 +209,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:21.654004Z",
-     "start_time": "2024-04-22T20:49:20.688743Z"
+     "end_time": "2024-06-25T15:08:27.698074Z",
+     "start_time": "2024-06-25T15:08:26.094359Z"
     }
    },
    "id": "be9cebbea43d03a8"
@@ -225,7 +232,7 @@
    "source": [
     "## Querying\n",
     "\n",
-    "Let's query for all objects that have `code=\"GB\"`, and get the results back as a CSV"
+    "Next we'll explore the `query` command:"
    ],
    "metadata": {
     "collapsed": false
@@ -234,29 +241,237 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 70,
+   "execution_count": 24,
    "outputs": [
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "name,code,capital,continent,languages\r\n",
-      "United Kingdom,GB,London,Europe,['English']\r\n"
+      "Usage: linkml-store query [OPTIONS]\n",
+      "\n",
+      "  Query objects from the specified collection.\n",
+      "\n",
+      "  Leave the query field blank to return all objects in the collection.\n",
+      "\n",
+      "  Examples:\n",
+      "\n",
+      "      linkml-store -d duckdb:///countries.db -c countries query\n",
+      "\n",
+      "  Queries can be specified in YAML, as basic key-value pairs\n",
+      "\n",
+      "  Examples:\n",
+      "\n",
+      "      linkml-store -d duckdb:///countries.db -c countries query -w 'code: NZ'\n",
+      "\n",
+      "  More complex queries can be specified using MongoDB-style query syntax\n",
+      "\n",
+      "  Examples:\n",
+      "\n",
+      "      linkml-store -d file:. -c persons query  -w 'occupation: {$ne:\n",
+      "      Architect}'\n",
+      "\n",
+      "  Finds all people who are not architects.\n",
+      "\n",
+      "Options:\n",
+      "  -w, --where TEXT                WHERE clause for the query, as YAML\n",
+      "  -l, --limit INTEGER             Maximum number of results to return\n",
+      "  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]\n",
+      "                                  Output format\n",
+      "  -o, --output PATH               Output file path\n",
+      "  --help                          Show this message and exit.\n"
      ]
     }
    ],
    "source": [
     "%%bash\n",
-    "linkml-store --database duckdb:///tmp/countries.db -c countries query -w \"code: GB\" -O csv"
+    "linkml-store query --help"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:22.845249Z",
-     "start_time": "2024-04-22T20:49:21.658897Z"
+     "end_time": "2024-06-25T15:19:07.166608Z",
+     "start_time": "2024-06-25T15:19:05.030214Z"
     }
    },
+   "id": "d4d0b66a1a78f50a"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Let's query for all objects that have `code=\"GB\"`, and get the results back as a CSV. The argument for the `--where` (or `-w`) option is a YAML object with a MongoDB-style query."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "99a6d52ab591f584"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "             name code capital continent  languages\n",
+      "0  United Kingdom   GB  London    Europe  [English]\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --database duckdb:///tmp/countries.db -c countries query -w \"code: GB\" -O formatted"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
    "id": "225613b70b0d57fc"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "We can get the output in different formats:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "e86ae98fe4c48413"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "name: United Kingdom\n",
+      "code: GB\n",
+      "capital: London\n",
+      "continent: Europe\n",
+      "languages:\n",
+      "- English\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store --database duckdb:///tmp/countries.db -c countries query -w \"code: GB\" -O yaml"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:09:27.368346Z",
+     "start_time": "2024-06-25T15:09:25.681868Z"
+    }
+   },
+   "id": "5d47e9648428caf0"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Formats include csv, tsv, yaml, json, jsonl, formatted (a human-readable format)"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "8d980c36b6c9b839"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "## Describing the data set\n",
+    "\n",
+    "The `describe` command gives a high-level overview of the data set:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "ae1d98ffa2767e5f"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store describe [OPTIONS]\n",
+      "\n",
+      "  Describe the collection schema.\n",
+      "\n",
+      "Options:\n",
+      "  -w, --where TEXT                WHERE clause for the query\n",
+      "  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]\n",
+      "                                  Output format\n",
+      "  -o, --output PATH               Output file path\n",
+      "  --help                          Show this message and exit.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store describe --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:19:57.960276Z",
+     "start_time": "2024-06-25T15:19:55.879771Z"
+    }
+   },
+   "id": "45cf8f0e25f8d1ae"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Let's try with the countries dataset:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "ff10a119becb6ad8"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "          count unique               top freq\n",
+      "capital       1      1  Washington, D.C.    1\n",
+      "code          1      1                US    1\n",
+      "continent     1      1     North America    1\n",
+      "languages     1      1         [English]    1\n",
+      "name          1      1     United States    1\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries describe"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:10:51.615868Z",
+     "start_time": "2024-06-25T15:10:49.498214Z"
+    }
+   },
+   "id": "364f240fc0035045"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Note this command is more useful for numeric data..."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "bdc0a6d167506809"
   },
   {
    "cell_type": "markdown",
@@ -273,7 +488,46 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 71,
+   "execution_count": 26,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store fq [OPTIONS]\n",
+      "\n",
+      "  Query facets from the specified collection.\n",
+      "\n",
+      "  :param ctx: :param where: :param limit: :param columns: :param output_type:\n",
+      "  :param output: :return:\n",
+      "\n",
+      "Options:\n",
+      "  -w, --where TEXT                WHERE clause for the query\n",
+      "  -l, --limit INTEGER             Maximum number of results to return\n",
+      "  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]\n",
+      "                                  Output format\n",
+      "  -o, --output PATH               Output file path\n",
+      "  -S, --columns TEXT              Columns to facet on\n",
+      "  --help                          Show this message and exit.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store fq --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:20:56.187707Z",
+     "start_time": "2024-06-25T15:20:54.588084Z"
+    }
+   },
+   "id": "5676c7a8a30699a7"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
    "outputs": [
     {
      "name": "stdout",
@@ -281,12 +535,12 @@
      "text": [
       "{\n",
       "  \"continent\": {\n",
-      "    \"Asia\": 5,\n",
       "    \"Europe\": 5,\n",
+      "    \"Asia\": 5,\n",
       "    \"Africa\": 3,\n",
       "    \"North America\": 3,\n",
-      "    \"Oceania\": 2,\n",
-      "    \"South America\": 2\n",
+      "    \"South America\": 2,\n",
+      "    \"Oceania\": 2\n",
       "  }\n",
       "}\n"
      ]
@@ -299,8 +553,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:23.811016Z",
-     "start_time": "2024-04-22T20:49:22.846688Z"
+     "end_time": "2024-06-25T15:11:38.152596Z",
+     "start_time": "2024-06-25T15:11:35.949820Z"
     }
    },
    "id": "6d8152d20290120c"
@@ -334,8 +588,146 @@
    "id": "1fd37a3fabafcac4"
   },
   {
+   "cell_type": "markdown",
+   "source": [
+    "### Indexing a collection\n",
+    "\n",
+    "First we will explore the `index` command"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "82dd185bda0ec1bd"
+  },
+  {
    "cell_type": "code",
-   "execution_count": 72,
+   "execution_count": 27,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store index [OPTIONS]\n",
+      "\n",
+      "  Create an index over a collection.\n",
+      "\n",
+      "  By default a simple trigram index is used.\n",
+      "\n",
+      "Options:\n",
+      "  -t, --index-type TEXT           Type of index to create. Values: simple, llm\n",
+      "                                  [default: simple]\n",
+      "  -E, --cached-embeddings-database TEXT\n",
+      "                                  Path to the database where embeddings are\n",
+      "                                  cached\n",
+      "  -T, --text-template TEXT        Template for text embeddings\n",
+      "  --help                          Show this message and exit.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store index --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:23:05.815936Z",
+     "start_time": "2024-06-25T15:23:03.735942Z"
+    }
+   },
+   "id": "ae0172f931e5f228"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Next we'll make a (default) index"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "65f5422c6dd449d9"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "outputs": [],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries index"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:23:32.706822Z",
+     "start_time": "2024-06-25T15:23:30.763140Z"
+    }
+   },
+   "id": "3c97f99cca09a03d"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "### Searching a collection using an index\n",
+    "\n",
+    "Let's explore the `search` command"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "981aea1e6dd63508"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Usage: linkml-store search [OPTIONS] SEARCH_TERM\n",
+      "\n",
+      "  Search objects in the specified collection.\n",
+      "\n",
+      "Options:\n",
+      "  -w, --where TEXT                WHERE clause for the search\n",
+      "  -l, --limit INTEGER             Maximum number of search results\n",
+      "  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]\n",
+      "                                  Output format\n",
+      "  -o, --output PATH               Output file path\n",
+      "  --auto-index / --no-auto-index  Automatically index the collection\n",
+      "                                  [default: no-auto-index]\n",
+      "  -t, --index-type TEXT           Type of index to create. Values: simple, llm\n",
+      "                                  [default: simple]\n",
+      "  --help                          Show this message and exit.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store search --help"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:23:49.293350Z",
+     "start_time": "2024-06-25T15:23:47.731123Z"
+    }
+   },
+   "id": "a6e98ccac65635ba"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Now we'll search for countries in the North where both English and French are spoken. We'll pose this as a natural language query, but the default index is only picking up on trigram tokens in the strings."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "f5c0cd805f8d19dc"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
    "outputs": [
     {
      "name": "stdout",
@@ -352,14 +744,13 @@
    ],
    "source": [
     "%%bash\n",
-    "linkml-store -d duckdb:///tmp/countries.db -c countries index\n",
     "linkml-store -d duckdb:///tmp/countries.db -c countries search \"countries in the North where both english and french spoken\" --limit 5 -O csv"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:25.742841Z",
-     "start_time": "2024-04-22T20:49:23.811732Z"
+     "end_time": "2024-06-25T15:25:05.946946Z",
+     "start_time": "2024-06-25T15:25:04.289332Z"
     }
    },
    "id": "8fce64c44a6aae21"
@@ -377,7 +768,7 @@
   {
    "cell_type": "markdown",
    "source": [
-    "## Indexing using an LLM\n",
+    "## Indexing using an LLM (OPTIONAL)\n",
     "\n",
     "Note for this to work, you need to have installed this package with the `llm` extra, like this:\n",
     "\n",
@@ -393,9 +784,7 @@
     "\n",
     "You will also need an OpenAI account.\n",
     "\n",
-    "If this is too much, you can just skip this section!\n",
-    "\n",
-    "__TODO__"
+    "If this is too much, you can just skip this section!\n"
    ],
    "metadata": {
     "collapsed": false
@@ -404,17 +793,60 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 72,
+   "execution_count": 31,
    "outputs": [],
-   "source": [],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries index -t llm -E tmp/llm_cache.db"
+   ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:25.746994Z",
-     "start_time": "2024-04-22T20:49:25.743003Z"
+     "end_time": "2024-06-25T15:27:24.863515Z",
+     "start_time": "2024-06-25T15:27:21.938776Z"
     }
    },
    "id": "180b3f44075c0291"
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "score,name,code,capital,continent,languages\r\n",
+      "0.7927589434263863,Canada,CA,Ottawa,North America,\"['English', 'French']\"\r\n",
+      "0.7641212153371397,France,FR,Paris,Europe,['French']\r\n",
+      "0.7546847140878102,United States,US,\"Washington, D.C.\",North America,['English']\r\n",
+      "0.7424773577897005,Australia,AU,Canberra,Oceania,['English']\r\n",
+      "0.741656789495497,United Kingdom,GB,London,Europe,['English']\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%bash\n",
+    "linkml-store -d duckdb:///tmp/countries.db -c countries search -t llm \"countries in the North where both english and french spoken\" --limit 5 -O csv"
+   ],
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2024-06-25T15:28:16.883407Z",
+     "start_time": "2024-06-25T15:28:14.554867Z"
+    }
+   },
+   "id": "9711a8db9c414953"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "The results are not particularly meaningful, but the idea is that this could be used in a RAG-style system."
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "df6bdc130db45fa2"
   },
   {
    "cell_type": "markdown",
@@ -432,7 +864,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 73,
+   "execution_count": 11,
    "outputs": [
     {
      "name": "stdout",
@@ -480,8 +912,8 @@
       "        multivalued: true\n",
       "        range: string\n",
       "        required: false\n",
-      "  internal__index__countries__test:\n",
-      "    name: internal__index__countries__test\n",
+      "  internal__index__countries__simple:\n",
+      "    name: internal__index__countries__simple\n",
       "    attributes:\n",
       "      name:\n",
       "        name: name\n",
@@ -523,8 +955,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:26.700077Z",
-     "start_time": "2024-04-22T20:49:25.746884Z"
+     "end_time": "2024-06-25T15:11:57.597135Z",
+     "start_time": "2024-06-25T15:11:55.984958Z"
     }
    },
    "id": "f36b8ae0c4325d2"
@@ -547,7 +979,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 74,
+   "execution_count": 12,
    "outputs": [],
    "source": [
     "%%bash\n",
@@ -557,8 +989,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:26.716620Z",
-     "start_time": "2024-04-22T20:49:26.701056Z"
+     "end_time": "2024-06-25T15:12:04.752008Z",
+     "start_time": "2024-06-25T15:12:04.733524Z"
     }
    },
    "id": "dad98c3579f24bbd"
@@ -575,7 +1007,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 75,
+   "execution_count": 13,
    "outputs": [
     {
      "name": "stdout",
@@ -598,8 +1030,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:26.732213Z",
-     "start_time": "2024-04-22T20:49:26.719217Z"
+     "end_time": "2024-06-25T15:12:07.629556Z",
+     "start_time": "2024-06-25T15:12:07.607664Z"
     }
    },
    "id": "bfde580a0ec64091"
@@ -617,7 +1049,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 76,
+   "execution_count": 14,
    "outputs": [
     {
      "name": "stdout",
@@ -647,16 +1079,22 @@
       "      - capital\n",
       "      - continent\n",
       "      - languages\n",
+      "  Route:\n",
+      "    slots:\n",
+      "      - origin\n",
+      "      - destination\n",
+      "      - method\n",
       "\n",
       "slots:\n",
       "  name:\n",
       "    description: The name of the country\n",
       "    required: true\n",
-      "    identifier: true\n",
+      "    # identifier: true\n",
       "  code:\n",
       "    description: The ISO 3166-1 alpha-2 code of the country\n",
       "    required: true\n",
       "    pattern: '^[A-Z]{2}$'\n",
+      "    identifier: true\n",
       "  capital:\n",
       "    description: The capital city of the country\n",
       "    required: true\n",
@@ -667,6 +1105,19 @@
       "    description: The main languages spoken in the country\n",
       "    range: Language\n",
       "    multivalued: true\n",
+      "  origin:\n",
+      "    range: Country\n",
+      "  destination:\n",
+      "    range: Country\n",
+      "  method:\n",
+      "    range: MethodEnum\n",
+      "\n",
+      "enums:\n",
+      "  MethodEnum:\n",
+      "    permissible_values:\n",
+      "      rail:\n",
+      "      air:\n",
+      "      road:\n",
       "\n",
       "types:\n",
       "  Language:\n",
@@ -682,15 +1133,15 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:26.783983Z",
-     "start_time": "2024-04-22T20:49:26.732313Z"
+     "end_time": "2024-06-25T15:12:19.817066Z",
+     "start_time": "2024-06-25T15:12:19.765625Z"
     }
    },
    "id": "cebbfe0d134749e7"
   },
   {
    "cell_type": "code",
-   "execution_count": 77,
+   "execution_count": 15,
    "outputs": [
     {
      "name": "stdout",
@@ -707,15 +1158,15 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:27.523764Z",
-     "start_time": "2024-04-22T20:49:26.761709Z"
+     "end_time": "2024-06-25T15:12:25.554095Z",
+     "start_time": "2024-06-25T15:12:23.774442Z"
     }
    },
    "id": "f0db6bd8db3ed955"
   },
   {
    "cell_type": "code",
-   "execution_count": 78,
+   "execution_count": 16,
    "outputs": [
     {
      "name": "stdout",
@@ -725,11 +1176,12 @@
       "name: countries\n",
       "alias: null\n",
       "type: Country\n",
-      "metadata: null\n",
+      "additional_properties: null\n",
       "attributes: null\n",
       "indexers: null\n",
       "hidden: false\n",
-      "is_prepopulated: false\n"
+      "is_prepopulated: false\n",
+      "source_location: null\n"
      ]
     }
    ],
@@ -740,15 +1192,15 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:28.238748Z",
-     "start_time": "2024-04-22T20:49:27.523066Z"
+     "end_time": "2024-06-25T15:12:27.084569Z",
+     "start_time": "2024-06-25T15:12:25.555144Z"
     }
    },
    "id": "722706dd4ac509b4"
   },
   {
    "cell_type": "code",
-   "execution_count": 79,
+   "execution_count": 17,
    "outputs": [
     {
      "name": "stdout",
@@ -775,8 +1227,8 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:29.056403Z",
-     "start_time": "2024-04-22T20:49:28.240180Z"
+     "end_time": "2024-06-25T15:12:28.679053Z",
+     "start_time": "2024-06-25T15:12:27.085311Z"
     }
    },
    "id": "b831b4012a6c03a3"
@@ -799,7 +1251,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 80,
+   "execution_count": 18,
    "outputs": [
     {
      "name": "stdout",
@@ -816,44 +1268,21 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:29.882322Z",
-     "start_time": "2024-04-22T20:49:29.058144Z"
+     "end_time": "2024-06-25T15:12:41.190334Z",
+     "start_time": "2024-06-25T15:12:39.647612Z"
     }
    },
    "id": "9d81c524271eddfc"
   },
   {
-   "cell_type": "code",
-   "execution_count": 81,
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "countries\n",
-      "name: countries\n",
-      "alias: null\n",
-      "type: Country\n",
-      "metadata: null\n",
-      "attributes: null\n",
-      "indexers: null\n",
-      "hidden: false\n",
-      "is_prepopulated: false\n"
-     ]
-    }
-   ],
+   "cell_type": "markdown",
    "source": [
-    "%%bash\n",
-    "linkml-store -C tmp/countries/countries.config.yaml list-collections"
+    "Let's check that the data is there:"
    ],
    "metadata": {
-    "collapsed": false,
-    "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:30.603602Z",
-     "start_time": "2024-04-22T20:49:29.883325Z"
-    }
+    "collapsed": false
    },
-   "id": "2901f8fabe4e44c4"
+   "id": "198e7b6dcfd0b1c7"
   },
   {
    "cell_type": "code",
@@ -889,6 +1318,20 @@
     }
    },
    "id": "bc79b2c4af397111"
+  },
+  {
+   "cell_type": "markdown",
+   "source": [
+    "Note that by default, validation is *deferred*. You can insert whatever you like, and then validate later.\n",
+    "\n",
+    "Other configurations may be more suited to your project, including strict/prospective validation.\n",
+    "\n",
+    "Next let's examine the schema:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "ef95ca843c46e78b"
   },
   {
    "cell_type": "code",
@@ -970,29 +1413,72 @@
    "id": "ba9a72c20c4f9f8"
   },
   {
+   "cell_type": "markdown",
+   "source": [
+    "### Run validation\n",
+    "\n",
+    "Next we will run the `validate` command:"
+   ],
+   "metadata": {
+    "collapsed": false
+   },
+   "id": "e72e6855cff8280c"
+  },
+  {
    "cell_type": "code",
-   "execution_count": 84,
+   "execution_count": 23,
    "outputs": [
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "type,severity,message,instance,instance_index,instantiates\r\n",
-      "jsonschema validation,ERROR,'X Y' does not match '^[A-Z]{2}$' in /code,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n",
-      "jsonschema validation,ERROR,None is not of type 'string' in /capital,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n",
-      "jsonschema validation,ERROR,None is not of type 'string' in /continent,\"{'name': 'Foolandia', 'code': 'X Y', 'capital': None, 'continent': None, 'languages': ['Fooish']}\",0,Country\r\n"
+      "type: jsonschema validation\n",
+      "severity: ERROR\n",
+      "message: '''X Y'' does not match ''^[A-Z]{2}$'' in /code'\n",
+      "instance:\n",
+      "  name: Foolandia\n",
+      "  code: X Y\n",
+      "  languages:\n",
+      "  - Fooish\n",
+      "instance_index: 0\n",
+      "instantiates: Country\n",
+      "context: []\n",
+      "---\n",
+      "type: jsonschema validation\n",
+      "severity: ERROR\n",
+      "message: '''capital'' is a required property in /'\n",
+      "instance:\n",
+      "  name: Foolandia\n",
+      "  code: X Y\n",
+      "  languages:\n",
+      "  - Fooish\n",
+      "instance_index: 0\n",
+      "instantiates: Country\n",
+      "context: []\n",
+      "---\n",
+      "type: jsonschema validation\n",
+      "severity: ERROR\n",
+      "message: '''continent'' is a required property in /'\n",
+      "instance:\n",
+      "  name: Foolandia\n",
+      "  code: X Y\n",
+      "  languages:\n",
+      "  - Fooish\n",
+      "instance_index: 0\n",
+      "instantiates: Country\n",
+      "context: []\n"
      ]
     }
    ],
    "source": [
     "%%bash\n",
-    "linkml-store -C tmp/countries/countries.config.yaml validate -O csv"
+    "linkml-store -C tmp/countries/countries.config.yaml validate -O yaml"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-04-22T20:49:33.223230Z",
-     "start_time": "2024-04-22T20:49:32.032060Z"
+     "end_time": "2024-06-25T15:16:27.611766Z",
+     "start_time": "2024-06-25T15:16:25.805899Z"
     }
    },
    "id": "597b805524772921"

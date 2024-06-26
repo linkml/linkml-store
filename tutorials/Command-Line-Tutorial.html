@@ -290,7 +290,7 @@
 <p>The top level command is <code class="docutils literal notranslate"><span class="pre">linkml-store</span></code>. This command doesn’t do anything itself, instead there are various <em>subcommands</em>.</p>
 <p>The store command has a few <em>global options</em> to specify configuration/database/collection</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -311,6 +311,7 @@ Options:
   -d, --database TEXT             Database name
   -c, --collection TEXT           Collection name
   -C, --config PATH               Path to the configuration file
+  --set TEXT                      Metadata settings in the form PATHEXPR=value
   -v, --verbose
   -q, --quiet / --no-quiet
   --stacktrace / --no-stacktrace  If set then show full stacktrace on error
@@ -318,14 +319,20 @@ Options:
   --help                          Show this message and exit.
 
 Commands:
+  apply             Apply a patch to a collection.
+  describe          Describe the collection schema.
+  diff              Diffs two collectoons to create a patch.
+  export            Exports a database to a dump.
   fq                Query facets from the specified collection.
+  import            Imports a database from a dump.
   index             Create an index over a collection.
-  indexes
+  indexes           Show the indexes for a collection.
   insert            Insert objects from files (JSON, YAML, TSV) into the...
   list-collections
   query             Query objects from the specified collection.
   schema            Show the schema for a database
   search            Search objects in the specified collection.
+  store             Store objects from files (JSON, YAML, TSV) into the...
   validate          Validate objects in the specified collection.
 </pre></div></div>
 </div>
@@ -334,7 +341,7 @@ Commands:
 <h2>Inserting objects from a file<a class="headerlink" href="#Inserting-objects-from-a-file" title="Link to this heading"></a></h2>
 <p>Next we’ll explore the <code class="docutils literal notranslate"><span class="pre">insert</span></code> command:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -352,7 +359,7 @@ Usage: linkml-store insert [OPTIONS] [FILES]...
   Insert objects from files (JSON, YAML, TSV) into the specified collection.
 
 Options:
-  -f, --format [json|jsonl|yaml|tsv|csv]
+  -f, --format [json|jsonl|yaml|tsv|csv|parquet|formatted]
                                   Input format
   -i, --object TEXT               Input object as YAML
   --help                          Show this message and exit.
@@ -360,7 +367,7 @@ Options:
 </div>
 <p>We’ll insert a small test file (in JSON Lines format) into a fresh database.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -388,7 +395,7 @@ head<span class="w"> </span>../../tests/input/countries/countries.jsonl
 <p>To make sure we have a fresh setup, we’ll create a temporary directory <code class="docutils literal notranslate"><span class="pre">tmp</span></code> (if it doesn’t already exist), and be sure to remove any copy of the database we intend to create.</p>
 <p>We’ll then insert the objects:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -411,13 +418,13 @@ Inserted 20 objects from ../../tests/input/countries/countries.jsonl into collec
 </section>
 <section id="Querying">
 <h2>Querying<a class="headerlink" href="#Querying" title="Link to this heading"></a></h2>
-<p>Let’s query for all objects that have <code class="docutils literal notranslate"><span class="pre">code=&quot;GB&quot;</span></code>, and get the results back as a CSV</p>
+<p>Next we’ll explore the <code class="docutils literal notranslate"><span class="pre">query</span></code> command:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>--database<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>query<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;code: GB&quot;</span><span class="w"> </span>-O<span class="w"> </span>csv
+linkml-store<span class="w"> </span>query<span class="w"> </span>--help
 </pre></div>
 </div>
 </div>
@@ -426,16 +433,174 @@ linkml-store<span class="w"> </span>--database<span class="w"> </span>duckdb:///
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-name,code,capital,continent,languages
-United Kingdom,GB,London,Europe,[&#39;English&#39;]
+Usage: linkml-store query [OPTIONS]
+
+  Query objects from the specified collection.
+
+  Leave the query field blank to return all objects in the collection.
+
+  Examples:
+
+      linkml-store -d duckdb:///countries.db -c countries query
+
+  Queries can be specified in YAML, as basic key-value pairs
+
+  Examples:
+
+      linkml-store -d duckdb:///countries.db -c countries query -w &#39;code: NZ&#39;
+
+  More complex queries can be specified using MongoDB-style query syntax
+
+  Examples:
+
+      linkml-store -d file:. -c persons query  -w &#39;occupation: {$ne:
+      Architect}&#39;
+
+  Finds all people who are not architects.
+
+Options:
+  -w, --where TEXT                WHERE clause for the query, as YAML
+  -l, --limit INTEGER             Maximum number of results to return
+  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]
+                                  Output format
+  -o, --output PATH               Output file path
+  --help                          Show this message and exit.
 </pre></div></div>
 </div>
+<p>Let’s query for all objects that have <code class="docutils literal notranslate"><span class="pre">code=&quot;GB&quot;</span></code>, and get the results back as a CSV. The argument for the <code class="docutils literal notranslate"><span class="pre">--where</span></code> (or <code class="docutils literal notranslate"><span class="pre">-w</span></code>) option is a YAML object with a MongoDB-style query.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>--database<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>query<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;code: GB&quot;</span><span class="w"> </span>-O<span class="w"> </span>formatted
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+             name code capital continent  languages
+0  United Kingdom   GB  London    Europe  [English]
+</pre></div></div>
+</div>
+<p>We can get the output in different formats:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>--database<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>query<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;code: GB&quot;</span><span class="w"> </span>-O<span class="w"> </span>yaml
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+name: United Kingdom
+code: GB
+capital: London
+continent: Europe
+languages:
+- English
+</pre></div></div>
+</div>
+<p>Formats include csv, tsv, yaml, json, jsonl, formatted (a human-readable format)</p>
+</section>
+<section id="Describing-the-data-set">
+<h2>Describing the data set<a class="headerlink" href="#Describing-the-data-set" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">describe</span></code> command gives a high-level overview of the data set:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>describe<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Usage: linkml-store describe [OPTIONS]
+
+  Describe the collection schema.
+
+Options:
+  -w, --where TEXT                WHERE clause for the query
+  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]
+                                  Output format
+  -o, --output PATH               Output file path
+  --help                          Show this message and exit.
+</pre></div></div>
+</div>
+<p>Let’s try with the countries dataset:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>describe
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+          count unique               top freq
+capital       1      1  Washington, D.C.    1
+code          1      1                US    1
+continent     1      1     North America    1
+languages     1      1         [English]    1
+name          1      1     United States    1
+</pre></div></div>
+</div>
+<p>Note this command is more useful for numeric data…</p>
 </section>
 <section id="Facet-Counts">
 <h2>Facet Counts<a class="headerlink" href="#Facet-Counts" title="Link to this heading"></a></h2>
 <p>You can combine any query (including an empty query, for fetching the whole database) with a <em>facet query</em> which fetches counts for numbers of objects broken down by some specified slot or slots.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>fq<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Usage: linkml-store fq [OPTIONS]
+
+  Query facets from the specified collection.
+
+  :param ctx: :param where: :param limit: :param columns: :param output_type:
+  :param output: :return:
+
+Options:
+  -w, --where TEXT                WHERE clause for the query
+  -l, --limit INTEGER             Maximum number of results to return
+  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]
+                                  Output format
+  -o, --output PATH               Output file path
+  -S, --columns TEXT              Columns to facet on
+  --help                          Show this message and exit.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -450,12 +615,12 @@ linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/coun
 <div class="highlight"><pre>
 {
   &#34;continent&#34;: {
-    &#34;Asia&#34;: 5,
     &#34;Europe&#34;: 5,
+    &#34;Asia&#34;: 5,
     &#34;Africa&#34;: 3,
     &#34;North America&#34;: 3,
-    &#34;Oceania&#34;: 2,
-    &#34;South America&#34;: 2
+    &#34;South America&#34;: 2,
+    &#34;Oceania&#34;: 2
   }
 }
 </pre></div></div>
@@ -467,12 +632,90 @@ linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/coun
 <p>LinkML-Store is intended to allow for a flexible range of <em>search strategies</em>. Some of these may come from the underlying data store (for example, SOLr or ES is backed by Lucene indexing). Or they may be integrated orthogonally.</p>
 <p>A key search mechanism that is supported is <em>text embedding</em> via <em>Large Language Models (LLMs)</em>. Note these are not enabled by default.</p>
 <p>Currently the default mechanism (which works regardless of the underlying store) is a highly naive trigram-based vector embedding. This requires no external model. It is intended primarily for demonstration purposes, and should be swapped out for something else.</p>
+<section id="Indexing-a-collection">
+<h3>Indexing a collection<a class="headerlink" href="#Indexing-a-collection" title="Link to this heading"></a></h3>
+<p>First we will explore the <code class="docutils literal notranslate"><span class="pre">index</span></code> command</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[72]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>index<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Usage: linkml-store index [OPTIONS]
+
+  Create an index over a collection.
+
+  By default a simple trigram index is used.
+
+Options:
+  -t, --index-type TEXT           Type of index to create. Values: simple, llm
+                                  [default: simple]
+  -E, --cached-embeddings-database TEXT
+                                  Path to the database where embeddings are
+                                  cached
+  -T, --text-template TEXT        Template for text embeddings
+  --help                          Show this message and exit.
+</pre></div></div>
+</div>
+<p>Next we’ll make a (default) index</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
 linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>index
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Searching-a-collection-using-an-index">
+<h3>Searching a collection using an index<a class="headerlink" href="#Searching-a-collection-using-an-index" title="Link to this heading"></a></h3>
+<p>Let’s explore the <code class="docutils literal notranslate"><span class="pre">search</span></code> command</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>search<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Usage: linkml-store search [OPTIONS] SEARCH_TERM
+
+  Search objects in the specified collection.
+
+Options:
+  -w, --where TEXT                WHERE clause for the search
+  -l, --limit INTEGER             Maximum number of search results
+  -O, --output-type [json|jsonl|yaml|tsv|csv|parquet|formatted]
+                                  Output format
+  -o, --output PATH               Output file path
+  --auto-index / --no-auto-index  Automatically index the collection
+                                  [default: no-auto-index]
+  -t, --index-type TEXT           Type of index to create. Values: simple, llm
+                                  [default: simple]
+  --help                          Show this message and exit.
+</pre></div></div>
+</div>
+<p>Now we’ll search for countries in the North where both English and French are spoken. We’ll pose this as a natural language query, but the default index is only picking up on trigram tokens in the strings.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
 linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>search<span class="w"> </span><span class="s2">&quot;countries in the North where both english and french spoken&quot;</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span><span class="w"> </span>-O<span class="w"> </span>csv
 </pre></div>
 </div>
@@ -492,8 +735,9 @@ score,name,code,capital,continent,languages
 </div>
 <p>By default, all fields in the object are indexed. Canada comes out top as the strings for English and France are present (or rather trigrams from those words). But remember the default method is just for illustration!</p>
 </section>
-<section id="Indexing-using-an-LLM">
-<h2>Indexing using an LLM<a class="headerlink" href="#Indexing-using-an-LLM" title="Link to this heading"></a></h2>
+</section>
+<section id="Indexing-using-an-LLM-(OPTIONAL)">
+<h2>Indexing using an LLM (OPTIONAL)<a class="headerlink" href="#Indexing-using-an-LLM-(OPTIONAL)" title="Link to this heading"></a></h2>
 <p>Note for this to work, you need to have installed this package with the <code class="docutils literal notranslate"><span class="pre">llm</span></code> extra, like this:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>linkml-store<span class="o">[</span>llm<span class="o">]</span>
 </pre></div>
@@ -504,22 +748,45 @@ score,name,code,capital,continent,languages
 </div>
 <p>You will also need an OpenAI account.</p>
 <p>If this is too much, you can just skip this section!</p>
-<p><strong>TODO</strong></p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[72]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>index<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span>-E<span class="w"> </span>tmp/llm_cache.db
 </pre></div>
 </div>
 </div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>search<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span><span class="s2">&quot;countries in the North where both english and french spoken&quot;</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span><span class="w"> </span>-O<span class="w"> </span>csv
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+score,name,code,capital,continent,languages
+0.7927589434263863,Canada,CA,Ottawa,North America,&#34;[&#39;English&#39;, &#39;French&#39;]&#34;
+0.7641212153371397,France,FR,Paris,Europe,[&#39;French&#39;]
+0.7546847140878102,United States,US,&#34;Washington, D.C.&#34;,North America,[&#39;English&#39;]
+0.7424773577897005,Australia,AU,Canberra,Oceania,[&#39;English&#39;]
+0.741656789495497,United Kingdom,GB,London,Europe,[&#39;English&#39;]
+</pre></div></div>
+</div>
+<p>The results are not particularly meaningful, but the idea is that this could be used in a RAG-style system.</p>
 </section>
 <section id="Schemas">
 <h2>Schemas<a class="headerlink" href="#Schemas" title="Link to this heading"></a></h2>
 <p>Note in the above we did not explicitly specify a schema; instead it is <em>induced</em>.</p>
 <p>We can use the <code class="docutils literal notranslate"><span class="pre">schema</span></code> command to see the induced schema in <a class="reference external" href="https://linkml.github.io/linkml/">LinkML YAML</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[73]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -574,8 +841,8 @@ classes:
         multivalued: true
         range: string
         required: false
-  internal__index__countries__test:
-    name: internal__index__countries__test
+  internal__index__countries__simple:
+    name: internal__index__countries__simple
     attributes:
       name:
         name: name
@@ -616,7 +883,7 @@ classes:
 <p>These can also package useful information and schemas.</p>
 <p>First we will create a fresh copy of a directory with both configuration files and schemas:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[74]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -627,7 +894,7 @@ rm<span class="w"> </span>tmp/countries/countries.db
 </div>
 <p>The configuration YAML is fairly minimal - it specifies a single database with a single collection, and a pointer to a schema</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[75]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -651,7 +918,7 @@ databases:
 </div>
 <p>The schema itself is fairly basic - a single class (whose name matches the <code class="docutils literal notranslate"><span class="pre">type</span></code>) in the configuration, with some slots. Note the slots have some constraints, e.g. regexps</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[76]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -688,16 +955,22 @@ classes:
       - capital
       - continent
       - languages
+  Route:
+    slots:
+      - origin
+      - destination
+      - method
 
 slots:
   name:
     description: The name of the country
     required: true
-    identifier: true
+    # identifier: true
   code:
     description: The ISO 3166-1 alpha-2 code of the country
     required: true
     pattern: &#39;^[A-Z]{2}$&#39;
+    identifier: true
   capital:
     description: The capital city of the country
     required: true
@@ -708,6 +981,19 @@ slots:
     description: The main languages spoken in the country
     range: Language
     multivalued: true
+  origin:
+    range: Country
+  destination:
+    range: Country
+  method:
+    range: MethodEnum
+
+enums:
+  MethodEnum:
+    permissible_values:
+      rail:
+      air:
+      road:
 
 types:
   Language:
@@ -716,7 +1002,7 @@ types:
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[77]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -733,7 +1019,7 @@ Inserted 20 objects from tmp/countries/countries.jsonl into collection &#39;coun
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[78]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -750,15 +1036,16 @@ countries
 name: countries
 alias: null
 type: Country
-metadata: null
+additional_properties: null
 attributes: null
 indexers: null
 hidden: false
 is_prepopulated: false
+source_location: null
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[79]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -791,7 +1078,7 @@ linkml-store<span class="w"> </span>--stacktrace<span class="w"> </span>-C<span 
 <p>For validation to work, we need to specify an explicit schema, as we have done with the configuration above.</p>
 <p>To test it, we will insert some fake data:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[80]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -807,31 +1094,7 @@ linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/coun
 Inserted 3 objects from {name: Foolandia, code: &#34;X Y&#34;, languages: [&#34;Fooish&#34;]} into collection &#39;countries&#39;.
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[81]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/countries.config.yaml<span class="w"> </span>list-collections
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-countries
-name: countries
-alias: null
-type: Country
-metadata: null
-attributes: null
-indexers: null
-hidden: false
-is_prepopulated: false
-</pre></div></div>
-</div>
+<p>Let’s check that the data is there:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[82]:
 </pre></div>
@@ -859,6 +1122,9 @@ linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/coun
 ]
 </pre></div></div>
 </div>
+<p>Note that by default, validation is <em>deferred</em>. You can insert whatever you like, and then validate later.</p>
+<p>Other configurations may be more suited to your project, including strict/prospective validation.</p>
+<p>Next let’s examine the schema:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
 </pre></div>
@@ -930,12 +1196,15 @@ classes:
 source_file: tmp/countries/countries.linkml.yaml
 </pre></div></div>
 </div>
+<section id="Run-validation">
+<h3>Run validation<a class="headerlink" href="#Run-validation" title="Link to this heading"></a></h3>
+<p>Next we will run the <code class="docutils literal notranslate"><span class="pre">validate</span></code> command:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[84]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/countries.config.yaml<span class="w"> </span>validate<span class="w"> </span>-O<span class="w"> </span>csv
+linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/countries.config.yaml<span class="w"> </span>validate<span class="w"> </span>-O<span class="w"> </span>yaml
 </pre></div>
 </div>
 </div>
@@ -944,10 +1213,41 @@ linkml-store<span class="w"> </span>-C<span class="w"> </span>tmp/countries/coun
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-type,severity,message,instance,instance_index,instantiates
-jsonschema validation,ERROR,&#39;X Y&#39; does not match &#39;^[A-Z]{2}$&#39; in /code,&#34;{&#39;name&#39;: &#39;Foolandia&#39;, &#39;code&#39;: &#39;X Y&#39;, &#39;capital&#39;: None, &#39;continent&#39;: None, &#39;languages&#39;: [&#39;Fooish&#39;]}&#34;,0,Country
-jsonschema validation,ERROR,None is not of type &#39;string&#39; in /capital,&#34;{&#39;name&#39;: &#39;Foolandia&#39;, &#39;code&#39;: &#39;X Y&#39;, &#39;capital&#39;: None, &#39;continent&#39;: None, &#39;languages&#39;: [&#39;Fooish&#39;]}&#34;,0,Country
-jsonschema validation,ERROR,None is not of type &#39;string&#39; in /continent,&#34;{&#39;name&#39;: &#39;Foolandia&#39;, &#39;code&#39;: &#39;X Y&#39;, &#39;capital&#39;: None, &#39;continent&#39;: None, &#39;languages&#39;: [&#39;Fooish&#39;]}&#34;,0,Country
+type: jsonschema validation
+severity: ERROR
+message: &#39;&#39;&#39;X Y&#39;&#39; does not match &#39;&#39;^[A-Z]{2}$&#39;&#39; in /code&#39;
+instance:
+  name: Foolandia
+  code: X Y
+  languages:
+  - Fooish
+instance_index: 0
+instantiates: Country
+context: []
+---
+type: jsonschema validation
+severity: ERROR
+message: &#39;&#39;&#39;capital&#39;&#39; is a required property in /&#39;
+instance:
+  name: Foolandia
+  code: X Y
+  languages:
+  - Fooish
+instance_index: 0
+instantiates: Country
+context: []
+---
+type: jsonschema validation
+severity: ERROR
+message: &#39;&#39;&#39;continent&#39;&#39; is a required property in /&#39;
+instance:
+  name: Foolandia
+  code: X Y
+  languages:
+  - Fooish
+instance_index: 0
+instantiates: Country
+context: []
 </pre></div></div>
 </div>
 <p>Here we can see 3 issues with the data we added:</p>
@@ -964,6 +1264,7 @@ jsonschema validation,ERROR,None is not of type &#39;string&#39; in /continent,&
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 </section>
 
@@ -1026,12 +1327,20 @@ jsonschema validation,ERROR,None is not of type &#39;string&#39; in /continent,&
 <li><a class="reference internal" href="#Top-level-command">Top level command</a></li>
 <li><a class="reference internal" href="#Inserting-objects-from-a-file">Inserting objects from a file</a></li>
 <li><a class="reference internal" href="#Querying">Querying</a></li>
+<li><a class="reference internal" href="#Describing-the-data-set">Describing the data set</a></li>
 <li><a class="reference internal" href="#Facet-Counts">Facet Counts</a></li>
-<li><a class="reference internal" href="#Search">Search</a></li>
-<li><a class="reference internal" href="#Indexing-using-an-LLM">Indexing using an LLM</a></li>
+<li><a class="reference internal" href="#Search">Search</a><ul>
+<li><a class="reference internal" href="#Indexing-a-collection">Indexing a collection</a></li>
+<li><a class="reference internal" href="#Searching-a-collection-using-an-index">Searching a collection using an index</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Indexing-using-an-LLM-(OPTIONAL)">Indexing using an LLM (OPTIONAL)</a></li>
 <li><a class="reference internal" href="#Schemas">Schemas</a></li>
 <li><a class="reference internal" href="#Configuration-Files-and-Explicit-Schemas">Configuration Files and Explicit Schemas</a></li>
-<li><a class="reference internal" href="#Validation">Validation</a></li>
+<li><a class="reference internal" href="#Validation">Validation</a><ul>
+<li><a class="reference internal" href="#Run-validation">Run validation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
