@@ -1,16 +1,15 @@
 """
-Adapter for DuckDB embedded database.
+Adapter for FileSystem wrapper
 
 Handles have the form:
 
- - ``duckdb:///<path>`` for a file-based database
- - ``duckdb:///:memory:`` for an in-memory database
-"""
+ - ``file:<path>`` for a local file
+ """
 
-from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
-from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
+from linkml_store.api.stores.filesystem.filesystem_collection import FileSystemCollection
+from linkml_store.api.stores.filesystem.filesystem_database import FileSystemDatabase
 
 __all__ = [
-    "DuckDBCollection",
-    "DuckDBDatabase",
+    "FileSystemCollection",
+    "FileSystemDatabase",
 ]

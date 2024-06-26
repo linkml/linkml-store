@@ -46,8 +46,8 @@ def test_load_objects_invalid_format():
     [
         (TEST_DATA, Format.JSON, json.dumps(TEST_DATA, indent=2)),
         (TEST_DATA, "json", json.dumps(TEST_DATA, indent=2)),
-        (TEST_DATA, Format.YAML, yaml.safe_dump(TEST_DATA, sort_keys=False)),
-        (TEST_DATA, "yaml", yaml.safe_dump(TEST_DATA, sort_keys=False)),
+        (TEST_DATA, Format.YAML, yaml.safe_dump_all(TEST_DATA, sort_keys=False)),
+        (TEST_DATA, "yaml", yaml.safe_dump_all(TEST_DATA, sort_keys=False)),
         (
             TEST_DATA,
             Format.TSV,

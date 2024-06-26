@@ -4,16 +4,19 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, TextIO, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union
 
 import numpy as np
+from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.linkml_model.meta import ArrayExpression
 from pydantic import BaseModel
 
+from linkml_store.api.types import DatabaseType
 from linkml_store.index import get_indexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.object_utils import clean_empties
+from linkml_store.utils.patch_utils import PatchDict, apply_patches_to_list, patches_from_objects_lists
 
 try:
     from linkml.validator.report import ValidationResult
@@ -36,7 +39,7 @@ IDENTIFIER = str
 FIELD_NAME = str
 
 
-class Collection:
+class Collection(Generic[DatabaseType]):
     """
     A collection is an organized set of objects of the same or similar type.
 
@@ -56,7 +59,7 @@ class Collection:
     """
 
     # name: str
-    parent: Optional["Database"] = None
+    parent: Optional[DatabaseType] = None
     _indexers: Optional[Dict[str, Indexer]] = None
     # hidden: Optional[bool] = False
 
@@ -197,6 +200,10 @@ class Collection:
         """
         raise NotImplementedError
 
+    def _post_insert_hook(self, objs: List[OBJECT], **kwargs):
+        patches = [{"op": "add", "path": "/0", "value": obj} for obj in objs]
+        self._broadcast(patches, **kwargs)
+
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
         Delete one or more objects from the collection.
@@ -301,7 +308,7 @@ class Collection:
 
     def query_facets(
         self, where: Optional[Dict] = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
-    ) -> Dict[str, Dict[str, int]]:
+    ) -> Dict[str, List[Tuple[Any, int]]]:
         """
         Run a query to get facet counts for one or more columns.
 
@@ -319,7 +326,7 @@ class Collection:
         :param query: A Query object representing the base query.
         :param facet_columns: A list of column names to get facet counts for.
         :param facet_limit:
-        :return: A dictionary where keys are column names and values are pandas DataFrames
+        :return: A dictionary where keys are column names and values are tuples
                  containing the facet counts for each unique value in the respective column.
         """
         raise NotImplementedError
@@ -523,6 +530,7 @@ class Collection:
                 ix_coll.delete_where()
 
         ix_coll.insert(objects_with_ix, **kwargs)
+        ix_coll.commit()
 
     def list_index_names(self) -> List[str]:
         """
@@ -557,11 +565,21 @@ class Collection:
 
         :return:
         """
-        sv = self.parent.schema_view
+        sv: SchemaView = self.parent.schema_view
         if sv:
             cls = sv.get_class(self.target_class_name)
+            if cls and not cls.attributes:
+                if not sv.class_induced_slots(cls.name):
+                    for att in self._induce_attributes():
+                        cls.attributes[att.name] = att
+                    sv.set_modified()
             return cls
         return None
+
+    def _induce_attributes(self) -> List[SlotDefinition]:
+        result = self.find({}, limit=-1)
+        cd = self.induce_class_definition_from_objects(result.rows, max_sample_size=None)
+        return list(cd.attributes.values())
 
     @property
     def identifier_attribute_name(self) -> Optional[str]:
@@ -578,6 +596,37 @@ class Collection:
                 if att.identifier:
                     return att.name
         return None
+
+    def set_identifier_attribute_name(self, name: str):
+        """
+        Set the name of the identifier attribute for the collection.
+
+        AKA the primary key.
+
+        :param name: The name of the identifier attribute.
+        """
+        cd = self.class_definition()
+        if not cd:
+            raise ValueError(f"Cannot find class definition for {self.target_class_name}")
+        id_att = None
+        candidates = []
+        sv: SchemaView = self.parent.schema_view
+        cls = sv.get_class(cd.name)
+        existing_id_slot = sv.get_identifier_slot(cls.name)
+        if existing_id_slot:
+            if existing_id_slot.name == name:
+                return
+            existing_id_slot.identifier = False
+        for att in cls.attributes.values():
+            candidates.append(att.name)
+            if att.name == name:
+                att.identifier = True
+                id_att = att
+            else:
+                att.identifier = False
+        if not id_att:
+            raise ValueError(f"No attribute found with name {name} in {candidates}")
+        sv.set_modified()
 
     def object_identifier(self, obj: OBJECT, auto=True) -> Optional[IDENTIFIER]:
         """
@@ -622,6 +671,8 @@ class Collection:
             for k, v in obj.items():
                 keys[k].append(v)
         for k, vs in keys.items():
+            if k == "_id":
+                continue
             multivalueds = []
             inlineds = []
             rngs = []
@@ -698,6 +749,39 @@ class Collection:
         """
         raise NotImplementedError
 
+    def apply_patches(self, patches: List[PatchDict], **kwargs):
+        """
+        Apply a patch to the collection.
+
+        Patches conform to the JSON Patch format,
+
+        :param patches:
+        :param kwargs:
+        :return:
+        """
+        all_objs = self.find(limit=-1).rows
+        primary_key = self.identifier_attribute_name
+        if not primary_key:
+            raise ValueError(f"No primary key for {self.target_class_name}")
+        new_objs = apply_patches_to_list(all_objs, patches, primary_key=primary_key, **kwargs)
+        self.replace(new_objs)
+
+    def diff(self, other: "Collection", **kwargs):
+        """
+        Diff two collections.
+
+        :param other:
+        :param kwargs:
+        :return:
+        """
+        src_objs = self.find(limit=-1).rows
+        tgt_objs = other.find(limit=-1).rows
+        primary_key = self.identifier_attribute_name
+        if not primary_key:
+            raise ValueError(f"No primary key for {self.target_class_name}")
+        patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
+        return patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
+
     def iter_validate_collection(self, **kwargs) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the collection
@@ -717,3 +801,14 @@ class Collection:
         for obj in result.rows:
             obj = clean_empties(obj)
             yield from validator.iter_results(obj, class_name)
+
+    def commit(self):
+        """
+        Commit changes to the collection.
+
+        :return:
+        """
+        pass
+
+    def _broadcast(self, *args, **kwargs):
+        self.parent.broadcast(self, *args, **kwargs)

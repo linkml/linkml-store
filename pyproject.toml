@@ -23,11 +23,13 @@ black = { version=">=24.0.0", optional = true }
 llm = { version="*", optional = true }
 pymongo = { version="*", optional = true }
 chromadb = { version="*", optional = true }
+pyarrow = { version="*", optional = true }
 h5py = { version="*", optional = true }
 linkml = { version="*", optional = true }
 linkml_map = { version="*", optional = true }
 pandas = ">=2.2.1"
 jinja2 = "^3.1.4"
+jsonlines = "^4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = {version = ">=7.1.2"}
@@ -43,6 +45,7 @@ furo = {version = "*"}
 nbsphinx = "*"
 jupyter = "*"
 jupysql = "*"
+papermill = "*"
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^7.4.0"
@@ -60,6 +63,7 @@ llm = ["llm"]
 mongodb = ["pymongo"]
 chromadb = ["chromadb"]
 h5py = ["h5py"]
+pyarrow = ["pyarrow"]
 validation = ["linkml"]
 map = ["linkml_map"]
 
@@ -127,7 +131,7 @@ skip = '.git,*.pdf,*.svg,./tests,pyproject.toml,*.dill,poetry.lock,*.ipynb'
 # Ignore table where words could be split across rows
 # Ignore shortcut specifications like [Ff]alse
 ignore-regex = '(\|.*\|.*\|.*\||\[[A-Z][a-z]\][a-z][a-z])'
-ignore-words-list = 'mater,connexion,infarction'
+ignore-words-list = 'mater,connexion,infarction,nin'
 count = ""
 quiet-level = 3
 

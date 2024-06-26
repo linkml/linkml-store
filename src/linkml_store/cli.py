@@ -14,7 +14,7 @@ from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output
+from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 
 index_type_option = click.option(
@@ -181,6 +181,7 @@ def insert(ctx, files, object, format):
             objects = yaml.safe_load(object_str)
             collection.insert(objects)
             click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{collection.name}'.")
+    collection.commit()
 
 
 @cli.command()
@@ -213,9 +214,9 @@ def store(ctx, files, object, format):
 
 
 @cli.command(name="import")
-@click.argument("files", type=click.Path(exists=True), nargs=-1)
 @click.option("--format", "-f", help="Input format")
 @click.pass_context
+@click.argument("files", type=click.Path(exists=True), nargs=-1)
 def import_database(ctx, files, format):
     """Imports a database from a dump."""
     settings = ctx.obj["settings"]
@@ -242,13 +243,77 @@ def export(ctx, output_type, output):
 
 
 @cli.command()
-@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--other-database", "-D", required=False, help="Path to the other database")
+@click.option("--other-collection", "-X", required=True, help="Name of the other collection")
+@click.option("--identifier-attribute", "-I", required=False, help="Primary key name")
+@click.pass_context
+def diff(ctx, output, output_type, other_database, other_collection, identifier_attribute):
+    """Diffs two collectoons to create a patch."""
+    settings = ctx.obj["settings"]
+    db = settings.database
+    collection = settings.collection
+    if not collection:
+        raise ValueError("Collection must be specified.")
+    other_db = settings.client.get_database(other_database) if other_database else db
+    other_collection = other_db.get_collection(other_collection)
+    if identifier_attribute:
+        collection.set_identifier_attribute_name(identifier_attribute)
+        other_collection.set_identifier_attribute_name(identifier_attribute)
+    diff = collection.diff(other_collection)
+    write_output(diff, output_type, target=output)
+
+
+@cli.command()
+@click.option("--identifier-attribute", "-I", required=False, help="Primary key name")
+@click.argument("patch_files", type=click.Path(exists=True), nargs=-1)
+@click.pass_context
+def apply(ctx, patch_files, identifier_attribute):
+    """
+    Apply a patch to a collection.
+    """
+    settings = ctx.obj["settings"]
+    collection = settings.collection
+    if not collection:
+        raise ValueError("Collection must be specified.")
+    if identifier_attribute:
+        collection.set_identifier_attribute_name(identifier_attribute)
+    for patch_file in patch_files:
+        patch_objs = load_objects(patch_file, expected_type=list)
+        collection.apply_patches(patch_objs)
+
+
+@cli.command()
+@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query, as YAML")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.pass_context
 def query(ctx, where, limit, output_type, output):
-    """Query objects from the specified collection."""
+    """Query objects from the specified collection.
+
+
+    Leave the query field blank to return all objects in the collection.
+
+    Examples:
+
+        linkml-store -d duckdb:///countries.db -c countries query
+
+    Queries can be specified in YAML, as basic key-value pairs
+
+    Examples:
+
+        linkml-store -d duckdb:///countries.db -c countries query -w 'code: NZ'
+
+    More complex queries can be specified using MongoDB-style query syntax
+
+    Examples:
+
+        linkml-store -d file:. -c persons query  -w 'occupation: {$ne: Architect}'
+
+    Finds all people who are not architects.
+    """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
     query = Query(from_table=collection.name, where_clause=where_clause, limit=limit)
@@ -327,6 +392,21 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 
 
 @cli.command()
+@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
+@click.option("--output-type", "-O", type=format_choice, default=Format.FORMATTED.value, help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.pass_context
+def describe(ctx, where, output_type, output):
+    """
+    Describe the collection schema.
+    """
+    where_clause = yaml.safe_load(where) if where else None
+    collection = ctx.obj["settings"].collection
+    df = collection.find(where_clause, limit=1).rows_dataframe
+    write_output(df.describe(include="all").transpose(), output_type, target=output)
+
+
+@cli.command()
 @index_type_option
 @click.option("--cached-embeddings-database", "-E", help="Path to the database where embeddings are cached")
 @click.option("--text-template", "-T", help="Template for text embeddings")
@@ -335,9 +415,7 @@ def index(ctx, index_type, **kwargs):
     """
     Create an index over a collection.
 
-    :param ctx:
-    :param index_type:
-    :return:
+    By default a simple trigram index is used.
     """
     collection = ctx.obj["settings"].collection
     ix = get_indexer(index_type, **kwargs)
@@ -397,6 +475,9 @@ def search(ctx, search_term, where, limit, index_type, output_type, output, auto
 @cli.command()
 @click.pass_context
 def indexes(ctx):
+    """
+    Show the indexes for a collection.
+    """
     collection = ctx.obj["settings"].collection
     for name, ix in collection.indexers.items():
         click.echo(f"{name}: {type(ix)}\n{ix.model_json()}")

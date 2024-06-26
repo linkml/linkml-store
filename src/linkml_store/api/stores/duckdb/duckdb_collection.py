@@ -38,6 +38,7 @@ class DuckDBCollection(Collection):
             with conn.begin():
                 conn.execute(insert(table), objs)
             conn.commit()
+        self._post_insert_hook(objs)
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         if not isinstance(objs, list):
