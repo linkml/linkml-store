@@ -5,10 +5,9 @@ from typing import Optional
 import yaml
 from linkml.utils.schema_builder import SchemaBuilder
 from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model import SlotDefinition
 
-from linkml_store.api import Collection, Database
-from linkml_store.api.config import CollectionConfig, DatabaseConfig
+from linkml_store.api import Database
+from linkml_store.api.config import DatabaseConfig
 from linkml_store.api.stores.filesystem.filesystem_collection import FileSystemCollection
 from linkml_store.utils.format_utils import Format, load_objects
 
@@ -31,7 +30,7 @@ class FileSystemDatabase(Database):
 
     @property
     def metadata_path(self) -> Path:
-        return self.directory_path / f".linkml_metadata.yaml"
+        return self.directory_path / ".linkml_metadata.yaml"
 
     def load_metadata(self):
         curr_metadata = self.metadata
@@ -72,4 +71,3 @@ class FileSystemDatabase(Database):
         for collection_name in self.list_collection_names():
             sb.add_class(collection_name)
         return SchemaView(sb.schema)
-

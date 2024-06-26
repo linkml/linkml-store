@@ -4,7 +4,7 @@ import sys
 from enum import Enum
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Type, TextIO
+from typing import Any, Dict, List, Optional, TextIO, Type, Union
 
 import pandas as pd
 import yaml
@@ -25,7 +25,9 @@ class Format(Enum):
     FORMATTED = "formatted"
 
 
-def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None, expected_type: Type=None) -> List[Dict[str, Any]]:
+def load_objects(
+    file_path: Union[str, Path], format: Union[Format, str] = None, expected_type: Type = None
+) -> List[Dict[str, Any]]:
     """
     Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
 
@@ -74,6 +76,7 @@ def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None,
         objs = list(reader)
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
+
         table = pq.read_table(f)
         objs = table.to_pandas().to_dict(orient="records")
     else:
@@ -83,7 +86,11 @@ def load_objects(file_path: Union[str, Path], format: Union[Format, str] = None,
     return objs
 
 
-def write_output(data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Union[Format, str] = Format.YAML, target: Optional[Union[TextIO, str, Path]] = None) -> None:
+def write_output(
+    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame],
+    format: Union[Format, str] = Format.YAML,
+    target: Optional[Union[TextIO, str, Path]] = None,
+) -> None:
     """
     Write output data to a file in JSON, JSONLines, YAML, CSV, or TSV format.
 
@@ -110,7 +117,9 @@ def write_output(data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame]
         print(output_str)
 
 
-def render_output(data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Union[Format, str] = Format.YAML) -> str:
+def render_output(
+    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Union[Format, str] = Format.YAML
+) -> str:
     """
     Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
 
@@ -184,6 +193,7 @@ def get_fieldnames(data: List[Dict[str, Any]]) -> List[str]:
     for obj in data:
         fieldnames.extend([k for k in obj.keys() if k not in fieldnames])
     return fieldnames
+
 
 def guess_format(path: str) -> Optional[Format]:
     """

@@ -2,7 +2,6 @@ import logging
 import shutil
 
 import pytest
-
 from linkml_store.api.stores.filesystem.filesystem_database import FileSystemDatabase
 from linkml_store.index import get_indexer
 
@@ -90,4 +89,3 @@ def test_insert_and_query(fmt):
     assert len(top2) == 2
     top2_names = sorted([r["name"] for _, r in top2])
     assert top2_names == ["Alice", "Jie"]
-

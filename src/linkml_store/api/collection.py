@@ -4,7 +4,7 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, TextIO, Type, Union, TypedDict, Generic, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union
 
 import numpy as np
 from linkml_runtime import SchemaView
@@ -201,9 +201,8 @@ class Collection(Generic[DatabaseType]):
         raise NotImplementedError
 
     def _post_insert_hook(self, objs: List[OBJECT], **kwargs):
-        patches = [{'op': 'add', 'path': "/0", 'value': obj} for obj in objs]
+        patches = [{"op": "add", "path": "/0", "value": obj} for obj in objs]
         self._broadcast(patches, **kwargs)
-
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
@@ -582,7 +581,6 @@ class Collection(Generic[DatabaseType]):
         cd = self.induce_class_definition_from_objects(result.rows, max_sample_size=None)
         return list(cd.attributes.values())
 
-
     @property
     def identifier_attribute_name(self) -> Optional[str]:
         """
@@ -629,8 +627,6 @@ class Collection(Generic[DatabaseType]):
         if not id_att:
             raise ValueError(f"No attribute found with name {name} in {candidates}")
         sv.set_modified()
-
-
 
     def object_identifier(self, obj: OBJECT, auto=True) -> Optional[IDENTIFIER]:
         """
@@ -785,7 +781,6 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"No primary key for {self.target_class_name}")
         patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
         return patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
-
 
     def iter_validate_collection(self, **kwargs) -> Iterator["ValidationResult"]:
         """

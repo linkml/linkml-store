@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional, Any, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 import jsonpatch
 
@@ -38,7 +38,9 @@ def apply_patches(obj: Any, patches: List[PatchDict], primary_key: Optional[str]
         raise ValueError(f"Unsupported object type: {type(obj)}")
 
 
-def apply_patches_to_list(objects: List[Dict[str, Any]], patches: List[PatchDict], primary_key: str, in_place=False) -> List[Dict[str, Any]]:
+def apply_patches_to_list(
+    objects: List[Dict[str, Any]], patches: List[PatchDict], primary_key: str, in_place=False
+) -> List[Dict[str, Any]]:
     """
     Apply a set of patches to a list of objects.
 
@@ -55,7 +57,9 @@ def apply_patches_to_list(objects: List[Dict[str, Any]], patches: List[PatchDict
     return list(result.values())
 
 
-def apply_patches_to_keyed_list(objs_as_dict: Dict[str, Dict[str, Any]], patches: List[PatchDict], in_place=False) -> Dict[str, Dict[str, Any]]:
+def apply_patches_to_keyed_list(
+    objs_as_dict: Dict[str, Dict[str, Any]], patches: List[PatchDict], in_place=False
+) -> Dict[str, Dict[str, Any]]:
     """
     Apply a set of patches to a list of objects, where the objects are keyed by a primary key
 
@@ -68,7 +72,10 @@ def apply_patches_to_keyed_list(objs_as_dict: Dict[str, Dict[str, Any]], patches
     result = patch_obj.apply(objs_as_dict, in_place=in_place)
     return result
 
-def patches_from_objects_lists(src_objs: List[Dict[str, Any]], dst_objs: List[Dict[str, Any]], primary_key: str, exclude_none=True) -> List[PatchDict]:
+
+def patches_from_objects_lists(
+    src_objs: List[Dict[str, Any]], dst_objs: List[Dict[str, Any]], primary_key: str, exclude_none=True
+) -> List[PatchDict]:
     """
     Generate a set of patches to transform src_objs into tgt_objs.
 
@@ -106,7 +113,7 @@ def patches_from_objects_lists(src_objs: List[Dict[str, Any]], dst_objs: List[Di
         dst_objs_as_dict = {k: remove_nones(v) for k, v in dst_objs_as_dict.items()}
     patch_obj = jsonpatch.JsonPatch.from_diff(src_objs_as_dict, dst_objs_as_dict)
     pl = patch_obj.patch
-    return sorted(pl, key=lambda x: (x['path'], x['op']))
+    return sorted(pl, key=lambda x: (x["path"], x["op"]))
 
 
 def remove_nones(obj: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,16 +1,17 @@
-from typing import Dict, Any, Callable
 import operator
+from typing import Any, Callable, Dict
 
 MONGO_OPERATORS = {
-    '$eq': operator.eq,
-    '$ne': operator.ne,
-    '$gt': operator.gt,
-    '$gte': operator.ge,
-    '$lt': operator.lt,
-    '$lte': operator.le,
-    '$in': lambda a, b: any(x in b for x in (a if isinstance(a, list) else [a])),
-    '$nin': lambda a, b: all(x not in b for x in (a if isinstance(a, list) else [a]))
+    "$eq": operator.eq,
+    "$ne": operator.ne,
+    "$gt": operator.gt,
+    "$gte": operator.ge,
+    "$lt": operator.lt,
+    "$lte": operator.le,
+    "$in": lambda a, b: any(x in b for x in (a if isinstance(a, list) else [a])),
+    "$nin": lambda a, b: all(x not in b for x in (a if isinstance(a, list) else [a])),
 }
+
 
 def mongo_query_to_match_function(where: Dict[str, Any]) -> Callable[[Dict[str, Any]], bool]:
     """
@@ -52,9 +53,10 @@ def mongo_query_to_match_function(where: Dict[str, Any]) -> Callable[[Dict[str, 
     """
     if where is None:
         where = {}
+
     def matches(obj: Dict[str, Any]) -> bool:
         def check_condition(key: str, condition: Any) -> bool:
-            if isinstance(condition, dict) and any(k.startswith('$') for k in condition.keys()):
+            if isinstance(condition, dict) and any(k.startswith("$") for k in condition.keys()):
                 for op, value in condition.items():
                     if op in MONGO_OPERATORS:
                         if not MONGO_OPERATORS[op](get_nested_value(obj, key), value):
@@ -74,7 +76,7 @@ def mongo_query_to_match_function(where: Dict[str, Any]) -> Callable[[Dict[str, 
             return True
 
         def get_nested_value(obj: Dict[str, Any], key: str) -> Any:
-            parts = key.split('.')
+            parts = key.split(".")
             for part in parts:
                 if isinstance(obj, dict):
                     obj = obj.get(part)

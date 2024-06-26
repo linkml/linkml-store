@@ -1,5 +1,4 @@
 import logging
-from dataclasses import field, dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -67,23 +66,28 @@ class FileSystemCollection(Collection[DatabaseType]):
         with open(path, mode, encoding=encoding) as stream:
             if fmt == "json":
                 import json
+
                 json.dump(self.objects_as_list, stream, indent=2)
             elif fmt == "jsonl":
                 import jsonlines
+
                 writer = jsonlines.Writer(stream)
                 writer.write_all(self.objects_as_list)
             elif fmt == "yaml":
                 import yaml
+
                 yaml.dump_all(self.objects_as_list, stream)
             elif fmt == "parquet":
                 import pandas as pd
-                import pyarrow.parquet as pq
                 import pyarrow
+                import pyarrow.parquet as pq
+
                 df = pd.DataFrame(self.objects_as_list)
                 table = pyarrow.Table.from_pandas(df)
                 pq.write_table(table, stream)
             elif fmt in {"csv", "tsv"}:
                 import csv
+
                 delimiter = "\t" if fmt == "tsv" else ","
                 fieldnames = list(self.objects_as_list[0].keys())
                 for obj in self.objects_as_list[1:]:
@@ -94,7 +98,6 @@ class FileSystemCollection(Collection[DatabaseType]):
                     writer.writerow(obj)
             else:
                 raise ValueError(f"Unsupported file format: {fmt}")
-
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
@@ -110,7 +113,6 @@ class FileSystemCollection(Collection[DatabaseType]):
                 self._object_map[pk_val] = obj
         else:
             self._objects_list.extend(objs)
-
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         if not isinstance(objs, list):
@@ -135,11 +137,13 @@ class FileSystemCollection(Collection[DatabaseType]):
         logger.info(f"Deleting from {self.target_class_name} where: {where}")
         if where is None:
             where = {}
+
         def matches(obj: OBJECT):
             for k, v in where.items():
                 if obj.get(k) != v:
                     return False
             return True
+
         print(type(self))
         print(self)
         print(vars(self))

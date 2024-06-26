@@ -30,7 +30,7 @@ SCHEMES = [
     f"duckdb:///{TEMP_DB_PATH}",
     # "mongodb://localhost:27017/test_db",
 ]
-#SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db"]
+# SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db"]
 SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db", f"file:{OUTPUT_DIR}/api_test_fs"]
 
 DEFAULT_DB = "default"
@@ -263,8 +263,8 @@ def test_patch(handle):
     ]
     collection_a = database.create_collection("Person", alias="persons_a", recreate_if_exists=True)
     collection_b = database.create_collection("Person", alias="persons_b", recreate_if_exists=True)
-    #p3 = collection_a.find({"id": "P3"}).rows[0]
-    #assert p3["name"] == "n3"
+    # p3 = collection_a.find({"id": "P3"}).rows[0]
+    # assert p3["name"] == "n3"
     # assert "age" not in p3 - TODO; https://github.com/orgs/linkml/discussions/1975
     collection_a.insert(persons_a)
     collection_b.insert(persons_b)
@@ -337,7 +337,7 @@ def test_load_from_source(handle):
     assert coll.find({}).num_rows > 0
 
 
-@pytest.mark.parametrize("handle", SCHEMES) # TODO - mongodb
+@pytest.mark.parametrize("handle", SCHEMES)  # TODO - mongodb
 @pytest.mark.parametrize(
     "type_alias",
     [

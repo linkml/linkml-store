@@ -393,7 +393,6 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
-
 @click.option("--output-type", "-O", type=format_choice, default=Format.FORMATTED.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.pass_context
@@ -404,7 +403,7 @@ def describe(ctx, where, output_type, output):
     where_clause = yaml.safe_load(where) if where else None
     collection = ctx.obj["settings"].collection
     df = collection.find(where_clause, limit=1).rows_dataframe
-    write_output(df.describe(include='all').transpose(), output_type, target=output)
+    write_output(df.describe(include="all").transpose(), output_type, target=output)
 
 
 @cli.command()

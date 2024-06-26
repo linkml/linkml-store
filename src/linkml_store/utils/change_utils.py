@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from linkml_store.api.collection import OBJECT
 
@@ -14,4 +14,4 @@ def insert_operation_to_patches(objs: List[OBJECT], **kwargs):
     """
     patches = []
     for obj in objs:
-        patches.append({'op': 'add', 'path': "/0", 'value': obj})
+        patches.append({"op": "add", "path": "/0", "value": obj})
