@@ -26,17 +26,23 @@ class MongoDBCollection(Collection):
     def mongo_collection(self) -> MongoCollection:
         if not self.name:
             raise ValueError("Collection name not set")
-        return self.parent.native_db[self.name]
+        collection_name = self.alias or self.name
+        return self.parent.native_db[collection_name]
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):
             objs = [objs]
         self.mongo_collection.insert_many(objs)
+        # TODO: allow mapping of _id to id for efficiency
+        for obj in objs:
+            del obj["_id"]
+        self._post_insert_hook(objs)
 
-    def query(self, query: Query, **kwargs) -> QueryResult:
+    def query(self, query: Query, limit: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
-        if query.limit:
-            cursor = self.mongo_collection.find(mongo_filter).limit(query.limit)
+        limit = limit or query.limit
+        if limit and limit >= 0:
+            cursor = self.mongo_collection.find(mongo_filter).limit(limit)
         else:
             cursor = self.mongo_collection.find(mongo_filter)
 

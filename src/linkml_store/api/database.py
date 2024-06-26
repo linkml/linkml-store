@@ -3,9 +3,12 @@ from abc import ABC
 from collections import defaultdict
 from copy import copy
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterator, Optional, Sequence, Type, Union, Generic, List, \
+    Callable
 
+from linkml_store.api.types import CollectionType
 from linkml_store.utils.format_utils import load_objects, render_output
+from linkml_store.utils.patch_utils import PatchDict
 
 try:
     from linkml.validator.report import Severity, ValidationResult
@@ -24,8 +27,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+LISTENER = Callable[[Collection, List[PatchDict]], None]
 
-class Database(ABC):
+
+class Database(ABC, Generic[CollectionType]):
     """
     A Database provides access to named collections of data.
 
@@ -88,6 +93,8 @@ class Database(ABC):
     parent: Optional["Client"] = None
     metadata: Optional[DatabaseConfig] = None
     collection_class: ClassVar[Optional[Type[Collection]]] = None
+
+    listeners: Optional[List[LISTENER]] = None
 
     def __init__(self, handle: Optional[str] = None, metadata: Optional[DatabaseConfig] = None, **kwargs):
         if metadata:
@@ -233,7 +240,8 @@ class Database(ABC):
         :param kwargs:
         :return:
         """
-        raise NotImplementedError()
+        for coll in self.list_collections():
+            coll.commit()
 
     def close(self, **kwargs):
         """
@@ -301,6 +309,7 @@ class Database(ABC):
             alias = name
         self._collections[alias] = collection
         if recreate_if_exists:
+            logger.debug(f"Recreating collection {collection.name}")
             collection.delete_where({}, missing_ok=True)
         return collection
 
@@ -418,7 +427,11 @@ class Database(ABC):
         :return:
 
         """
-        raise NotImplementedError
+        if query.from_table:
+            collection = self.get_collection(query.from_table)
+            return collection.query(query, **kwargs)
+        else:
+            raise NotImplementedError(f"Querying without a table is not supported in {self.__class__.__name__}")
 
     @property
     def schema_view(self) -> SchemaView:
@@ -689,3 +702,9 @@ class Database(ABC):
         logger.info(f"Exporting object with {len(obj)} collections to {location} in {target_format} format")
         with open(location, "w", encoding="utf-8") as stream:
             stream.write(render_output(obj, format=target_format))
+
+    def broadcast(self, source: Collection, patches: List[PatchDict]):
+        if not self.listeners:
+            return
+        for listener in self.listeners:
+            listener(source, patches)

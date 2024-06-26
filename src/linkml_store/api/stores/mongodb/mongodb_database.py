@@ -29,8 +29,16 @@ class MongoDBDatabase(Database):
 
     def __init__(self, handle: Optional[str] = None, **kwargs):
         if handle is None:
-            handle = "mongodb://localhost:27017"
+            handle = "mongodb://localhost:27017/test"
         super().__init__(handle=handle, **kwargs)
+
+    @property
+    def _db_name(self) -> str:
+        if self.handle:
+            db = self.handle.split("/")[-1]
+        else:
+            db = "default"
+        return db
 
     @property
     def native_client(self) -> MongoClient:
@@ -44,7 +52,7 @@ class MongoDBDatabase(Database):
             alias = self.metadata.alias
             if not alias:
                 alias = "default"
-            self._native_db = self.native_client[alias]
+            self._native_db = self.native_client[self._db_name]
         return self._native_db
 
     def commit(self, **kwargs):
@@ -58,9 +66,12 @@ class MongoDBDatabase(Database):
         self.native_client.drop_database(self.metadata.alias)
 
     def query(self, query: Query, **kwargs) -> QueryResult:
+        # TODO: DRY
         if query.from_table:
             collection = self.get_collection(query.from_table)
             return collection.query(query, **kwargs)
+        else:
+            raise NotImplementedError(f"Querying without a table is not supported in {self.__class__.__name__}")
 
     def init_collections(self):
         if self._collections is None:

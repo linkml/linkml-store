@@ -1,4 +1,4 @@
-name: linkml-data-browser QC
+name: linkml-store QC
 
 on:
   push:
@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.8", "3.11" ]
+        mongodb-version: ['8.0']
 
     steps:
       - uses: actions/checkout@v3.0.2
@@ -33,5 +34,10 @@ jobs:
       - name: Check code quality with flake8
         run: poetry run tox -e lint
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+        
       - name: Test with pytest and generate coverage file
         run: poetry run pytest
