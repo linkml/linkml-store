@@ -244,7 +244,7 @@ def test_collections_of_same_type(handle):
 
 
 # TODO: mongo works locally but fails on github actions
-#@pytest.mark.parametrize("handle", SCHEMES_PLUS)
+# @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 @pytest.mark.parametrize("handle", SCHEMES)
 def test_patch(handle):
     """
