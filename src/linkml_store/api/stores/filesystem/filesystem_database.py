@@ -33,7 +33,6 @@ class FileSystemDatabase(Database):
         return self.directory_path / ".linkml_metadata.yaml"
 
     def load_metadata(self):
-        curr_metadata = self.metadata
         if self.metadata_path.exists():
             md_dict = yaml.safe_load(open(self.metadata_path))
             metadata = DatabaseConfig(**md_dict)
