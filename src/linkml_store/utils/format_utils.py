@@ -64,7 +64,7 @@ def load_objects(
     elif format == Format.JSONL or (not format and file_path.endswith(".jsonl")):
         objs = [json.loads(line) for line in f]
     elif format == Format.YAML or (not format and (file_path.endswith(".yaml") or file_path.endswith(".yml"))):
-        if expected_type and expected_type == list:
+        if expected_type and expected_type == list:  # noqa E721
             objs = list(yaml.safe_load_all(f))
         else:
             objs = yaml.safe_load(f)
