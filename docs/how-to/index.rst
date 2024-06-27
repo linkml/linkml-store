@@ -15,4 +15,5 @@ How-To Guides
    Check-Referential-Integrity
    Store-an-Ontology
    Index-Phenopackets
+   Index-GO-CAMs
 
