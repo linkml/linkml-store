@@ -1,3 +1,13 @@
+"""
+Indexers package.
+
+Indexers allow indexes to be added to existing :class:`Collection` objects.
+
+Current two are supported:
+
+* simple: :class:`SimpleIndexer`
+* llm: :class:`LLMIndexer`
+"""
 from typing import Type
 
 from linkml_store.index.implementations.llm_indexer import LLMIndexer
@@ -14,7 +24,7 @@ def get_indexer_class(name: str) -> Type[Indexer]:
     """
     Get an indexer class by name.
 
-    :param name: the name of the indexer
+    :param name: the name of the indexer (simple, llm, ...)
     :return: the indexer class
     """
     if name not in INDEXER_CLASSES:
@@ -26,7 +36,10 @@ def get_indexer(index_type: str, **kwargs) -> Indexer:
     """
     Get an indexer by name.
 
-    :param name: the name of the indexer
+    >>> simple_indexer = get_indexer("simple")
+    >>> llm_indexer = get_indexer("llm")
+
+    :param name: the name of the indexer (simple, llm, ...)
     :param kwargs: additional arguments to pass to the indexer
     :return: the indexer
     """

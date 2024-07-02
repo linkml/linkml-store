@@ -78,6 +78,16 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
+
+# Add this to create a parallel hierarchy
+#add_module_names = False
+#python_use_unqualified_type_names = True
+
+# Ensure full module paths are used as page names
+#autosummary_generate = True
+#autosummary_imported_members = True
+
+
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
