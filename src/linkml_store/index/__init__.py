@@ -8,6 +8,7 @@ Current two are supported:
 * simple: :class:`SimpleIndexer`
 * llm: :class:`LLMIndexer`
 """
+
 from typing import Type
 
 from linkml_store.index.implementations.llm_indexer import LLMIndexer

@@ -1,4 +1,3 @@
-
 import logging
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -15,6 +14,7 @@ class TemplateSyntaxEnum(str, Enum):
     """
     Template syntax types.
     """
+
     jinja2 = "jinja2"
     fstring = "fstring"
 
