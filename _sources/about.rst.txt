@@ -17,10 +17,26 @@ The overall goals are to provide:
 Installation
 ------------
 
+At this stage we recommend installing all extras:
+
 .. code-block:: bash
 
-    pip install linkml-store
+    pip install "linkml-store[all]"
 
+Minimal implementation:
+
+.. code-block:: bash
+
+    pip install "linkml-store"
+
+For developers working on the linkml-store codebase, we recommend checking out the repo, and then
+installing all packages via the `make` command:
+
+.. code-block:: bash
+
+    git clone <URL>
+    cd linkml-store
+    make install
 
 Quickstart
 ----------

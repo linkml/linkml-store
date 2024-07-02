@@ -294,7 +294,19 @@ over multiple different backends, unified via LinkML schemas.</p>
 </ul>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>linkml-store
+<p>At this stage we recommend installing all extras:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store[all]&quot;</span>
+</pre></div>
+</div>
+<p>Minimal implementation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store&quot;</span>
+</pre></div>
+</div>
+<p>For developers working on the linkml-store codebase, we recommend checking out the repo, and then
+installing all packages via the <cite>make</cite> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;URL&gt;
+<span class="nb">cd</span><span class="w"> </span>linkml-store
+make<span class="w"> </span>install
 </pre></div>
 </div>
 </section>

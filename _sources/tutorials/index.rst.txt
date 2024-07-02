@@ -1,4 +1,4 @@
-.. tutorials
+.. _tutorials
    :title: LinkML-Store Tutorial
 
 Tutorials

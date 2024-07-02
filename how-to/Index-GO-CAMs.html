@@ -284,7 +284,7 @@
           <section id="How-to-index-GO-CAMs-with-LinkML-Store">
 <h1>How to index GO-CAMs with LinkML-Store<a class="headerlink" href="#How-to-index-GO-CAMs-with-LinkML-Store" title="Link to this heading"></a></h1>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -295,7 +295,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load_all</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
@@ -306,7 +306,7 @@
 <h2>Creating a client and attaching to a database<a class="headerlink" href="#Creating-a-client-and-attaching-to-a-database" title="Link to this heading"></a></h2>
 <p>First we will create a client as normal:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -319,7 +319,7 @@
 <p>We will make a database called “GO-CAMs” and recreate it if it already exists</p>
 <p>(note for people running this notebook locally - if you happen to have a database with this name in your current mongo instance it will be deleted!)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017/gocams&quot;</span><span class="p">,</span> <span class="s2">&quot;gocams&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -331,7 +331,7 @@
 <h2>Creating a collection<a class="headerlink" href="#Creating-a-collection" title="Link to this heading"></a></h2>
 <p>We’ll create a simple test collection. The concept of collection in linkml-store maps directly to mongodb collections</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -343,7 +343,7 @@
 <h2>Inserting objects into the store<a class="headerlink" href="#Inserting-objects-into-the-store" title="Link to this heading"></a></h2>
 <p>We’ll use the standard <code class="docutils literal notranslate"><span class="pre">insert</span></code> method to insert the GO-CAMs into the collection. At this stage there is no explicit schema.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
@@ -355,7 +355,7 @@
 <h2>Check contents<a class="headerlink" href="#Check-contents" title="Link to this heading"></a></h2>
 <p>We can check the number of rows in the collection, to ensure everything was inserted correctly:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span>
@@ -363,7 +363,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -372,7 +372,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
@@ -380,7 +380,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;taxon&quot;</span><span class="p">:</span> <span class="s2">&quot;NCBITaxon:6239&quot;</span><span class="p">},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -389,7 +389,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -457,7 +457,7 @@
 </div>
 <p>Let’s check with pandas just to make sure it looks as expected; we’ll query for a specific OMIM disease:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;activities.enabled_by&quot;</span><span class="p">:</span> <span class="s2">&quot;WB:WBGene00006575&quot;</span><span class="p">},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -466,7 +466,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -529,7 +529,7 @@
 <p>We will now demonstrate faceted queries, allowing us to count the number of instances of different categorical values or categorical value combinations.</p>
 <p>First we’ll facet on the subject sex. We can use path notation, e.g. <code class="docutils literal notranslate"><span class="pre">subject.sex</span></code> here:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;taxon&quot;</span><span class="p">])</span>
@@ -537,7 +537,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -564,7 +564,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;taxon&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">)])</span>
@@ -572,7 +572,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -584,24 +584,24 @@
    15), ({&#39;taxon&#39;: &#39;NCBITaxon:7955&#39;, &#39;status&#39;: &#39;production&#39;},
    14), ({&#39;taxon&#39;: &#39;NCBITaxon:7227&#39;,
     &#39;status&#39;: &#39;production&#39;}, 13), ({&#39;taxon&#39;: &#39;NCBITaxon:559292&#39;, &#39;status&#39;: &#39;production&#39;},
-   6), ({&#39;taxon&#39;: &#39;NCBITaxon:9823&#39;, &#39;status&#39;: &#39;production&#39;},
-   4), ({&#39;taxon&#39;: &#39;NCBITaxon:6239&#39;,
-    &#39;status&#39;: &#39;production&#39;}, 4), ({&#39;taxon&#39;: &#39;NCBITaxon:28576&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:425011&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:1403190&#39;,
-    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:5074&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:229533&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:99287&#39;,
-    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:602072&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:8355&#39;, &#39;status&#39;: &#39;production&#39;},
+   6), ({&#39;taxon&#39;: &#39;NCBITaxon:6239&#39;, &#39;status&#39;: &#39;production&#39;},
+   4), ({&#39;taxon&#39;: &#39;NCBITaxon:9823&#39;,
+    &#39;status&#39;: &#39;production&#39;}, 4), ({&#39;taxon&#39;: &#39;NCBITaxon:227321&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:8364&#39;, &#39;status&#39;: &#39;production&#39;},
    1), ({&#39;taxon&#39;: &#39;NCBITaxon:1735992&#39;,
-    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:8364&#39;, &#39;status&#39;: &#39;production&#39;},
-   1), ({&#39;taxon&#39;: &#39;NCBITaxon:227321&#39;, &#39;status&#39;: &#39;production&#39;}, 1)]}
+    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:8355&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:602072&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:229533&#39;,
+    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:1403190&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:425011&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:5074&#39;,
+    &#39;status&#39;: &#39;production&#39;}, 1), ({&#39;taxon&#39;: &#39;NCBITaxon:28576&#39;, &#39;status&#39;: &#39;production&#39;},
+   1), ({&#39;taxon&#39;: &#39;NCBITaxon:99287&#39;, &#39;status&#39;: &#39;production&#39;}, 1)]}
 </pre></div></div>
 </div>
 <p>We can also facet by the disease name/label. We’ll restrict this to the top 20</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;activities.molecular_function.term&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -609,7 +609,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -619,55 +619,66 @@
     &#39;GO:0004674&#39;],
    2),
   ([&#39;GO:0048018&#39;, &#39;GO:0038023&#39;, &#39;GO:0004252&#39;, &#39;GO:0004252&#39;], 2),
-  ([&#39;GO:0005179&#39;, &#39;GO:0016500&#39;, &#39;GO:0005125&#39;], 2),
-  ([&#39;GO:0004714&#39;, &#39;GO:0004713&#39;, &#39;GO:0048018&#39;], 2),
   ([&#39;GO:0008083&#39;, &#39;GO:0016167&#39;, &#39;GO:0004714&#39;], 2),
+  ([&#39;GO:0004714&#39;, &#39;GO:0004713&#39;, &#39;GO:0048018&#39;], 2),
+  ([&#39;GO:0005179&#39;, &#39;GO:0016500&#39;, &#39;GO:0005125&#39;], 2),
   ([&#39;GO:0061630&#39;, &#39;GO:0004879&#39;, &#39;GO:0030374&#39;], 2),
-  ([&#39;GO:0004222&#39;, &#39;GO:0003674&#39;, &#39;GO:0004694&#39;, &#39;GO:0043539&#39;], 1),
-  ([&#39;GO:0031386&#39;, &#39;GO:0140311&#39;, &#39;GO:0042296&#39;, &#39;GO:0042296&#39;, &#39;GO:0019782&#39;], 1),
-  ([&#39;GO:0061630&#39;, &#39;GO:0019706&#39;, &#39;GO:0035591&#39;, &#39;GO:0038187&#39;], 1),
-  ([&#39;GO:0004674&#39;, &#39;GO:0004691&#39;, &#39;GO:0043539&#39;, &#39;GO:0004691&#39;, &#39;GO:0140767&#39;], 1),
-  ([&#39;GO:0004197&#39;,
-    &#39;GO:0038187&#39;,
-    &#39;GO:0003690&#39;,
-    &#39;GO:0005546&#39;,
-    &#39;GO:0140608&#39;,
-    &#39;GO:0004197&#39;,
-    &#39;GO:0035591&#39;,
-    &#39;GO:0022829&#39;],
+  ([&#39;GO:0140311&#39;, &#39;GO:0003700&#39;, &#39;GO:0140311&#39;, &#39;GO:1990756&#39;], 1),
+  ([&#39;GO:0004674&#39;, &#39;GO:0061665&#39;, &#39;GO:1990931&#39;, &#39;GO:0070139&#39;, &#39;GO:0004674&#39;], 1),
+  ([&#39;GO:0060090&#39;,
+    &#39;GO:0004674&#39;,
+    &#39;GO:0060090&#39;,
+    &#39;GO:0060090&#39;,
+    &#39;GO:0061630&#39;,
+    &#39;GO:0060090&#39;,
+    &#39;GO:0061630&#39;],
    1),
-  ([&#39;GO:0004175&#39;,
-    &#39;GO:0038131&#39;,
-    &#39;GO:0008237&#39;,
-    &#39;GO:0048018&#39;,
-    &#39;GO:0008237&#39;,
-    &#39;GO:0004713&#39;],
+  ([&#39;GO:0061630&#39;, &#39;GO:0170011&#39;, &#39;GO:0061630&#39;, &#39;GO:0061630&#39;], 1),
+  ([&#39;GO:0140463&#39;, &#39;GO:0140463&#39;, &#39;GO:0004674&#39;, &#39;GO:0004674&#39;, &#39;GO:0003887&#39;], 1),
+  ([&#39;GO:0038023&#39;, &#39;GO:0060090&#39;, &#39;GO:0060090&#39;, &#39;GO:0140311&#39;], 1),
+  ([&#39;GO:0003846&#39;, &#39;GO:0004144&#39;, &#39;GO:0005488&#39;], 1),
+  ([&#39;GO:0019706&#39;, &#39;GO:0140693&#39;, &#39;GO:0003690&#39;], 1),
+  ([&#39;GO:0004810&#39;, &#39;GO:0004521&#39;, &#39;GO:0004549&#39;, &#39;GO:1904678&#39;], 1),
+  ([&#39;GO:0003700&#39;, &#39;GO:0004715&#39;, &#39;GO:0005125&#39;, &#39;GO:0004900&#39;], 1),
+  ([&#39;GO:0004888&#39;, &#39;GO:0030674&#39;, &#39;GO:0004713&#39;, &#39;GO:0048018&#39;], 1),
+  ([&#39;GO:0003674&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0000511&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0140683&#39;,
+    &#39;GO:0140463&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0030674&#39;,
+    &#39;GO:0008428&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0004525&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0003968&#39;,
+    &#39;GO:0032129&#39;,
+    &#39;GO:0031078&#39;,
+    &#39;GO:0000511&#39;,
+    &#39;GO:0140566&#39;,
+    &#39;GO:0031078&#39;,
+    &#39;GO:0003724&#39;,
+    &#39;GO:0016891&#39;,
+    &#39;GO:0140750&#39;,
+    &#39;GO:0046974&#39;,
+    &#39;GO:0140683&#39;,
+    &#39;GO:0042393&#39;,
+    &#39;GO:0003674&#39;,
+    &#39;GO:0005515&#39;,
+    &#39;GO:0060090&#39;,
+    &#39;GO:0140566&#39;],
    1),
-  ([&#39;GO:0140767&#39;, &#39;GO:0035242&#39;, &#39;GO:0003712&#39;], 1),
-  ([&#39;GO:0070883&#39;, &#39;GO:0070883&#39;, &#39;GO:0140517&#39;], 1),
-  ([&#39;GO:0004919&#39;,
-    &#39;GO:0003700&#39;,
-    &#39;GO:0003700&#39;,
+  ([&#39;GO:0004714&#39;,
     &#39;GO:0005125&#39;,
-    &#39;GO:0015026&#39;,
-    &#39;GO:0003700&#39;,
-    &#39;GO:0004713&#39;,
-    &#39;GO:0004713&#39;],
+    &#39;GO:0008201&#39;,
+    &#39;GO:0005125&#39;,
+    &#39;GO:0005125&#39;,
+    &#39;GO:0004714&#39;],
    1),
-  ([&#39;GO:0061630&#39;, &#39;GO:0034979&#39;, &#39;GO:0003700&#39;, &#39;GO:0030674&#39;], 1),
-  ([&#39;GO:0000981&#39;, &#39;GO:0140416&#39;, &#39;GO:0003713&#39;], 1),
-  ([&#39;GO:0019855&#39;, &#39;GO:0005262&#39;, &#39;GO:0061891&#39;, &#39;GO:0030674&#39;, &#39;GO:0061891&#39;], 1),
-  ([&#39;GO:0015018&#39;,
-    &#39;GO:0015018&#39;,
-    &#39;GO:0046525&#39;,
-    &#39;GO:0015018&#39;,
-    &#39;GO:0047220&#39;,
-    &#39;GO:0048040&#39;,
-    &#39;GO:0030158&#39;,
-    &#39;GO:0030158&#39;,
-    &#39;GO:0005464&#39;],
-   1),
-  ([&#39;GO:0022829&#39;, &#39;GO:0042605&#39;, &#39;GO:0004197&#39;], 1)]}
+  ([&#39;GO:0061891&#39;, &#39;GO:0061891&#39;, &#39;GO:0005262&#39;, &#39;GO:0030674&#39;], 1)]}
 </pre></div></div>
 </div>
 </section>
@@ -676,7 +687,7 @@
 <p>We will index GO-CAMs using a template that extracts key elements</p>
 <p>First we will create a textualization template for a GO-CAM. We will keep it minimal for simplicity - this doesn’t include treatments, families, etc.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -691,7 +702,7 @@
 </div>
 <p>Next we will create an indexer using the template. This will use the Jinja2 syntax for templating. We will also cache LLM embedding queries, so if we want to incrementally add new GO-CAMs we can avoid re-running the LLM embeddings calls.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_indexer</span> <span class="kn">import</span> <span class="n">LLMIndexer</span>
@@ -707,7 +718,7 @@
 </div>
 <p>We can test the template on the first row of the collection:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">object_to_text</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -729,7 +740,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 <p>That looks as expected. We can now attach the indexer to the collection and index the collection:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -741,7 +752,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 <h2>Semantic Search<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p>Let’s query based on text criteria:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;pathways involving cell death&quot;</span><span class="p">)</span>
@@ -750,7 +761,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -844,7 +855,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 <p>Let’s check the first one</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -852,7 +863,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1031,7 +1042,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 <p>We can combine semantic search with queries:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;cell death pathways&quot;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;taxon&quot;</span><span class="p">:</span> <span class="s2">&quot;NCBITaxon:10090&quot;</span><span class="p">})</span>
@@ -1040,7 +1051,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1075,7 +1086,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.829510</td>
+      <td>0.829536</td>
       <td>gomodel:64e7eefa00001233</td>
       <td>Extrinsic apoptotic signaling pathway via deat...</td>
       <td>NCBITaxon:10090</td>
@@ -1086,7 +1097,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
     </tr>
     <tr>
       <th>1</th>
-      <td>0.822007</td>
+      <td>0.822032</td>
       <td>gomodel:62b4ffe300000240</td>
       <td>Perforin maturation leading to granzyme-mediat...</td>
       <td>NCBITaxon:10090</td>
@@ -1097,7 +1108,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
     </tr>
     <tr>
       <th>2</th>
-      <td>0.805274</td>
+      <td>0.805320</td>
       <td>gomodel:645d887900001077</td>
       <td>Cell type specific, p53-independent mitotic G2...</td>
       <td>NCBITaxon:10090</td>
@@ -1108,7 +1119,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
     </tr>
     <tr>
       <th>3</th>
-      <td>0.801138</td>
+      <td>0.801173</td>
       <td>gomodel:5ce58dde00001215</td>
       <td>Mouse-Aatf-antiapoptosis</td>
       <td>NCBITaxon:10090</td>
@@ -1119,7 +1130,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
     </tr>
     <tr>
       <th>4</th>
-      <td>0.795213</td>
+      <td>0.795273</td>
       <td>gomodel:6516135700000211</td>
       <td>Tumor necrosis factor-mediated signaling pathw...</td>
       <td>NCBITaxon:10090</td>
@@ -1138,7 +1149,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 <p>Next we will demonstrate validation over a whole collection.</p>
 <p>Currently validating depends on a LinkML schema - we have previously copied this schema into the test folder. We will load the schema into the database object:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">load_schema_view</span><span class="p">(</span><span class="s2">&quot;input/gocam-models-schema.yaml&quot;</span><span class="p">)</span>
@@ -1147,7 +1158,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 <p>Quick sanity check to ensure that worked:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">schema_view</span><span class="o">.</span><span class="n">all_classes</span><span class="p">())[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
@@ -1155,7 +1166,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1173,7 +1184,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;Model&quot;</span>
@@ -1181,7 +1192,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_runtime.dumpers</span> <span class="kn">import</span> <span class="n">yaml_dumper</span>
@@ -1201,7 +1212,7 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
 <p>We can also use the command line for all of the above operations.</p>
 <p>For example, feceted queries:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017/gocams<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>taxon
@@ -1223,17 +1234,273 @@ objects:  WB:WBGene00006599 &#34;tpa-1 Cele&#34;;  GO:0004674 &#34;protein serin
     &#34;NCBITaxon:559292&#34;: 6,
     &#34;NCBITaxon:6239&#34;: 4,
     &#34;NCBITaxon:9823&#34;: 4,
-    &#34;NCBITaxon:5074&#34;: 1,
-    &#34;NCBITaxon:99287&#34;: 1,
-    &#34;NCBITaxon:8364&#34;: 1,
     &#34;NCBITaxon:227321&#34;: 1,
-    &#34;NCBITaxon:602072&#34;: 1,
-    &#34;NCBITaxon:28576&#34;: 1,
-    &#34;NCBITaxon:425011&#34;: 1,
     &#34;NCBITaxon:8355&#34;: 1,
     &#34;NCBITaxon:1403190&#34;: 1,
     &#34;NCBITaxon:1735992&#34;: 1,
-    &#34;NCBITaxon:229533&#34;: 1
+    &#34;NCBITaxon:229533&#34;: 1,
+    &#34;NCBITaxon:5074&#34;: 1,
+    &#34;NCBITaxon:602072&#34;: 1,
+    &#34;NCBITaxon:425011&#34;: 1,
+    &#34;NCBITaxon:28576&#34;: 1,
+    &#34;NCBITaxon:99287&#34;: 1,
+    &#34;NCBITaxon:8364&#34;: 1
+  }
+}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017/gocams<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>activities.enabled_by,taxon<span class="w"> </span>-O<span class="w"> </span>yaml
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+activities.enabled_by:
+  MGI:MGI:109482: 91
+  MGI:MGI:98973: 55
+  UniProtKB:P42345: 53
+  UniProtKB:Q8N884: 43
+  UniProtKB:P57764: 37
+  UniProtKB:Q9UHD2: 31
+  MGI:MGI:109349: 30
+  UniProtKB:Q9HB90: 25
+  UniProtKB:Q13315: 23
+  UniProtKB:Q13501: 23
+  MGI:MGI:95294: 23
+  UniProtKB:P29466: 22
+  UniProtKB:Q7L523: 22
+  UniProtKB:Q86WV6: 22
+  UniProtKB:P09874: 21
+  UniProtKB:P62877: 21
+  UniProtKB:Q15382: 19
+  UniProtKB:Q7Z434: 17
+  UniProtKB:O43318: 17
+  UniProtKB:Q9Y4K3: 16
+  UniProtKB:P62753: 16
+  MGI:MGI:2686159: 16
+  UniProtKB:P23443: 16
+  UniProtKB:Q9UBS0: 15
+  UniProtKB:P23458: 15
+  UniProtKB:Q96P20: 15
+  UniProtKB:P49662: 14
+  UniProtKB:Q13541: 14
+  UniProtKB:P31749: 14
+  UniProtKB:P49959: 14
+  UniProtKB:Q04206: 14
+  UniProtKB:Q14653: 14
+  MGI:MGI:1916396: 14
+  MGI:MGI:3647519: 13
+  MGI:MGI:98907: 13
+  UniProtKB:Q9C000: 13
+  MGI:MGI:1916142: 13
+  UniProtKB:Q92993: 13
+  MGI:MGI:97365: 13
+  UniProtKB:Q9UBF6: 12
+  UniProtKB:O60934: 12
+  MGI:MGI:95410: 12
+  UniProtKB:P25963: 12
+  UniProtKB:P40763: 12
+  UniProtKB:Q8N6T7: 12
+  MGI:MGI:95654: 12
+  UniProtKB:O75385: 12
+  UniProtKB:P68400: 11
+  UniProtKB:O43914: 11
+  UniProtKB:P43405: 10
+  MGI:MGI:95797: 10
+  MGI:MGI:1924809: 10
+  UniProtKB:Q8N122: 10
+  UniProtKB:Q93034: 10
+  UniProtKB:P42229: 9
+  UniProtKB:O60674: 9
+  UniProtKB:O94874: 9
+  UniProtKB:Q99836: 9
+  UniProtKB:P42224: 9
+  UniProtKB:Q13131: 9
+  UniProtKB:O00206: 9
+  UniProtKB:P55210: 8
+  UniProtKB:P05198: 8
+  UniProtKB:Q7NWF2: 8
+  UniProtKB:Q9NZC2: 8
+  UniProtKB:O14920: 8
+  UniProtKB:Q6IAA8: 8
+  MGI:MGI:107700: 8
+  UniProtKB:Q14790: 8
+  MGI:MGI:95805: 8
+  UniProtKB:P06493: 8
+  MGI:MGI:96433: 8
+  UniProtKB:P42574: 8
+  UniProtKB:P0DP23: 8
+  UniProtKB:Q13188: 8
+  MGI:MGI:1351352: 8
+  UniProtKB:Q13535: 7
+  UniProtKB:Q5T4S7: 7
+  UniProtKB:Q13616: 7
+  UniProtKB:Q9H4B6: 7
+  MGI:MGI:87916: 7
+  UniProtKB:P59044: 7
+  UniProtKB:A1A4Y4: 7
+  UniProtKB:P50542: 7
+  UniProtKB:P19838: 7
+  MGI:MGI:1354954: 7
+  MGI:MGI:1096335: 7
+  UniProtKB:O95786: 7
+  MGI:MGI:98797: 7
+  MGI:MGI:96544: 7
+  UniProtKB:Q09472: 7
+  UniProtKB:Q16531: 7
+  PomBase:SPAC664.01c: 7
+  SGD:S000002674: 7
+  UniProtKB:Q13619: 7
+  MGI:MGI:97565: 7
+  MGI:MGI:103202: 7
+  UniProtKB:P14222: 7
+  MGI:MGI:97592: 7
+  MGI:MGI:97564: 7
+taxon:
+  NCBITaxon:9606: 541
+  NCBITaxon:10090: 185
+  NCBITaxon:4896: 15
+  NCBITaxon:7955: 14
+  NCBITaxon:7227: 13
+  NCBITaxon:559292: 6
+  NCBITaxon:6239: 4
+  NCBITaxon:9823: 4
+  NCBITaxon:28576: 1
+  NCBITaxon:1403190: 1
+  NCBITaxon:8355: 1
+  NCBITaxon:5074: 1
+  NCBITaxon:1735992: 1
+  NCBITaxon:229533: 1
+  NCBITaxon:99287: 1
+  NCBITaxon:8364: 1
+  NCBITaxon:227321: 1
+  NCBITaxon:602072: 1
+  NCBITaxon:425011: 1
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017/gocams<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>taxon+activities.molecular_function.term
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;taxon+activities.molecular_function.term&#34;: {
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004674&#39;)&#34;: 280,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061630&#39;)&#34;: 167,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0030674&#39;)&#34;: 88,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003700&#39;)&#34;: 86,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0003674&#39;)&#34;: 82,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0060090&#39;)&#34;: 76,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005125&#39;)&#34;: 73,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004197&#39;)&#34;: 68,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140311&#39;)&#34;: 65,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0035591&#39;)&#34;: 64,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:1990756&#39;)&#34;: 54,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004713&#39;)&#34;: 54,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0043539&#39;)&#34;: 51,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0048018&#39;)&#34;: 48,
+    &#34;(&#39;NCBITaxon:4896&#39;, &#39;GO:0003674&#39;)&#34;: 41,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003674&#39;)&#34;: 39,
+    &#34;(&#39;NCBITaxon:7955&#39;, &#39;GO:0003674&#39;)&#34;: 38,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0043495&#39;)&#34;: 37,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0022829&#39;)&#34;: 37,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140693&#39;)&#34;: 37,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0048018&#39;)&#34;: 32,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005515&#39;)&#34;: 31,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004713&#39;)&#34;: 31,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140463&#39;)&#34;: 28,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0038187&#39;)&#34;: 28,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0160072&#39;)&#34;: 27,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004855&#39;)&#34;: 26,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0038023&#39;)&#34;: 23,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0015026&#39;)&#34;: 23,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004888&#39;)&#34;: 23,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003735&#39;)&#34;: 23,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005546&#39;)&#34;: 21,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0019706&#39;)&#34;: 20,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004843&#39;)&#34;: 19,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140767&#39;)&#34;: 18,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0000981&#39;)&#34;: 18,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0008253&#39;)&#34;: 18,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0035591&#39;)&#34;: 18,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003924&#39;)&#34;: 18,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061733&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003690&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005179&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0030371&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0003925&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061501&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005096&#39;)&#34;: 17,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140313&#39;)&#34;: 15,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004674&#39;)&#34;: 15,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004252&#39;)&#34;: 14,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003712&#39;)&#34;: 14,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004614&#39;)&#34;: 14,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0051997&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003925&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004846&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0008331&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0033971&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004731&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004854&#39;)&#34;: 13,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0019003&#39;)&#34;: 12,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0008320&#39;)&#34;: 12,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0001228&#39;)&#34;: 12,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061507&#39;)&#34;: 12,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003743&#39;)&#34;: 12,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0005085&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004707&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0034979&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0008384&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0001228&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005525&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004715&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0030674&#39;)&#34;: 11,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0003876&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061891&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004714&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004347&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0003938&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140036&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004842&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0008184&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0140608&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0016301&#39;)&#34;: 10,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0005068&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005085&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061666&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0005245&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004693&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0003723&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004679&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:4896&#39;, &#39;GO:0004674&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:4896&#39;, &#39;GO:0140463&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004708&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0004707&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004222&#39;)&#34;: 9,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061631&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:10090&#39;, &#39;GO:0038024&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0061608&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0005516&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:559292&#39;, &#39;GO:0061630&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:4896&#39;, &#39;GO:0005515&#39;)&#34;: 8,
+    &#34;(&#39;NCBITaxon:9606&#39;, &#39;GO:0004879&#39;)&#34;: 8
   }
 }
 </pre></div></div>

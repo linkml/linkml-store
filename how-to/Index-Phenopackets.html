@@ -286,8 +286,8 @@
 <section id="Use-pystow-to-download-phenopackets">
 <h2>Use pystow to download phenopackets<a class="headerlink" href="#Use-pystow-to-download-phenopackets" title="Link to this heading"></a></h2>
 <p>We will download from the Monarch Initiative <a class="reference external" href="https://github.com/monarch-initiative/phenopacket-store">phenopacket-store</a></p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -298,14 +298,8 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "9b366f9d761d49f59047f30f10c59f8f"}</script></div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="c1"># iterate over all *.json files in the phenopackets directory and parse to an object</span>
@@ -324,7 +318,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -337,7 +331,7 @@
 <h2>Creating a client and attaching to a database<a class="headerlink" href="#Creating-a-client-and-attaching-to-a-database" title="Link to this heading"></a></h2>
 <p>First we will create a client as normal:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -350,7 +344,7 @@
 <p>We will make a database called “phenopackets” and recreate it if it already exists</p>
 <p>(note for people running this notebook locally - if you happen to have a database with this name in your current mongo instance it will be deleted!)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;phenopackets&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -362,7 +356,7 @@
 <h2>Creating a collection<a class="headerlink" href="#Creating-a-collection" title="Link to this heading"></a></h2>
 <p>We’ll create a simple test collection. The concept of collection in linkml-store maps directly to mongodb collections</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -374,7 +368,7 @@
 <h2>Inserting objects into the store<a class="headerlink" href="#Inserting-objects-into-the-store" title="Link to this heading"></a></h2>
 <p>We’ll use the standard <code class="docutils literal notranslate"><span class="pre">insert</span></code> method to insert the phenopackets into the collection. At this stage there is no explicit schema.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
@@ -386,7 +380,7 @@
 <h2>Check contents<a class="headerlink" href="#Check-contents" title="Link to this heading"></a></h2>
 <p>We can check the number of rows in the collection, to ensure everything was inserted correctly:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span>
@@ -394,7 +388,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -403,7 +397,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
@@ -412,7 +406,7 @@
 </div>
 <p>Let’s check with pandas just to make sure it looks as expected; we’ll query for a specific OMIM disease:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;diseases.term.id&quot;</span><span class="p">:</span> <span class="s2">&quot;OMIM:618499&quot;</span><span class="p">},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
@@ -421,7 +415,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -490,7 +484,7 @@
 <p>We will now demonstrate faceted queries, allowing us to count the number of instances of different categorical values or categorical value combinations.</p>
 <p>First we’ll facet on the subject sex. We can use path notation, e.g. <code class="docutils literal notranslate"><span class="pre">subject.sex</span></code> here:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">])</span>
@@ -498,17 +492,17 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;subject.sex&#39;: [(&#39;MALE&#39;, 1807), (&#39;FEMALE&#39;, 1564), (None, 1505)]}
+{&#39;subject.sex&#39;: [(&#39;MALE&#39;, 1807), (&#39;FEMALE&#39;, 1564)]}
 </pre></div></div>
 </div>
 <p>We can also facet by the disease name/label. We’ll restrict this to the top 20</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;diseases.term.label&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -516,37 +510,36 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;diseases.term.label&#39;: [([&#39;Developmental and epileptic encephalopathy 4&#39;],
-   463),
-  ([&#39;Developmental and epileptic encephalopathy 11&#39;], 342),
-  ([&#39;KBG syndrome&#39;], 337),
-  ([&#39;Leber congenital amaurosis 6&#39;], 191),
-  ([&#39;Glass syndrome&#39;], 158),
-  ([&#39;Holt-Oram syndrome&#39;], 103),
-  ([&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;], 95),
-  ([&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;],
+{&#39;diseases.term.label&#39;: [(&#39;Developmental and epileptic encephalopathy 4&#39;, 463),
+  (&#39;Developmental and epileptic encephalopathy 11&#39;, 342),
+  (&#39;KBG syndrome&#39;, 337),
+  (&#39;Leber congenital amaurosis 6&#39;, 191),
+  (&#39;Glass syndrome&#39;, 158),
+  (&#39;Holt-Oram syndrome&#39;, 103),
+  (&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;, 95),
+  (&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;,
    73),
-  ([&#39;Jacobsen syndrome&#39;], 69),
-  ([&#39;Coffin-Siris syndrome 8&#39;], 65),
-  ([&#39;Kabuki Syndrome 1&#39;], 65),
-  ([&#39;Houge-Janssen syndrome 2&#39;], 60),
-  ([&#39;ZTTK SYNDROME&#39;], 52),
-  ([&#39;Greig cephalopolysyndactyly syndrome&#39;], 51),
-  ([&#39;Seizures, benign familial infantile, 3&#39;], 51),
-  ([&#39;Marfan syndrome&#39;], 50),
-  ([&#39;Mitochondrial DNA depletion syndrome 6 (hepatocerebral type)&#39;], 50),
-  ([&#39;Loeys-Dietz syndrome 3&#39;], 49),
-  ([&#39;Developmental delay, dysmorphic facies, and brain anomalies&#39;], 49),
-  ([&#39;Intellectual developmental disorder, autosomal dominant 21&#39;], 46)]}
+  (&#39;Jacobsen syndrome&#39;, 69),
+  (&#39;Kabuki Syndrome 1&#39;, 65),
+  (&#39;Coffin-Siris syndrome 8&#39;, 65),
+  (&#39;Houge-Janssen syndrome 2&#39;, 60),
+  (&#39;ZTTK SYNDROME&#39;, 52),
+  (&#39;Seizures, benign familial infantile, 3&#39;, 51),
+  (&#39;Greig cephalopolysyndactyly syndrome&#39;, 51),
+  (&#39;Marfan syndrome&#39;, 50),
+  (&#39;Mitochondrial DNA depletion syndrome 6 (hepatocerebral type)&#39;, 50),
+  (&#39;Loeys-Dietz syndrome 3&#39;, 49),
+  (&#39;Developmental delay, dysmorphic facies, and brain anomalies&#39;, 49),
+  (&#39;Hypomagnesemia 3, renal&#39;, 46)]}
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;subject.timeAtLastEncounter.age.iso8601duration&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -554,13 +547,12 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;subject.timeAtLastEncounter.age.iso8601duration&#39;: [(None, 2087),
-  (&#39;P4Y&#39;, 131),
+{&#39;subject.timeAtLastEncounter.age.iso8601duration&#39;: [(&#39;P4Y&#39;, 131),
   (&#39;P3Y&#39;, 114),
   (&#39;P6Y&#39;, 100),
   (&#39;P5Y&#39;, 97),
@@ -572,7 +564,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;interpretations.diagnosis.genomicInterpretations.variantInterpretation.variationDescriptor.geneContext.symbol&quot;</span><span class="p">],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -580,27 +572,27 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;interpretations.diagnosis.genomicInterpretations.variantInterpretation.variationDescriptor.geneContext.symbol&#39;: [([[&#39;STXBP1&#39;]],
+{&#39;interpretations.diagnosis.genomicInterpretations.variantInterpretation.variationDescriptor.geneContext.symbol&#39;: [(&#39;STXBP1&#39;,
    463),
-  ([[&#39;SCN2A&#39;]], 393),
-  ([[&#39;ANKRD11&#39;]], 337),
-  ([[&#39;RPGRIP1&#39;]], 185),
-  ([[&#39;SATB2&#39;]], 158),
-  ([[&#39;FBN1&#39;]], 151),
-  ([[&#39;LMNA&#39;]], 127),
-  ([[&#39;TBX5&#39;]], 103),
-  ([[&#39;SPTAN1&#39;]], 85),
-  ([[&#39;GLI3&#39;]], 82)]}
+  (&#39;SCN2A&#39;, 393),
+  (&#39;ANKRD11&#39;, 337),
+  (&#39;RPGRIP1&#39;, 273),
+  (&#39;SATB2&#39;, 158),
+  (&#39;FBN1&#39;, 151),
+  (&#39;LMNA&#39;, 127),
+  (&#39;FBXL4&#39;, 117),
+  (&#39;TBX5&#39;, 103),
+  (&#39;SPTAN1&#39;, 85)]}
 </pre></div></div>
 </div>
 <p>We can also facet on combinations:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">fqr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">({},</span> <span class="n">facet_columns</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">,</span> <span class="s2">&quot;diseases.term.label&quot;</span><span class="p">)],</span> <span class="n">facet_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -609,41 +601,33 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{(&#39;subject.sex&#39;,
-  &#39;diseases.term.label&#39;): [({&#39;diseasestermlabel&#39;: [&#39;Developmental and epileptic encephalopathy 4&#39;]},
-   463), ({&#39;diseasestermlabel&#39;: [&#39;Developmental and epileptic encephalopathy 11&#39;]},
-   342), ({&#39;diseasestermlabel&#39;: [&#39;Leber congenital amaurosis 6&#39;]},
-   191), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;KBG syndrome&#39;]}, 175), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;KBG syndrome&#39;]},
-   143), ({&#39;subjectsex&#39;: &#39;MALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Glass syndrome&#39;]},
-   90), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Glass syndrome&#39;]},
-   62), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;]},
-   58), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;]},
-   54), ({&#39;diseasestermlabel&#39;: [&#39;Holt-Oram syndrome&#39;]},
-   53), ({&#39;diseasestermlabel&#39;: [&#39;Greig cephalopolysyndactyly syndrome&#39;]}, 51), ({&#39;diseasestermlabel&#39;: [&#39;Seizures, benign familial infantile, 3&#39;]},
-   51), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Jacobsen syndrome&#39;]},
-   49), ({&#39;diseasestermlabel&#39;: [&#39;Emery-Dreifuss muscular dystrophy 2, autosomal dominant&#39;]},
-   41), ({&#39;diseasestermlabel&#39;: [&#39;Cone-rod dystrophy 13&#39;]},
-   38), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;]}, 37), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;Coffin-Siris syndrome 8&#39;]},
-   37), ({&#39;subjectsex&#39;: &#39;FEMALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Kabuki Syndrome 1&#39;]},
-   35), ({&#39;subjectsex&#39;: &#39;MALE&#39;,
-    &#39;diseasestermlabel&#39;: [&#39;Houge-Janssen syndrome 2&#39;]},
-   32), ({&#39;subjectsex&#39;: &#39;MALE&#39;, &#39;diseasestermlabel&#39;: [&#39;Kabuki Syndrome 1&#39;]},
-   30)]}
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AttributeError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[14], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> fqr <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">collection</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">query_facets</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">{</span><span class="ansi-yellow-bg">}</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">facet_columns</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">subject.sex</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">diseases.term.label</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">facet_limit</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">20</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> fqr
+
+File <span class="ansi-green-fg">~/repos/linkml-store/src/linkml_store/api/stores/mongodb/mongodb_collection.py:80</span>, in <span class="ansi-cyan-fg">MongoDBCollection.query_facets</span><span class="ansi-blue-fg">(self, where, facet_columns, facet_limit, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     77</span> logger<span style="color: rgb(98,98,98)">.</span>debug(<span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Faceting on </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>col<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">     79</span> <span style="color: rgb(95,135,135)"># Split the column into parts to handle nested fields</span>
+<span class="ansi-green-fg">---&gt; 80</span> col_parts <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">col</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">split</span>(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">.</span><span style="color: rgb(175,0,0)">&#39;</span>)
+<span class="ansi-green-intense-fg ansi-bold">     82</span> <span style="color: rgb(95,135,135)"># Initial pipeline without unwinding</span>
+<span class="ansi-green-intense-fg ansi-bold">     83</span> facet_pipeline <span style="color: rgb(98,98,98)">=</span> [
+<span class="ansi-green-intense-fg ansi-bold">     84</span>     {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$match</span><span style="color: rgb(175,0,0)">&#34;</span>: where} <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> where <span class="ansi-bold" style="color: rgb(0,135,0)">else</span> {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$match</span><span style="color: rgb(175,0,0)">&#34;</span>: {}},
+<span class="ansi-green-intense-fg ansi-bold">     85</span>     {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$group</span><span style="color: rgb(175,0,0)">&#34;</span>: {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">_id</span><span style="color: rgb(175,0,0)">&#34;</span>: <span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>col<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)">&#34;</span>, <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">count</span><span style="color: rgb(175,0,0)">&#34;</span>: {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$sum</span><span style="color: rgb(175,0,0)">&#34;</span>: <span style="color: rgb(98,98,98)">1</span>}}},
+<span class="ansi-green-intense-fg ansi-bold">     86</span>     {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$sort</span><span style="color: rgb(175,0,0)">&#34;</span>: {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">count</span><span style="color: rgb(175,0,0)">&#34;</span>: <span style="color: rgb(98,98,98)">-</span><span style="color: rgb(98,98,98)">1</span>}},
+<span class="ansi-green-intense-fg ansi-bold">     87</span>     {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">$limit</span><span style="color: rgb(175,0,0)">&#34;</span>: facet_limit},
+<span class="ansi-green-intense-fg ansi-bold">     88</span> ]
+
+<span class="ansi-red-fg">AttributeError</span>: &#39;tuple&#39; object has no attribute &#39;split&#39;
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -665,166 +649,13 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subject.sex</th>
-      <th>diseases.term.label</th>
-      <th>count</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Developmental and epileptic encephalopathy 4</td>
-      <td>NaN</td>
-      <td>463</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Developmental and epileptic encephalopathy 11</td>
-      <td>NaN</td>
-      <td>342</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Leber congenital amaurosis 6</td>
-      <td>NaN</td>
-      <td>191</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>MALE</td>
-      <td>KBG syndrome</td>
-      <td>175</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>FEMALE</td>
-      <td>KBG syndrome</td>
-      <td>143</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>MALE</td>
-      <td>Glass syndrome</td>
-      <td>90</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>FEMALE</td>
-      <td>Glass syndrome</td>
-      <td>62</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>MALE</td>
-      <td>Mitochondrial DNA depletion syndrome 13 (encep...</td>
-      <td>58</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>MALE</td>
-      <td>Neurodevelopmental disorder with coarse facies...</td>
-      <td>54</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Holt-Oram syndrome</td>
-      <td>NaN</td>
-      <td>53</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>Greig cephalopolysyndactyly syndrome</td>
-      <td>NaN</td>
-      <td>51</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>Seizures, benign familial infantile, 3</td>
-      <td>NaN</td>
-      <td>51</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>FEMALE</td>
-      <td>Jacobsen syndrome</td>
-      <td>49</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>Emery-Dreifuss muscular dystrophy 2, autosomal...</td>
-      <td>NaN</td>
-      <td>41</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>Cone-rod dystrophy 13</td>
-      <td>NaN</td>
-      <td>38</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>FEMALE</td>
-      <td>Mitochondrial DNA depletion syndrome 13 (encep...</td>
-      <td>37</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>MALE</td>
-      <td>Coffin-Siris syndrome 8</td>
-      <td>37</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>FEMALE</td>
-      <td>Kabuki Syndrome 1</td>
-      <td>35</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>MALE</td>
-      <td>Houge-Janssen syndrome 2</td>
-      <td>32</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>MALE</td>
-      <td>Kabuki Syndrome 1</td>
-      <td>30</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
 </section>
 <section id="Semantic-Search">
 <h2>Semantic Search<a class="headerlink" href="#Semantic-Search" title="Link to this heading"></a></h2>
 <p>We will index phenopackets using a template that extracts the subject, phenotypic features and diseases.</p>
 <p>First we will create a textualization template for a phenopacket. We will keep it minimal for simplicity - this doesn’t include treatments, families, etc.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -837,7 +668,7 @@
 </div>
 <p>Next we will create an indexer using the template. This will use the Jinja2 syntax for templating. We will also cache LLM embedding queries, so if we want to incrementally add new phenopackets we can avoid re-running the LLM embeddings calls.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_indexer</span> <span class="kn">import</span> <span class="n">LLMIndexer</span>
@@ -853,7 +684,7 @@
 </div>
 <p>We can test the template on the first row of the collection:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">object_to_text</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -872,31 +703,20 @@ diseases: Noonan syndrome-11
 </pre></div></div>
 </div>
 <p>That looks as expected. We can now attach the indexer to the collection and index the collection:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">attach_indexer</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:580: SAWarning: Did not recognize type &#39;list&#39; of column &#39;embedding&#39;
-  columns = self._get_columns_info(rows, domains, enums, schema)  # type: ignore[attr-defined]
-/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/duckdb_engine/__init__.py:173: DuckDBEngineWarning: duckdb-engine doesn&#39;t yet support reflection on indices
-  warnings.warn(
-</pre></div></div>
-</div>
 </section>
 <section id="id1">
 <h2>Semantic Search<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p>Let’s query based on text criteria:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;patients with liver diseases&quot;</span><span class="p">)</span>
@@ -905,7 +725,7 @@ diseases: Noonan syndrome-11
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -993,7 +813,7 @@ diseases: Noonan syndrome-11
 </div>
 <p>Let’s check the first one</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span><span class="o">.</span><span class="n">ranked_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1001,7 +821,7 @@ diseases: Noonan syndrome-11
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1106,7 +926,7 @@ diseases: Noonan syndrome-11
 </div>
 <p>We can combine semantic search with queries:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;patients with liver diseases&quot;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;subject.sex&quot;</span><span class="p">:</span> <span class="s2">&quot;MALE&quot;</span><span class="p">})</span>
@@ -1115,7 +935,7 @@ diseases: Noonan syndrome-11
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1207,16 +1027,16 @@ diseases: Noonan syndrome-11
 <p>Next we will demonstrate validation over a whole collection.</p>
 <p>Currently validating depends on a LinkML schema - we have previously copied this schema into the test folder. We will load the schema into the database object:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">load_schema_view</span><span class="p">(</span><span class="s2">&quot;../../tests/input/phenopackets_linkml/phenopackets.yaml&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">load_schema_view</span><span class="p">(</span><span class="s2">&quot;../../tests/input/schemas/phenopackets_linkml/phenopackets.yaml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <p>Quick sanity check to ensure that worked:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">schema_view</span><span class="o">.</span><span class="n">all_classes</span><span class="p">())[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
@@ -1224,7 +1044,7 @@ diseases: Noonan syndrome-11
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1242,7 +1062,7 @@ diseases: Noonan syndrome-11
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;Phenopacket&quot;</span>
@@ -1250,7 +1070,7 @@ diseases: Noonan syndrome-11
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_runtime.dumpers</span> <span class="kn">import</span> <span class="n">yaml_dumper</span>
@@ -1270,7 +1090,7 @@ diseases: Noonan syndrome-11
 <p>We can also use the command line for all of the above operations.</p>
 <p>For example, feceted queries:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>subject.sex
@@ -1285,10 +1105,243 @@ diseases: Noonan syndrome-11
 {
   &#34;subject.sex&#34;: {
     &#34;MALE&#34;: 1807,
-    &#34;FEMALE&#34;: 1564,
-    &#34;None&#34;: 1505
+    &#34;FEMALE&#34;: 1564
   }
 }
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>phenotypicFeatures.type.label<span class="w"> </span>-O<span class="w"> </span>yaml
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+phenotypicFeatures.type.label:
+  Global developmental delay: 1705
+  Hypotonia: 1056
+  Intellectual disability: 1028
+  Seizure: 950
+  Hypertelorism: 925
+  Delayed speech and language development: 829
+  Short stature: 806
+  Microcephaly: 780
+  Scoliosis: 702
+  Feeding difficulties: 678
+  Low-set ears: 598
+  Autistic behavior: 519
+  Motor delay: 518
+  Downslanted palpebral fissures: 505
+  Strabismus: 504
+  Long philtrum: 500
+  Ptosis: 498
+  Patent foramen ovale: 469
+  Anteverted nares: 461
+  Hearing impairment: 451
+  Epicanthus: 447
+  Ventricular septal defect: 435
+  Thick eyebrow: 433
+  Cleft palate: 423
+  Joint hypermobility: 388
+  High palate: 383
+  Triangular face: 369
+  Micrognathia: 364
+  Posteriorly rotated ears: 350
+  Failure to thrive: 345
+  Prominent forehead: 343
+  Thin upper lip vermilion: 338
+  Sleep abnormality: 331
+  Wide nasal bridge: 331
+  Infantile spasms: 325
+  Long eyelashes: 325
+  Pectus excavatum: 322
+  Ataxia: 319
+  Pes planus: 315
+  Bilateral tonic-clonic seizure: 314
+  Bulbous nose: 311
+  Intellectual disability, severe: 306
+  Nystagmus: 298
+  Absent speech: 294
+  Midface retrusion: 290
+  Bicuspid aortic valve: 288
+  Deeply set eye: 283
+  Delayed ability to walk: 282
+  Pulmonic stenosis: 280
+  Cryptorchidism: 279
+  Talipes equinovarus: 277
+  Attention deficit hyperactivity disorder: 275
+  Macrocephaly: 275
+  Recurrent otitis media: 275
+  Depressed nasal bridge: 273
+  Abnormality of the hand: 273
+  Autism: 270
+  Macrodontia: 266
+  Dystonia: 265
+  Narrow forehead: 261
+  Smooth philtrum: 249
+  Microtia: 248
+  Inguinal hernia: 247
+  Upslanted palpebral fissure: 246
+  Ventriculomegaly: 240
+  Synophrys: 236
+  Ectopia lentis: 234
+  Cerebellar atrophy: 234
+  Thin corpus callosum: 231
+  EEG abnormality: 230
+  Short philtrum: 226
+  Arachnodactyly: 224
+  Short neck: 223
+  Highly arched eyebrow: 221
+  Epileptic encephalopathy: 219
+  Developmental regression: 218
+  Generalized tonic seizure: 218
+  Protruding ear: 217
+  Atrial septal defect: 213
+  Umbilical hernia: 213
+  Cerebral atrophy: 212
+  Atrioventricular canal defect: 206
+  Low anterior hairline: 203
+  Focal impaired awareness seizure: 199
+  Mitral valve prolapse: 199
+  Hypsarrhythmia: 198
+  Delayed skeletal maturation: 198
+  Intrauterine growth retardation: 196
+  Spasticity: 192
+  Hypoplasia of the corpus callosum: 192
+  Growth delay: 186
+  Aortic root aneurysm: 181
+  Severe global developmental delay: 173
+  Multifocal epileptiform discharges: 169
+  Mandibular prognathia: 167
+  Dysarthria: 167
+  Blue sclerae: 166
+  Patent ductus arteriosus: 166
+  Proptosis: 164
+  Cataract: 162
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017<span class="w"> </span>-c<span class="w"> </span>main<span class="w"> </span>fq<span class="w"> </span>-S<span class="w"> </span>diseases.term.label+subject.sex<span class="w"> </span>-O<span class="w"> </span>yaml
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+diseases.term.label+subject.sex:
+  (&#39;KBG syndrome&#39;, &#39;MALE&#39;): 175
+  (&#39;KBG syndrome&#39;, &#39;FEMALE&#39;): 143
+  (&#39;Glass syndrome&#39;, &#39;MALE&#39;): 90
+  (&#39;Glass syndrome&#39;, &#39;FEMALE&#39;): 62
+  (&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;, &#39;MALE&#39;): 58
+  (&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;, &#39;MALE&#39;): 54
+  (&#39;Jacobsen syndrome&#39;, &#39;FEMALE&#39;): 49
+  (&#39;Coffin-Siris syndrome 8&#39;, &#39;MALE&#39;): 37
+  (&#39;Mitochondrial DNA depletion syndrome 13 (encephalomyopathic type)&#39;, &#39;FEMALE&#39;): 37
+  (&#39;Kabuki Syndrome 1&#39;, &#39;FEMALE&#39;): 35
+  (&#39;Houge-Janssen syndrome 2&#39;, &#39;MALE&#39;): 32
+  (&#39;Kabuki Syndrome 1&#39;, &#39;MALE&#39;): 30
+  (&#39;Developmental delay, dysmorphic facies, and brain anomalies&#39;, &#39;FEMALE&#39;): 29
+  (&#39;Intellectual developmental disorder, autosomal dominant 21&#39;, &#39;MALE&#39;): 28
+  (&#39;Cardiac, facial, and digital anomalies with developmental delay&#39;, &#39;MALE&#39;): 28
+  (&#39;Holt-Oram syndrome&#39;, &#39;FEMALE&#39;): 28
+  (&#39;Developmental and epileptic encephalopathy 28&#39;, &#39;FEMALE&#39;): 27
+  (&#39;Loeys-Dietz syndrome 3&#39;, &#39;MALE&#39;): 27
+  (&#39;Loeys-Dietz syndrome 4&#39;, &#39;MALE&#39;): 26
+  (&#39;Hypomagnesemia 3, renal&#39;, &#39;MALE&#39;): 26
+  (&#39;Marfan syndrome&#39;, &#39;MALE&#39;): 26
+  (&#39;ZTTK SYNDROME&#39;, &#39;MALE&#39;): 26
+  (&#39;ZTTK SYNDROME&#39;, &#39;FEMALE&#39;): 26
+  (&#39;Mitochondrial DNA depletion syndrome 6 (hepatocerebral type)&#39;, &#39;MALE&#39;): 26
+  (&#39;Intellectual developmental disorder, X-linked 112&#39;, &#39;MALE&#39;): 26
+  (&#39;Marfan syndrome&#39;, &#39;FEMALE&#39;): 24
+  (&#39;Houge-Janssen syndrome 2&#39;, &#39;FEMALE&#39;): 24
+  (&#39;Mitochondrial DNA depletion syndrome 6 (hepatocerebral type)&#39;, &#39;FEMALE&#39;): 24
+  (&#39;Ectopia lentis, familial&#39;, &#39;MALE&#39;): 24
+  (&#39;Coffin-Siris syndrome 8&#39;, &#39;FEMALE&#39;): 24
+  (&#39;Cardiomyopathy, dilated, 1A&#39;, &#39;MALE&#39;): 23
+  (&#39;Loeys-Dietz syndrome 5&#39;, &#39;MALE&#39;): 23
+  (&#39;Loeys-Dietz syndrome 3&#39;, &#39;FEMALE&#39;): 22
+  (&#39;Holt-Oram syndrome&#39;, &#39;MALE&#39;): 22
+  (&#39;Mitochondrial complex IV deficiency, nuclear type 2&#39;, &#39;MALE&#39;): 22
+  (&#39;Kufor-Rakeb syndrome&#39;, &#39;MALE&#39;): 21
+  (&#39;Cardiomyopathy, dilated, 1A&#39;, &#39;FEMALE&#39;): 21
+  (&#39;Loeys-Dietz syndrome 5&#39;, &#39;FEMALE&#39;): 20
+  (&#39;Ehlers-Danlos syndrome, vascular type&#39;, &#39;FEMALE&#39;): 20
+  (&#39;Ectopia lentis, familial&#39;, &#39;FEMALE&#39;): 20
+  (&#39;Jacobsen syndrome&#39;, &#39;MALE&#39;): 20
+  (&#39;Developmental delay, dysmorphic facies, and brain anomalies&#39;, &#39;MALE&#39;): 20
+  (&#39;Neurodevelopmental disorder with coarse facies and mild distal skeletal abnormalities&#39;, &#39;FEMALE&#39;): 19
+  (&#39;Hypomagnesemia 3, renal&#39;, &#39;FEMALE&#39;): 19
+  (&#39;Spastic ataxia 8, autosomal recessive, with hypomyelinating leukodystrophy&#39;, &#39;MALE&#39;): 18
+  (&#39;Anemia, sideroblastic, and spinocerebellar ataxia&#39;, &#39;MALE&#39;): 18
+  (&#39;LEOPARD syndrome 1&#39;, &#39;MALE&#39;): 18
+  (&#39;Acrofacial dysostosis 1, Nager type&#39;, &#39;FEMALE&#39;): 18
+  (&#39;Intellectual developmental disorder, autosomal dominant 21&#39;, &#39;FEMALE&#39;): 18
+  (&#39;Cardiac, facial, and digital anomalies with developmental delay&#39;, &#39;FEMALE&#39;): 17
+  (&#39;Albinism, oculocutaneous, type IV&#39;, &#39;FEMALE&#39;): 17
+  (&#39;Developmental and epileptic encephalopathy 28&#39;, &#39;MALE&#39;): 16
+  (&#39;Developmental delay with or without epilepsy&#39;, &#39;MALE&#39;): 16
+  (&#39;Aarskog-Scott syndrome&#39;, &#39;MALE&#39;): 16
+  (&#39;Spastic paraplegia 91, autosomal dominant, with or without cerebellar ataxia&#39;, &#39;FEMALE&#39;): 15
+  (&#39;Marfan lipodystrophy syndrome&#39;, &#39;FEMALE&#39;): 15
+  (&#39;Ehlers-Danlos syndrome, vascular type&#39;, &#39;MALE&#39;): 15
+  (&#39;Spastic ataxia 8, autosomal recessive, with hypomyelinating leukodystrophy&#39;, &#39;FEMALE&#39;): 15
+  (&#39;Sulfite oxidase deficiency&#39;, &#39;MALE&#39;): 14
+  (&#39;Noonan syndrome 1&#39;, &#39;MALE&#39;): 14
+  (&#39;Albinism, oculocutaneous, type IV&#39;, &#39;MALE&#39;): 13
+  (&#39;Developmental and epileptic encephalopathy 5&#39;, &#39;FEMALE&#39;): 13
+  (&#39;Noonan syndrome 1&#39;, &#39;FEMALE&#39;): 13
+  (&#39;Developmental and epileptic encephalopathy 112&#39;, &#39;FEMALE&#39;): 13
+  (&#39;Neurodevelopmental disorder with motor and language delay, ocular defects, and brain abnormalities&#39;, &#39;FEMALE&#39;): 13
+  (&#39;Loeys-Dietz syndrome 2&#39;, &#39;MALE&#39;): 13
+  (&#39;LEOPARD syndrome 1&#39;, &#39;FEMALE&#39;): 13
+  (&#39;Spastic paraplegia 91, autosomal dominant, with or without cerebellar ataxia&#39;, &#39;MALE&#39;): 13
+  (&#39;Ataxia-pancytopenia syndrome&#39;, &#39;MALE&#39;): 12
+  (&#39;Hypotonia, infantile, with psychomotor retardation and characteristic facies 3&#39;, &#39;FEMALE&#39;): 12
+  (&#39;Autoinflammatory syndrome, familial, with or without immunodeficiency&#39;, &#39;FEMALE&#39;): 12
+  (&#39;Neurodevelopmental disorder with or without anomalies of the brain, eye, or heart&#39;, &#39;MALE&#39;): 12
+  (&#39;Kufor-Rakeb syndrome&#39;, &#39;FEMALE&#39;): 12
+  (&#39;Neurodevelopmental disorder with or without variable brain abnormalities&#39;, &#39;MALE&#39;): 11
+  (&#39;Hypotonia, infantile, with psychomotor retardation and characteristic facies 3&#39;, &#39;MALE&#39;): 11
+  (&#39;Acrofacial dysostosis, Cincinnati type&#39;, &#39;MALE&#39;): 11
+  (&#39;HMG-CoA synthase-2 deficiency&#39;, &#39;MALE&#39;): 11
+  (&#39;Sulfite oxidase deficiency&#39;, &#39;FEMALE&#39;): 11
+  (&#39;Noonan syndrome 2&#39;, &#39;FEMALE&#39;): 11
+  (&#39;Autoimmune polyendocrinopathy syndrome , type I, with or without reversible metaphyseal dysplasia&#39;, &#39;FEMALE&#39;): 11
+  (&#39;Noonan syndrome 6&#39;, &#39;MALE&#39;): 10
+  (&#39;EZH1-related neurodevelopmental disorder&#39;, &#39;FEMALE&#39;): 10
+  (&#39;Cornelia de Lange syndrome 6&#39;, &#39;MALE&#39;): 10
+  (&#39;Neurodevelopmental disorder with progressive microcephaly, spasticity, and brain anomalies&#39;, &#39;MALE&#39;): 10
+  (&#39;Loeys-Dietz syndrome 6&#39;, &#39;FEMALE&#39;): 10
+  (&#39;Spastic paraplegia 76, autosomal recessive&#39;, &#39;FEMALE&#39;): 10
+  (&#39;Coffin-Siris syndrome 3&#39;, &#39;FEMALE&#39;): 10
+  (&#39;Parkinson disease 15, autosomal recessive&#39;, &#39;MALE&#39;): 9
+  (&#39;Neurodevelopmental disorder with or without variable brain abnormalities&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Developmental and epileptic encephalopathy 5&#39;, &#39;MALE&#39;): 9
+  (&#39;Noonan syndrome 2&#39;, &#39;MALE&#39;): 9
+  (&#39;Multiple mitochondrial dysfunctions syndrome 4&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Contractural arachnodactyly, congenital&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Distal renal tubular acidosis 1&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Immunoskeletal dysplasia with neurodevelopmental abnormalitie&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Distal renal tubular acidosis 1&#39;, &#39;MALE&#39;): 9
+  (&#39;Joubert syndrome 10&#39;, &#39;MALE&#39;): 9
+  (&#39;Ataxia-pancytopenia syndrome&#39;, &#39;FEMALE&#39;): 9
+  (&#39;Intellectual developmental disorder, autosomal dominant 70&#39;, &#39;MALE&#39;): 9
+  (&#39;Muscular dystrophy, limb-girdle, autosomal recessive 28&#39;, &#39;MALE&#39;): 9
+
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
