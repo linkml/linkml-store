@@ -31,6 +31,18 @@ logger = logging.getLogger(__name__)
 
 
 class DuckDBDatabase(Database):
+    """
+    An adapter for DuckDB databases.
+
+    Note that this adapter does not make use of a LinkML relational model transformation and
+    SQL Alchemy ORM layer. Instead, it attempts to map each collection (which is of type
+    some LinkML class) to a *single* DuckDB table. New tables are not created for nested references,
+    and linking tables are not created for many-to-many relationships.
+
+    Instead the native DuckDB ARRAY type is used to store multivalued attributes, and DuckDB JSON
+    types are used for nested inlined objects.
+    """
+
     _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
     collection_class = DuckDBCollection
@@ -103,7 +115,14 @@ class DuckDBDatabase(Database):
                         if row[col]:
                             if isinstance(row[col], list):
                                 for i in range(len(row[col])):
-                                    row[col][i] = json.loads(row[col][i])
+                                    try:
+                                        parsed_val = json.loads(row[col][i])
+                                    except json.JSONDecodeError as e:
+                                        logger.error(f"Failed to parse col {col}[{i}] == {row[col][i]}")
+                                        raise e
+                                    row[col][i] = parsed_val
+                            elif isinstance(row[col], dict):
+                                pass
                             else:
                                 row[col] = json.loads(row[col])
             qr.set_rows(pd.DataFrame(rows))

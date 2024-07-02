@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.9, !=3.9.7"
 click = "*"
 pydantic = "^2.0.0"
-linkml-runtime = "^1.7.5"
+linkml-runtime = ">=1.8.0rc2"
 streamlit = { version = "^1.32.2", optional = true }
 sqlalchemy = "*"
 duckdb = "^0.10.1"
@@ -27,9 +27,12 @@ pyarrow = { version="*", optional = true }
 h5py = { version="*", optional = true }
 linkml = { version="*", optional = true }
 linkml_map = { version="*", optional = true }
+linkml_renderer = { version="*", optional = true }
 pandas = ">=2.2.1"
 jinja2 = "^3.1.4"
 jsonlines = "^4.0.0"
+fastapi = { version="*", optional = true }
+uvicorn = { version="*", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 pytest = {version = ">=7.1.2"}
@@ -66,9 +69,12 @@ h5py = ["h5py"]
 pyarrow = ["pyarrow"]
 validation = ["linkml"]
 map = ["linkml_map"]
+renderer = ["linkml_renderer"]
+fastapi = ["fastapi", "uvicorn"]
 
 [tool.poetry.scripts]
 linkml-store = "linkml_store.cli:cli"
+linkml-store-api = "linkml_store.webapi.main:start"
 
 [tool.poetry-dynamic-versioning]
 enable = true

@@ -9,7 +9,7 @@ databases:
             range: string
           name:
             range: string
-          employer:
+          employed_by:
             range: Organization
       organizations:
         type: Organization
@@ -54,4 +54,16 @@ databases:
         type: Patient
       samples:
         type: Sample
+  phenopackets_duckdb:
+    handle: duckdb:///{base_dir}/phenopackets.db
+    schema_location: "{base_dir}/phenopackets_linkml/phenopackets.yaml"
+    collections:
+      test_phenopackets:
+        type: Phenopacket
+  phenopackets_fs:
+    handle: file:///{base_dir}/phenopackets_tmpdir
+    schema_location: "{base_dir}/phenopackets_linkml/phenopackets.yaml"
+    collections:
+      test_phenopackets:
+        type: Phenopacket
 

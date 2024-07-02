@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LinkML Store API{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        h1 { color: #333; }
+        a { color: #0066cc; }
+        .navigation { margin-bottom: 20px; }
+        .content { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="navigation">
+        <a href="/pages/">Home</a> |
+        <a href="/pages/databases">Databases</a>
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

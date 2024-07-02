@@ -1,0 +1,14 @@
+{% extends "base.html.j2" %}
+
+{% block title %}LinkML Store API - Databases{% endblock %}
+
+{% block content %}
+<h1>Databases</h1>
+<ul>
+{% for db in response.data.databases %}
+    <li>
+        <a href="/pages/databases/{{ db.name }}">{{ db.name }}</a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

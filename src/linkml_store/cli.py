@@ -159,7 +159,15 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
 @click.pass_context
 def insert(ctx, files, object, format):
-    """Insert objects from files (JSON, YAML, TSV) into the specified collection."""
+    """Insert objects from files (JSON, YAML, TSV) into the specified collection.
+
+    Using a configuration:
+
+        linkml-store -C config.yaml -c genes insert data/genes/*.json
+
+    Note: if you don't provide a schema this will be inferred, but it is
+    usually better to provide an explicit schema
+    """
     settings = ctx.obj["settings"]
     collection = settings.collection
     if not collection:

@@ -28,6 +28,7 @@ class Indexer(BaseModel):
     """
 
     name: Optional[str] = None
+    index_type: Optional[str] = None
     index_function: Optional[Callable] = None
     distance_function: Optional[Callable] = None
     index_attributes: Optional[List[str]] = None
@@ -93,13 +94,17 @@ class Indexer(BaseModel):
                 if "{%" in self.text_template or "{{" in self.text_template:
                     logger.info("Detected Jinja2 syntax in text template")
                     syntax = TemplateSyntaxEnum.jinja2
-            if syntax and syntax == TemplateSyntaxEnum.jinja2:
+            if not syntax:
+                syntax = TemplateSyntaxEnum.fstring
+            if syntax == TemplateSyntaxEnum.jinja2:
                 from jinja2 import Template
 
                 template = Template(self.text_template)
                 return template.render(**obj)
-            else:
+            elif syntax == TemplateSyntaxEnum.fstring:
                 return self.text_template.format(**obj)
+            else:
+                raise NotImplementedError(f"Cannot handle template syntax: {syntax}")
         return str(obj)
 
     def search(
