@@ -69,6 +69,10 @@ need to have a vector database to run embedding search!
 
 See [How to Use-Semantic-Search](https://linkml.io/linkml-store/how-to/Use-Semantic-Search.html)
 
+### Use with LLMs
+
+TODO - docs
+
 ### Validation
 
 LinkML-Store is backed by [LinkML](https://linkml.io), which allows
@@ -78,6 +82,33 @@ See [Indexing JSON](https://linkml.io/linkml-store/how-to/Index-Phenopackets.htm
 
 and [Referential Integrity](https://linkml.io/linkml-store/how-to/Check-Referential-Integrity.html)
 
+## Web API
+
+There is a preliminary API following HATEOAS principles implemented using FastAPI.
+
+To start you should first create a config file, e.g. `db/conf.yaml`:
+
+Then run:
+
+```
+export LINKML_STORE_CONFIG=./db/conf.yaml
+make api
+```
+
+The API returns links as well as data objects, it's recommended to use a Chrome plugin for JSON viewing
+for exploring the API. TODO: add docs here.
+
+The main endpoints are:
+
+* `http://localhost:8000/` - the root of the API
+* `http://localhost:8000/pages/` - browse the API via HTML
+* `http://localhost:8000/docs` - the Swagger UI
+
+## Streamlit app
+
+```
+make app
+```
 
 ## Background
 

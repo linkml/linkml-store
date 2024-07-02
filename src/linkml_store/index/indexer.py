@@ -11,11 +11,22 @@ logger = logging.getLogger(__name__)
 
 
 class TemplateSyntaxEnum(str, Enum):
+    """
+    Template syntax types.
+    """
+
     jinja2 = "jinja2"
     fstring = "fstring"
 
 
-def cosine_similarity(vector1, vector2):
+def cosine_similarity(vector1, vector2) -> float:
+    """
+    Calculate the cosine similarity between two vectors
+
+    :param vector1:
+    :param vector2:
+    :return:
+    """
     dot_product = np.dot(vector1, vector2)
     norm1 = np.linalg.norm(vector1)
     norm2 = np.linalg.norm(vector2)
@@ -24,7 +35,7 @@ def cosine_similarity(vector1, vector2):
 
 class Indexer(BaseModel):
     """
-    An index operates on a collection in order to search for objects.
+    An indexer operates on a collection in order to search for objects.
     """
 
     name: Optional[str] = None
