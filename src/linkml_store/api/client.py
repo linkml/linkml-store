@@ -98,7 +98,7 @@ class Client:
         """
         return self.metadata.base_dir
 
-    def from_config(self, config: Union[ClientConfig, str, Path], base_dir=None, **kwargs):
+    def from_config(self, config: Union[ClientConfig, dict, str, Path], base_dir=None, **kwargs):
         """
         Create a client from a configuration.
 
@@ -118,11 +118,13 @@ class Client:
         :return:
 
         """
+        if isinstance(config, dict):
+            config = ClientConfig(**config)
         if isinstance(config, Path):
             config = str(config)
         if isinstance(config, str):
-            if not base_dir:
-                base_dir = Path(config).parent
+            #if not base_dir:
+            #    base_dir = Path(config).parent
             parsed_obj = yaml.safe_load(open(config))
             config = ClientConfig(**parsed_obj)
         self.metadata = config
@@ -133,8 +135,15 @@ class Client:
 
     def _initialize_databases(self, **kwargs):
         for name, db_config in self.metadata.databases.items():
-            handle = db_config.handle.format(base_dir=self.base_dir)
+            base_dir = self.base_dir
+            logger.info(f"Initializing database: {name}, base_dir: {base_dir}")
+            if not base_dir:
+                base_dir = Path.cwd()
+                logger.info(f"Using current working directory: {base_dir}")
+            handle = db_config.handle.format(base_dir=base_dir)
             db_config.handle = handle
+            if db_config.schema_location:
+                db_config.schema_location = db_config.schema_location.format(base_dir=base_dir)
             db = self.attach_database(handle, alias=name, **kwargs)
             db.from_config(db_config)
 

@@ -80,10 +80,6 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
                 *test_files,
             ],
         )
-        if result.exit_code != 0:
-            print(f"zzERR: {result.stderr}")
-            print(f"zzOUT: {result.stdout}")
-            print(f"zzALL: {result.output}")
         assert result.exit_code == 0
 
     # Query objects
@@ -105,10 +101,6 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
             output_file,
         ],
     )
-    if result.exit_code != 0:
-        print(f"xERR: {result.stderr}")
-        print(f"xOUT: {result.stdout}")
-        print(f"xALL: {result.output}")
     assert result.exit_code == 0
     assert os.path.exists(output_file)
 
@@ -116,7 +108,7 @@ def test_insert_and_query_command(cli_runner, config_file, test_files, output_di
     # client = Client().from_config(config_file)
     if db_name != "duckdb:///:memory:":
         client = Client()
-        print(f"Getting db {db_name}")
+        # print(f"Getting db {db_name}")
         database = client.get_database(db_name)
         collection = database.get_collection(collection_name)
         objects = collection.find({"name": "John"}).rows

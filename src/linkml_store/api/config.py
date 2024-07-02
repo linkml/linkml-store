@@ -3,7 +3,11 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 
-class CollectionConfig(BaseModel):
+class ConfiguredBaseModel(BaseModel, extra="forbid"):
+    pass
+
+
+class CollectionConfig(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None,
         description="An optional name for the collection",
@@ -42,7 +46,7 @@ class CollectionConfig(BaseModel):
     )
 
 
-class DatabaseConfig(BaseModel):
+class DatabaseConfig(ConfiguredBaseModel):
     handle: str = Field(
         default="duckdb:///:memory:",
         description="The database handle, e.g., 'duckdb:///:memory:' or 'mongodb://localhost:27017'",
@@ -86,7 +90,7 @@ class DatabaseConfig(BaseModel):
     )
 
 
-class ClientConfig(BaseModel):
+class ClientConfig(ConfiguredBaseModel):
     handle: Optional[str] = Field(
         default=None,
         description="The client handle",
@@ -94,6 +98,10 @@ class ClientConfig(BaseModel):
     databases: Dict[str, DatabaseConfig] = Field(
         default={},
         description="A dictionary of database configurations",
+    )
+    default_database: Optional[str] = Field(
+        default=None,
+        description="The default database",
     )
     schema_path: Optional[str] = Field(
         default=None,

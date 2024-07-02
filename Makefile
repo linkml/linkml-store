@@ -21,12 +21,19 @@ all-pytest:
 install-all:
 	poetry install -E analytics -E app -E tests -E llm -E mongodb
 
-# not yet deployed
+DOCTEST_DIR = docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils
 doctest:
-	find src docs -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
+	find $(DOCTEST_DIR) -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
+
+
+doctest-%:
+	find $* -type f \( -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
 
 %-doctest: %
 	$(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE $<
+
+api:
+	poetry run linkml-store-api
 
 app:
 	$(RUN) streamlit run $(CODE)/app.py

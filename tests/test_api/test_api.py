@@ -1,4 +1,5 @@
 import json
+import logging
 import shutil
 import unittest
 from pathlib import Path
@@ -16,11 +17,14 @@ from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.api.stores.mongodb import MongoDBDatabase
 from linkml_store.api.stores.solr.solr_database import SolrDatabase
 from linkml_store.constants import LINKML_STORE_MODULE
+from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.sql_utils import introspect_schema
 
 from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR, PERSONINFO_SCHEMA
+
+logger = logging.getLogger(__name__)
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
 TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
@@ -666,7 +670,8 @@ def test_validate_referential_integrity(personinfo_schema_view, handle):
     assert len(results) == 2
 
 
-def test_from_config_object():
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
+def test_from_config_object(handle):
     """
     Test creating a client from a configuration
 
@@ -675,14 +680,14 @@ def test_from_config_object():
     config = ClientConfig(
         databases={
             "test1": {
-                "handle": "duckdb",
+                "handle": handle,
                 "collections": {
-                    "persons": {"category": "Person"},
+                    "persons": {"type": "Person"},
                 },
             }
         }
     )
-    assert config.databases["test1"].handle == "duckdb"
+    assert config.databases["test1"].handle == handle
     client = Client().from_config(config)
     db1 = client.get_database("test1")
     assert db1 is not None
@@ -720,6 +725,42 @@ def test_from_config_object():
                 ),
             ],
         ),
+        (
+            "conf1",
+            [
+                (
+                    "phenopackets_duckdb",
+                    "test",
+                    [
+                        {"id": "s1", "phenotypicFeatures": [
+                                      {
+                                        "type": {
+                                          "id": "HP:0001263",
+                                          "label": "Global developmental delay"
+                                        }
+                                      }]},
+                    ],
+                ),
+            ],
+        ),
+        (
+            "conf1",
+            [
+                (
+                    "phenopackets_fs",
+                    "test",
+                    [
+                        {"id": "s1", "phenotypicFeatures": [
+                                      {
+                                        "type": {
+                                          "id": "HP:0001263",
+                                          "label": "Global developmental delay"
+                                        }
+                                      }]},
+                    ],
+                ),
+            ],
+        ),
     ],
 )
 def test_from_config_file(name, inserts):
@@ -735,25 +776,25 @@ def test_from_config_file(name, inserts):
     shutil.rmtree(target_dir, ignore_errors=True)
     target_dir.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+    schema_dir = INPUT_DIR / "schemas"
+    shutil.copytree(schema_dir, target_dir, dirs_exist_ok=True)
 
     path = target_dir / "config.yaml"
-    client = Client().from_config(path)
+    client = Client().from_config(path, base_dir=path.parent)
     config = client.metadata
-    index = SimpleIndexer(name="test")
+    # index = SimpleIndexer(name="test")
 
     for db_alias in config.databases:
-        print(f"DB: {db_alias}")
         db = client.get_database(db_alias)
         sv = db.schema_view
-        print(f"SV: {sv.schema.classes.keys()}")
         for coll in db.list_collections():
-            print(f"Looking up coll: {coll.alias} in {config.databases[db_alias].collections.keys()}")
+            logger.info(f"Looking up coll: {coll.alias} in {config.databases[db_alias].collections.keys()}")
             coll_config = config.databases[db_alias].collections[coll.alias]
             if coll_config.attributes:
-                print(f"Checking CD; expected as schema has {sv.schema.classes.keys()}")
+                logger.info(f"Checking CD; expected as schema has {sv.schema.classes.keys()}")
                 cd = coll.class_definition()
-                assert cd is not None
-                assert cd.attributes.keys() == coll_config.attributes.keys()
+                assert cd is not None, f"expected a class definitions from {coll_config}"
+                assert cd.attributes.keys() == coll_config.attributes.keys(), f"columns do not match for {coll_config}"
 
     for insert in inserts:
         db_alias, coll_alias, objs = insert
@@ -762,16 +803,58 @@ def test_from_config_file(name, inserts):
         assert collection is not None
         assert collection.alias == coll_alias
         collection.insert(objs)
-        print(f"Searching in {coll_alias}; TC={collection.target_class_name}, ALIAS={collection.alias}")
+        logger.info(f"Searching in {coll_alias}; TC={collection.target_class_name}, ALIAS={collection.alias}")
         qr = collection.find()
         assert qr.num_rows == len(objs), f"expected {len(objs)} for n={coll_alias} I= {insert}"
+        collection.commit()
+        # check works with a fresh connection
+        db2 = client.get_database(db_alias)
+        collection2 = db2.get_collection(coll_alias)
+        qr2 = collection2.find()
+        assert qr2.num_rows == len(objs), f"expected {len(objs)} for n={coll_alias} I= {insert}"
 
     for db_alias in config.databases:
         db = client.get_database(db_alias)
         for coll in db.list_collections():
-            coll.attach_indexer(index)
-            _results = coll.search("e")
+            index = get_indexer("simple")
+            coll.attach_indexer(index, auto_index=True)
+            results = coll.search("org")
+            # assert len(results.ranked_rows) > 0, f"did not find search results for {coll.alias} using {index}"
 
+
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
+@pytest.mark.parametrize("data_path, schema_location",
+                         [("Phenopacket-001.json", "phenopackets_linkml/phenopackets.yaml")])
+def test_domain_objects(data_path, schema_location, handle):
+    """
+    Test loading domain objects
+
+    :param handle:
+    :param data_path:
+    :param schema_location:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    schema_dir = INPUT_DIR / "schemas" / schema_location
+    data_dir = INPUT_DIR
+    schema_view = SchemaView(schema_dir)
+    database.set_schema_view(schema_view)
+    collection = database.create_collection("Phenopacket", alias="test", recreate_if_exists=True)
+    data_path = data_dir / data_path
+    objs = json.load(open(data_path))
+    collection.insert(objs)
+    qr = collection.find()
+    rows = [remove_none(r) for r in qr.rows]
+    if isinstance(objs, list):
+        assert qr.num_rows == len(objs)
+        for obj in objs:
+            assert obj in rows
+    else:
+        assert qr.num_rows == 1
+        assert rows[0] == objs
+    facets = collection.query_facets()
+    print(facets)
 
 @pytest.mark.integration
 def test_integration():

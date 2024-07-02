@@ -22,7 +22,7 @@ def get_indexer_class(name: str) -> Type[Indexer]:
     return INDEXER_CLASSES[name]
 
 
-def get_indexer(name: str, **kwargs) -> Indexer:
+def get_indexer(index_type: str, **kwargs) -> Indexer:
     """
     Get an indexer by name.
 
@@ -31,7 +31,9 @@ def get_indexer(name: str, **kwargs) -> Indexer:
     :return: the indexer
     """
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
-    cls = get_indexer_class(name)
-    kwargs["name"] = name
+    cls = get_indexer_class(index_type)
+    kwargs["index_type"] = index_type
     indexer = cls(**kwargs)
+    if not indexer.name:
+        indexer.name = index_type
     return indexer

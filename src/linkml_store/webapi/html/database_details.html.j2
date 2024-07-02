@@ -1,0 +1,16 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<h1>{{ response.meta.title }}</h1>
+<p>Handle: {{ response.data.handle }}</p>
+<p>Number of collections: {{ response.data.num_collections }}</p>
+
+<h2>Collections</h2>
+<ul>
+{% for collection in response.data.collections %}
+    <li>
+        <a href="/pages{{ collection.links|selectattr('rel', 'equalto', 'self')|first|attr('href') }}">{{ collection.name }}</a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

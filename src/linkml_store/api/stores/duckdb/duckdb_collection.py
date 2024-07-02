@@ -90,7 +90,9 @@ class DuckDBCollection(Collection):
         cd = self.class_definition()
         with self.parent.engine.connect() as conn:
             if not facet_columns:
-                facet_columns = list(self.class_definition().attributes.keys())
+                if not cd:
+                    raise ValueError(f"No class definition found for {self.target_class_name}")
+                facet_columns = list(cd.attributes.keys())
             for col in facet_columns:
                 logger.debug(f"Faceting on {col}")
                 if isinstance(col, tuple):
@@ -101,7 +103,7 @@ class DuckDBCollection(Collection):
                 facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued)
                 logger.debug(f"Facet query: {facet_query_str}")
                 rows = list(conn.execute(text(facet_query_str)))
-                results[col] = rows
+                results[col] = [tuple(row) for row in rows]
             return results
 
     def _sqla_table(self, cd: ClassDefinition) -> Table:
@@ -110,7 +112,7 @@ class DuckDBCollection(Collection):
         cols = []
         for att in schema_view.class_induced_slots(cd.name):
             typ = TMAP.get(att.range, sqla.String)
-            if att.inlined:
+            if att.inlined or att.inlined_as_list:
                 typ = sqla.JSON
             if att.multivalued:
                 typ = sqla.ARRAY(typ, dimensions=1)

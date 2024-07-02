@@ -170,6 +170,8 @@ class FileSystemCollection(Collection[DatabaseType]):
             for fc in facet_columns:
                 if fc in row:
                     v = row[fc]
+                    if not isinstance(v, str):
+                        v = str(v)
                     if v not in facet_results[fc]:
                         facet_results[fc][v] = 1
                     else:

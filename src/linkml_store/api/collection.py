@@ -4,7 +4,7 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union, ClassVar
 
 import numpy as np
 from linkml_runtime import SchemaView
@@ -64,6 +64,7 @@ class Collection(Generic[DatabaseType]):
     # hidden: Optional[bool] = False
 
     metadata: Optional[CollectionConfig] = None
+    default_index_name: ClassVar[str] = "simple"
 
     def __init__(
         self, name: str, parent: Optional["Database"] = None, metadata: Optional[CollectionConfig] = None, **kwargs
@@ -421,7 +422,30 @@ class Collection(Generic[DatabaseType]):
         **kwargs,
     ) -> QueryResult:
         """
-        Search the collection using a full-text search index.
+        Search the collection using a text-based index index.
+
+        Example:
+
+        >>> from linkml_store import Client
+        >>> from linkml_store.utils.format_utils import load_objects
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb")
+        >>> collection = db.create_collection("Country")
+        >>> objs = load_objects("tests/input/countries/countries.jsonl")
+        >>> collection.insert(objs)
+
+        Now let's index, using the simple trigram-based index
+
+        >>> index = get_indexer("simple")
+        >>> collection.attach_indexer(index)
+
+        Now let's find all objects:
+
+        >>> qr = collection.search("France")
+        >>> score, top_obj = qr.ranked_rows[0]
+        >>> assert score > 0.1
+        >>> top_obj["code"]
+        'FR'
 
         :param query:
         :param where:
@@ -431,12 +455,18 @@ class Collection(Generic[DatabaseType]):
         :return:
         """
         if index_name is None:
-            if len(self._indexers) == 1:
-                index_name = list(self._indexers.keys())[0]
+            if len(self.indexers) == 1:
+                index_name = list(self.indexers.keys())[0]
             else:
-                raise ValueError("Multiple indexes found. Please specify an index name.")
+                logger.warning("Multiple indexes found. Using default index.")
+                index_name = self.default_index_name
         ix_coll = self.parent.get_collection(self._index_collection_name(index_name))
-        ix = self._indexers.get(index_name)
+        if index_name not in self.indexers:
+            ix = get_indexer(index_name)
+            if not self._indexers:
+                self._indexers = {}
+            self._indexers[index_name] = ix
+        ix = self.indexers.get(index_name)
         if not ix:
             raise ValueError(f"No index named {index_name}")
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
@@ -453,7 +483,10 @@ class Collection(Generic[DatabaseType]):
     @property
     def is_internal(self) -> bool:
         """
-        Check if the collection is internal
+        Check if the collection is internal.
+
+        Internal collections are hidden by default. Examples of internal collections
+        include shadow "index" collections
 
         :return:
         """
@@ -468,6 +501,45 @@ class Collection(Generic[DatabaseType]):
     def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
         Attach an index to the collection.
+
+        As an example, first let's create a collection in a database:
+
+        >>> from linkml_store import Client
+        >>> from linkml_store.utils.format_utils import load_objects
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb")
+        >>> collection = db.create_collection("Country")
+        >>> objs = load_objects("tests/input/countries/countries.jsonl")
+        >>> collection.insert(objs)
+
+        We will create two indexes - one that indexes the whole object
+        (default behavior), the other one indexes the name only
+
+        >>> full_index = get_indexer("simple")
+        >>> full_index.name = "full"
+        >>> name_index = get_indexer("simple", text_template="{name}")
+        >>> name_index.name = "name"
+        >>> collection.attach_indexer(full_index)
+        >>> collection.attach_indexer(name_index)
+
+        Now let's find objects using the full index, using the string "France".
+        We expect the country France to be the top hit, but the score will
+        be less than zero because we did not match all fields in the object.
+
+        >>> qr = collection.search("France", index_name="full")
+        >>> score, top_obj = qr.ranked_rows[0]
+        >>> assert score > 0.1
+        >>> assert score < 0.5
+        >>> top_obj["code"]
+        'FR'
+
+        Now using the name index
+
+        >>> qr = collection.search("France", index_name="name")
+        >>> score, top_obj = qr.ranked_rows[0]
+        >>> assert score > 0.99
+        >>> top_obj["code"]
+        'FR'
 
         :param index:
         :param name:
@@ -504,15 +576,18 @@ class Collection(Generic[DatabaseType]):
 
     def index_objects(self, objs: List[OBJECT], index_name: str, replace=False, **kwargs):
         """
-        Index a list of objects
+        Index a list of objects using a specified index.
+
+        By default, the indexed objects will be stored in a shadow
+        collection in the same database, with additional fields for the index vector
 
         :param objs:
-        :param index_name:
+        :param index_name: e.g. simple, llm
         :param replace:
         :param kwargs:
         :return:
         """
-        ix = self._indexers.get(index_name)
+        ix = self._indexers.get(index_name, None)
         if not ix:
             raise ValueError(f"No index named {index_name}")
         ix_coll_name = self._index_collection_name(index_name)

@@ -1,0 +1,46 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{meta.path}{% endblock %}
+
+{% block content %}
+    <h1>Meta</h1>
+        <pre>
+{{ response.meta }}
+        </pre>
+
+    <h1>Links</h1>
+        <ul>
+{% for link in response.links %}
+            <li>
+                <a href="/pages{{ link.href }}">{{ link.rel }} ({{ link.href }})</a>
+            </li>
+{% endfor %}
+    </ul>
+</ul>
+
+    <h1>Data</h1>
+    {% if data_html %}
+        <ul>
+        {% for e in data_html %}
+            <li>{{ e|safe }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+
+        {%  if "items" in response.data %}
+        <ul>
+        {% for item in response.data['items'] %}
+            <li>
+                {{ item.name }}
+                {% for link in item.links %}
+                    <a href="/pages{{ link.href }}">{{ link.rel }}</a>
+                {% endfor %}
+            </li>
+        {% endfor %}
+        </ul>
+        {%  endif %}
+        <pre>
+{{ response.data }}
+        </pre>
+    {% endif %}
+{% endblock %}
