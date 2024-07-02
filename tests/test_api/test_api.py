@@ -732,13 +732,12 @@ def test_from_config_object(handle):
                     "phenopackets_duckdb",
                     "test",
                     [
-                        {"id": "s1", "phenotypicFeatures": [
-                                      {
-                                        "type": {
-                                          "id": "HP:0001263",
-                                          "label": "Global developmental delay"
-                                        }
-                                      }]},
+                        {
+                            "id": "s1",
+                            "phenotypicFeatures": [
+                                {"type": {"id": "HP:0001263", "label": "Global developmental delay"}}
+                            ],
+                        },
                     ],
                 ),
             ],
@@ -750,13 +749,12 @@ def test_from_config_object(handle):
                     "phenopackets_fs",
                     "test",
                     [
-                        {"id": "s1", "phenotypicFeatures": [
-                                      {
-                                        "type": {
-                                          "id": "HP:0001263",
-                                          "label": "Global developmental delay"
-                                        }
-                                      }]},
+                        {
+                            "id": "s1",
+                            "phenotypicFeatures": [
+                                {"type": {"id": "HP:0001263", "label": "Global developmental delay"}}
+                            ],
+                        },
                     ],
                 ),
             ],
@@ -818,13 +816,14 @@ def test_from_config_file(name, inserts):
         for coll in db.list_collections():
             index = get_indexer("simple")
             coll.attach_indexer(index, auto_index=True)
-            results = coll.search("org")
+            _results = coll.search("org")
             # assert len(results.ranked_rows) > 0, f"did not find search results for {coll.alias} using {index}"
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
-@pytest.mark.parametrize("data_path, schema_location",
-                         [("Phenopacket-001.json", "phenopackets_linkml/phenopackets.yaml")])
+@pytest.mark.parametrize(
+    "data_path, schema_location", [("Phenopacket-001.json", "phenopackets_linkml/phenopackets.yaml")]
+)
 def test_domain_objects(data_path, schema_location, handle):
     """
     Test loading domain objects
@@ -855,6 +854,7 @@ def test_domain_objects(data_path, schema_location, handle):
         assert rows[0] == objs
     facets = collection.query_facets()
     print(facets)
+
 
 @pytest.mark.integration
 def test_integration():

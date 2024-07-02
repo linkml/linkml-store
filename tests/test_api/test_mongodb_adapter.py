@@ -2,7 +2,6 @@
 
 import pytest
 import yaml
-
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from pymongo import MongoClient
 
@@ -31,21 +30,41 @@ def test_insert_and_query(mongodb_database):
 
     # Insert a few documents
     documents = [
-        {"name": "Alice", "age": 25, "occupation": "Architect", "foods": ["apple", "banana"],
-         "relationships": [
+        {
+            "name": "Alice",
+            "age": 25,
+            "occupation": "Architect",
+            "foods": ["apple", "banana"],
+            "relationships": [
                 {"person": "Bob", "relation": "friend"},
                 {"person": "Charlie", "relation": "brother"},
             ],
-         "meta": {"date": "2021-01-01", "notes": "likes fruit"}},
-        {"name": "Bob", "age": 30, "occupation": "Builder", "foods": ["carrot", "date"],
-         "relationships": [
+            "meta": {"date": "2021-01-01", "notes": "likes fruit"},
+        },
+        {
+            "name": "Bob",
+            "age": 30,
+            "occupation": "Builder",
+            "foods": ["carrot", "date"],
+            "relationships": [
                 {"person": "Alice", "relation": "friend"},
             ],
-         "meta": {"date": "2021-01-01"}},
-        {"name": "Charlie", "age": 35, "occupation": "Lawyer", "foods": ["eggplant", "fig", "banana"],
-         "meta": {"date": "2021-01-03", "notes": "likes fruit", "curator": "Ziggy"}},
-        {"name": "Jie", "age": 27, "occupation": "Architect", "foods": ["grape", "honey", "apple"],
-         "meta": {"date": "2021-01-03"}},
+            "meta": {"date": "2021-01-01"},
+        },
+        {
+            "name": "Charlie",
+            "age": 35,
+            "occupation": "Lawyer",
+            "foods": ["eggplant", "fig", "banana"],
+            "meta": {"date": "2021-01-03", "notes": "likes fruit", "curator": "Ziggy"},
+        },
+        {
+            "name": "Jie",
+            "age": 27,
+            "occupation": "Architect",
+            "foods": ["grape", "honey", "apple"],
+            "meta": {"date": "2021-01-03"},
+        },
     ]
     collection.insert(documents)
 
@@ -65,23 +84,47 @@ def test_insert_and_query(mongodb_database):
         ({}, "occupation", {("Architect", 2), ("Lawyer", 1), ("Builder", 1)}),
         ({"occupation": "Architect"}, "occupation", {("Architect", 2)}),
         # test unwinding multivalued
-        ({}, "foods", {('fig', 1), ('banana', 2), ('eggplant', 1),
-                       ('apple', 2), ('carrot', 1), ('date', 1), ('grape', 1), ('honey', 1)}),
-        ({}, "relationships.relation", {('friend', 2), ('brother', 1)}),
+        (
+            {},
+            "foods",
+            {
+                ("fig", 1),
+                ("banana", 2),
+                ("eggplant", 1),
+                ("apple", 2),
+                ("carrot", 1),
+                ("date", 1),
+                ("grape", 1),
+                ("honey", 1),
+            },
+        ),
+        ({}, "relationships.relation", {("friend", 2), ("brother", 1)}),
         ({}, "meta.date", {("2021-01-01", 2), ("2021-01-03", 2)}),
-        ({}, "meta", {("curator: Ziggy\ndate: '2021-01-03'\nnotes: likes fruit\n", 1),
-                      ("date: '2021-01-01'\nnotes: likes fruit\n", 1),
-                      ("date: '2021-01-01'\n", 1), ("date: '2021-01-03'\n", 1)}),
-        ({}, ("occupation", "foods"), {(('Architect', 'apple'), 2),
-             (('Architect', 'banana'), 1),
-             (('Architect', 'grape'), 1),
-             (('Architect', 'honey'), 1),
-             (('Builder', 'carrot'), 1),
-             (('Builder', 'date'), 1),
-             (('Lawyer', 'banana'), 1),
-             (('Lawyer', 'eggplant'), 1),
-             (('Lawyer', 'fig'), 1)}),
-
+        (
+            {},
+            "meta",
+            {
+                ("curator: Ziggy\ndate: '2021-01-03'\nnotes: likes fruit\n", 1),
+                ("date: '2021-01-01'\nnotes: likes fruit\n", 1),
+                ("date: '2021-01-01'\n", 1),
+                ("date: '2021-01-03'\n", 1),
+            },
+        ),
+        (
+            {},
+            ("occupation", "foods"),
+            {
+                (("Architect", "apple"), 2),
+                (("Architect", "banana"), 1),
+                (("Architect", "grape"), 1),
+                (("Architect", "honey"), 1),
+                (("Builder", "carrot"), 1),
+                (("Builder", "date"), 1),
+                (("Lawyer", "banana"), 1),
+                (("Lawyer", "eggplant"), 1),
+                (("Lawyer", "fig"), 1),
+            },
+        ),
     ]
     for where, fc, expected in cases:
         fr = collection.query_facets(where, facet_columns=[fc])

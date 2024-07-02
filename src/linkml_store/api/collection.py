@@ -4,7 +4,7 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union
 
 import numpy as np
 from linkml_runtime import SchemaView

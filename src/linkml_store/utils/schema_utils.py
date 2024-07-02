@@ -11,7 +11,7 @@ def path_to_attribute_list(class_name: str, path: str, schema_view: SchemaView) 
     :param path:
     :return:
     """
-    parts = path.split('.')
+    parts = path.split(".")
     att_list = []
     while parts:
         part = parts.pop(0)

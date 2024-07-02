@@ -123,7 +123,7 @@ class Client:
         if isinstance(config, Path):
             config = str(config)
         if isinstance(config, str):
-            #if not base_dir:
+            # if not base_dir:
             #    base_dir = Path(config).parent
             parsed_obj = yaml.safe_load(open(config))
             config = ClientConfig(**parsed_obj)

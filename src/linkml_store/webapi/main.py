@@ -1,15 +1,15 @@
 import os
-from typing import List, Optional, Any, Dict, Union, Callable
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 import httpx
 import uvicorn
 import yaml
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, Depends, Request
-from fastapi.templating import Jinja2Templates
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from linkml_renderer.renderers.html_renderer import HTMLRenderer
 from linkml_renderer.style.style_engine import StyleEngine
 from linkml_runtime.dumpers import json_dumper
@@ -17,10 +17,9 @@ from pydantic import BaseModel, Field
 from starlette.responses import JSONResponse
 
 from linkml_store import Client
-from linkml_store.api import Database, Collection
+from linkml_store.api import Collection, Database
 from linkml_store.api.queries import Query as StoreQuery
 from linkml_store.utils.format_utils import load_objects
-
 from linkml_store.webapi.html import HTML_TEMPLATES_DIR
 
 html_renderer = HTMLRenderer()
@@ -29,16 +28,15 @@ html_renderer = HTMLRenderer()
 load_dotenv()
 
 # Parse command-line arguments
-#parser = argparse.ArgumentParser(description="LinkML Store FastAPI server")
-#parser.add_argument("--config", type=str, help="Path to the configuration file")
-#args = parser.parse_args()
-
+# parser = argparse.ArgumentParser(description="LinkML Store FastAPI server")
+# parser.add_argument("--config", type=str, help="Path to the configuration file")
+# args = parser.parse_args()
 
 
 # Load configuration
 config = None
 if os.environ.get("LINKML_STORE_CONFIG"):
-    with open(os.environ["LINKML_STORE_CONFIG"], 'r') as f:
+    with open(os.environ["LINKML_STORE_CONFIG"], "r") as f:
         config = yaml.safe_load(f)
 
 # Initialize client
@@ -50,6 +48,7 @@ templates = Jinja2Templates(directory=HTML_TEMPLATES_DIR)
 
 
 # Pydantic models for requests and responses
+
 
 class Link(BaseModel):
     rel: str
@@ -94,6 +93,7 @@ class ObjectInsert(BaseModel):
 
 # Helper functions
 
+
 def get_client():
     return client
 
@@ -120,8 +120,8 @@ def get_collection(database: Database = Depends(get_database())):
 
 # API routes
 
-@app.get("/", response_model=APIResponse,
-         description="Top level.")
+
+@app.get("/", response_model=APIResponse, description="Top level.")
 async def top(request: Request, client: Client = Depends(get_client)):
     links = [
         Link(rel="self", href="/"),
@@ -129,36 +129,29 @@ async def top(request: Request, client: Client = Depends(get_client)):
         Link(rel="databases", href="/databases"),
         Link(rel="config", href="/config"),
     ]
-    return APIResponse(
-        data={},
-        links=links
-    )
+    return APIResponse(data={}, links=links)
 
 
-@app.get("/config", response_model=APIResponse,
-         description="Configuration metadata")
+@app.get("/config", response_model=APIResponse, description="Configuration metadata")
 async def config(request: Request, client: Client = Depends(get_client)):
     client = get_client()
     data = client.metadata
     links = [
         Link(rel="self", href="/"),
-        Link(rel="docs", href= "/docs"),
-        Link(rel="databases", href= "/databases"),
-        Link(rel="config", href= "/config"),
+        Link(rel="docs", href="/docs"),
+        Link(rel="databases", href="/databases"),
+        Link(rel="config", href="/config"),
     ]
-    return APIResponse(
-        data=data,
-        links=links
-    )
+    return APIResponse(data=data, links=links)
 
-@app.get("/databases", response_model=APIResponse,
-         description="List all databases with clickable links to their details.")
+
+@app.get(
+    "/databases", response_model=APIResponse, description="List all databases with clickable links to their details."
+)
 async def list_databases(request: Request, client: Client = Depends(get_client)):
     databases = list(client.databases.keys())
 
-    database_links = [
-        Link(rel="database", href=f"/databases/{db_name}") for db_name in databases
-    ]
+    database_links = [Link(rel="database", href=f"/databases/{db_name}") for db_name in databases]
 
     additional_links = [
         Link(rel="self", href="/databases"),
@@ -173,21 +166,17 @@ async def list_databases(request: Request, client: Client = Depends(get_client))
                 "links": [
                     {"rel": "self", "href": f"/databases/{db_name}"},
                     {"rel": "collections", "href": f"/databases/{db_name}/collections"},
-                    {"rel": "schema", "href": f"/databases/{db_name}/schema"}
-                ]
-            } for db_name in databases
+                    {"rel": "schema", "href": f"/databases/{db_name}/schema"},
+                ],
+            }
+            for db_name in databases
         ]
     }
 
     api_response = APIResponse(
-        meta=Meta(
-            path=request.url.path,
-            path_template="databases",
-            params={
-            }
-        ),
+        meta=Meta(path=request.url.path, path_template="databases", params={}),
         data=response_data,
-        links=additional_links + database_links
+        links=additional_links + database_links,
     )
     if request.headers.get("Accept") == "text/html":
         return templates.TemplateResponse("databases.html", {"request": request, "response": api_response})
@@ -202,27 +191,19 @@ async def create_database(database: DatabaseCreate, client: Client = Depends(get
         data={"name": db.metadata.alias, "handle": db.metadata.handle},
         links=[
             Link(rel="self", href=f"/databases/{db.metadata.alias}"),
-            Link(rel="collections", href=f"/databases/{db.metadata.alias}/collections")
-        ]
+            Link(rel="collections", href=f"/databases/{db.metadata.alias}/collections"),
+        ],
     )
 
 
 @app.get("/databases/{database_name}", response_model=APIResponse)
 async def get_database_details(
-    request: Request,
-    database_name: str,
-    get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request, database_name: str, get_db: Callable[[str], Database] = Depends(get_database)
 ):
     database = get_db(database_name)
     collections = database.list_collections()
     return APIResponse(
-        meta=Meta(
-            path=request.url.path,
-            path_template="database_details",
-            params={
-                "database_name": database_name
-            }
-        ),
+        meta=Meta(path=request.url.path, path_template="database_details", params={"database_name": database_name}),
         data={
             "name": database.metadata.alias,
             "handle": database.metadata.handle,
@@ -232,35 +213,29 @@ async def get_database_details(
                     "name": c.name,
                     "links": [
                         {"rel": "self", "href": f"/databases/{database_name}/collections/{c.name}"},
-                        {"rel": "objects", "href": f"/databases/{database_name}/collections/{c.name}/objects"}
-                    ]
-                } for c in collections
-            ]
+                        {"rel": "objects", "href": f"/databases/{database_name}/collections/{c.name}/objects"},
+                    ],
+                }
+                for c in collections
+            ],
         },
         links=[
             Link(rel="self", href=f"/databases/{database_name}"),
             Link(rel="collections", href=f"/databases/{database_name}/collections"),
             Link(rel="schema", href=f"/databases/{database_name}/schema"),
-            Link(rel="all_databases", href="/databases")
-        ]
+            Link(rel="all_databases", href="/databases"),
+        ],
     )
 
 
 @app.get("/databases/{database_name}/collections", response_model=APIResponse)
 async def list_collections(
-    request: Request,
-    database_name: str,
-    get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request, database_name: str, get_db: Callable[[str], Database] = Depends(get_database)
 ):
     database = get_db(database_name)
     collections = database.list_collections()
     return APIResponse(
-        meta=Meta(
-            path=request.url.path,
-            path_template="collections",
-            params={
-            }
-        ),
+        meta=Meta(path=request.url.path, path_template="collections", params={}),
         data={
             "items": [
                 {
@@ -268,16 +243,17 @@ async def list_collections(
                     "type": "Collection",
                     "links": [
                         {"rel": "self", "href": f"/databases/{database_name}/collections/{c.name}"},
-                        {"rel": "objects", "href": f"/databases/{database_name}/collections/{c.name}/objects"}
-                    ]
-                } for c in collections
+                        {"rel": "objects", "href": f"/databases/{database_name}/collections/{c.name}/objects"},
+                    ],
+                }
+                for c in collections
             ]
         },
         links=[
             Link(rel="self", href=f"/databases/{database_name}/collections"),
             Link(rel="database", href=f"/databases/{database_name}"),
-            Link(rel="create_collection", href=f"/databases/{database_name}/collections")
-        ]
+            Link(rel="create_collection", href=f"/databases/{database_name}/collections"),
+        ],
     )
 
 
@@ -286,7 +262,7 @@ async def get_collection_details(
     request: Request,
     database_name: str,
     collection_name: str,
-    get_db: Callable[[str], Database] = Depends(get_database)
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
@@ -297,59 +273,49 @@ async def get_collection_details(
             params={
                 "database_name": database_name,
                 "collection_name": collection_name,
-            }
+            },
         ),
-        data={
-            "name": collection.name,
-            "alias": collection.alias,
-            "num_objects": collection.find({}).num_rows
-        },
+        data={"name": collection.name, "alias": collection.alias, "num_objects": collection.find({}).num_rows},
         links=[
             Link(rel="self", href=f"/databases/{database_name}/collections/{collection_name}"),
             Link(rel="objects", href=f"/databases/{database_name}/collections/{collection_name}/objects"),
             Link(rel="facets", href=f"/databases/{database_name}/collections/{collection_name}/facets"),
             Link(rel="search", href=f"/databases/{database_name}/collections/{collection_name}/search/{{term}}"),
-            Link(rel="database", href=f"/databases/{database_name}")
-        ]
+            Link(rel="database", href=f"/databases/{database_name}"),
+        ],
     )
 
 
 @app.post("/databases/{database_name}/collections/{collection_name}/create", response_model=APIResponse)
 async def create_collection(
-        request: Request,
-        database_name: str,
-        collection: CollectionCreate,
-        get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request,
+    database_name: str,
+    collection: CollectionCreate,
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     new_collection = database.create_collection(collection.name, alias=collection.alias)
     return APIResponse(
-        meta=Meta(
-            path=request.url.path,
-            path_template="create_collection",
-            params={
-                "database_name": database_name
-            }
-        ),
+        meta=Meta(path=request.url.path, path_template="create_collection", params={"database_name": database_name}),
         data={"name": new_collection.name, "alias": new_collection.alias},
         links=[
             Link(rel="self", href=f"/databases/{database_name}/collections/{new_collection.name}"),
             Link(rel="database", href=f"/databases/{database_name}"),
             Link(rel="objects", href=f"/databases/{database_name}/collections/{new_collection.name}/objects"),
             Link(rel="objects", href=f"/databases/{database_name}/collections/{new_collection.name}/facets"),
-        ]
+        ],
     )
 
 
 @app.get("/databases/{database_name}/collections/{collection_name}/objects", response_model=APIResponse)
 async def collection_list_objects(
-        request: Request,
-        database_name: str,
-        collection_name: str,
-        where: Optional[str] = None,
-        limit: int = Query(10, ge=1, le=100),
-        offset: int = Query(0, ge=0),
-        get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request,
+    database_name: str,
+    collection_name: str,
+    where: Optional[str] = None,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
@@ -362,20 +328,20 @@ async def collection_list_objects(
     current_page = offset // limit + 1
 
     base_url = f"/databases/{database_name}/collections/{collection_name}/objects"
-    links = [
-        Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")
-    ]
+    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
     if current_page > 1:
         links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
     if current_page < total_pages:
         links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
 
-    links.extend([
-        Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-        Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
-        Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
-        Link(rel="database", href=f"/databases/{database_name}")
-    ])
+    links.extend(
+        [
+            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
+            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
+            Link(rel="database", href=f"/databases/{database_name}"),
+        ]
+    )
 
     return APIResponse(
         meta=Meta(
@@ -384,28 +350,28 @@ async def collection_list_objects(
             params={
                 "database_name": database_name,
                 "collection_name": collection_name,
-            }
+            },
         ),
         data={
             "domain_objects": result.rows,
             "total_count": total_count,
             "page": current_page,
             "total_pages": total_pages,
-            "page_size": limit
+            "page_size": limit,
         },
-        links=links
+        links=links,
     )
 
 
 @app.get("/databases/{database_name}/collections/{collection_name}/search/{term}", response_model=APIResponse)
 async def search_objects(
-        request: Request,
-        database_name: str,
-        collection_name: str,
-        term: str,
-        limit: int = Query(5, ge=1, le=100),
-        offset: int = Query(0, ge=0),
-        get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request,
+    database_name: str,
+    collection_name: str,
+    term: str,
+    limit: int = Query(5, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
@@ -416,20 +382,20 @@ async def search_objects(
     current_page = offset // limit + 1
 
     base_url = f"/databases/{database_name}/collections/{collection_name}/search/{term}"
-    links = [
-        Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")
-    ]
+    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
     if current_page > 1:
         links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
     if current_page < total_pages:
         links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
 
-    links.extend([
-        Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-        Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
-        Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
-        Link(rel="database", href=f"/databases/{database_name}")
-    ])
+    links.extend(
+        [
+            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
+            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
+            Link(rel="database", href=f"/databases/{database_name}"),
+        ]
+    )
 
     return APIResponse(
         meta=Meta(
@@ -439,28 +405,28 @@ async def search_objects(
                 "database_name": database_name,
                 "collection_name": collection_name,
                 "term": term,
-            }
+            },
         ),
         data={
             "objects": result.ranked_rows,
             "total_count": total_count,
             "page": current_page,
             "total_pages": total_pages,
-            "page_size": limit
+            "page_size": limit,
         },
-        links=links
+        links=links,
     )
 
 
 @app.get("/databases/{database_name}/collections/{collection_name}/facets", response_model=APIResponse)
 async def objects_facets(
-        request: Request,
-        database_name: str,
-        collection_name: str,
-        where: Optional[str] = None,
-        limit: int = Query(10, ge=1, le=100),
-        offset: int = Query(0, ge=0),
-        get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request,
+    database_name: str,
+    collection_name: str,
+    where: Optional[str] = None,
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
@@ -472,20 +438,20 @@ async def objects_facets(
     current_page = offset // limit + 1
 
     base_url = f"/databases/{database_name}/collections/{collection_name}/facets"
-    links = [
-        Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")
-    ]
+    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
     if current_page > 1:
         links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
     if current_page < total_pages:
         links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
 
-    links.extend([
-        Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-        Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
-        Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
-        Link(rel="database", href=f"/databases/{database_name}")
-    ])
+    links.extend(
+        [
+            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
+            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
+            Link(rel="database", href=f"/databases/{database_name}"),
+        ]
+    )
 
     return APIResponse(
         meta=Meta(
@@ -494,24 +460,25 @@ async def objects_facets(
             params={
                 "database_name": database_name,
                 "collection_name": collection_name,
-            }
+            },
         ),
         data={
             "items": results,
             "total_count": total_count,
             "page": current_page,
             "total_pages": total_pages,
-            "page_size": limit
+            "page_size": limit,
         },
-        links=links
+        links=links,
     )
+
 
 @app.post("/databases/{database_name}/collections/{collection_name}/objects", response_model=APIResponse)
 async def insert_objects(
-        database_name: str,
-        collection_name: str,
-        insert: ObjectInsert,
-        get_db: Callable[[str], Database] = Depends(get_database)
+    database_name: str,
+    collection_name: str,
+    insert: ObjectInsert,
+    get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
@@ -520,33 +487,25 @@ async def insert_objects(
         data={"inserted_count": len(insert.objects)},
         links=[
             Link(rel="self", href=f"/databases/{database_name}/collections/{collection_name}/objects"),
-            Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}")
-        ]
+            Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
+        ],
     )
 
 
 @app.get("/databases/{database_name}/schema", response_model=APIResponse)
 async def get_database_schema(
-        request: Request,
-        database_name: str,
-        get_db: Callable[[str], Database] = Depends(get_database)
+    request: Request, database_name: str, get_db: Callable[[str], Database] = Depends(get_database)
 ):
     database = get_db(database_name)
     schema = database.schema_view.schema
     schema_dict = json_dumper.to_dict(schema)
     return APIResponse(
-        meta=Meta(
-            path=request.url.path,
-            path_template="schema",
-            params={
-                "database_name": database_name
-            }
-        ),
+        meta=Meta(path=request.url.path, path_template="schema", params={"database_name": database_name}),
         data={"schema": schema_dict},
         links=[
             Link(rel="self", href=f"/databases/{database_name}/schema"),
-            Link(rel="database", href=f"/databases/{database_name}")
-        ]
+            Link(rel="database", href=f"/databases/{database_name}"),
+        ],
     )
 
 
@@ -567,10 +526,10 @@ async def generic_page(request: Request, path: str, get_db: Callable[[str], Data
     api_data = response.json()
 
     # Use the template specified in the API response
-    meta = api_data['meta']
+    meta = api_data["meta"]
     # template_name = meta['path_template'] + ".html.j2"
     template_name = "generic.html.j2"
-    params = meta['params']
+    params = meta["params"]
 
     data = api_data["data"]
     data_html = None
@@ -585,22 +544,28 @@ async def generic_page(request: Request, path: str, get_db: Callable[[str], Data
             html_renderer.style_engine = style_engine
             data_html = [html_renderer.render(obj, schemaview=sv, source_element_name=cn) for obj in objs]
 
-
     # Render the appropriate template
-    return templates.TemplateResponse(template_name, {
-        "request": request,
-        "response": api_data,
-        "current_path": f"/pages/{path}",
-        "data_html": data_html,
-        "params": params,
-    })
+    return templates.TemplateResponse(
+        template_name,
+        {
+            "request": request,
+            "response": api_data,
+            "current_path": f"/pages/{path}",
+            "data_html": data_html,
+            "params": params,
+        },
+    )
+
 
 def run_server():
     import uvicorn
+
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
 
-#if __name__ == "__main__":
+
+# if __name__ == "__main__":
 #    run_server()
+
 
 def start():
     """Launched with `poetry run start` at root level"""

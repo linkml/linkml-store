@@ -42,6 +42,7 @@ class DuckDBDatabase(Database):
     Instead the native DuckDB ARRAY type is used to store multivalued attributes, and DuckDB JSON
     types are used for nested inlined objects.
     """
+
     _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
     collection_class = DuckDBCollection

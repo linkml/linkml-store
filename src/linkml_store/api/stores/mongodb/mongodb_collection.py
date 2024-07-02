@@ -2,13 +2,11 @@ import logging
 from copy import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from linkml_runtime.linkml_model import SlotDefinition
 from pymongo.collection import Collection as MongoCollection
 
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.queries import Query, QueryResult
-from linkml_store.utils.schema_utils import path_to_attribute_list
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +64,14 @@ class MongoDBCollection(Collection):
                 mongo_filter[field] = value
         return mongo_filter
 
-    from typing import Dict, List, Tuple, Union, Any
-
-    from typing import Dict, List, Tuple, Union, Any
+    from typing import Any, Dict, List, Union
 
     def query_facets(
-            self, where: Dict = None, facet_columns: List[Union[str, Tuple[str, ...]]] = None,
-            facet_limit=DEFAULT_FACET_LIMIT, **kwargs
+        self,
+        where: Dict = None,
+        facet_columns: List[Union[str, Tuple[str, ...]]] = None,
+        facet_limit=DEFAULT_FACET_LIMIT,
+        **kwargs,
     ) -> Dict[Union[str, Tuple[str, ...]], List[Tuple[Any, int]]]:
         results = {}
         if not facet_columns:
@@ -103,9 +102,10 @@ class MongoDBCollection(Collection):
             # Check if we need to unwind based on the results
             needs_unwinding = False
             if isinstance(col, tuple):
-                needs_unwinding = any(isinstance(result["_id"], dict) and
-                                      any(isinstance(v, list) for v in result["_id"].values())
-                                      for result in initial_results)
+                needs_unwinding = any(
+                    isinstance(result["_id"], dict) and any(isinstance(v, list) for v in result["_id"].values())
+                    for result in initial_results
+                )
             else:
                 needs_unwinding = any(isinstance(result["_id"], list) for result in initial_results)
 
@@ -115,15 +115,17 @@ class MongoDBCollection(Collection):
 
                 # Unwind each field if needed
                 for field in all_fields:
-                    field_parts = field.split('.')
+                    field_parts = field.split(".")
                     for i in range(len(field_parts)):
                         facet_pipeline.append({"$unwind": f"${'.'.join(field_parts[:i + 1])}"})
 
-                facet_pipeline.extend([
-                    {"$group": {"_id": group_id, "count": {"$sum": 1}}},
-                    {"$sort": {"count": -1}},
-                    {"$limit": facet_limit},
-                ])
+                facet_pipeline.extend(
+                    [
+                        {"$group": {"_id": group_id, "count": {"$sum": 1}}},
+                        {"$sort": {"count": -1}},
+                        {"$limit": facet_limit},
+                    ]
+                )
 
                 logger.info(f"Updated facet pipeline with unwinding: {facet_pipeline}")
                 facet_results = list(self.mongo_collection.aggregate(facet_pipeline))
@@ -134,12 +136,15 @@ class MongoDBCollection(Collection):
 
             # Process results
             if isinstance(col, tuple):
-                results[col] = [(tuple(result["_id"].values()), result["count"])
-                                for result in facet_results if result["_id"] is not None
-                                and all(v is not None for v in result["_id"].values())]
+                results[col] = [
+                    (tuple(result["_id"].values()), result["count"])
+                    for result in facet_results
+                    if result["_id"] is not None and all(v is not None for v in result["_id"].values())
+                ]
             else:
-                results[col] = [(result["_id"], result["count"])
-                                for result in facet_results if result["_id"] is not None]
+                results[col] = [
+                    (result["_id"], result["count"]) for result in facet_results if result["_id"] is not None
+                ]
 
         return results
 
