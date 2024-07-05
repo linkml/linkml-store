@@ -18,7 +18,7 @@ class SolrCollection(Collection):
     @property
     def _collection_base(self) -> str:
         if self.parent.use_cores:
-            base_url = f"{self.parent.base_url}/{self.name}"
+            base_url = f"{self.parent.base_url}/{self.alias}"
         else:
             base_url = self.parent.base_url
         return base_url
@@ -37,7 +37,7 @@ class SolrCollection(Collection):
         if not qfs:
             raise ValueError("No searchable slots configured for Solr collection")
         solr_query = self._build_solr_query(where, search_term=query, extra={"defType": index_name, "qf": qfs})
-        logger.info(f"Querying Solr collection {self.name} with query: {solr_query}")
+        logger.info(f"Querying Solr collection {self.alias} with query: {solr_query}")
 
         response = requests.get(f"{self._collection_base}/select", params=solr_query)
         response.raise_for_status()
@@ -50,7 +50,7 @@ class SolrCollection(Collection):
 
     def query(self, query: Query, **kwargs) -> QueryResult:
         solr_query = self._build_solr_query(query)
-        logger.info(f"Querying Solr collection {self.name} with query: {solr_query}")
+        logger.info(f"Querying Solr collection {self.alias} with query: {solr_query}")
 
         response = requests.get(f"{self._collection_base}/select", params=solr_query)
         response.raise_for_status()
@@ -69,7 +69,7 @@ class SolrCollection(Collection):
         solr_query["facet.field"] = facet_columns
         solr_query["facet.limit"] = facet_limit
 
-        logger.info(f"Querying Solr collection {self.name} for facets with query: {solr_query}")
+        logger.info(f"Querying Solr collection {self.alias} for facets with query: {solr_query}")
 
         response = requests.get(f"{self._collection_base}/select", params=solr_query)
         response.raise_for_status()

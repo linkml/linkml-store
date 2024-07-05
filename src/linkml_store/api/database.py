@@ -149,26 +149,19 @@ class Database(ABC, Generic[CollectionType]):
     def _initialize_collections(self):
         if not self.metadata.collections:
             return
-        for name, collection_config in self.metadata.collections.items():
-            alias = collection_config.alias
-            typ = collection_config.type
-            # if typ and alias is None:
-            #    alias = name
-            # if typ is None:
-            #    typ = name
-            # collection = self.create_collection(
-            #    typ, alias=alias, metadata=collection_config.metadata
-            # )
-            if False and typ is not None:
-                if not alias:
-                    alias = name
-                name = typ
-            if not collection_config.name:
-                collection_config.name = name
-            _collection = self.create_collection(name, alias=alias, metadata=collection_config)
+        for k, collection_config in self.metadata.collections.items():
+            if collection_config.alias:
+                if collection_config.alias != k:
+                    raise ValueError(f"Alias mismatch: {collection_config.alias} != {k}")
+            alias = k
+            typ = collection_config.type or alias
+            _collection = self.create_collection(typ, alias=alias, metadata=collection_config)
+            assert _collection.alias == alias
+            assert _collection.target_class_name == typ
             if collection_config.attributes:
+                # initialize schema
                 sv = self.schema_view
-                cd = ClassDefinition(name, attributes=collection_config.attributes)
+                cd = ClassDefinition(typ, attributes=collection_config.attributes)
                 sv.schema.classes[cd.name] = cd
                 sv.set_modified()
                 # assert collection.class_definition() is not None
@@ -275,7 +268,7 @@ class Database(ABC, Generic[CollectionType]):
         metadata: Optional[CollectionConfig] = None,
         recreate_if_exists=False,
         **kwargs,
-    ) -> Collection:
+    ) -> CollectionType:
         """
         Create a new collection in the current database.
 
@@ -307,8 +300,10 @@ class Database(ABC, Generic[CollectionType]):
         if not name:
             raise ValueError(f"Collection name must be provided: alias: {alias} metadata: {metadata}")
         collection_cls = self.collection_class
-        collection = collection_cls(name=name, alias=alias, parent=self, metadata=metadata)
-        if metadata and metadata.source_location:
+        collection = collection_cls(name=name, parent=self, metadata=metadata)
+        if alias:
+            collection.metadata.alias = alias
+        if metadata and metadata.source:
             collection.load_from_source()
         if metadata and metadata.attributes:
             sv = self.schema_view
@@ -321,7 +316,7 @@ class Database(ABC, Generic[CollectionType]):
             alias = name
         self._collections[alias] = collection
         if recreate_if_exists:
-            logger.debug(f"Recreating collection {collection.name}")
+            logger.debug(f"Recreating collection {collection.alias}")
             collection.delete_where({}, missing_ok=True)
         return collection
 
@@ -339,7 +334,7 @@ class Database(ABC, Generic[CollectionType]):
         >>> collections = db.list_collections()
         >>> len(collections)
         2
-        >>> [c.name for c in collections]
+        >>> [c.target_class_name for c in collections]
         ['Person', 'Product']
 
         :param include_internal: include internal collections
@@ -367,7 +362,7 @@ class Database(ABC, Generic[CollectionType]):
         ['Person', 'Product']
 
         """
-        return [c.name for c in self.list_collections(**kwargs)]
+        return [c.alias for c in self.list_collections(**kwargs)]
 
     def get_collection(
         self, name: str, type: Optional[str] = None, create_if_not_exists=True, **kwargs
@@ -410,7 +405,7 @@ class Database(ABC, Generic[CollectionType]):
         """
         Initialize collections.
 
-        Not typically called directly: consider making hidden
+        TODO: Not typically called directly: consider making this private
         :return:
         """
         raise NotImplementedError
@@ -502,7 +497,7 @@ class Database(ABC, Generic[CollectionType]):
         >>> sorted(collection.class_definition().slots)
         ['capital', 'code', 'continent', 'languages', 'name']
 
-        :param schema_view:
+        :param schema_view: can be either a path to the schema, or a SchemaView object
         :return:
         """
         if isinstance(schema_view, Path):
@@ -585,7 +580,15 @@ class Database(ABC, Generic[CollectionType]):
 
         :return: A schema view
         """
-        raise NotImplementedError()
+        logger.info(f"Inducing schema view for {self.handle}")
+        from linkml_runtime.utils.schema_builder import SchemaBuilder
+
+        sb = SchemaBuilder()
+
+        for collection_name in self.list_collection_names():
+            coll = self.get_collection(collection_name)
+            sb.add_class(coll.target_class_name)
+        return SchemaView(sb.schema)
 
     def iter_validate_database(self, **kwargs) -> Iterator["ValidationResult"]:
         """
@@ -682,6 +685,21 @@ class Database(ABC, Generic[CollectionType]):
     def drop(self, **kwargs):
         """
         Drop the database and all collections.
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> path = Path("/tmp/test.db")
+        >>> path.parent.mkdir(exist_ok=True, parents=True)
+        >>> db = client.attach_database(f"duckdb:///{path}")
+        >>> db.store({"persons": [{"id": "P1", "name": "John", "age_in_years": 30}]})
+        >>> coll = db.get_collection("persons")
+        >>> coll.find({}).num_rows
+        1
+        >>> db.drop()
+        >>> db = client.attach_database("duckdb:///tmp/test.db", alias="test")
+        >>> coll = db.get_collection("persons")
+        >>> coll.find({}).num_rows
+        0
 
         :param kwargs: additional arguments
         """

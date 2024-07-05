@@ -16,6 +16,7 @@ from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
+from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
 
 index_type_option = click.option(
     "--index-type",
@@ -87,6 +88,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
 @click.option("--set", help="Metadata settings in the form PATHEXPR=value", multiple=True)
 @click.option("-v", "--verbose", count=True)
 @click.option("-q", "--quiet/--no-quiet")
+@click.option("--base-dir", "-B", help="Base directory for the client configuration")
 @click.option(
     "--stacktrace/--no-stacktrace",
     default=False,
@@ -94,7 +96,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
     help="If set then show full stacktrace on error",
 )
 @click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set):
+def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, **kwargs):
     """A CLI for interacting with the linkml-store."""
     if not stacktrace:
         sys.tracebacklimit = 0
@@ -117,7 +119,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     if quiet:
         logger.setLevel(logging.ERROR)
     ctx.ensure_object(dict)
-    client = Client().from_config(config) if config else Client()
+    client = Client().from_config(config, **kwargs) if config else Client()
     settings = ContextSettings(client=client, database_name=database, collection_name=collection)
     ctx.obj["settings"] = settings
     # DEPRECATED
@@ -150,7 +152,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         #    raise ValueError("Collection must be specified if there are multiple collections.")
         if settings.database and settings.database.list_collections():
             collection = settings.database.list_collections()[0]
-            settings.collection_name = collection.name
+            settings.collection_name = collection.alias
 
 
 @cli.command()
@@ -180,15 +182,15 @@ def insert(ctx, files, object, format):
             objects = load_objects(file_path, format=format)
         else:
             objects = load_objects(file_path)
-        logger.info(f"Inserting {len(objects)} objects from {file_path} into collection '{collection.name}'.")
+        logger.info(f"Inserting {len(objects)} objects from {file_path} into collection '{collection.alias}'.")
         collection.insert(objects)
-        click.echo(f"Inserted {len(objects)} objects from {file_path} into collection '{collection.name}'.")
+        click.echo(f"Inserted {len(objects)} objects from {file_path} into collection '{collection.alias}'.")
     if object:
         for object_str in object:
             logger.info(f"Parsing: {object_str}")
             objects = yaml.safe_load(object_str)
             collection.insert(objects)
-            click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{collection.name}'.")
+            click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{collection.alias}'.")
     collection.commit()
 
 
@@ -324,7 +326,7 @@ def query(ctx, where, limit, output_type, output):
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
-    query = Query(from_table=collection.name, where_clause=where_clause, limit=limit)
+    query = Query(from_table=collection.alias, where_clause=where_clause, limit=limit)
     result = collection.query(query)
     output_data = render_output(result.rows, output_type)
     if output:
@@ -341,7 +343,7 @@ def query(ctx, where, limit, output_type, output):
 def list_collections(ctx, **kwargs):
     db = ctx.obj["settings"].database
     for collection in db.list_collections(**kwargs):
-        click.echo(collection.name)
+        click.echo(collection.alias)
         click.echo(render_output(collection.metadata))
 
 
@@ -351,8 +353,9 @@ def list_collections(ctx, **kwargs):
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.option("--columns", "-S", help="Columns to facet on")
+@click.option("--wide/--no-wide", "-U/--no-U", default=False, show_default=True, help="Wide table")
 @click.pass_context
-def fq(ctx, where, limit, columns, output_type, output):
+def fq(ctx, where, limit, columns, output_type, wide, output):
     """
     Query facets from the specified collection.
 
@@ -379,11 +382,22 @@ def fq(ctx, where, limit, columns, output_type, output):
             return "+".join([str(x) for x in key])
         return key
 
-    count_dict = {}
-    for key, value in results.items():
-        value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}
-        count_dict[_untuple(key)] = value_as_dict
-    output_data = render_output(count_dict, output_type)
+    if wide:
+        results_obj = facet_summary_to_dataframe_unmelted(results)
+    else:
+        if output_type == Format.PYTHON.value:
+            results_obj = results
+        elif output_type in [Format.TSV.value, Format.CSV.value]:
+            results_obj = []
+            for fc, data in results.items():
+                for v, c in data:
+                    results_obj.append({"facet": fc, "value": v, "count": c})
+        else:
+            results_obj = {}
+            for key, value in results.items():
+                value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}
+                results_obj[_untuple(key)] = value_as_dict
+    output_data = render_output(results_obj, output_type)
     if output:
         with open(output, "w") as f:
             f.write(output_data)
@@ -403,14 +417,17 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
 @click.option("--output-type", "-O", type=format_choice, default=Format.FORMATTED.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option(
+    "--limit", "-l", default=-1, show_default=True, type=click.INT, help="Maximum number of results to return"
+)
 @click.pass_context
-def describe(ctx, where, output_type, output):
+def describe(ctx, where, output_type, output, limit):
     """
     Describe the collection schema.
     """
     where_clause = yaml.safe_load(where) if where else None
     collection = ctx.obj["settings"].collection
-    df = collection.find(where_clause, limit=1).rows_dataframe
+    df = collection.find(where_clause, limit=limit).rows_dataframe
     write_output(df.describe(include="all").transpose(), output_type, target=output)
 
 
@@ -468,7 +485,7 @@ def search(ctx, search_term, where, limit, index_type, output_type, output, auto
     """Search objects in the specified collection."""
     collection = ctx.obj["settings"].collection
     ix = get_indexer(index_type)
-    logger.info(f"Attaching index to collection {collection.name}: {ix.model_dump()}")
+    logger.info(f"Attaching index to collection {collection.alias}: {ix.model_dump()}")
     collection.attach_indexer(ix, auto_index=auto_index)
     result = collection.search(search_term, where=where, limit=limit)
     output_data = render_output([{"score": row[0], **row[1]} for row in result.ranked_rows], output_type)
@@ -498,6 +515,7 @@ def indexes(ctx):
 def validate(ctx, output_type, output):
     """Validate objects in the specified collection."""
     collection = ctx.obj["settings"].collection
+    logger.info(f"Validating collection {collection.alias}")
     validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection()]
     output_data = render_output(validation_results, output_type)
     if output:

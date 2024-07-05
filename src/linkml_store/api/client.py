@@ -242,7 +242,7 @@ class Client:
         Return all attached databases
 
         Examples
-        --------
+
         >>> client = Client()
         >>> _ = client.attach_database("duckdb", alias="test1")
         >>> _ = client.attach_database("duckdb", alias="test2")
@@ -268,25 +268,81 @@ class Client:
         """
         Drop a database.
 
+        Example (in-memory):
+
+        >>> client = Client()
+        >>> db1 = client.attach_database("duckdb", alias="test1")
+        >>> db2 = client.attach_database("duckdb", alias="test2")
+        >>> len(client.databases)
+        2
+        >>> client.drop_database("test1")
+        >>> len(client.databases)
+        1
+
+        Databases that persist on disk:
+
+        >>> client = Client()
+        >>> path = Path("tmp/test.db")
+        >>> path.parent.mkdir(parents=True, exist_ok=True)
+        >>> db = client.attach_database(f"duckdb:///{path}", alias="test")
+        >>> len(client.databases)
+        1
+        >>> db.store({"persons": [{"id": "P1", "name": "John"}]})
+        >>> db.commit()
+        >>> Path("tmp/test.db").exists()
+        True
+        >>> client.drop_database("test")
+        >>> len(client.databases)
+        0
+        >>> Path("tmp/test.db").exists()
+        False
+
+        Dropping a non-existent database:
+
+        >>> client = Client()
+        >>> client.drop_database("duckdb:///tmp/made-up1", missing_ok=True)
+        >>> client.drop_database("duckdb:///tmp/made-up2", missing_ok=False)
+        Traceback (most recent call last):
+        ...
+        ValueError: Database duckdb:///tmp/made-up2 not found
+
         :param name:
         :param missing_ok:
         :return:
         """
-        if name in self._databases:
-            db = self._databases[name]
-            db.drop(**kwargs)
-            del self._databases[name]
+        if self._databases:
+            if name in self._databases:
+                db = self._databases[name]
+                db.drop(**kwargs)
+                del self._databases[name]
+            else:
+                if not missing_ok:
+                    raise ValueError(f"Database {name} not found")
         else:
-            if not missing_ok:
-                raise ValueError(f"Database {name} not found")
+            db = self.get_database(name, create_if_not_exists=True)
+            db.drop(**kwargs)
 
     def drop_all_databases(self, **kwargs):
         """
         Drop all databases.
 
+        Example (in-memory):
+
+        >>> client = Client()
+        >>> db1 = client.attach_database("duckdb", alias="test1")
+        >>> assert "test1" in client.databases
+        >>> db2 = client.attach_database("duckdb", alias="test2")
+        >>> assert "test2" in client.databases
+        >>> client.drop_all_databases()
+        >>> len(client.databases)
+        0
+
+
         :param missing_ok:
         :return:
         """
+        if not self._databases:
+            return
         for name in list(self._databases.keys()):
             self.drop_database(name, missing_ok=False, **kwargs)
         self._databases = {}

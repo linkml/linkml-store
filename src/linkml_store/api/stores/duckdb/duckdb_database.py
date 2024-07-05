@@ -26,6 +26,8 @@ TYPE_MAP = {
     "JSON": "Any",
 }
 
+MEMORY_HANDLE = "duckdb:///:memory:"
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +51,7 @@ class DuckDBDatabase(Database):
 
     def __init__(self, handle: Optional[str] = None, recreate_if_exists: bool = False, **kwargs):
         if handle is None:
-            handle = "duckdb:///:memory:"
+            handle = MEMORY_HANDLE
         if recreate_if_exists:
             path = Path(handle.replace("duckdb:///", ""))
             if path.exists():
@@ -76,6 +78,17 @@ class DuckDBDatabase(Database):
     def close(self, **kwargs):
         self.engine.dispose()
 
+    def drop(self, missing_ok=True, **kwargs):
+        self.close()
+        if self.handle == MEMORY_HANDLE:
+            return
+        path = Path(self.handle.replace("duckdb:///", ""))
+        if path.exists():
+            path.unlink()
+        else:
+            if not missing_ok:
+                raise FileNotFoundError(f"Database file not found: {path}")
+
     def query(self, query: Query, **kwargs) -> QueryResult:
         json_encoded_cols = []
         if query.from_table:
@@ -94,7 +107,8 @@ class DuckDBDatabase(Database):
             if sv:
                 cd = None
                 for c in self._collections.values():
-                    if c.name == query.from_table or c.metadata.alias == query.from_table:
+                    # if c.name == query.from_table or c.metadata.alias == query.from_table:
+                    if c.alias == query.from_table or c.target_class_name == query.from_table:
                         cd = c.class_definition()
                         break
                 if cd:
