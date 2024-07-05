@@ -127,7 +127,7 @@ class DuckDBCollection(Collection):
         return t
 
     def _check_if_initialized(self) -> bool:
-        #if self._initialized:
+        # if self._initialized:
         #    return True
         query = Query(
             from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}

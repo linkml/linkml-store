@@ -82,7 +82,6 @@ class Collection(Generic[DatabaseType]):
         # if name is not None and self.metadata.name is not None and name != self.metadata.name:
         #    raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
 
-
     @property
     def hidden(self) -> bool:
         """
@@ -535,9 +534,13 @@ class Collection(Generic[DatabaseType]):
             source = metadata.source
             kwargs = source.arguments or {}
             if source.local_path:
-                objects = load_objects(metadata.source.local_path, format=source.format, expected_type=source.expected_type, **kwargs)
+                objects = load_objects(
+                    metadata.source.local_path, format=source.format, expected_type=source.expected_type, **kwargs
+                )
             elif metadata.source.url:
-                objects = load_objects_from_url(metadata.source.url, format=source.format, expected_type=source.expected_type, **kwargs)
+                objects = load_objects_from_url(
+                    metadata.source.url, format=source.format, expected_type=source.expected_type, **kwargs
+                )
         self.insert(objects)
 
     def _check_if_initialized(self) -> bool:
@@ -572,6 +575,7 @@ class Collection(Generic[DatabaseType]):
                 raise ValueError(f"No mappings for {self.name}")
             target_class_name = self.target_class_name
             from linkml_map.session import Session
+
             session = Session()
             session.set_source_schema(db.schema_view.schema)
             session.set_object_transformer(
@@ -593,7 +597,6 @@ class Collection(Generic[DatabaseType]):
                 raise ValueError(f"No objects derived from {coll.name}")
             self.insert(tr_objs)
             self.commit()
-
 
     def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
@@ -822,7 +825,9 @@ class Collection(Generic[DatabaseType]):
         else:
             return None
 
-    def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size: Optional[int] = None) -> ClassDefinition:
+    def induce_class_definition_from_objects(
+        self, objs: List[OBJECT], max_sample_size: Optional[int] = None
+    ) -> ClassDefinition:
         """
         Induce a class definition from a list of objects.
 

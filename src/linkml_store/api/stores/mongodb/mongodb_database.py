@@ -3,9 +3,6 @@
 import logging
 from typing import Optional
 
-from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from linkml_runtime.utils.schema_builder import SchemaBuilder
 from pymongo import MongoClient
 from pymongo.database import Database as NativeDatabase
 

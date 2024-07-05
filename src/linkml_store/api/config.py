@@ -7,6 +7,7 @@ class ConfiguredBaseModel(BaseModel, extra="forbid"):
     """
     Base class for all configuration models.
     """
+
     pass
 
 
@@ -14,6 +15,7 @@ class DerivationConfiguration(ConfiguredBaseModel):
     """
     Configuration for a derivation
     """
+
     database: Optional[str] = None
     collection: Optional[str] = None
     mappings: Optional[Dict[str, Any]] = None
@@ -24,6 +26,7 @@ class CollectionSource(ConfiguredBaseModel):
     """
     Metadata about a source
     """
+
     url: Optional[str] = None
     local_path: Optional[str] = None
     source_location: Optional[str] = None
@@ -37,6 +40,7 @@ class CollectionConfig(ConfiguredBaseModel):
     """
     Configuration for a collection
     """
+
     alias: Optional[str] = Field(
         default=None,
         description="An optional alias for the collection",
@@ -80,6 +84,7 @@ class DatabaseConfig(ConfiguredBaseModel):
     """
     Configuration for a database
     """
+
     handle: str = Field(
         default="duckdb:///:memory:",
         description="The database handle, e.g., 'duckdb:///:memory:' or 'mongodb://localhost:27017'",
@@ -127,6 +132,7 @@ class ClientConfig(ConfiguredBaseModel):
     """
     Configuration for a client
     """
+
     handle: Optional[str] = Field(
         default=None,
         description="The client handle",

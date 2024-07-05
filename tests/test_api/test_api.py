@@ -140,7 +140,7 @@ def create_client(handle: str, recreate_if_exists=True) -> Client:
         # existing databases
         pass
     print(f"DB2s={client.databases}")
-    #client.attach_database(handle, alias=DEFAULT_DB)
+    # client.attach_database(handle, alias=DEFAULT_DB)
     client.attach_database(handle)
     print(f"ATTACHED: {handle} // num={len(client.databases)} // {client.databases}")
     return client
@@ -410,7 +410,7 @@ def test_load_from_source(handle):
     assert coll.find({}).num_rows > 0
 
 
-#@pytest.mark.parametrize("handle", SCHEMES)  # TODO - mongodb
+# @pytest.mark.parametrize("handle", SCHEMES)  # TODO - mongodb
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 @pytest.mark.parametrize(
     "type_alias",
@@ -450,8 +450,9 @@ def test_induced_schema(handle, type_alias):
         assert collection.alias == typ
         assert collection.target_class_name == typ
     assert len(database.list_collections()) == 1, "expected collection to be created"
-    assert collection.class_definition() is None or not collection.class_definition().attributes, \
-        "no explicit schema and no data to induce from"
+    assert (
+        collection.class_definition() is None or not collection.class_definition().attributes
+    ), "no explicit schema and no data to induce from"
     qr = collection.find()
     assert qr.num_rows == 0, "database should be empty"
     objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
@@ -463,7 +464,9 @@ def test_induced_schema(handle, type_alias):
     assert collection.parent.schema_view.schema is not None, "expected schema to be initialized from data"
     # print(yaml_dumper.dumps(collection.parent.schema_view.schema))
     assert collection.parent.schema_view.schema.classes, "expected single class to be initialized from data"
-    assert len(collection.parent.schema_view.schema.classes.keys()) == 1, "expected single class to be initialized from data"
+    assert (
+        len(collection.parent.schema_view.schema.classes.keys()) == 1
+    ), "expected single class to be initialized from data"
     print(typ, alias, collection.target_class_name, collection.parent.schema_view.schema.classes.keys())
     assert typ in collection.parent.schema_view.schema.classes.keys(), "name of class is collection name by default"
     assert (

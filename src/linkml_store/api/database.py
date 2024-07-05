@@ -146,7 +146,6 @@ class Database(ABC, Generic[CollectionType]):
         self._initialize_collections()
         return self
 
-
     def _initialize_collections(self):
         if not self.metadata.collections:
             return
@@ -583,6 +582,7 @@ class Database(ABC, Generic[CollectionType]):
         """
         logger.info(f"Inducing schema view for {self.handle}")
         from linkml_runtime.utils.schema_builder import SchemaBuilder
+
         sb = SchemaBuilder()
 
         for collection_name in self.list_collection_names():

@@ -30,7 +30,11 @@ class Format(Enum):
 
 
 def load_objects_from_url(
-    url: str, format: Union[Format, str] = None, expected_type: Type = None, local_path: Optional[str] = None, **kwargs,
+    url: str,
+    format: Union[Format, str] = None,
+    expected_type: Type = None,
+    local_path: Optional[str] = None,
+    **kwargs,
 ) -> List[Dict[str, Any]]:
     """
     Load objects from a URL in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -49,8 +53,10 @@ def load_objects_from_url(
 
 
 def load_objects(
-    file_path: Union[str, Path], format: Union[Format, str] = None, expected_type: Type = None,
-        header_comment_token: Optional[str] = None,
+    file_path: Union[str, Path],
+    format: Union[Format, str] = None,
+    expected_type: Type = None,
+    header_comment_token: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -124,6 +130,7 @@ def load_objects(
         objs = list(reader)
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
+
         table = pq.read_table(f)
         objs = table.to_pandas().to_dict(orient="records")
     else:
@@ -211,7 +218,7 @@ def render_output(
     elif format == Format.PYTHON:
         return str(data)
     elif format == Format.TABLE:
-        return tabulate(pd.DataFrame(data), headers='keys', tablefmt='psql')
+        return tabulate(pd.DataFrame(data), headers="keys", tablefmt="psql")
     elif format == Format.YAML:
         if isinstance(data, list):
             return yaml.safe_dump_all(data, sort_keys=False)

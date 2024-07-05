@@ -89,7 +89,6 @@ class DuckDBDatabase(Database):
             if not missing_ok:
                 raise FileNotFoundError(f"Database file not found: {path}")
 
-
     def query(self, query: Query, **kwargs) -> QueryResult:
         json_encoded_cols = []
         if query.from_table:

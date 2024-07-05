@@ -353,10 +353,7 @@ def list_collections(ctx, **kwargs):
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.option("--columns", "-S", help="Columns to facet on")
-@click.option("--wide/--no-wide", "-U/--no-U",
-              default=False,
-              show_default=True,
-              help="Wide table")
+@click.option("--wide/--no-wide", "-U/--no-U", default=False, show_default=True, help="Wide table")
 @click.pass_context
 def fq(ctx, where, limit, columns, output_type, wide, output):
     """
@@ -420,11 +417,9 @@ def _get_index(index_type=None, **kwargs) -> Indexer:
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
 @click.option("--output-type", "-O", type=format_choice, default=Format.FORMATTED.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--limit", "-l",
-              default=-1,
-              show_default=True,
-              type=click.INT,
-              help="Maximum number of results to return")
+@click.option(
+    "--limit", "-l", default=-1, show_default=True, type=click.INT, help="Maximum number of results to return"
+)
 @click.pass_context
 def describe(ctx, where, output_type, output, limit):
     """
