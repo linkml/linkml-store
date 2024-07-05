@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 class DuckDBCollection(Collection):
     _table_created: bool = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         logger.debug(f"Inserting {len(objs)}")
         if not isinstance(objs, list):
@@ -123,6 +126,17 @@ class DuckDBCollection(Collection):
         t = Table(self.alias, metadata_obj, *cols)
         return t
 
+    def _check_if_initialized(self) -> bool:
+        #if self._initialized:
+        #    return True
+        query = Query(
+            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
+        )
+        qr = self.parent.query(query)
+        if qr.num_rows > 0:
+            return True
+        return False
+
     def _create_table(self, cd: ClassDefinition):
         if self._table_created or self.metadata.is_prepopulated:
             logger.info(f"Already have table for: {cd.name}")
@@ -134,6 +148,7 @@ class DuckDBCollection(Collection):
         if qr.num_rows > 0:
             logger.info(f"Table already exists for {cd.name}")
             self._table_created = True
+            self._initialized = True
             self.metadata.is_prepopulated = True
             return
         logger.info(f"Creating table for {cd.name}")
@@ -144,4 +159,5 @@ class DuckDBCollection(Collection):
             conn.execute(text(ddl))
             conn.commit()
         self._table_created = True
+        self._initialized = True
         self.metadata.is_prepopulated = True

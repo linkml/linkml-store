@@ -31,7 +31,7 @@ class FileSystemCollection(Collection[DatabaseType]):
 
     @property
     def path_to_file(self):
-        return Path(self.parent.directory_path) / f"{self.name}.{self.file_format}"
+        return Path(self.parent.directory_path) / f"{self.alias}.{self.file_format}"
 
     @property
     def objects_as_list(self) -> List[OBJECT]:
@@ -150,13 +150,20 @@ class FileSystemCollection(Collection[DatabaseType]):
         curr_objects = [o for o in self.objects_as_list if not matches(o)]
         self._set_objects(curr_objects)
 
-    def query(self, query: Query, **kwargs) -> QueryResult:
-
+    def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
+        limit = limit or query.limit
+        offset = offset or query.offset
+        if offset is None:
+            offset = 0
         where = query.where_clause or {}
         match = mongo_query_to_match_function(where)
         rows = [o for o in self.objects_as_list if match(o)]
         count = len(rows)
-        return QueryResult(query=query, num_rows=count, rows=rows)
+        if limit is None or limit < 0:
+            limit = count
+        # TODO: avoid recalculating
+        returned_row = rows[offset : offset + limit]
+        return QueryResult(query=query, num_rows=count, rows=returned_row)
 
     def query_facets(
         self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs

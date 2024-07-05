@@ -4,14 +4,39 @@ from pydantic import BaseModel, Field
 
 
 class ConfiguredBaseModel(BaseModel, extra="forbid"):
+    """
+    Base class for all configuration models.
+    """
     pass
 
 
+class DerivationConfiguration(ConfiguredBaseModel):
+    """
+    Configuration for a derivation
+    """
+    database: Optional[str] = None
+    collection: Optional[str] = None
+    mappings: Optional[Dict[str, Any]] = None
+    where: Optional[Dict[str, Any]] = None
+
+
+class CollectionSource(ConfiguredBaseModel):
+    """
+    Metadata about a source
+    """
+    url: Optional[str] = None
+    local_path: Optional[str] = None
+    source_location: Optional[str] = None
+    refresh_interval_days: Optional[float] = None
+    expected_type: Optional[str] = None
+    format: Optional[str] = None
+    arguments: Optional[Dict[str, Any]] = None
+
+
 class CollectionConfig(ConfiguredBaseModel):
-    name: Optional[str] = Field(
-        default=None,
-        description="An optional name for the collection",
-    )
+    """
+    Configuration for a collection
+    """
     alias: Optional[str] = Field(
         default=None,
         description="An optional alias for the collection",
@@ -40,13 +65,21 @@ class CollectionConfig(ConfiguredBaseModel):
         default=False,
         description="Whether the collection is prepopulated",
     )
-    source_location: Optional[str] = Field(
+    source: Optional[CollectionSource] = Field(
         default=None,
-        description="Filesystem or remote URL that stores the data",
+        description="Metadata about the source",
+    )
+    # TODO: derived_from
+    derived_from: Optional[List[DerivationConfiguration]] = Field(
+        default=None,
+        description="LinkML-Map derivations",
     )
 
 
 class DatabaseConfig(ConfiguredBaseModel):
+    """
+    Configuration for a database
+    """
     handle: str = Field(
         default="duckdb:///:memory:",
         description="The database handle, e.g., 'duckdb:///:memory:' or 'mongodb://localhost:27017'",
@@ -91,6 +124,9 @@ class DatabaseConfig(ConfiguredBaseModel):
 
 
 class ClientConfig(ConfiguredBaseModel):
+    """
+    Configuration for a client
+    """
     handle: Optional[str] = Field(
         default=None,
         description="The client handle",

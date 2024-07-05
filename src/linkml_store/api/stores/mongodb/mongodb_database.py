@@ -63,10 +63,9 @@ class MongoDBDatabase(Database):
             self._native_client.close()
 
     def drop(self, **kwargs):
-        self.native_client.drop_database(self.metadata.alias)
+        self.native_client.drop_database(self.native_db.name)
 
     def query(self, query: Query, **kwargs) -> QueryResult:
-        # TODO: DRY
         if query.from_table:
             collection = self.get_collection(query.from_table)
             return collection.query(query, **kwargs)
@@ -81,34 +80,3 @@ class MongoDBDatabase(Database):
             if collection_name not in self._collections:
                 collection = MongoDBCollection(name=collection_name, parent=self)
                 self._collections[collection_name] = collection
-
-    def induce_schema_view(self) -> SchemaView:
-        logger.info(f"Inducing schema view for {self.handle}")
-        sb = SchemaBuilder()
-        schema = sb.schema
-
-        for collection_name in self.native_db.list_collection_names():
-            sb.add_class(collection_name)
-            mongo_collection = self.native_db[collection_name]
-            sample_doc = mongo_collection.find_one()
-            if sample_doc:
-                for field, value in sample_doc.items():
-                    if field == "_id":
-                        continue
-                    sd = SlotDefinition(field)
-                    if isinstance(value, list):
-                        sd.multivalued = True
-                    if isinstance(value, dict):
-                        sd.inlined = True
-                    sb.schema.classes[collection_name].attributes[sd.name] = sd
-
-        sb.add_defaults()
-        for cls_name in schema.classes:
-            if cls_name in self.metadata.collections:
-                collection_metadata = self.metadata.collections[cls_name]
-                if collection_metadata.attributes:
-                    del schema.classes[cls_name]
-                    cls = ClassDefinition(name=collection_metadata.type, attributes=collection_metadata.attributes)
-                    schema.classes[cls.name] = cls
-
-        return SchemaView(schema)

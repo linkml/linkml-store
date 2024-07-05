@@ -74,7 +74,7 @@ class LLMIndexer(Indexer):
 
             embeddings_client = Client()
             config = CollectionConfig(
-                name=coll_name,
+                alias=coll_name,
                 type="Embeddings",
                 attributes={
                     "text": {"range": "string"},
@@ -116,6 +116,7 @@ class LLMIndexer(Indexer):
                     embeddings_collection.insert(
                         {"text": uncached_texts[i], "embedding": embeddings[index], "model_id": model_id}
                     )
+                embeddings_collection.commit()
         else:
             logger.info(f"Embedding {len(texts)} texts")
             embeddings = model.embed_multi(texts)

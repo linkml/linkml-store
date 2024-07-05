@@ -25,6 +25,16 @@ DOCTEST_DIR = docs src/linkml_store/api src/linkml_store/index src/linkml_store/
 doctest:
 	find $(DOCTEST_DIR) -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
 
+NB_DIRS = tutorials how-to
+NB_DIRS_EXPANDED = $(patsubst %, docs/%/*.ipynb, $(NB_DIRS))
+NOTEBOOKS = $(wildcard ls $(NB_DIRS_EXPANDED))
+NB_TGTS = $(patsubst docs/%, tmp/docs/%, $(NOTEBOOKS))
+nbtest: $(NB_TGTS)
+	echo $(NOTEBOOKS)
+
+tmp/docs/%.ipynb: docs/%.ipynb
+	mkdir -p $(dir $@) && \
+	$(RUN) papermill --cwd $(dir $<) $< $@.tmp.ipynb && mv $@.tmp $@.ipynb && $(RUN) nbdiff -M -D $< $@
 
 doctest-%:
 	find $* -type f \( -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE

@@ -19,8 +19,9 @@ TYPE_MAP = {
 
 OP_MAP = {
     "eq": "=",
+    "$in": "ARRAY_CONTAINS",          ## mongodb
+    "$contains": "ARRAY_CONTAINS",    ## TODO: this is chromadb-specific
     "in": "ARRAY_CONTAINS",
-    "$contains": "ARRAY_CONTAINS",
 }
 
 

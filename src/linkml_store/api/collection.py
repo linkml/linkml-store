@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from linkml_store.api.types import DatabaseType
 from linkml_store.index import get_indexer
-from linkml_store.utils.format_utils import load_objects
+from linkml_store.utils.format_utils import load_objects, load_objects_from_url
 from linkml_store.utils.object_utils import clean_empties
 from linkml_store.utils.patch_utils import PatchDict, apply_patches_to_list, patches_from_objects_lists
 
@@ -61,6 +61,7 @@ class Collection(Generic[DatabaseType]):
     # name: str
     parent: Optional[DatabaseType] = None
     _indexers: Optional[Dict[str, Indexer]] = None
+    _initialized: Optional[bool] = None
     # hidden: Optional[bool] = False
 
     metadata: Optional[CollectionConfig] = None
@@ -73,7 +74,7 @@ class Collection(Generic[DatabaseType]):
         if metadata:
             self.metadata = metadata
         else:
-            self.metadata = CollectionConfig(name=name, **kwargs)
+            self.metadata = CollectionConfig(type=name, **kwargs)
             if not self.metadata.alias:
                 self.metadata.alias = name
             if not self.metadata.type:
@@ -81,16 +82,6 @@ class Collection(Generic[DatabaseType]):
         # if name is not None and self.metadata.name is not None and name != self.metadata.name:
         #    raise ValueError(f"Name mismatch: {name} != {self.metadata.name}")
 
-    @property
-    def name(self) -> str:
-        """
-        Return the name of the collection.
-
-        TODO: deprecate in favor of Type
-
-        :return: name of the collection
-        """
-        return self.metadata.name
 
     @property
     def hidden(self) -> bool:
@@ -118,12 +109,18 @@ class Collection(Generic[DatabaseType]):
         >>> collection.target_class_name
         'Person'
 
+        >>> collection = db.create_collection("Organization")
+        >>> collection.target_class_name
+        'Organization'
+        >>> collection.alias
+        'Organization'
+
         :return: name of the class which members of this collection instantiate
         """
         # TODO: this is a shim layer until we can normalize on this
         if self.metadata.type:
             return self.metadata.type
-        return self.name
+        return self.alias
 
     @property
     def alias(self):
@@ -161,10 +158,9 @@ class Collection(Generic[DatabaseType]):
         :return:
         """
         # TODO: this is a shim layer until we can normalize on this
-        # TODO: this is a shim layer until we can normalize on this
         if self.metadata.alias:
             return self.metadata.alias
-        return self.name
+        return self.target_class_name
 
     def replace(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """
@@ -201,7 +197,14 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
+    def _pre_query_hook(self, query: Optional[Query] = None, **kwargs):
+        logger.info(f"Pre-query hook (state: {self._initialized}; Q= {query}")
+        if not self._initialized:
+            self._materialize_derivations()
+            self._initialized = True
+
     def _post_insert_hook(self, objs: List[OBJECT], **kwargs):
+        self._initialized = True
         patches = [{"op": "add", "path": "/0", "value": obj} for obj in objs]
         self._broadcast(patches, **kwargs)
 
@@ -305,6 +308,7 @@ class Collection(Generic[DatabaseType]):
         :param kwargs:
         :return:
         """
+        self._pre_query_hook()
         return self.parent.query(query, **kwargs)
 
     def query_facets(
@@ -340,7 +344,6 @@ class Collection(Generic[DatabaseType]):
         :param kwargs:
         :return:
         """
-        # TODO
         id_field = self.identifier_attribute_name
         if not id_field:
             raise ValueError(f"No identifier for {self.name}")
@@ -399,9 +402,10 @@ class Collection(Generic[DatabaseType]):
         :return:
         """
         query = self._create_query(where_clause=where)
+        self._pre_query_hook(query)
         return self.query(query, **kwargs)
 
-    def find_iter(self, where: Optional[Any] = None, **kwargs) -> Iterator[OBJECT]:
+    def find_iter(self, where: Optional[Any] = None, page_size=100, **kwargs) -> Iterator[OBJECT]:
         """
         Find objects in the collection using a where query.
 
@@ -409,9 +413,22 @@ class Collection(Generic[DatabaseType]):
         :param kwargs:
         :return:
         """
-        qr = self.find(where=where, limit=-1, **kwargs)
-        for row in qr.rows:
-            yield row
+        total_rows = None
+        offset = 0
+        if page_size < 1:
+            raise ValueError(f"Invalid page size: {page_size}")
+        while True:
+            qr = self.find(where=where, offset=offset, limit=page_size, **kwargs)
+            if total_rows is None:
+                total_rows = qr.num_rows
+            if not qr.rows:
+                return
+            for row in qr.rows:
+                yield row
+            offset += page_size
+            if offset >= total_rows:
+                break
+        return
 
     def search(
         self,
@@ -454,6 +471,7 @@ class Collection(Generic[DatabaseType]):
         :param kwargs:
         :return:
         """
+        self._pre_query_hook()
         if index_name is None:
             if len(self.indexers) == 1:
                 index_name = list(self.indexers.keys())[0]
@@ -494,9 +512,88 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"Collection has no alias: {self} // {self.metadata}")
         return self.alias.startswith("internal__")
 
-    def load_from_source(self):
-        objects = load_objects(self.metadata.source_location)
+    def exists(self) -> Optional[bool]:
+        """
+        Check if the collection exists.
+
+        :return:
+        """
+        cd = self.class_definition()
+        return cd is not None
+
+    def load_from_source(self, load_if_exists=False):
+        """
+        Load objects from the source location.
+
+        :param load_if_exists:
+        :return:
+        """
+        if not load_if_exists and self.exists():
+            return
+        metadata = self.metadata
+        if metadata.source:
+            source = metadata.source
+            kwargs = source.arguments or {}
+            if source.local_path:
+                objects = load_objects(metadata.source.local_path, format=source.format, expected_type=source.expected_type, **kwargs)
+            elif metadata.source.url:
+                objects = load_objects_from_url(metadata.source.url, format=source.format, expected_type=source.expected_type, **kwargs)
         self.insert(objects)
+
+    def _check_if_initialized(self) -> bool:
+        return self._initialized
+
+    def _materialize_derivations(self, **kwargs):
+        metadata = self.metadata
+        if not metadata.derived_from:
+            logger.info(f"No metadata for {self.alias}; no derivations")
+            return
+        if self._check_if_initialized():
+            logger.info(f"Already initialized {self.alias}; no derivations")
+            return
+        parent_db = self.parent
+        client = parent_db.parent
+        # cd = self.class_definition()
+        for derivation in metadata.derived_from:
+            # TODO: optimize this; utilize underlying engine
+            logger.info(f"Deriving from {derivation}")
+            if derivation.database:
+                db = client.get_database(derivation.database)
+            else:
+                db = parent_db
+            if derivation.collection:
+                coll = db.get_collection(derivation.collection)
+            else:
+                coll = self
+            coll.class_definition()
+            source_obj_iter = coll.find_iter(derivation.where or {})
+            mappings = derivation.mappings
+            if not mappings:
+                raise ValueError(f"No mappings for {self.name}")
+            target_class_name = self.target_class_name
+            from linkml_map.session import Session
+            session = Session()
+            session.set_source_schema(db.schema_view.schema)
+            session.set_object_transformer(
+                {
+                    "class_derivations": {
+                        target_class_name: {
+                            "populated_from": coll.target_class_name,
+                            "slot_derivations": mappings,
+                        },
+                    }
+                },
+            )
+            logger.debug(f"Session Spec: {session.object_transformer}")
+            tr_objs = []
+            for source_obj in source_obj_iter:
+                tr_obj = session.transform(source_obj, source_type=coll.target_class_name)
+                tr_objs.append(tr_obj)
+            if not tr_objs:
+                raise ValueError(f"No objects derived from {coll.name}")
+            self.insert(tr_objs)
+            self.commit()
+
 
     def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
@@ -572,7 +669,7 @@ class Collection(Generic[DatabaseType]):
         :param indexer:
         :return:
         """
-        return f"internal__index__{self.name}__{index_name}"
+        return f"internal__index__{self.alias}__{index_name}"
 
     def index_objects(self, objs: List[OBJECT], index_name: str, replace=False, **kwargs):
         """
@@ -637,6 +734,9 @@ class Collection(Generic[DatabaseType]):
     def class_definition(self) -> Optional[ClassDefinition]:
         """
         Return the class definition for the collection.
+
+        If no schema has been explicitly set, and the native database does not
+        have a schema, then a schema will be induced from the objects in the collection.
 
         :return:
         """
@@ -722,7 +822,7 @@ class Collection(Generic[DatabaseType]):
         else:
             return None
 
-    def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size=10) -> ClassDefinition:
+    def induce_class_definition_from_objects(self, objs: List[OBJECT], max_sample_size: Optional[int] = None) -> ClassDefinition:
         """
         Induce a class definition from a list of objects.
 
@@ -733,6 +833,9 @@ class Collection(Generic[DatabaseType]):
         :param max_sample_size:
         :return:
         """
+        # TODO: use schemaview
+        if max_sample_size is None:
+            max_sample_size = 10
         if not self.target_class_name:
             raise ValueError(f"No target_class_name for {self.alias}")
         cd = ClassDefinition(self.target_class_name)
@@ -795,6 +898,7 @@ class Collection(Generic[DatabaseType]):
             for other_rng in rngs:
                 if rng != other_rng:
                     raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
+            logger.debug(f"Inducing {k} as {rng} {multivalued} {inlined}")
             cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined)
             if exact_dimensions_list:
                 array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
@@ -828,7 +932,7 @@ class Collection(Generic[DatabaseType]):
         """
         Apply a patch to the collection.
 
-        Patches conform to the JSON Patch format,
+        Patches conform to the JSON Patch format.
 
         :param patches:
         :param kwargs:
@@ -841,11 +945,11 @@ class Collection(Generic[DatabaseType]):
         new_objs = apply_patches_to_list(all_objs, patches, primary_key=primary_key, **kwargs)
         self.replace(new_objs)
 
-    def diff(self, other: "Collection", **kwargs):
+    def diff(self, other: "Collection", **kwargs) -> List[PatchDict]:
         """
         Diff two collections.
 
-        :param other:
+        :param other: The collection to diff against
         :param kwargs:
         :return:
         """
@@ -872,8 +976,7 @@ class Collection(Generic[DatabaseType]):
         if not cd:
             raise ValueError(f"Cannot find class definition for {self.target_class_name}")
         class_name = cd.name
-        result = self.find(**kwargs)
-        for obj in result.rows:
+        for obj in self.find_iter(**kwargs):
             obj = clean_empties(obj)
             yield from validator.iter_results(obj, class_name)
 

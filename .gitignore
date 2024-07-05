@@ -4,6 +4,8 @@ db/
 tests/output/
 tests/input/integration/
 tmp/
+*.TEST-RUN.ipynb
+*.tmp
 
 
 # Byte-compiled / optimized / DLL files

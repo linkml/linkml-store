@@ -7,8 +7,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TextIO, Type, Union
 
 import pandas as pd
+import pystow
 import yaml
 from pydantic import BaseModel
+from tabulate import tabulate
 
 
 class Format(Enum):
@@ -21,12 +23,34 @@ class Format(Enum):
     YAML = "yaml"
     TSV = "tsv"
     CSV = "csv"
+    PYTHON = "python"
     PARQUET = "parquet"
     FORMATTED = "formatted"
+    TABLE = "table"
+
+
+def load_objects_from_url(
+    url: str, format: Union[Format, str] = None, expected_type: Type = None, local_path: Optional[str] = None, **kwargs,
+) -> List[Dict[str, Any]]:
+    """
+    Load objects from a URL in JSON, JSONLines, YAML, CSV, or TSV format.
+
+    :param url: The URL to the file.
+    :param format: The format of the file. Can be a Format enum or a string value.
+    :param expected_type: The target type to load the objects into.
+    :param local_path: The local path to save the file to.
+    :return: A list of dictionaries representing the loaded objects.
+    """
+    local_path = pystow.ensure("linkml", "linkml-store", url=url)
+    objs = load_objects(local_path, format=format, expected_type=expected_type, **kwargs)
+    if not objs:
+        raise ValueError(f"No objects loaded from URL: {url}")
+    return objs
 
 
 def load_objects(
-    file_path: Union[str, Path], format: Union[Format, str] = None, expected_type: Type = None
+    file_path: Union[str, Path], format: Union[Format, str] = None, expected_type: Type = None,
+        header_comment_token: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -37,7 +61,7 @@ def load_objects(
 
     :param file_path: The path to the file.
     :param format: The format of the file. Can be a Format enum or a string value.
-    :param expected_type: The target type to load the objects into.
+    :param expected_type: The target type to load the objects into, e.g. list
     :return: A list of dictionaries representing the loaded objects.
     """
     if isinstance(format, str):
@@ -48,6 +72,12 @@ def load_objects(
 
     if not format and (file_path.endswith(".parquet") or file_path.endswith(".pq")):
         format = Format.PARQUET
+    if not format and file_path.endswith(".tsv"):
+        format = Format.TSV
+    if not format and file_path.endswith(".csv"):
+        format = Format.CSV
+    if not format and file_path.endswith(".py"):
+        format = Format.PYTHON
 
     mode = "r"
     if format == Format.PARQUET:
@@ -68,15 +98,32 @@ def load_objects(
             objs = list(yaml.safe_load_all(f))
         else:
             objs = yaml.safe_load(f)
-    elif format == Format.TSV or (not format and file_path.endswith(".tsv")):
-        reader = csv.DictReader(f, delimiter="\t")
-        objs = list(reader)
-    elif format == Format.CSV or (not format and file_path.endswith(".csv")):
-        reader = csv.DictReader(f)
+    elif format == Format.TSV or format == Format.CSV:
+        # Skip initial comment lines if comment_char is set
+        if header_comment_token:
+            # Store the original position
+            original_pos = f.tell()
+
+            # Read and store lines until we find a non-comment line
+            lines = []
+            for line in f:
+                if not line.startswith(header_comment_token):
+                    break
+                lines.append(line)
+
+            # Go back to the original position
+            f.seek(original_pos)
+
+            # Skip the comment lines we found
+            for _ in lines:
+                f.readline()
+        if format == Format.TSV:
+            reader = csv.DictReader(f, delimiter="\t")
+        else:
+            reader = csv.DictReader(f)
         objs = list(reader)
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
-
         table = pq.read_table(f)
         objs = table.to_pandas().to_dict(orient="records")
     else:
@@ -151,6 +198,9 @@ def render_output(
     if isinstance(data, pd.DataFrame):
         data = data.to_dict(orient="records")
 
+    if isinstance(data, dict) and format in [Format.TSV, Format.CSV]:
+        data = [data]
+
     if isinstance(data, BaseModel):
         data = data.model_dump()
 
@@ -158,6 +208,10 @@ def render_output(
         return json.dumps(data, indent=2, default=str)
     elif format == Format.JSONL:
         return "\n".join(json.dumps(obj) for obj in data)
+    elif format == Format.PYTHON:
+        return str(data)
+    elif format == Format.TABLE:
+        return tabulate(pd.DataFrame(data), headers='keys', tablefmt='psql')
     elif format == Format.YAML:
         if isinstance(data, list):
             return yaml.safe_dump_all(data, sort_keys=False)

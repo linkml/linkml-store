@@ -9,6 +9,7 @@ from linkml_runtime import SchemaView
 from linkml_store.api import Database
 from linkml_store.api.config import DatabaseConfig
 from linkml_store.api.stores.filesystem.filesystem_collection import FileSystemCollection
+from linkml_store.utils.file_utils import safe_remove_directory
 from linkml_store.utils.format_utils import Format, load_objects
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,8 @@ class FileSystemDatabase(Database):
 
     directory_path: Optional[Path] = None
     default_file_format: Optional[str] = None
+
+    no_backup_on_drop: bool = False
 
     def __init__(self, handle: Optional[str] = None, **kwargs):
         handle = handle.replace("file:", "")
@@ -43,6 +46,12 @@ class FileSystemDatabase(Database):
     def close(self, **kwargs):
         pass
 
+    def drop(self, no_backup=False, **kwargs):
+        self.close()
+        path = self.directory_path
+        if path.exists():
+            safe_remove_directory(path, no_backup=self.no_backup_on_drop or no_backup)
+
     def init_collections(self):
         metadata = self.metadata
         if self._collections is None:
@@ -63,7 +72,7 @@ class FileSystemDatabase(Database):
                     self._collections[n] = collection
                     collection._set_objects(objs)
 
-    def induce_schema_view(self) -> SchemaView:
+    def xxxinduce_schema_view(self) -> SchemaView:
         logger.info(f"Inducing schema view for {self.handle}")
         sb = SchemaBuilder()
 

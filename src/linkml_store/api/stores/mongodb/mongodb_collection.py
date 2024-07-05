@@ -23,10 +23,14 @@ class MongoDBCollection(Collection):
 
     @property
     def mongo_collection(self) -> MongoCollection:
-        if not self.name:
+        # collection_name = self.alias or self.name
+        collection_name = self.alias
+        if not collection_name:
             raise ValueError("Collection name not set")
-        collection_name = self.alias or self.name
         return self.parent.native_db[collection_name]
+
+    def _check_if_initialized(self) -> bool:
+        return self.alias in self.parent.native_db.list_collection_names()
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         if not isinstance(objs, list):

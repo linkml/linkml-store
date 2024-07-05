@@ -11,7 +11,7 @@ from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
 from linkml_store.api.client import Client
-from linkml_store.api.config import ClientConfig, CollectionConfig
+from linkml_store.api.config import ClientConfig, CollectionConfig, DerivationConfiguration
 from linkml_store.api.queries import Query
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.api.stores.mongodb import MongoDBDatabase
@@ -64,7 +64,7 @@ EMPLOYED_AT = [
 
 
 def is_persistent(handle: str) -> bool:
-    return ".db" in handle
+    return ".db" in handle or "mongodb" in handle or "file:" in handle
 
 
 def remove_none(d: dict, additional_keys=None):
@@ -126,6 +126,9 @@ def create_client(handle: str, recreate_if_exists=True) -> Client:
     :return:
     """
     client = Client()
+    if recreate_if_exists:
+        client.drop_database(handle, missing_ok=True, no_backup=True)
+    print(f"DBs={client.databases}")
     if handle.endswith(".db"):
         path = handle.replace("duckdb:///", "")
         if recreate_if_exists:
@@ -133,17 +136,23 @@ def create_client(handle: str, recreate_if_exists=True) -> Client:
             Path(path).unlink(missing_ok=True)
             assert not Path(path).exists()
     if handle.startswith("mongodb:"):
-        # client.drop_all_databases()
+        # because the mongo instance is shared, we want to avoid destroying
+        # existing databases
         pass
-    client.attach_database(handle, alias=DEFAULT_DB)
-    print(f"ATTACHED: {handle}")
+    print(f"DB2s={client.databases}")
+    #client.attach_database(handle, alias=DEFAULT_DB)
+    client.attach_database(handle)
+    print(f"ATTACHED: {handle} // num={len(client.databases)} // {client.databases}")
     return client
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_store(handle):
     """
-    Tests storing of objects in a database automatically creating collections
+    Tests storing of objects in a database automatically creating collections.
+
+    The store command is at the level of a database; it's assumed that
+    each key in the stored object corresponds to a :class:`Collection`.
 
     :param handle:
     :return:
@@ -173,6 +182,64 @@ def test_store(handle):
     qr = orgs_coll.find()
     assert qr.num_rows == 2
     assert remove_none(qr.rows[0]) == obj["organizations"][0]
+
+
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
+def test_find_iter(handle):
+    """
+    Tests querying using iterator
+
+    :param handle:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    coll = database.create_collection("Person", recreate_if_exists=True)
+    n = 200
+    objs = [{"id": i, "name": f"n{i}", "score": i * 10} for i in range(n)]
+    coll.insert(objs)
+    retrieved_objs = list(coll.find_iter())
+    assert len(retrieved_objs) == n
+    for offset, limit in [(0, 1), (10, 10)]:
+        qr = coll.find({}, offset=offset, limit=limit)
+        assert qr.num_rows == len(objs)
+        assert len(qr.rows) == limit
+        assert qr.rows[0] == retrieved_objs[offset]
+
+
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
+def test_derivations(handle):
+    """
+    Tests querying using iterator
+
+    :param handle:
+    :return:
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    coll = database.create_collection("Person", recreate_if_exists=True)
+    n = 100
+    base_age_in_months = 120
+    objs = [{"id": i, "name": f"n{i}", "age_in_months": base_age_in_months + i} for i in range(n)]
+    age_by_id = {obj["id"]: obj["age_in_months"] for obj in objs}
+    coll.insert(objs)
+    coll.commit()
+    tgt_coll = database.create_collection("Person2", recreate_if_exists=True, alias="derived_persons")
+    deriv = DerivationConfiguration(
+        database=database.alias,
+        collection=coll.alias,
+        mappings={
+            "id": {"populated_from": "id"},
+            "full_name": {"populated_from": "name"},
+            "age": {"expr": "age_in_months / 12"},
+        },
+    )
+    tgt_coll.metadata.derived_from = [deriv]
+    qr = tgt_coll.find({})
+    assert qr.num_rows > 0
+    for obj in qr.rows:
+        assert obj["age"] == pytest.approx(age_by_id[obj["id"]] / 12)
+        assert obj["full_name"]
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
@@ -343,7 +410,8 @@ def test_load_from_source(handle):
     assert coll.find({}).num_rows > 0
 
 
-@pytest.mark.parametrize("handle", SCHEMES)  # TODO - mongodb
+#@pytest.mark.parametrize("handle", SCHEMES)  # TODO - mongodb
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
 @pytest.mark.parametrize(
     "type_alias",
     [
@@ -356,7 +424,11 @@ def test_load_from_source(handle):
 )
 def test_induced_schema(handle, type_alias):
     """
-    Test induced schema and collection creation
+    Test inference of schema from data
+
+    1. Create a database and collection
+    2. Insert data
+    3. Check that schema is inferred
 
     :param handle:
     :param type_alias:
@@ -364,32 +436,44 @@ def test_induced_schema(handle, type_alias):
     """
     typ, alias = type_alias
     client = create_client(handle)
-    assert len(client.databases) == 1
+    assert len(client.databases) == 1, "expected single database in fresh client"
     database = client.get_database()
+    assert database is not None, "expected singleton to be retrieved without name"
     if not isinstance(database, MongoDBDatabase):
         assert len(database.list_collections()) == 0, "fresh database should have no collections"
     if alias:
         collection = database.create_collection(typ, alias=alias, recreate_if_exists=True)
+        assert collection.alias == alias
+        assert collection.target_class_name == typ
     else:
         collection = database.create_collection(typ, recreate_if_exists=True)
+        assert collection.alias == typ
+        assert collection.target_class_name == typ
     assert len(database.list_collections()) == 1, "expected collection to be created"
-    assert collection.class_definition() is None, "no explicit schema and no data to induce from"
-    # check is empty
+    assert collection.class_definition() is None or not collection.class_definition().attributes, \
+        "no explicit schema and no data to induce from"
     qr = collection.find()
     assert qr.num_rows == 0, "database should be empty"
     objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
     collection.insert(objs)
+    collection.commit()
     assert collection.find().num_rows == len(objs), "expected all objects to be added"
+    # assert collection.class_definition().name == typ
     assert collection.parent.schema_view is not None, "expected schema view to be initialized from data"
     assert collection.parent.schema_view.schema is not None, "expected schema to be initialized from data"
+    # print(yaml_dumper.dumps(collection.parent.schema_view.schema))
     assert collection.parent.schema_view.schema.classes, "expected single class to be initialized from data"
-    assert len(collection.parent.schema_view.schema.classes) == 1, "expected single class to be initialized from data"
-    assert collection.parent.schema_view.schema.classes[typ], "name of class is collection name by default"
+    assert len(collection.parent.schema_view.schema.classes.keys()) == 1, "expected single class to be initialized from data"
+    print(typ, alias, collection.target_class_name, collection.parent.schema_view.schema.classes.keys())
+    assert typ in collection.parent.schema_view.schema.classes.keys(), "name of class is collection name by default"
     assert (
         collection.parent.schema_view.schema.classes[typ].name == collection.target_class_name
     ), "name of class is collection name by default"
     assert collection.parent.schema_view.get_class(typ), "schema view should work"
     assert collection.class_definition() is not None, "expected class definition to be created"
+    cd = collection.class_definition()
+    assert cd.attributes
+    assert sorted(cd.attributes.keys()) == ["age_in_years", "id", "name"]
     assert len(database.list_collections()) == 1, "collections should be unmodified"
     assert collection.find().num_rows == len(objs), "expected no change in data"
     assert len(database.list_collections()) == 1, "collections should be unmodified"
@@ -495,7 +579,7 @@ def test_induced_multivalued(handle):
                 w = {fc_key: fc_val}
                 if fc_key == "aliases":
                     # w = {fc_key: ("ARRAY_CONTAINS", fc_val)}
-                    w = {fc_key: {"$contains": fc_val}}
+                    w = {fc_key: {"$in": fc_val}}
             fc_results = collection.find(w)
             assert fc_results.num_rows == num, f"unexpected diff for fc_key={fc_key}, fc_val={fc_val} // {w}, num={num}"
             facet_subq = collection.query_facets(w, facet_columns=[fc_key])
