@@ -282,7 +282,9 @@ class Client:
         Databases that persist on disk:
 
         >>> client = Client()
-        >>> db = client.attach_database("duckdb:///tmp/test.db", alias="test")
+        >>> path = Path("tmp/test.db")
+        >>> path.parent.mkdir(parents=True, exist_ok=True)
+        >>> db = client.attach_database(f"duckdb:///{path}", alias="test")
         >>> len(client.databases)
         1
         >>> db.store({"persons": [{"id": "P1", "name": "John"}]})

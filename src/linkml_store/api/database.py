@@ -688,7 +688,9 @@ class Database(ABC, Generic[CollectionType]):
 
         >>> from linkml_store.api.client import Client
         >>> client = Client()
-        >>> db = client.attach_database("duckdb:///tmp/test.db")
+        >>> path = Path("/tmp/test.db")
+        >>> path.parent.mkdir(exist_ok=True, parents=True)
+        >>> db = client.attach_database(f"duckdb:///{path}")
         >>> db.store({"persons": [{"id": "P1", "name": "John", "age_in_years": 30}]})
         >>> coll = db.get_collection("persons")
         >>> coll.find({}).num_rows
