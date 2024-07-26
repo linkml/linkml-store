@@ -12,7 +12,7 @@ from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from linkml_store.utils.file_utils import safe_remove_directory
 from linkml_store.utils.format_utils import Format
-from linkml_store.utils.mongodb_utils import extract_connection_info, import_mongodb
+from linkml_store.utils.mongodb_utils import import_mongodb
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +90,7 @@ class MongoDBDatabase(Database):
             if path.exists():
                 safe_remove_directory(path, no_backup=True)
             from linkml_store.utils.mongodb_utils import export_mongodb
+
             export_mongodb(self.handle, location)
         else:
             super().export_database(location, target_format=target_format, **kwargs)

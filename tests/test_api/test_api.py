@@ -243,13 +243,15 @@ def test_derivations(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
-@pytest.mark.parametrize("location,export_format",
-                         [
-                             (OUTPUT_DIR / "export.yaml", "yaml"),
-                             (OUTPUT_DIR / "export.json", "json"),
-                             (OUTPUT_DIR / "export.duckdb", "duckdb"),
-                             (OUTPUT_DIR / "export.mongodb", "mongodb"),
-                         ])
+@pytest.mark.parametrize(
+    "location,export_format",
+    [
+        (OUTPUT_DIR / "export.yaml", "yaml"),
+        (OUTPUT_DIR / "export.json", "json"),
+        (OUTPUT_DIR / "export.duckdb", "duckdb"),
+        (OUTPUT_DIR / "export.mongodb", "mongodb"),
+    ],
+)
 def test_export(handle, location, export_format):
     """
     Tests export and re-import
@@ -653,7 +655,6 @@ def test_predefined_schema(schema_view, handle):
     assert remove_none(qr.rows[0]) == obj
     qr = collection.get(["p1", "p2"])
     assert qr.num_rows == 2
-
 
 
 @pytest.mark.parametrize("handle", SCHEMES)

@@ -538,11 +538,19 @@ class Collection(Generic[DatabaseType]):
             kwargs = source.arguments or {}
             if source.local_path:
                 objects = load_objects(
-                    metadata.source.local_path, format=source.format, expected_type=source.expected_type, compression=source.compression, **kwargs
+                    metadata.source.local_path,
+                    format=source.format,
+                    expected_type=source.expected_type,
+                    compression=source.compression,
+                    **kwargs,
                 )
             elif metadata.source.url:
                 objects = load_objects_from_url(
-                    metadata.source.url, format=source.format, expected_type=source.expected_type, compression=source.compression, **kwargs
+                    metadata.source.url,
+                    format=source.format,
+                    expected_type=source.expected_type,
+                    compression=source.compression,
+                    **kwargs,
                 )
         self.insert(objects)
 

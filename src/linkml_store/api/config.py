@@ -78,10 +78,7 @@ class CollectionConfig(ConfiguredBaseModel):
         default=None,
         description="LinkML-Map derivations",
     )
-    page_size: Optional[int] = Field(
-        default=None,
-        description="Suggested page size (items per page) in apps and APIs"
-    )
+    page_size: Optional[int] = Field(default=None, description="Suggested page size (items per page) in apps and APIs")
 
 
 class DatabaseConfig(ConfiguredBaseModel):

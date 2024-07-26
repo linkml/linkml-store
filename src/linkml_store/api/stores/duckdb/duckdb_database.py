@@ -45,7 +45,7 @@ class DuckDBDatabase(Database):
     types are used for nested inlined objects.
     """
 
-    #_connection: DuckDBPyConnection = None
+    # _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
     collection_class = DuckDBCollection
 
@@ -230,4 +230,3 @@ class DuckDBDatabase(Database):
                 conn.commit()
         else:
             super().import_database(location, source_format=source_format, **kwargs)
-

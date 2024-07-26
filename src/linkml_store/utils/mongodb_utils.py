@@ -5,10 +5,8 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
 
-from pymongo.database import Database
 from pymongo import MongoClient
-
-
+from pymongo.database import Database
 
 logger = logging.getLogger(__name__)
 
@@ -30,17 +28,13 @@ def extract_connection_info(db: Database):
 
     # Get username if available
     username = None
-    if hasattr(client, 'options') and hasattr(client.options, 'credentials'):
+    if hasattr(client, "options") and hasattr(client.options, "credentials"):
         credentials = client.options.credentials
         if credentials:
             username = credentials.username
 
-    return {
-        'host': host,
-        'port': port,
-        'db_name': db_name,
-        'username': username
-    }
+    return {"host": host, "port": port, "db_name": db_name, "username": username}
+
 
 def get_connection_string(client: MongoClient):
     """
@@ -50,13 +44,13 @@ def get_connection_string(client: MongoClient):
     if client.address:
         host, port = client.address
         return f"{host}:{port}"
-    if hasattr(client, 'address') and client.address:
+    if hasattr(client, "address") and client.address:
         host, port = client.address
         return f"{host}:{port}"
     elif client.hosts:
         # For replica sets, return all hosts
-        return ','.join(f"{host}:{port}" for host, port in client.hosts)
-    elif hasattr(client, 'HOST'):
+        return ",".join(f"{host}:{port}" for host, port in client.hosts)
+    elif hasattr(client, "HOST"):
         # If we can't determine hosts, use the entire URI
         parsed_uri = urlparse(client.HOST)
         return f"{parsed_uri.hostname}:{parsed_uri.port}"
@@ -83,18 +77,19 @@ def get_connection_info(db: Database):
 
     return host, port, db_name
 
+
 def get_auth_from_client(client: MongoClient):
     """Extract authentication details from MongoClient."""
-    if hasattr(client, '_MongoClient__options'):
+    if hasattr(client, "_MongoClient__options"):
         # For older versions of PyMongo
         options = client._MongoClient__options
-    elif hasattr(client, 'options'):
+    elif hasattr(client, "options"):
         # For newer versions of PyMongo
         options = client.options
     else:
         return None, None, None
 
-    if hasattr(options, 'credentials'):
+    if hasattr(options, "credentials"):
         creds = options.credentials
         return creds.username, creds.password, creds.source
     return None, None, None
@@ -111,11 +106,7 @@ def export_mongodb(handle: str, location: str, password: Optional[str] = None):
     host, db_name = connection_from_handle(handle)
 
     # Construct the mongodump command
-    cmd = [
-        "mongodump",
-        f"--host={host}",
-        f"--db={db_name}"
-    ]
+    cmd = ["mongodump", f"--host={host}", f"--db={db_name}"]
     logger.info(f"Exporting MongoDB database {db_name} from {host} to {location}")
     cmd.extend(["--out", location])
     result = subprocess.run(cmd, check=True, capture_output=True, text=True)

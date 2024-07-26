@@ -19,7 +19,7 @@ from typing import (
 )
 
 from linkml_store.api.types import CollectionType
-from linkml_store.utils.format_utils import load_objects, render_output, Format
+from linkml_store.utils.format_utils import Format, load_objects, render_output
 from linkml_store.utils.patch_utils import PatchDict
 
 try:

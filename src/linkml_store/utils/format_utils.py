@@ -1,21 +1,20 @@
 import csv
+import gzip
+import io
 import json
+import logging
 import sys
 import tarfile
-import logging
 from enum import Enum
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TextIO, Type, Union, IO
+from typing import IO, Any, Dict, List, Optional, TextIO, Type, Union
 
 import pandas as pd
 import pystow
 import yaml
 from pydantic import BaseModel
 from tabulate import tabulate
-
-import gzip
-import io
 
 logger = logging.getLogger(__name__)
 
@@ -38,21 +37,20 @@ class Format(Enum):
     SQLDUMP_POSTGRES = "postgres"
     DUMP_MONGODB = "mongodb"
 
-
     @classmethod
-    def guess_format(cls, file_name: str) -> Optional['Format']:
+    def guess_format(cls, file_name: str) -> Optional["Format"]:
         ext = Path(file_name).suffix.lower()
 
         format_map = {
-            '.json': cls.JSON,
-            '.jsonl': cls.JSONL,
-            '.yaml': cls.YAML,
-            '.yml': cls.YAML,
-            '.tsv': cls.TSV,
-            '.csv': cls.CSV,
-            '.py': cls.PYTHON,
-            '.parquet': cls.PARQUET,
-            '.pq': cls.PARQUET,
+            ".json": cls.JSON,
+            ".jsonl": cls.JSONL,
+            ".yaml": cls.YAML,
+            ".yml": cls.YAML,
+            ".tsv": cls.TSV,
+            ".csv": cls.CSV,
+            ".py": cls.PYTHON,
+            ".parquet": cls.PARQUET,
+            ".pq": cls.PARQUET,
         }
         fmt = format_map.get(ext, None)
         if fmt is None:
@@ -90,12 +88,8 @@ def load_objects_from_url(
     return objs
 
 
-
 def process_file(
-    f: IO,
-    format: Format,
-    expected_type: Optional[Type] = None,
-    header_comment_token: Optional[str] = None
+    f: IO, format: Format, expected_type: Optional[Type] = None, header_comment_token: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Process a single file and return a list of objects.
@@ -122,6 +116,7 @@ def process_file(
         objs = list(reader)
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
+
         table = pq.read_table(f)
         objs = table.to_pandas().to_dict(orient="records")
     elif format in [Format.PYTHON, Format.FORMATTED, Format.TABLE]:
@@ -132,6 +127,7 @@ def process_file(
     if not isinstance(objs, list):
         objs = [objs]
     return objs
+
 
 def load_objects(
     file_path: Union[str, Path],
@@ -159,8 +155,8 @@ def load_objects(
 
     all_objects = []
 
-    if compression == 'tgz':
-        with tarfile.open(file_path, 'r:gz') as tar:
+    if compression == "tgz":
+        with tarfile.open(file_path, "r:gz") as tar:
             for member in tar.getmembers():
                 if member.isfile():
                     f = tar.extractfile(member)
@@ -182,6 +178,7 @@ def load_objects(
 
     logger.debug(f"Loaded {len(all_objects)} objects from {file_path}")
     return all_objects
+
 
 def xxxload_objects(
     file_path: Union[str, Path],

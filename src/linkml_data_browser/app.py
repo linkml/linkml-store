@@ -7,11 +7,9 @@ import pandas as pd
 import streamlit as st
 import yaml
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-
 from linkml_store import Client
 from linkml_store.api import Collection
 from linkml_store.api.queries import QueryResult
-from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +88,8 @@ def main():
     selected_db = st.selectbox("Select a Database", db_names, key="db_selector")
     print(f"DB SELECTED={selected_db}")
     # con = duckdb.connect(DB_PATH.format(db=selected_db))
-    #db_name = DB_PATH.format(db=selected_db)
-    #database = DuckDBDatabase(f"duckdb:///{db_name}")
+    # db_name = DB_PATH.format(db=selected_db)
+    # database = DuckDBDatabase(f"duckdb:///{db_name}")
     database = client.get_database(selected_db)
     st.write(f"Connected to {selected_db}")
     candidate_tables = database.list_collection_names()
@@ -109,7 +107,7 @@ def main():
     # Pagination setup
     session_state = st.session_state
     if "current_page" not in session_state:
-        print(f'RESETTING CP// {session_state}')
+        print(f"RESETTING CP// {session_state}")
         session_state.current_page = 0  # Start with page 0
     rows_per_page = DEFAULT_LIMIT
 
