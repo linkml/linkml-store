@@ -601,7 +601,7 @@ async def get_attribute_details(
     where_clause = load_objects(where) if where else None
     base_url = f"/databases/{database_name}/collections/{collection_name}/attributes/{attribute_name}"
     count_tuples = collection.query_facets(where_clause, facet_columns=[attribute_name])[attribute_name]
-    count_objs = [{"value": v, "count": c} for v, c in count_tuples]
+    _count_objs = [{"value": v, "count": c} for v, c in count_tuples]
     cd = collection.class_definition()
     att = cd.attributes[attribute_name]
     att_dict = json_dumper.to_dict(att)
@@ -757,7 +757,7 @@ async def xxxgeneric_page(request: Request, path: str, get_db: Callable[[str], D
 
     # Parse the JSON response
     api_data = response.json()
-    api_response = APIResponse(**api_data)
+    # api_response = APIResponse(**api_data)
 
     # Use the template specified in the API response
     meta = api_data["meta"]
@@ -810,7 +810,7 @@ async def generic_page(request: Request, path: str, get_db: Callable[[str], Data
     template_name = "generic.html.j2"
     params = payload.meta.params
 
-    data = payload.data
+    # data = payload.data
     data_html = None
     if "database_name" in params:
         db = get_db(params["database_name"])

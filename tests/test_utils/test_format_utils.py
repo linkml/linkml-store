@@ -1,4 +1,7 @@
 import json
+import os
+import tarfile
+import tempfile
 from typing import Any, Dict, List, Union
 
 import pytest
@@ -66,21 +69,6 @@ def test_render_output(data: List[Dict[str, Any]], format: Union[Format, str], e
 def test_render_output_invalid_format():
     with pytest.raises(ValueError):
         render_output(TEST_DATA, format="invalid")
-
-
-# Existing test cases...
-# New test for tgz functionality
-import json
-import os
-import tarfile
-import tempfile
-from typing import Any, Dict, List, Union
-
-import pytest
-import yaml
-from linkml_store.utils.format_utils import Format
-
-from tests.conftest import TEST_DATA
 
 
 def test_enum():
