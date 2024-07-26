@@ -261,6 +261,10 @@ def test_export(handle, location, export_format):
     :param export_format: format to export to
     :return:
     """
+    is_mongodb = handle.startswith("mongodb")
+    path_to_mongodump = shutil.which("mongodump")
+    if is_mongodb and path_to_mongodump is None:
+        pytest.skip("mongodump not found in PATH")
     client = create_client(handle)
     database = client.get_database()
     obj = {
@@ -274,8 +278,10 @@ def test_export(handle, location, export_format):
         ],
     }
     database.store(obj)
+    if export_format == "mongodb" and path_to_mongodump is None:
+        pytest.skip("mongodump not found in PATH")
     database.export_database(location, export_format)
-    if handle.startswith("mongodb"):
+    if is_mongodb:
         client2 = create_client("mongodb://localhost:27017/test_db_tmp")
         database = client2.get_database()
         # database = client.attach_database("mongodb://localhost:27017/test_db_tmp")
