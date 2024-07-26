@@ -1,11 +1,16 @@
 import logging
+import os
 from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 import streamlit as st
+import yaml
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
+
+from linkml_store import Client
 from linkml_store.api import Collection
+from linkml_store.api.queries import QueryResult
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 
 logger = logging.getLogger(__name__)
@@ -13,6 +18,13 @@ logger = logging.getLogger(__name__)
 # Set page config to make layout "wide" by default
 st.set_page_config(layout="wide")
 
+config = None
+if os.environ.get("LINKML_STORE_CONFIG"):
+    with open(os.environ["LINKML_STORE_CONFIG"], "r") as f:
+        config = yaml.safe_load(f)
+
+# Initialize client
+client = Client().from_config(config) if config else Client()
 
 DEFAULT_LIMIT = 25
 
@@ -33,14 +45,16 @@ def init_reset_filters(cd: ClassDefinition, reset=False):
             st.session_state[key] = ""  # Assuming text input, adjust for other types
 
 
-def apply_filters(collection: Collection, filters: Dict[str, Any], offset: int, limit: int, **kwargs):
-    print(f"FILTERS={filters}")
-    return collection.find(filters, offset=offset, limit=limit, **kwargs)
+def apply_filters(collection: Collection, filters: Dict[str, Any], offset: int, limit: int, **kwargs) -> QueryResult:
+    print(f"FILTERS={filters} // offset={offset}")
+    qr = collection.find(filters, offset=offset, limit=limit, **kwargs)
+    print(f"QR={qr.num_rows}")
+    return qr
 
 
 def render_filter_widget(collection: Collection, attribute: SlotDefinition):
     """Render appropriate Streamlit widget based on column type."""
-    logger.info("Rendering filter widget")
+    logger.info(f"Rendering filter widget: {attribute.name}")
     # print(f"{attribute.name} // RANGE={attribute.range}")
     # col_type = attribute.range
     col_name = attribute.name
@@ -72,24 +86,30 @@ def render_filter_widget(collection: Collection, attribute: SlotDefinition):
 # Main function to render the app
 def main():
     st.title("LinkML Table Browser")
-    selected_db = st.selectbox("Select a Database", list(DBS.keys()), key="db_selector")
+    db_names = list(client.databases.keys())
+    selected_db = st.selectbox("Select a Database", db_names, key="db_selector")
     print(f"DB SELECTED={selected_db}")
     # con = duckdb.connect(DB_PATH.format(db=selected_db))
-    db_name = DB_PATH.format(db=selected_db)
-    database = DuckDBDatabase(f"duckdb:///{db_name}")
+    #db_name = DB_PATH.format(db=selected_db)
+    #database = DuckDBDatabase(f"duckdb:///{db_name}")
+    database = client.get_database(selected_db)
     st.write(f"Connected to {selected_db}")
-    candidate_tables = DBS.get(selected_db)
+    candidate_tables = database.list_collection_names()
+    print(f"COLLECtiONS={candidate_tables}")
     if len(candidate_tables) > 1:
         curr_table = st.selectbox("Select a Table", candidate_tables, key="table_selector")
     else:
-        curr_table = DBS.get(selected_db)[0]
+        curr_table = candidate_tables[0]
     collection = database.get_collection(curr_table)
+    print(f"CURR={collection.alias} // {collection.target_class_name}")
     cd = collection.class_definition()
+    print(f"CD={cd.name} // {len(cd.attributes)}")
     filters = {}
 
     # Pagination setup
     session_state = st.session_state
     if "current_page" not in session_state:
+        print(f'RESETTING CP// {session_state}')
         session_state.current_page = 0  # Start with page 0
     rows_per_page = DEFAULT_LIMIT
 
@@ -105,8 +125,8 @@ def main():
         if filter_widget is not None and filter_widget != "":
             filters[att_name] = filter_widget
         new_value = filters.get(att_name)
-        if prev_value != new_value:
-            # print(f"CHANGE FOR {att_name}: {prev_value} -> {new_value}")
+        if prev_value != new_value and not (not prev_value and not new_value):
+            print(f"CHANGE FOR {att_name}: {prev_value} -> {new_value}")
             filter_changed = True
             # st.session_state[key] = new_value
         facet_key = f"facet_view_{att_name}"
@@ -116,6 +136,7 @@ def main():
             st.sidebar.write(facet_df)
     # If any filter has changed, reset pagination
     if filter_changed:
+        print(f"FILTER CHANGED={filter_changed}")
         st.session_state.current_page = 0  # Reset offset
     result = apply_filters(collection, filters, session_state.current_page * rows_per_page, rows_per_page)
     # if filter_changed:
@@ -123,6 +144,7 @@ def main():
     #    print(f"FACET={facet_results}")
     st.write(f"Number of rows: {result.num_rows}")
     st.write(f"Page: {session_state.current_page + 1}")
+    print(f"SESSION STATE: {session_state}")
     filtered_data = pd.DataFrame(result.rows)
 
     # Pagination buttons
@@ -133,6 +155,7 @@ def main():
         if session_state.current_page > 0:
             session_state.current_page -= 1
     if next_button.button("Next"):
+        print(f"NEXT: CP={session_state.current_page} RPP={rows_per_page} NR={result.num_rows}")
         # Assuming result.num_rows gives the total number of rows after filtering, not just this page's rows
         if (session_state.current_page + 1) * rows_per_page < result.num_rows:
             session_state.current_page += 1

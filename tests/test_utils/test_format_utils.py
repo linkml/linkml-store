@@ -66,3 +66,89 @@ def test_render_output(data: List[Dict[str, Any]], format: Union[Format, str], e
 def test_render_output_invalid_format():
     with pytest.raises(ValueError):
         render_output(TEST_DATA, format="invalid")
+
+
+import tempfile
+import os
+import tarfile
+
+
+# Existing test cases...
+
+# New test for tgz functionality
+import json
+import tempfile
+import os
+import tarfile
+import io
+from typing import Any, Dict, List, Union
+
+import pytest
+import yaml
+from linkml_store.utils.format_utils import Format, load_objects, render_output
+
+from tests.conftest import TEST_DATA
+
+
+def test_enum():
+    # TODO: check handles
+    for fmt in Format:
+        print(fmt, fmt.is_dump_format())
+        assert Format.guess_format(f"foo.{fmt.value}") == fmt
+    assert Format.JSON.value == "json"
+
+
+def test_load_objects_from_tgz():
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # Create test files in different formats
+        json_path = os.path.join(tmpdirname, 'data.json')
+        yaml_path = os.path.join(tmpdirname, 'data.yaml')
+        tsv_path = os.path.join(tmpdirname, 'data.tsv')
+
+        with open(json_path, 'w') as f:
+            json.dump(TEST_DATA, f)
+
+        with open(yaml_path, 'w') as f:
+            yaml.safe_dump(TEST_DATA, f)
+
+        with open(tsv_path, 'w') as f:
+            f.write("id\tname\tage\n")
+            for item in TEST_DATA:
+                f.write(f"{item['id']}\t{item['name']}\t{item['age']}\n")
+
+        # Create tar.gz archive
+        tgz_path = os.path.join(tmpdirname, 'data.tar.gz')
+        with tarfile.open(tgz_path, 'w:gz') as tar:
+            tar.add(json_path, arcname='data.json')
+            tar.add(yaml_path, arcname='data.yaml')
+            tar.add(tsv_path, arcname='data.tsv')
+
+        # Debug: Print contents of tar.gz file
+        with tarfile.open(tgz_path, 'r:gz') as tar:
+            for member in tar.getmembers():
+                print(f"File in archive: {member.name}")
+                f = tar.extractfile(member)
+                if f:
+                    content = f.read().decode('utf-8')
+                    print(f"Content of {member.name}:")
+                    print(content[:100])  # Print first 100 characters
+                    print("---")
+
+        # Test load_objects with tgz file
+        try:
+            loaded_objects = load_objects(tgz_path, compression='tgz')
+        except Exception as e:
+            print(f"Error in load_objects: {str(e)}")
+            raise
+
+        # We expect 3 * len(TEST_DATA) objects because we have 3 files
+        assert len(loaded_objects) == 3 * len(TEST_DATA)
+
+        # Check that all original objects are present in the loaded objects
+        for original_obj in TEST_DATA:
+            matching_objects = [obj for obj in loaded_objects if str(obj['id']) == str(original_obj['id'])]
+            assert len(matching_objects) == 3  # One from each file
+
+            for loaded_obj in matching_objects:
+                assert loaded_obj['name'] == original_obj['name']
+                assert int(loaded_obj['age']) == int(original_obj['age'])  # Convert to int for comparison

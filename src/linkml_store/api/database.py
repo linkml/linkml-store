@@ -19,7 +19,7 @@ from typing import (
 )
 
 from linkml_store.api.types import CollectionType
-from linkml_store.utils.format_utils import load_objects, render_output
+from linkml_store.utils.format_utils import load_objects, render_output, Format
 from linkml_store.utils.patch_utils import PatchDict
 
 try:
@@ -705,7 +705,7 @@ class Database(ABC, Generic[CollectionType]):
         """
         raise NotImplementedError()
 
-    def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
+    def import_database(self, location: str, source_format: Optional[Union[str, Format]] = None, **kwargs):
         """
         Import a database from a file or location.
 
@@ -713,11 +713,27 @@ class Database(ABC, Generic[CollectionType]):
         :param source_format: source format
         :param kwargs: additional arguments
         """
+        if isinstance(source_format, str):
+            source_format = Format(source_format)
+        if isinstance(source_format, Format):
+            if source_format.is_dump_format() and source_format in [Format.SQLDUMP_DUCKDB, Format.DUMP_MONGODB]:
+                # import into a test instance
+                tmp_handle = source_format.value
+                client = self.parent
+                tmp_db = client.attach_database(tmp_handle, alias="tmp")
+                # TODO: check for infinite recursion
+                tmp_db.import_database(location, source_format=source_format)
+                obj = {}
+                for coll in tmp_db.list_collections():
+                    qr = coll.find({}, limit=-1)
+                    obj[coll.alias] = qr.rows
+                self.store(obj)
+                return
         objects = load_objects(location, format=source_format)
         for obj in objects:
             self.store(obj)
 
-    def export_database(self, location: str, target_format: Optional[str] = None, **kwargs):
+    def export_database(self, location: str, target_format: Optional[Union[str, Format]] = None, **kwargs):
         """
         Export a database to a file or location.
 
@@ -726,10 +742,23 @@ class Database(ABC, Generic[CollectionType]):
         :param kwargs: additional arguments
         """
         obj = {}
+        if isinstance(target_format, str):
+            target_format = Format(target_format)
         for coll in self.list_collections():
             qr = coll.find({}, limit=-1)
             obj[coll.alias] = qr.rows
         logger.info(f"Exporting object with {len(obj)} collections to {location} in {target_format} format")
+        if isinstance(target_format, Format):
+            if target_format.is_dump_format() and target_format in [Format.SQLDUMP_DUCKDB, Format.DUMP_MONGODB]:
+                tmp_handle = target_format.value
+                client = self.parent
+                tmp_db = client.attach_database(tmp_handle, alias="tmp")
+                tmp_db.store(obj)
+                # TODO: check for infinite recursion
+                tmp_db.export_database(location, target_format=target_format)
+                return
+        if Path(location).is_dir():
+            raise ValueError(f"{location} is a directory; cannot write {target_format} to a dir")
         with open(location, "w", encoding="utf-8") as stream:
             stream.write(render_output(obj, format=target_format))
 

@@ -243,12 +243,20 @@ def test_derivations(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
-@pytest.mark.parametrize("location,export_format", [(OUTPUT_DIR / "export.yaml", "yaml")])
+@pytest.mark.parametrize("location,export_format",
+                         [
+                             (OUTPUT_DIR / "export.yaml", "yaml"),
+                             (OUTPUT_DIR / "export.json", "json"),
+                             (OUTPUT_DIR / "export.duckdb", "duckdb"),
+                             (OUTPUT_DIR / "export.mongodb", "mongodb"),
+                         ])
 def test_export(handle, location, export_format):
     """
     Tests export and re-import
 
-    :param handle:
+    :param handle: scheme/handle to test
+    :param location: where to export to
+    :param export_format: format to export to
     :return:
     """
     client = create_client(handle)
@@ -265,7 +273,12 @@ def test_export(handle, location, export_format):
     }
     database.store(obj)
     database.export_database(location, export_format)
-    database = client.attach_database("duckdb")
+    if handle.startswith("mongodb"):
+        client2 = create_client("mongodb://localhost:27017/test_db_tmp")
+        database = client2.get_database()
+        # database = client.attach_database("mongodb://localhost:27017/test_db_tmp")
+    else:
+        database = client.attach_database("duckdb")
     database.import_database(location, export_format)
     persons_coll = database.get_collection("persons")
     qr = persons_coll.find()
@@ -429,6 +442,8 @@ def test_induced_schema(handle, type_alias):
     1. Create a database and collection
     2. Insert data
     3. Check that schema is inferred
+
+    TODO: test partial induction case where schema is implicit but class name is in config
 
     :param handle:
     :param type_alias:
@@ -628,6 +643,17 @@ def test_predefined_schema(schema_view, handle):
     ret_obj = {k: v for k, v in ret_obj.items() if v is not None}
     assert ret_obj == obj
     assert len(database.list_collections()) == 1
+    qr = collection.get(["p1"])
+    assert qr.num_rows == 1
+    assert remove_none(qr.rows[0]) == obj
+    obj2 = {"id": "p2", "name": "n2"}
+    collection.insert([obj2])
+    qr = collection.get(["p1"])
+    assert qr.num_rows == 1
+    assert remove_none(qr.rows[0]) == obj
+    qr = collection.get(["p1", "p2"])
+    assert qr.num_rows == 2
+
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
