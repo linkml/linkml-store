@@ -99,7 +99,7 @@ def process_file(
     elif format == Format.JSONL:
         objs = [json.loads(line) for line in f]
     elif format == Format.YAML:
-        if expected_type and expected_type == list:
+        if expected_type and expected_type == list:  # noqa E721
             objs = list(yaml.safe_load_all(f))
         else:
             objs = yaml.safe_load(f)
