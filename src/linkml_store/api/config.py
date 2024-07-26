@@ -33,6 +33,7 @@ class CollectionSource(ConfiguredBaseModel):
     refresh_interval_days: Optional[float] = None
     expected_type: Optional[str] = None
     format: Optional[str] = None
+    compression: Optional[str] = None
     arguments: Optional[Dict[str, Any]] = None
 
 
@@ -73,11 +74,11 @@ class CollectionConfig(ConfiguredBaseModel):
         default=None,
         description="Metadata about the source",
     )
-    # TODO: derived_from
     derived_from: Optional[List[DerivationConfiguration]] = Field(
         default=None,
         description="LinkML-Map derivations",
     )
+    page_size: Optional[int] = Field(default=None, description="Suggested page size (items per page) in apps and APIs")
 
 
 class DatabaseConfig(ConfiguredBaseModel):

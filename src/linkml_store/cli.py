@@ -228,7 +228,11 @@ def store(ctx, files, object, format):
 @click.pass_context
 @click.argument("files", type=click.Path(exists=True), nargs=-1)
 def import_database(ctx, files, format):
-    """Imports a database from a dump."""
+    """Imports a database from a dump.
+
+    See the `export` command for a full list of supported formats. The same
+    formats are generally supported for imports.
+    """
     settings = ctx.obj["settings"]
     db = settings.database
     if not files and not object:
@@ -242,7 +246,30 @@ def import_database(ctx, files, format):
 @click.option("--output", "-o", required=True, type=click.Path(), help="Output file path")
 @click.pass_context
 def export(ctx, output_type, output):
-    """Exports a database to a dump."""
+    """Exports a database to a standard dump format.
+
+    Example:
+
+        linkml-store -d duckdb:///countries.db export -O yaml -o countries.yaml
+
+    Export format will be guessed from extension if not specified
+
+    Example:
+
+        linkml-store -d duckdb:///countries.db export -o countries.json
+
+    Tree formats such as YAML and JSON can natively store an entire database; each collection
+    will be a distinct key in the database.
+
+    Additionally, native dump formats can be used:
+
+    Example:
+
+        linkml-store -d duckdb:///countries.db export -o countries -O duckdb
+
+    Here, `countries` is a directory. This is equivalent to running EXPORT DATABASE
+    (see https://duckdb.org/docs/sql/statements/export.html)
+    """
     settings = ctx.obj["settings"]
     db = settings.database
     if output_type is None:

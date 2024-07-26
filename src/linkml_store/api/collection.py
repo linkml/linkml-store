@@ -346,7 +346,10 @@ class Collection(Generic[DatabaseType]):
         id_field = self.identifier_attribute_name
         if not id_field:
             raise ValueError(f"No identifier for {self.name}")
-        return self.find({id_field: ids})
+        if len(ids) == 1:
+            return self.find({id_field: ids[0]})
+        else:
+            return self.find({id_field: {"$in": ids}})
 
     def get_one(self, id: IDENTIFIER, **kwargs) -> Optional[OBJECT]:
         """
@@ -518,7 +521,7 @@ class Collection(Generic[DatabaseType]):
         :return:
         """
         cd = self.class_definition()
-        return cd is not None
+        return cd is not None and cd.attributes
 
     def load_from_source(self, load_if_exists=False):
         """
@@ -535,11 +538,19 @@ class Collection(Generic[DatabaseType]):
             kwargs = source.arguments or {}
             if source.local_path:
                 objects = load_objects(
-                    metadata.source.local_path, format=source.format, expected_type=source.expected_type, **kwargs
+                    metadata.source.local_path,
+                    format=source.format,
+                    expected_type=source.expected_type,
+                    compression=source.compression,
+                    **kwargs,
                 )
             elif metadata.source.url:
                 objects = load_objects_from_url(
-                    metadata.source.url, format=source.format, expected_type=source.expected_type, **kwargs
+                    metadata.source.url,
+                    format=source.format,
+                    expected_type=source.expected_type,
+                    compression=source.compression,
+                    **kwargs,
                 )
         self.insert(objects)
 
@@ -746,6 +757,7 @@ class Collection(Generic[DatabaseType]):
         sv: SchemaView = self.parent.schema_view
         if sv:
             cls = sv.get_class(self.target_class_name)
+            # cls = sv.schema.classes[self.target_class_name]
             if cls and not cls.attributes:
                 if not sv.class_induced_slots(cls.name):
                     for att in self._induce_attributes():
@@ -868,7 +880,7 @@ class Collection(Generic[DatabaseType]):
                     exact_dimensions_list.append(v.shape)
                     break
                 if isinstance(v, list):
-                    v = v[0]
+                    v = v[0] if v else None
                     multivalueds.append(True)
                 elif isinstance(v, dict):
                     v = list(v.values())[0]

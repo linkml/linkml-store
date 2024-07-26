@@ -66,9 +66,14 @@ def col_val_constraints_to_conjs(col_name: str, val_constraints: Any) -> list:
         conjs = []
         for k, v in val_constraints.items():
             if k in OP_MAP:
-                conjs.append(f"{OP_MAP[k]}({col_name}, {_quote(v)})")
+                if k == "$in" and isinstance(v, list):
+                    v_mapped = [_quote(v1) for v1 in v]
+                    t = f"{col_name} IN ({', '.join(v_mapped)})"
+                else:
+                    t = f"{OP_MAP[k]}({col_name}, {_quote(v)})"
             else:
-                conjs.append(f"{col_name} {k} {_quote(v)}")
+                t = f"{col_name} {k} {_quote(v)}"
+            conjs.append(t)
         return conjs
     else:
         return [f"{col_name} = {_quote(val_constraints)}"]

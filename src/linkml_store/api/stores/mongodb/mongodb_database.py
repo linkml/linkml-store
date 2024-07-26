@@ -1,7 +1,8 @@
 # mongodb_database.py
 
 import logging
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 from pymongo import MongoClient
 from pymongo.database import Database as NativeDatabase
@@ -9,6 +10,9 @@ from pymongo.database import Database as NativeDatabase
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
+from linkml_store.utils.file_utils import safe_remove_directory
+from linkml_store.utils.format_utils import Format
+from linkml_store.utils.mongodb_utils import import_mongodb
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +31,8 @@ class MongoDBDatabase(Database):
     def __init__(self, handle: Optional[str] = None, **kwargs):
         if handle is None:
             handle = "mongodb://localhost:27017/test"
+        if handle == "mongodb":
+            handle = "mongodb://localhost:27017/temporary"
         super().__init__(handle=handle, **kwargs)
 
     @property
@@ -77,3 +83,27 @@ class MongoDBDatabase(Database):
             if collection_name not in self._collections:
                 collection = MongoDBCollection(name=collection_name, parent=self)
                 self._collections[collection_name] = collection
+
+    def export_database(self, location: str, target_format: Optional[Union[str, Format]] = None, **kwargs):
+        if target_format == Format.DUMP_MONGODB.value or target_format == Format.DUMP_MONGODB:
+            path = Path(location)
+            if path.exists():
+                safe_remove_directory(path, no_backup=True)
+            from linkml_store.utils.mongodb_utils import export_mongodb
+
+            export_mongodb(self.handle, location)
+        else:
+            super().export_database(location, target_format=target_format, **kwargs)
+
+    def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
+        """
+        Import a database from a file or location.
+
+        :param location: location of the file
+        :param source_format: source format
+        :param kwargs: additional arguments
+        """
+        if source_format == Format.DUMP_MONGODB.value or source_format == Format.DUMP_MONGODB:
+            import_mongodb(self.handle, location, drop=True)
+        else:
+            super().import_database(location, source_format=source_format, **kwargs)

@@ -1,11 +1,10 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import pandas as pd
 import sqlalchemy
-from duckdb import DuckDBPyConnection
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
@@ -14,6 +13,7 @@ from sqlalchemy import NullPool, text
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
+from linkml_store.utils.format_utils import Format
 from linkml_store.utils.sql_utils import introspect_schema, query_to_sql
 
 TYPE_MAP = {
@@ -45,7 +45,7 @@ class DuckDBDatabase(Database):
     types are used for nested inlined objects.
     """
 
-    _connection: DuckDBPyConnection = None
+    # _connection: DuckDBPyConnection = None
     _engine: sqlalchemy.Engine = None
     collection_class = DuckDBCollection
 
@@ -202,3 +202,31 @@ class DuckDBDatabase(Database):
                     cls = ClassDefinition(name=collection_metadata.type, attributes=collection_metadata.attributes)
                     schema.classes[cls.name] = cls
         return SchemaView(schema)
+
+    def export_database(self, location: str, target_format: Optional[Union[str, Format]] = None, **kwargs):
+        if target_format == "duckdb" or target_format == Format.SQLDUMP_DUCKDB:
+            path = Path(location)
+            if path.exists():
+                if path.is_file():
+                    path.unlink()
+            with self.engine.connect() as conn:
+                sql = text(f"EXPORT DATABASE '{location}'")
+                conn.execute(sql)
+        else:
+            super().export_database(location, target_format=target_format, **kwargs)
+
+    def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
+        """
+        Import a database from a file or location.
+
+        :param location: location of the file
+        :param source_format: source format
+        :param kwargs: additional arguments
+        """
+        if source_format == Format.SQLDUMP_DUCKDB.value or source_format == Format.SQLDUMP_DUCKDB:
+            with self.engine.connect() as conn:
+                sql = text(f"IMPORT DATABASE '{location}'")
+                conn.execute(sql)
+                conn.commit()
+        else:
+            super().import_database(location, source_format=source_format, **kwargs)

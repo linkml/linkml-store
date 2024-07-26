@@ -20,10 +20,11 @@ def mongodb_database(mongodb_client):
     db.drop_collection("test_collection")
 
 
+@pytest.mark.parametrize("handle", ["mongodb://localhost:27017/test_db", None, "mongodb"])
 @pytest.mark.integration
-def test_insert_and_query(mongodb_database):
+def test_insert_and_query(handle):
     # Create a MongoDBDatabase instance
-    db = MongoDBDatabase(handle="mongodb://localhost:27017/test_db")
+    db = MongoDBDatabase(handle=handle)
 
     # Create a collection
     collection = db.create_collection("test_collection", recreate_if_exists=True)

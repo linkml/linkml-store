@@ -1,16 +1,22 @@
 import csv
+import gzip
+import io
 import json
+import logging
 import sys
+import tarfile
 from enum import Enum
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TextIO, Type, Union
+from typing import IO, Any, Dict, List, Optional, TextIO, Type, Union
 
 import pandas as pd
 import pystow
 import yaml
 from pydantic import BaseModel
 from tabulate import tabulate
+
+logger = logging.getLogger(__name__)
 
 
 class Format(Enum):
@@ -27,6 +33,35 @@ class Format(Enum):
     PARQUET = "parquet"
     FORMATTED = "formatted"
     TABLE = "table"
+    SQLDUMP_DUCKDB = "duckdb"
+    SQLDUMP_POSTGRES = "postgres"
+    DUMP_MONGODB = "mongodb"
+
+    @classmethod
+    def guess_format(cls, file_name: str) -> Optional["Format"]:
+        ext = Path(file_name).suffix.lower()
+
+        format_map = {
+            ".json": cls.JSON,
+            ".jsonl": cls.JSONL,
+            ".yaml": cls.YAML,
+            ".yml": cls.YAML,
+            ".tsv": cls.TSV,
+            ".csv": cls.CSV,
+            ".py": cls.PYTHON,
+            ".parquet": cls.PARQUET,
+            ".pq": cls.PARQUET,
+        }
+        fmt = format_map.get(ext, None)
+        if fmt is None:
+            if ext.startswith("."):
+                ext = ext[1:]
+            if ext in [f.value for f in Format]:
+                return Format(ext)
+        return fmt
+
+    def is_dump_format(self):
+        return self in [Format.SQLDUMP_DUCKDB, Format.SQLDUMP_POSTGRES, Format.DUMP_MONGODB]
 
 
 def load_objects_from_url(
@@ -46,15 +81,109 @@ def load_objects_from_url(
     :return: A list of dictionaries representing the loaded objects.
     """
     local_path = pystow.ensure("linkml", "linkml-store", url=url)
+    logger.info(f"synced to {local_path}")
     objs = load_objects(local_path, format=format, expected_type=expected_type, **kwargs)
     if not objs:
         raise ValueError(f"No objects loaded from URL: {url}")
     return objs
 
 
+def process_file(
+    f: IO, format: Format, expected_type: Optional[Type] = None, header_comment_token: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """
+    Process a single file and return a list of objects.
+    """
+    if format == Format.JSON:
+        objs = json.load(f)
+    elif format == Format.JSONL:
+        objs = [json.loads(line) for line in f]
+    elif format == Format.YAML:
+        if expected_type and expected_type == list:  # noqa E721
+            objs = list(yaml.safe_load_all(f))
+        else:
+            objs = yaml.safe_load(f)
+    elif format in [Format.TSV, Format.CSV]:
+        if header_comment_token:
+            while True:
+                pos = f.tell()
+                line = f.readline()
+                if not line.startswith(header_comment_token):
+                    f.seek(pos)
+                    break
+        delimiter = "\t" if format == Format.TSV else ","
+        reader = csv.DictReader(f, delimiter=delimiter)
+        objs = list(reader)
+    elif format == Format.PARQUET:
+        import pyarrow.parquet as pq
+
+        table = pq.read_table(f)
+        objs = table.to_pandas().to_dict(orient="records")
+    elif format in [Format.PYTHON, Format.FORMATTED, Format.TABLE]:
+        raise ValueError(f"Format {format} is not supported for loading objects")
+    else:
+        raise ValueError(f"Unsupported file format: {format}")
+
+    if not isinstance(objs, list):
+        objs = [objs]
+    return objs
+
+
 def load_objects(
     file_path: Union[str, Path],
+    format: Optional[Union[Format, str]] = None,
+    compression: Optional[str] = None,
+    expected_type: Optional[Type] = None,
+    header_comment_token: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Load objects from a file or archive in supported formats.
+    For tgz archives, it processes all files and concatenates the results.
+
+    :param file_path: The path to the file or archive.
+    :param format: The format of the file. Can be a Format enum or a string value.
+    :param compression: The compression type. Supports 'gz' for gzip and 'tgz' for tar.gz.
+    :param expected_type: The target type to load the objects into, e.g. list
+    :param header_comment_token: Token used for header comments to be skipped
+    :return: A list of dictionaries representing the loaded objects.
+    """
+    if isinstance(file_path, Path):
+        file_path = str(file_path)
+
+    if isinstance(format, str):
+        format = Format(format)
+
+    all_objects = []
+
+    if compression == "tgz":
+        with tarfile.open(file_path, "r:gz") as tar:
+            for member in tar.getmembers():
+                if member.isfile():
+                    f = tar.extractfile(member)
+                    if f:
+                        content = io.TextIOWrapper(f)
+                        member_format = Format.guess_format(member.name) if not format else format
+                        logger.debug(f"Processing tar member {member.name} with format {member_format}")
+                        all_objects.extend(process_file(content, member_format, expected_type, header_comment_token))
+    else:
+        if Path(file_path).is_dir():
+            raise ValueError(f"{file_path} is a dir, which is invalid for {format}")
+        mode = "rb" if format == Format.PARQUET or compression == "gz" else "r"
+        open_func = gzip.open if compression == "gz" else open
+        format = Format.guess_format(file_path) if not format else format
+        with open_func(file_path, mode) if file_path != "-" else sys.stdin as f:
+            if compression == "gz" and mode == "r":
+                f = io.TextIOWrapper(f)
+            all_objects = process_file(f, format, expected_type, header_comment_token)
+
+    logger.debug(f"Loaded {len(all_objects)} objects from {file_path}")
+    return all_objects
+
+
+def xxxload_objects(
+    file_path: Union[str, Path],
     format: Union[Format, str] = None,
+    compression: Optional[str] = None,
     expected_type: Type = None,
     header_comment_token: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
@@ -172,7 +301,7 @@ def write_output(
 
 
 def render_output(
-    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Union[Format, str] = Format.YAML
+    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Optional[Union[Format, str]] = Format.YAML
 ) -> str:
     """
     Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -271,15 +400,4 @@ def guess_format(path: str) -> Optional[Format]:
     :param path: The path to the file.
     :return: The guessed format.
     """
-    if path.endswith(".json"):
-        return Format.JSON
-    elif path.endswith(".jsonl"):
-        return Format.JSONL
-    elif path.endswith(".yaml") or path.endswith(".yml"):
-        return Format.YAML
-    elif path.endswith(".tsv"):
-        return Format.TSV
-    elif path.endswith(".csv"):
-        return Format.CSV
-    else:
-        return None
+    return Format.guess_format(path)
