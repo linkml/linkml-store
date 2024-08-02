@@ -34,7 +34,6 @@ jobs:
       run: |
         mkdir gh-pages
         touch gh-pages/.nojekyll
-        make apidocs
         make sphinx-html
         cp -r _build/* ../gh-pages/
 
