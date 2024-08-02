@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+from linkml_store.graphs.graph_map import GraphProjection
+
 
 class ConfiguredBaseModel(BaseModel, extra="forbid"):
     """
@@ -79,6 +81,14 @@ class CollectionConfig(ConfiguredBaseModel):
         description="LinkML-Map derivations",
     )
     page_size: Optional[int] = Field(default=None, description="Suggested page size (items per page) in apps and APIs")
+    graph_projection: Optional[GraphProjection] = Field(
+        default=None,
+        description="Optional graph projection configuration",
+    )
+    validate_modifications: Optional[bool] = Field(
+        default=False,
+        description="Whether to validate inserts, updates, and deletes",
+    )
 
 
 class DatabaseConfig(ConfiguredBaseModel):

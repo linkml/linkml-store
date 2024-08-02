@@ -11,6 +11,7 @@ from linkml_store.api.stores.chromadb.chromadb_database import ChromaDBDatabase
 from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
 from linkml_store.api.stores.filesystem.filesystem_database import FileSystemDatabase
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
+from linkml_store.api.stores.neo4j.neo4j_database import Neo4jDatabase
 from linkml_store.api.stores.solr.solr_database import SolrDatabase
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ HANDLE_MAP = {
     "solr": SolrDatabase,
     "mongodb": MongoDBDatabase,
     "chromadb": ChromaDBDatabase,
+    "neo4j": Neo4jDatabase,
     "file": FileSystemDatabase,
 }
 
