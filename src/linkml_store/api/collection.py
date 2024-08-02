@@ -4,7 +4,21 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    TextIO,
+    Tuple,
+    Type,
+    Union,
+)
 
 import numpy as np
 from linkml_runtime import SchemaView
@@ -201,6 +215,12 @@ class Collection(Generic[DatabaseType]):
         if not self._initialized:
             self._materialize_derivations()
             self._initialized = True
+
+    def _pre_insert_hook(self, objs: List[OBJECT], **kwargs):
+        if self.metadata.validate_modifications:
+            errors = list(self.iter_validate_collection(objs))
+            if errors:
+                raise ValueError(f"Validation errors: {errors}")
 
     def _post_insert_hook(self, objs: List[OBJECT], **kwargs):
         self._initialized = True
@@ -978,11 +998,14 @@ class Collection(Generic[DatabaseType]):
         patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
         return patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
 
-    def iter_validate_collection(self, **kwargs) -> Iterator["ValidationResult"]:
+    def iter_validate_collection(
+        self, objects: Optional[Iterable[OBJECT]] = None, **kwargs
+    ) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the collection
 
         :param kwargs:
+        :param objects: objects to validate
         :return: iterator over validation results
         """
         from linkml.validator import JsonschemaValidationPlugin, Validator
@@ -992,10 +1015,24 @@ class Collection(Generic[DatabaseType]):
         cd = self.class_definition()
         if not cd:
             raise ValueError(f"Cannot find class definition for {self.target_class_name}")
+        type_designator = None
+        for att in self.parent.schema_view.class_induced_slots(cd.name):
+            if att.designates_type:
+                type_designator = att.name
         class_name = cd.name
-        for obj in self.find_iter(**kwargs):
+        if objects is None:
+            objects = self.find_iter(**kwargs)
+        for obj in objects:
             obj = clean_empties(obj)
-            yield from validator.iter_results(obj, class_name)
+            v_class_name = class_name
+            if type_designator is not None:
+                # TODO: move type designator logic to core linkml
+                this_class_name = obj.get(type_designator)
+                if this_class_name:
+                    if ":" in this_class_name:
+                        this_class_name = this_class_name.split(":")[-1]
+                    v_class_name = this_class_name
+            yield from validator.iter_results(obj, v_class_name)
 
     def commit(self):
         """

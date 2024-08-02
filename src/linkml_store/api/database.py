@@ -505,8 +505,10 @@ class Database(ABC, Generic[CollectionType]):
         if isinstance(schema_view, str):
             schema_view = SchemaView(schema_view)
         self._schema_view = schema_view
+        # self._schema_view = SchemaView(schema_view.materialize_derived_schema())
         if not self._collections:
             return
+
         # align with induced schema
         roots = [c for c in schema_view.all_classes().values() if c.tree_root]
         if len(roots) == 0:
