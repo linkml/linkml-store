@@ -18,3 +18,4 @@ Subpackages
    linkml_store.api.stores.solr
    linkml_store.api.stores.hdf5
    linkml_store.api.stores.chromadb
+   linkml_store.api.stores.neo4j
