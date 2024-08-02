@@ -305,9 +305,26 @@
         <article role="main" id="furo-main-content">
           <section id="How-to-use-Neo4J-with-LinkML-Store">
 <h1>How to use Neo4J with LinkML-Store<a class="headerlink" href="#How-to-use-Neo4J-with-LinkML-Store" title="Link to this heading"></a></h1>
-<p>We will try and use some of the same examples as in <a class="reference external" href="https://neo4j.com/docs/getting-started/appendix/graphdb-concepts/">neo4j graph concepts guide</a></p>
-<p><img alt="img" src="../_images/MoviesKG.svg" /></p>
-<p><strong>IMPORTANT NOTE</strong> if you run this Notebook locally, and you have a Neo4J server running, it will overwrite the default <code class="docutils literal notranslate"><span class="pre">neo4j</span></code></p>
+<p>This how-to guide shows you how to use linkml-store over a Neo4j database. linkml-store is a flexible framework that can be used with different backends, employing simple mappings via LinkML schemas.</p>
+<p>One of the main use cases here is being able to provide a schema for validating a property graph database, as well as making it easier to map between a property graph database and other representations (tabular/dataframe, JSON/YAML, RDF, RDFstar, OWL, …)</p>
+<p>We will try and use some of the same examples as in <a class="reference external" href="https://neo4j.com/docs/getting-started/appendix/graphdb-concepts/">neo4j graph concepts guide</a>, making a simple Movie-oriented KG:</p>
+<p><img alt="neo4j graph concepts" src="images/graph_simple-arr.svg" /></p>
+<section id="Running-this-how-to-guide-interactively.">
+<h2>Running this how-to guide interactively.<a class="headerlink" href="#Running-this-how-to-guide-interactively." title="Link to this heading"></a></h2>
+<p>This guide is both documentation, and a Jupyter notebook.</p>
+<p>You can run the notebook locally. You will need a local neo4j database running, with authentication disabled.</p>
+<p>One way to do this is via Docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run
+<span class="w">  </span>--name<span class="w"> </span>myneo4j
+<span class="w">  </span>--publish<span class="w"> </span><span class="m">7474</span>:7474
+<span class="w">  </span>--publish<span class="w"> </span><span class="m">7687</span>:7687
+<span class="w">  </span>--volume<span class="w"> </span><span class="nv">$HOME</span>/neo4j/data/:/data
+<span class="w">  </span>--volume<span class="w"> </span><span class="nv">$HOME</span>/neo4j/logs/:/logs
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">NEO4J_AUTH</span><span class="o">=</span>none
+<span class="w">  </span>neo4j
+</pre></div>
+</div>
+<p><strong>IMPORTANT NOTE</strong> if you run this Notebook locally, it will overwrite the default <code class="docutils literal notranslate"><span class="pre">neo4j</span></code>. If you have the enterprise edition you can modify this notebook to use a different database.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -329,6 +346,7 @@
 </pre></div>
 </div>
 </div>
+</section>
 <section id="Using-a-schema">
 <h2>Using a schema<a class="headerlink" href="#Using-a-schema" title="Link to this heading"></a></h2>
 <p>It is not necessary to defined a LinkML schema in advance, but this has a lot of advantages:</p>
@@ -364,7 +382,7 @@ gen-plantuml<span class="w"> </span>--directory<span class="w"> </span>input/mov
 WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: rdf
 </pre></div></div>
 </div>
-<p><img alt="img" src="../_images/MoviesKG.svg" /></p>
+<p><img alt="UML Schema" src="../_images/MoviesKG.svg" /></p>
 <p>Note that this is in many respects a “normal” UML type schema, with classes and class relationships.</p>
 <p>Here we define to base classes <code class="docutils literal notranslate"><span class="pre">Node</span></code> and <code class="docutils literal notranslate"><span class="pre">Edge</span></code>. We are treating edges as first-class entities in the model. We are following conventions and using <code class="docutils literal notranslate"><span class="pre">subject</span></code> and <code class="docutils literal notranslate"><span class="pre">object</span></code> for the head and tail nodes.</p>
 <p>You don’t <em>need</em> to define your schema this way. In fact it’s possible to map <strong>any</strong> LinkML schema to a property graph. You don’t need classes like “Node” and “Edge”, and you don’t need a reification type model.</p>
@@ -443,18 +461,35 @@ WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: r
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">persons</span><span class="p">)</span>
-<span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">movies</span><span class="p">)</span>
-<span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">characters</span><span class="p">)</span>
-<span class="n">edge_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Modify this to experiment with different ways of adding</span>
+<span class="n">ADD_INDIVIDUALLY</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">ADD_INDIVIDUALLY</span><span class="p">:</span>
+    <span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">persons</span><span class="p">)</span>
+    <span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">movies</span><span class="p">)</span>
+    <span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">characters</span><span class="p">)</span>
+    <span class="n">edge_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="n">persons</span> <span class="o">+</span> <span class="n">movies</span> <span class="o">+</span> <span class="n">characters</span><span class="p">,</span>
+        <span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="n">edges</span>
+    <span class="p">}</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
 <section id="Visualization">
 <h2>Visualization<a class="headerlink" href="#Visualization" title="Link to this heading"></a></h2>
+<p>We will visualize the whole database using py2neo, networkx, and matplotlib. This is not as visually attractive as the native neo4j UI but it works better in a notebook:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -473,25 +508,28 @@ WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: r
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/how-to_Use-Neo4j_20_0.png" src="../_images/how-to_Use-Neo4j_20_0.png" />
+<img alt="../_images/how-to_Use-Neo4j_21_0.png" src="../_images/how-to_Use-Neo4j_21_0.png" />
 </div>
 </div>
+<p>Note this doesn’t display edge properties (e.g. the “plays” edge property between Tom Hanks and Forrest Gump</p>
+<section id="Exploring-in-Neo4j">
+<h3>Exploring in Neo4j<a class="headerlink" href="#Exploring-in-Neo4j" title="Link to this heading"></a></h3>
+<p>If we go on over to <a class="reference external" href="http://localhost:7474/browser/">http://localhost:7474/browser/</a> (if you are running this locally) you can see this in the normal UI:</p>
+<p><img alt="neo4j screenshot of single edge" src="images/neo4j-screenshot-1.png" /></p>
+</section>
 </section>
 <section id="Validation">
 <h2>Validation<a class="headerlink" href="#Validation" title="Link to this heading"></a></h2>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">validate_modifications</span> <span class="o">=</span> <span class="kc">True</span>
-<br/></pre></div>
-</div>
-</div>
+<p>One of the main use cases for LinkML and LinkML-Store is validation using a schema. Most of the rich features of LinkML validation are available for property graphs, we will illustrate some simple ones here.</p>
+<section id="Validating-an-existing-database">
+<h3>Validating an existing database<a class="headerlink" href="#Validating-an-existing-database" title="Link to this heading"></a></h3>
+<p>First we’ll validate the database. Note that by default, validation is retrospective; it’s possible to insert invalid data into the database.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">errs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">iter_validate_database</span><span class="p">())</span>
+<span class="n">errs</span>
 </pre></div>
 </div>
 </div>
@@ -501,11 +539,25 @@ WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: r
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-dict_keys([&#39;subject&#39;, &#39;predicate&#39;, &#39;object&#39;])
+[]
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
+<p>Good, no errors!</p>
+</section>
+<section id="Prospective-Validation">
+<h3>Prospective Validation<a class="headerlink" href="#Prospective-Validation" title="Link to this heading"></a></h3>
+<p>We can switch on prospective validation, to prevent any future modifications making the data invalid:</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">validate_modifications</span> <span class="o">=</span> <span class="kc">True</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Let’s test this out by inserting deliberately invalid data – making up an edge property not defined in the schema</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
@@ -525,6 +577,34 @@ Got an exception (we expect this!!!)
 Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt;, message=&#34;Additional properties are not allowed (&#39;date&#39; was unexpected) in /&#34;, instance={&#39;subject&#39;: &#39;ACTOR:RZ&#39;, &#39;predicate&#39;: &#39;Directed&#39;, &#39;object&#39;: &#39;MOVIE:BTTF&#39;, &#39;date&#39;: 1985}, instance_index=0, instantiates=&#39;Directed&#39;, context=[])]
 </pre></div></div>
 </div>
+<p>We can also test referential integrity. By default, inserting an edge that points to a non-existent node will create a dangling node in Neo4j (Neo4j enforces that there must be some kind of node).</p>
+<p>We will change the policy and try and insert a dangling edge</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.api.stores.neo4j.neo4j_collection</span> <span class="kn">import</span> <span class="n">DeletePolicy</span>
+
+<span class="n">edge_collection</span><span class="o">.</span><span class="n">delete_policy</span> <span class="o">=</span> <span class="n">DeletePolicy</span><span class="o">.</span><span class="n">ERROR</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">edge_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span> <span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="n">RZ</span><span class="p">,</span> <span class="s2">&quot;predicate&quot;</span><span class="p">:</span> <span class="s2">&quot;Directed&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;MOVIE:MADE_UP_NODE&quot;</span><span class="p">})</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Got an exception (we expect this!!!)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Got an exception (we expect this!!!)
+Node with identifier MOVIE:MADE_UP_NODE not found in the database.
+</pre></div></div>
+</div>
+</section>
 </section>
 <section id="Loading-Data-from-a-file">
 <h2>Loading Data from a file<a class="headerlink" href="#Loading-Data-from-a-file" title="Link to this heading"></a></h2>
@@ -532,7 +612,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 <p>Data could be combined in a single JSON file, but it’s also convenient to use tabular or dataframe-oriented formats.</p>
 <p>Here we will load from CSV</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -540,7 +620,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nodes_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;input/movies_kg/nodes.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_dtypes</span><span class="p">()</span>
@@ -549,7 +629,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -664,7 +744,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edges_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;input/movies_kg/edges.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_dtypes</span><span class="p">()</span>
@@ -673,7 +753,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -749,7 +829,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">node_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">))</span>
@@ -757,7 +837,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: use type designator in validation</span>
@@ -766,7 +846,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">edges_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">))</span>
@@ -774,7 +854,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
@@ -790,14 +870,19 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/how-to_Use-Neo4j_32_0.png" src="../_images/how-to_Use-Neo4j_32_0.png" />
+<img alt="../_images/how-to_Use-Neo4j_39_0.png" src="../_images/how-to_Use-Neo4j_39_0.png" />
 </div>
 </div>
+<p>The above display is a little cluttered.</p>
+<p>If you are running this notebook locally you can head over to your neo4j and explore via interactive views like this:</p>
+<p><img alt="neo4j screenshot of more edges" src="images/neo4j-screenshot-2.png" /></p>
 </section>
 <section id="Queries">
 <h2>Queries<a class="headerlink" href="#Queries" title="Link to this heading"></a></h2>
+<p>The graph can be queried the same as any other database in linkml-store. Note that at this time we don’t expose a graph-oriented API, we instead expose everything as node or edge collections. This has some advantages and disadvantages. The goal is not to replace something like Cypher (you can and should of course just do Cypher queries over the underlying neoj4 database if and when you need to).</p>
+<p>Let’s start by querying for the entire contents of both collections:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">node_collection</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -805,7 +890,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -827,132 +912,132 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>born</th>
       <th>name</th>
       <th>id</th>
       <th>category</th>
+      <th>born</th>
       <th>released</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1964.0</td>
-      <td>Keanu Reeves</td>
-      <td>PERSON:KR</td>
-      <td>Actor</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1961.0</td>
-      <td>Michael J. Fox</td>
-      <td>PERSON:MJF</td>
-      <td>Actor</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>NaN</td>
-      <td>Forrest Gump</td>
-      <td>MOVIE:FG</td>
-      <td>Movie</td>
-      <td>1994.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>NaN</td>
-      <td>The Matrix</td>
-      <td>MOVIE:TM</td>
-      <td>Movie</td>
-      <td>1999.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>NaN</td>
-      <td>The Matrix Reloaded</td>
-      <td>MOVIE:TM2</td>
-      <td>Movie</td>
-      <td>2003.0</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>NaN</td>
-      <td>The Matrix Revolutions</td>
-      <td>MOVIE:TM3</td>
-      <td>Movie</td>
-      <td>2003.0</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>NaN</td>
-      <td>Robert Zemekis</td>
-      <td>ACTOR:RZ</td>
-      <td>Director</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>NaN</td>
-      <td>Back to the Future</td>
-      <td>MOVIE:BTTF</td>
-      <td>Movie</td>
-      <td>1985.0</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>NaN</td>
       <td>Forest Gump</td>
       <td>MOVIE:FG</td>
       <td>Movie</td>
       <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
-      <th>9</th>
-      <td>NaN</td>
+      <th>1</th>
       <td>Forest Gump (Character)</td>
       <td>CHARACTER:FGC</td>
       <td>Character</td>
       <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
-      <th>10</th>
-      <td>1956.0</td>
+      <th>2</th>
       <td>Tom Hanks</td>
       <td>PERSON:TH</td>
       <td>Actor</td>
+      <td>1956.0</td>
       <td>NaN</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>3</th>
+      <td>Robert Zemeckis</td>
+      <td>PERSON:RZ</td>
+      <td>Director</td>
+      <td>1951.0</td>
       <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Hugo Weaving</td>
+      <td>PERSON:HW</td>
+      <td>Actor</td>
+      <td>1960.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Keanu Reeves</td>
+      <td>PERSON:KR</td>
+      <td>Actor</td>
+      <td>1964.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Michael J. Fox</td>
+      <td>PERSON:MJF</td>
+      <td>Actor</td>
+      <td>1961.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Forrest Gump</td>
+      <td>MOVIE:FG</td>
+      <td>Movie</td>
+      <td>NaN</td>
+      <td>1994.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Back to the Future</td>
+      <td>MOVIE:BTTF</td>
+      <td>Movie</td>
+      <td>NaN</td>
+      <td>1985.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
       <td>Tom Hanks</td>
       <td>ACTOR:TH</td>
       <td>Actor</td>
       <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>The Matrix</td>
+      <td>MOVIE:TM</td>
+      <td>Movie</td>
+      <td>NaN</td>
+      <td>1999.0</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Robert Zemekis</td>
+      <td>ACTOR:RZ</td>
+      <td>Director</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>12</th>
-      <td>1951.0</td>
-      <td>Robert Zemeckis</td>
-      <td>PERSON:RZ</td>
-      <td>Director</td>
+      <td>The Matrix Reloaded</td>
+      <td>MOVIE:TM2</td>
+      <td>Movie</td>
       <td>NaN</td>
+      <td>2003.0</td>
     </tr>
     <tr>
       <th>13</th>
-      <td>1960.0</td>
-      <td>Hugo Weaving</td>
-      <td>PERSON:HW</td>
-      <td>Actor</td>
+      <td>The Matrix Revolutions</td>
+      <td>MOVIE:TM3</td>
+      <td>Movie</td>
       <td>NaN</td>
+      <td>2003.0</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -960,7 +1045,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1063,8 +1148,9 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </table>
 </div></div>
 </div>
+<p>We can also use standard key-value mongodb-like queries; over nodes:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">node_collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Actor&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -1072,7 +1158,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1103,45 +1189,46 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
   <tbody>
     <tr>
       <th>0</th>
-      <td>1964.0</td>
-      <td>Keanu Reeves</td>
-      <td>PERSON:KR</td>
-      <td>Actor</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1961.0</td>
-      <td>Michael J. Fox</td>
-      <td>PERSON:MJF</td>
-      <td>Actor</td>
-    </tr>
-    <tr>
-      <th>2</th>
       <td>1956.0</td>
       <td>Tom Hanks</td>
       <td>PERSON:TH</td>
       <td>Actor</td>
     </tr>
     <tr>
+      <th>1</th>
+      <td>1960.0</td>
+      <td>Hugo Weaving</td>
+      <td>PERSON:HW</td>
+      <td>Actor</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1964.0</td>
+      <td>Keanu Reeves</td>
+      <td>PERSON:KR</td>
+      <td>Actor</td>
+    </tr>
+    <tr>
       <th>3</th>
-      <td>NaN</td>
-      <td>Tom Hanks</td>
-      <td>ACTOR:TH</td>
+      <td>1961.0</td>
+      <td>Michael J. Fox</td>
+      <td>PERSON:MJF</td>
       <td>Actor</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>1960.0</td>
-      <td>Hugo Weaving</td>
-      <td>PERSON:HW</td>
+      <td>NaN</td>
+      <td>Tom Hanks</td>
+      <td>ACTOR:TH</td>
       <td>Actor</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
+<p>over edges:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;predicate&quot;</span><span class="p">:</span> <span class="s2">&quot;ActedIn&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -1149,7 +1236,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1224,12 +1311,13 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </table>
 </div></div>
 </div>
-<p>Note that the main linkml-store API is intended to be generic and does not directly support graph queries. In future graph API facades will be provided.</p>
 </section>
 <section id="Facet-Counts">
 <h2>Facet Counts<a class="headerlink" href="#Facet-Counts" title="Link to this heading"></a></h2>
+<p>We can also do basic analytic queries such as Solr-style facet grouping and counting.</p>
+<p>We’ll make use of a lightweight function that converts linkml-store facet counts to dataframes:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.utils.pandas_utils</span> <span class="kn">import</span> <span class="n">facet_summary_to_dataframe_unmelted</span>
@@ -1237,7 +1325,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">node_collection</span><span class="o">.</span><span class="n">query_facets</span><span class="p">(</span><span class="n">facet_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">])</span>
@@ -1246,7 +1334,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -1298,19 +1386,28 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 </div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: implement facet counts for edges</span>
 <span class="c1">#r = edge_collection.query_facets(facet_columns=[&quot;subject&quot;, &quot;predicate&quot;, &quot;object&quot;])</span>
 <span class="c1">#facet_summary_to_dataframe_unmelted(r)</span>
 </pre></div>
 </div>
 </div>
 </section>
-<section id="TODO---mapping-non-Graph-schemas">
-<h2>TODO - mapping non-Graph schemas<a class="headerlink" href="#TODO---mapping-non-Graph-schemas" title="Link to this heading"></a></h2>
-<p>TODO - add examples on mapping schemas that are not “natively” PGs</p>
+<section id="Indexing-via-LLM-embeddings">
+<h2>Indexing via LLM embeddings<a class="headerlink" href="#Indexing-via-LLM-embeddings" title="Link to this heading"></a></h2>
+<p>Neo4j can be indexed and search via LLM embeddings, just like any other linkml-store wrapped database.</p>
+<p><strong>TODO</strong> show examples</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
 </section>
 </section>
 
@@ -1370,15 +1467,23 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How to use Neo4J with LinkML-Store</a><ul>
+<li><a class="reference internal" href="#Running-this-how-to-guide-interactively.">Running this how-to guide interactively.</a></li>
 <li><a class="reference internal" href="#Using-a-schema">Using a schema</a></li>
 <li><a class="reference internal" href="#Create-Node-and-Edge-collections">Create Node and Edge collections</a></li>
 <li><a class="reference internal" href="#Adding-Data">Adding Data</a></li>
-<li><a class="reference internal" href="#Visualization">Visualization</a></li>
-<li><a class="reference internal" href="#Validation">Validation</a></li>
+<li><a class="reference internal" href="#Visualization">Visualization</a><ul>
+<li><a class="reference internal" href="#Exploring-in-Neo4j">Exploring in Neo4j</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Validation">Validation</a><ul>
+<li><a class="reference internal" href="#Validating-an-existing-database">Validating an existing database</a></li>
+<li><a class="reference internal" href="#Prospective-Validation">Prospective Validation</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#Loading-Data-from-a-file">Loading Data from a file</a></li>
 <li><a class="reference internal" href="#Queries">Queries</a></li>
 <li><a class="reference internal" href="#Facet-Counts">Facet Counts</a></li>
-<li><a class="reference internal" href="#TODO---mapping-non-Graph-schemas">TODO - mapping non-Graph schemas</a></li>
+<li><a class="reference internal" href="#Indexing-via-LLM-embeddings">Indexing via LLM embeddings</a></li>
 </ul>
 </li>
 </ul>
