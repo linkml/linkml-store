@@ -7,7 +7,7 @@ from neo4j import Driver, Session
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.queries import Query, QueryResult
-from linkml_store.graphs.graph_map import GraphProjection, EdgeProjection, NodeProjection
+from linkml_store.graphs.graph_map import EdgeProjection, GraphProjection, NodeProjection
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Neo4jCollection(Collection):
 
     def _check_if_initialized(self) -> bool:
         with self.session() as session:
-            result = session.run(f"MATCH (n) RETURN count(n) > 0 as exists")
+            result = session.run("MATCH (n) RETURN count(n) > 0 as exists")
             return result.single()["exists"]
 
     @property
@@ -101,7 +101,9 @@ class Neo4jCollection(Collection):
             raise ValueError("Cannot reassign without force=True")
         self.metadata.graph_projection = NodeProjection()
 
-    def _prop_clause(self, obj: OBJECT, node_var: Optional[str] = None, exclude_attributes: Optional[List[str]]=None) -> str:
+    def _prop_clause(
+        self, obj: OBJECT, node_var: Optional[str] = None, exclude_attributes: Optional[List[str]] = None
+    ) -> str:
         if exclude_attributes is None:
             exclude_attributes = [self.category_labels_attribute]
         node_prefix = node_var + "." if node_var else ""
@@ -141,7 +143,9 @@ class Neo4jCollection(Collection):
             # check if nodes present; if not, make dangling stubs
             # TODO: decide on how this should be handled in validation if some fields are required
             for node_id in [obj[ep.subject_attribute], obj[ep.object_attribute]]:
-                check_query = f"MATCH (n {{{ep.identifier_attribute}: ${ep.identifier_attribute}}}) RETURN count(n) as count"
+                check_query = (
+                    f"MATCH (n {{{ep.identifier_attribute}: ${ep.identifier_attribute}}}) RETURN count(n) as count"
+                )
                 with self.session() as session:
                     result = session.run(check_query, **{ep.identifier_attribute: node_id})
                     if result.single()["count"] == 0:
@@ -150,11 +154,9 @@ class Neo4jCollection(Collection):
                             session.run(stub_query, **{ep.identifier_attribute: node_id})
                         else:
                             raise ValueError(f"Node with identifier {node_id} not found in the database.")
-            edge_props = self._prop_clause(obj, exclude_attributes=[
-                ep.subject_attribute,
-                ep.predicate_attribute,
-                ep.object_attribute
-            ])
+            edge_props = self._prop_clause(
+                obj, exclude_attributes=[ep.subject_attribute, ep.predicate_attribute, ep.object_attribute]
+            )
             return f"""
             MATCH (s {{{id_attribute}: ${ep.subject_attribute}}}), (o {{{id_attribute}: ${ep.object_attribute}}})
             CREATE (s)-[r:{pred} {{{edge_props}}}]->(o)
@@ -175,6 +177,7 @@ class Neo4jCollection(Collection):
             if self.is_edge_collection:
                 rows = [self._edge_to_dict(record) for record in result]
             else:
+
                 def node_to_dict(n) -> dict:
                     d = dict(n.items())
                     if ca:
@@ -182,6 +185,7 @@ class Neo4jCollection(Collection):
                         if labels:
                             d[ca] = labels[0]
                     return d
+
                 rows = [node_to_dict(record["n"]) for record in result]
 
         # count_query = self._build_count_query(query, is_count=True)
@@ -191,7 +195,9 @@ class Neo4jCollection(Collection):
 
         return QueryResult(query=query, num_rows=count, rows=rows)
 
-    def _build_cypher_query(self, query: Query, limit: Optional[int] = None, offset: Optional[int]=None, is_count=False) -> str:
+    def _build_cypher_query(
+        self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, is_count=False
+    ) -> str:
         if self.is_edge_collection:
             ep = self.edge_projection
             ia = ep.identifier_attribute
@@ -247,8 +253,7 @@ class Neo4jCollection(Collection):
 
         return cypher_query
 
-
-    def _build_where_clause(self, where_clause: Dict[str, Any], prefix: str = 'n') -> str:
+    def _build_where_clause(self, where_clause: Dict[str, Any], prefix: str = "n") -> str:
         conditions = []
         if where_clause is None:
             return ""
@@ -269,15 +274,15 @@ class Neo4jCollection(Collection):
             ep.subject_attribute: record["subject"],
             ep.predicate_attribute: record["predicate"],
             ep.object_attribute: record["object"],
-            **dict(r.items())
+            **dict(r.items()),
         }
 
     def query_facets(
-            self,
-            where: Dict = None,
-            facet_columns: List[Union[str, Tuple[str, ...]]] = None,
-            facet_limit=DEFAULT_FACET_LIMIT,
-            **kwargs,
+        self,
+        where: Dict = None,
+        facet_columns: List[Union[str, Tuple[str, ...]]] = None,
+        facet_limit=DEFAULT_FACET_LIMIT,
+        **kwargs,
     ) -> Dict[Union[str, Tuple[str, ...]], List[Tuple[Any, int]]]:
         results = {}
         if not facet_columns:
@@ -334,23 +339,24 @@ class Neo4jCollection(Collection):
 
         return deleted_nodes
 
-    def delete_where(self, where: Optional[Dict[str, Any]] = None,
-                     missing_ok=True, **kwargs) -> int:
+    def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
         delete_policy = self.delete_policy
         where_clause = self._build_where_clause(where) if where else ""
         node_pattern = self._node_pattern(where)
 
         with self.session() as session:
-            deleted_nodes, deleted_relationships = self._execute_delete(session, node_pattern, where_clause,
-                                                                        delete_policy)
+            deleted_nodes, deleted_relationships = self._execute_delete(
+                session, node_pattern, where_clause, delete_policy
+            )
 
         if deleted_nodes == 0 and not missing_ok:
             raise ValueError(f"No nodes found for {where}")
 
         return deleted_nodes
 
-    def _execute_delete(self, session, node_pattern: str, where_clause: str, delete_policy: DeletePolicy, **params) -> \
-    Tuple[int, int]:
+    def _execute_delete(
+        self, session, node_pattern: str, where_clause: str, delete_policy: DeletePolicy, **params
+    ) -> Tuple[int, int]:
         deleted_relationships = 0
         deleted_nodes = 0
 
@@ -376,7 +382,6 @@ class Neo4jCollection(Collection):
 
         return deleted_nodes, deleted_relationships
 
-
     def update(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
         if not isinstance(objs, list):
             objs = [objs]
@@ -393,7 +398,6 @@ class Neo4jCollection(Collection):
     def _create_update_cypher_query(self, obj: OBJECT) -> str:
         id_attribute = self.identifier_attribute
         category_labels_attribute = self.category_labels_attribute
-        node_pattern = self._node_pattern(obj)
 
         # Prepare SET clause
         set_items = [f"n.{k} = ${k}" for k in obj.keys() if k not in [id_attribute, category_labels_attribute]]
@@ -401,21 +405,24 @@ class Neo4jCollection(Collection):
 
         # Prepare labels update
         labels_to_add = []
-        labels_to_remove = []
+        # labels_to_remove = []
         if category_labels_attribute in obj:
-            new_labels = obj[category_labels_attribute] if isinstance(obj[category_labels_attribute], list) else [
-                obj[category_labels_attribute]]
+            new_labels = (
+                obj[category_labels_attribute]
+                if isinstance(obj[category_labels_attribute], list)
+                else [obj[category_labels_attribute]]
+            )
             labels_to_add = [f":{label}" for label in new_labels]
-            labels_to_remove = [f":Label" for _ in new_labels]  # Placeholder for labels to remove
+            # labels_to_remove = [":Label" for _ in new_labels]  # Placeholder for labels to remove
 
         # Construct the query
         query = f"MATCH (n {{{id_attribute}: ${id_attribute}}})\n"
-        #if labels_to_remove:
+        # f labels_to_remove:
         #    query += f"REMOVE n{' '.join(labels_to_remove)}\n"
         if labels_to_add:
             query += f"SET n{' '.join(labels_to_add)}\n"
-                 #f"REMOVE n{' '.join(labels_to_remove)}' if labels_to_remove else ''}"
-                 #f"{f'SET n{' '.join(labels_to_add)}' if labels_to_add else ''}"
+            # f"REMOVE n{' '.join(labels_to_remove)}' if labels_to_remove else ''}"
+            # f"{f'SET n{' '.join(labels_to_add)}' if labels_to_add else ''}"
         query += f"SET {set_clause}\n"
         query += "RETURN n"
         print(query)

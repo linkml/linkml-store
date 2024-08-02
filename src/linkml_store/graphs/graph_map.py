@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -16,6 +16,7 @@ class GraphProjection(BaseModel, ABC):
 
 class NodeProjection(GraphProjection):
     category_labels_attribute: Optional[str] = DEFAULT_CATEGORY_LABELS_ATTRIBUTE
+
 
 class EdgeProjection(GraphProjection):
     subject_attribute: str = DEFAULT_SUBJECT_ATTRIBUTE

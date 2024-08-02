@@ -504,8 +504,8 @@ class Database(ABC, Generic[CollectionType]):
             schema_view = str(schema_view)
         if isinstance(schema_view, str):
             schema_view = SchemaView(schema_view)
-        # self._schema_view = schema_view
-        self._schema_view = SchemaView(schema_view.materialize_derived_schema())
+        self._schema_view = schema_view
+        # self._schema_view = SchemaView(schema_view.materialize_derived_schema())
         if not self._collections:
             return
 
@@ -530,7 +530,6 @@ class Database(ABC, Generic[CollectionType]):
                     if slot.name in self._collections:
                         coll = self._collections[slot.name]
                         coll.metadata.type = slot.range
-
 
     def load_schema_view(self, path: Union[str, Path]):
         """

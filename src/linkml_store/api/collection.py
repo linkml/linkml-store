@@ -4,8 +4,21 @@ import hashlib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, Iterator, List, Optional, TextIO, Tuple, Type, Union, \
-    Iterable
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    TextIO,
+    Tuple,
+    Type,
+    Union,
+)
 
 import numpy as np
 from linkml_runtime import SchemaView
@@ -985,7 +998,9 @@ class Collection(Generic[DatabaseType]):
         patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
         return patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
 
-    def iter_validate_collection(self, objects: Optional[Iterable[OBJECT]] = None, **kwargs) -> Iterator["ValidationResult"]:
+    def iter_validate_collection(
+        self, objects: Optional[Iterable[OBJECT]] = None, **kwargs
+    ) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the collection
 
@@ -1001,7 +1016,7 @@ class Collection(Generic[DatabaseType]):
         if not cd:
             raise ValueError(f"Cannot find class definition for {self.target_class_name}")
         type_designator = None
-        for att in cd.attributes.values():
+        for att in self.parent.schema_view.class_induced_slots(cd.name):
             if att.designates_type:
                 type_designator = att.name
         class_name = cd.name
@@ -1014,7 +1029,7 @@ class Collection(Generic[DatabaseType]):
                 # TODO: move type designator logic to core linkml
                 this_class_name = obj.get(type_designator)
                 if this_class_name:
-                    if ":"in this_class_name:
+                    if ":" in this_class_name:
                         this_class_name = this_class_name.split(":")[-1]
                     v_class_name = this_class_name
             yield from validator.iter_results(obj, v_class_name)

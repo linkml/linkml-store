@@ -1,7 +1,6 @@
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-
 from linkml_store.api.client import Client
 from linkml_store.api.stores.neo4j.neo4j_collection import DeletePolicy
 from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection
@@ -20,13 +19,18 @@ def neo4j_db():
     # db.drop()
 
 
-@pytest.mark.parametrize("edge_projection,node_projection",
-                        [
-                            (EdgeProjection(), None),
-                            (EdgeProjection(), NodeProjection()),
-                            (EdgeProjection(subject_attribute="source", predicate_attribute="relation", object_attribute="target"), None),
-                            (EdgeProjection(identifier_attribute="uid"), NodeProjection(identifier_attribute="uid", category_labels_attribute="category"))
-                        ])
+@pytest.mark.parametrize(
+    "edge_projection,node_projection",
+    [
+        (EdgeProjection(), None),
+        (EdgeProjection(), NodeProjection()),
+        (EdgeProjection(subject_attribute="source", predicate_attribute="relation", object_attribute="target"), None),
+        (
+            EdgeProjection(identifier_attribute="uid"),
+            NodeProjection(identifier_attribute="uid", category_labels_attribute="category"),
+        ),
+    ],
+)
 @pytest.mark.integration
 def test_neo4j_adapter(neo4j_db, edge_projection, node_projection):
     # Create a collection
@@ -144,9 +148,6 @@ def test_neo4j_adapter(neo4j_db, edge_projection, node_projection):
     att = neo4j_db.schema_view.induced_slot(ca, "Manager")
     assert att.designates_type
     assert collection.target_class_name == "Node"
-    cd = collection.class_definition()
-    att = cd.attributes[ca]
-    assert att.designates_type
     errs = list(neo4j_db.iter_validate_database())
     assert len(errs) == 0
     collection.metadata.validate_modifications = True
@@ -179,8 +180,3 @@ def test_neo4j_adapter(neo4j_db, edge_projection, node_projection):
             ec.insert(edge)
     collection.metadata.validate_modifications = False
     collection.insert(invalid_objs)
-
-
-
-
-

@@ -1,10 +1,10 @@
 # neo4j_database.py
 
 import logging
-from typing import Optional, Union, List, Dict, Any
 from pathlib import Path
+from typing import Optional, Union
 
-from neo4j import GraphDatabase, Driver, Session
+from neo4j import Driver, GraphDatabase, Session
 
 from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
@@ -107,13 +107,20 @@ class Neo4jDatabase(Database):
 
                 result = session.run("MATCH ()-[r]->() RETURN r")
                 relationships = [
-                    {"type": record["r"].type, "start": record["r"].start_node.id, "end": record["r"].end_node.id,
-                     **dict(record["r"].items())} for record in result]
+                    {
+                        "type": record["r"].type,
+                        "start": record["r"].start_node.id,
+                        "end": record["r"].end_node.id,
+                        **dict(record["r"].items()),
+                    }
+                    for record in result
+                ]
 
                 data = {"nodes": nodes, "relationships": relationships}
 
                 import json
-                with open(path, 'w') as f:
+
+                with open(path, "w") as f:
                     json.dump(data, f)
         else:
             super().export_database(location, target_format=target_format, **kwargs)
@@ -121,8 +128,9 @@ class Neo4jDatabase(Database):
     def import_database(self, location: str, source_format: Optional[str] = None, **kwargs):
         if source_format == Format.JSON or source_format == "json":
             path = Path(location)
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 import json
+
                 data = json.load(f)
 
             with self.driver.session() as session:
@@ -133,11 +141,14 @@ class Neo4jDatabase(Database):
                     session.run(query, **node)
 
                 for rel in data["relationships"]:
-                    rel_type = rel.pop("type")
+                    # rel_type = rel.pop("type")
                     start = rel.pop("start")
                     end = rel.pop("end")
-                    props = ", ".join([f"{k}: ${k}" for k in rel.keys()])
-                    query = f"MATCH (a), (b) WHERE id(a) = {start} AND id(b) = {end} CREATE (a)-[r:{rel_type} {{{props}}}]->(b)"
+                    # props = ", ".join([f"{k}: ${k}" for k in rel.keys()])
+                    query = (
+                        f"MATCH (a), (b) WHERE id(a) = {start} AND id(b) = {end} "
+                        "CREATE (a)-[r:{rel_type} {{{props}}}]->(b)"
+                    )
                     session.run(query, **rel)
         else:
             super().import_database(location, source_format=source_format, **kwargs)
