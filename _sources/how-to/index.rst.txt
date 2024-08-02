@@ -12,6 +12,7 @@ How-To Guides
    Use-Semantic-Search
    Query-the-Monarch-KG
    Query-Solr-using-CLI
+   Use-Neo4J
    Check-Referential-Integrity
    Store-an-Ontology
    Index-Phenopackets
