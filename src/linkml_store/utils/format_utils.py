@@ -27,6 +27,7 @@ class Format(Enum):
     JSON = "json"
     JSONL = "jsonl"
     YAML = "yaml"
+    YAMLL = "yamll"
     TSV = "tsv"
     CSV = "csv"
     PYTHON = "python"
@@ -135,6 +136,7 @@ def load_objects(
     compression: Optional[str] = None,
     expected_type: Optional[Type] = None,
     header_comment_token: Optional[str] = None,
+    select_query: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Load objects from a file or archive in supported formats.
@@ -177,96 +179,20 @@ def load_objects(
             all_objects = process_file(f, format, expected_type, header_comment_token)
 
     logger.debug(f"Loaded {len(all_objects)} objects from {file_path}")
+    if select_query:
+        import jsonpath_ng as jp
+
+        path_expr = jp.parse(select_query)
+        new_objs = []
+        for obj in all_objects:
+            for match in path_expr.find(obj):
+                logging.debug(f"Match: {match.value}")
+                if isinstance(match.value, list):
+                    new_objs.extend(match.value)
+                else:
+                    new_objs.append(match.value)
+        all_objects = new_objs
     return all_objects
-
-
-def xxxload_objects(
-    file_path: Union[str, Path],
-    format: Union[Format, str] = None,
-    compression: Optional[str] = None,
-    expected_type: Type = None,
-    header_comment_token: Optional[str] = None,
-) -> List[Dict[str, Any]]:
-    """
-    Load objects from a file in JSON, JSONLines, YAML, CSV, or TSV format.
-
-    >>> load_objects("tests/input/test_data/data.csv")
-    [{'id': '1', 'name': 'John', 'age': '30'},
-     {'id': '2', 'name': 'Alice', 'age': '25'}, {'id': '3', 'name': 'Bob', 'age': '35'}]
-
-    :param file_path: The path to the file.
-    :param format: The format of the file. Can be a Format enum or a string value.
-    :param expected_type: The target type to load the objects into, e.g. list
-    :return: A list of dictionaries representing the loaded objects.
-    """
-    if isinstance(format, str):
-        format = Format(format)
-
-    if isinstance(file_path, Path):
-        file_path = str(file_path)
-
-    if not format and (file_path.endswith(".parquet") or file_path.endswith(".pq")):
-        format = Format.PARQUET
-    if not format and file_path.endswith(".tsv"):
-        format = Format.TSV
-    if not format and file_path.endswith(".csv"):
-        format = Format.CSV
-    if not format and file_path.endswith(".py"):
-        format = Format.PYTHON
-
-    mode = "r"
-    if format == Format.PARQUET:
-        mode = "rb"
-
-    if file_path == "-":
-        # set file_path to be a stream from stdin
-        f = sys.stdin
-    else:
-        f = open(file_path, mode)
-
-    if format == Format.JSON or (not format and file_path.endswith(".json")):
-        objs = json.load(f)
-    elif format == Format.JSONL or (not format and file_path.endswith(".jsonl")):
-        objs = [json.loads(line) for line in f]
-    elif format == Format.YAML or (not format and (file_path.endswith(".yaml") or file_path.endswith(".yml"))):
-        if expected_type and expected_type == list:  # noqa E721
-            objs = list(yaml.safe_load_all(f))
-        else:
-            objs = yaml.safe_load(f)
-    elif format == Format.TSV or format == Format.CSV:
-        # Skip initial comment lines if comment_char is set
-        if header_comment_token:
-            # Store the original position
-            original_pos = f.tell()
-
-            # Read and store lines until we find a non-comment line
-            lines = []
-            for line in f:
-                if not line.startswith(header_comment_token):
-                    break
-                lines.append(line)
-
-            # Go back to the original position
-            f.seek(original_pos)
-
-            # Skip the comment lines we found
-            for _ in lines:
-                f.readline()
-        if format == Format.TSV:
-            reader = csv.DictReader(f, delimiter="\t")
-        else:
-            reader = csv.DictReader(f)
-        objs = list(reader)
-    elif format == Format.PARQUET:
-        import pyarrow.parquet as pq
-
-        table = pq.read_table(f)
-        objs = table.to_pandas().to_dict(orient="records")
-    else:
-        raise ValueError(f"Unsupported file format: {file_path}")
-    if not isinstance(objs, list):
-        objs = [objs]
-    return objs
 
 
 def write_output(
@@ -329,7 +255,7 @@ def render_output(
     if format == Format.FORMATTED:
         if not isinstance(data, pd.DataFrame):
             data = pd.DataFrame(data)
-        return str(data)
+        return data.to_string(max_rows=None)
 
     if isinstance(data, pd.DataFrame):
         data = data.to_dict(orient="records")

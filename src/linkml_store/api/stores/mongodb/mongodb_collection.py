@@ -51,9 +51,13 @@ class MongoDBCollection(Collection):
         if offset and offset >= 0:
             cursor = cursor.skip(offset)
 
+        select_cols = query.select_cols
+
         def _as_row(row: dict):
             row = copy(row)
             del row["_id"]
+            if select_cols:
+                row = {k: row[k] for k in select_cols if k in row}
             return row
 
         rows = [_as_row(row) for row in cursor]

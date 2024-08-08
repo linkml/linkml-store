@@ -100,7 +100,7 @@ class Client:
         """
         return self.metadata.base_dir
 
-    def from_config(self, config: Union[ClientConfig, dict, str, Path], base_dir=None, **kwargs):
+    def from_config(self, config: Union[ClientConfig, dict, str, Path], base_dir=None, auto_attach=False, **kwargs):
         """
         Create a client from a configuration.
 
@@ -109,6 +109,10 @@ class Client:
         >>> from linkml_store.api.config import ClientConfig
         >>> client = Client().from_config(ClientConfig(databases={"test": {"handle": "duckdb:///:memory:"}}))
         >>> len(client.databases)
+        0
+        >>> client = Client().from_config(ClientConfig(databases={"test": {"handle": "duckdb:///:memory:"}}),
+        ...                                auto_attach=True)
+        >>> len(client.databases)
         1
         >>> "test" in client.databases
         True
@@ -116,6 +120,8 @@ class Client:
         'duckdb:///:memory:'
 
         :param config:
+        :param base_dir:
+        :param auto_attach:
         :param kwargs:
         :return:
 
@@ -125,17 +131,17 @@ class Client:
         if isinstance(config, Path):
             config = str(config)
         if isinstance(config, str):
-            # if not base_dir:
-            #    base_dir = Path(config).parent
+            if not base_dir:
+               base_dir = Path(config).parent
             parsed_obj = yaml.safe_load(open(config))
             config = ClientConfig(**parsed_obj)
         self.metadata = config
         if base_dir:
             self.metadata.base_dir = base_dir
-        self._initialize_databases(**kwargs)
+        self._initialize_databases(auto_attach=auto_attach, **kwargs)
         return self
 
-    def _initialize_databases(self, **kwargs):
+    def _initialize_databases(self, auto_attach=False, **kwargs):
         for name, db_config in self.metadata.databases.items():
             base_dir = self.base_dir
             logger.info(f"Initializing database: {name}, base_dir: {base_dir}")
@@ -146,8 +152,22 @@ class Client:
             db_config.handle = handle
             if db_config.schema_location:
                 db_config.schema_location = db_config.schema_location.format(base_dir=base_dir)
-            db = self.attach_database(handle, alias=name, **kwargs)
-            db.from_config(db_config)
+            if auto_attach:
+                db = self.attach_database(handle, alias=name, **kwargs)
+                db.from_config(db_config)
+
+    def _set_database_config(self, db: Database):
+        """
+        Set the configuration for a database.
+
+        :param name:
+        :param config:
+        :return:
+        """
+        if not self.metadata:
+            return
+        if db.alias in self.metadata.databases:
+            db.from_config(self.metadata.databases[db.alias])
 
     def attach_database(
         self,
@@ -202,6 +222,7 @@ class Client:
                 raise AssertionError(f"Inconsistent alias: {db.alias} != {alias}")
         else:
             db.metadata.alias = alias
+        self._set_database_config(db)
         return db
 
     def get_database(self, name: Optional[str] = None, create_if_not_exists=True, **kwargs) -> Database:
@@ -230,13 +251,20 @@ class Client:
             return list(self._databases.values())[0]
         if not self._databases:
             self._databases = {}
+        if name not in self._databases and name in self.metadata.databases:
+            db_config = self.metadata.databases[name]
+            db = self.attach_database(db_config.handle, alias=name, **kwargs)
+            self._databases[name] = db
         if name not in self._databases:
             if create_if_not_exists:
                 logger.info(f"Creating database: {name}")
                 self.attach_database(name, **kwargs)
             else:
                 raise ValueError(f"Database {name} does not exist")
-        return self._databases[name]
+        db = self._databases[name]
+        self._set_database_config(db)
+        return db
+
 
     @property
     def databases(self) -> Dict[str, Database]:

@@ -1,7 +1,9 @@
+import logging
 from typing import Dict, List, Tuple, Union
 
 import pandas as pd
 
+logger = logging.getLogger(__name__)
 
 def facet_summary_to_dataframe_unmelted(
     facet_summary: Dict[Union[str, Tuple[str, ...]], List[Tuple[Union[str, Tuple[str, ...]], int]]]
@@ -22,7 +24,8 @@ def facet_summary_to_dataframe_unmelted(
                     categories, value = cat_val_tuple[:-1], cat_val_tuple[-1]
                 row = {"Value": value}
                 for i, facet in enumerate(facet_type):
-                    row[facet] = categories[i]
+                    logger.debug(f"FT={facet_type} i={i} Facet: {facet}, categories: {categories}")
+                    row[facet] = categories[i] if len(categories) > i else None
                 rows.append(row)
 
     df = pd.DataFrame(rows)

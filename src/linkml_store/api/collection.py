@@ -502,6 +502,7 @@ class Collection(Generic[DatabaseType]):
                 index_name = self.default_index_name
         ix_coll = self.parent.get_collection(self._index_collection_name(index_name))
         if index_name not in self.indexers:
+            logger.debug(f"Indexer not found: {index_name} -- creating")
             ix = get_indexer(index_name)
             if not self._indexers:
                 self._indexers = {}
@@ -509,6 +510,11 @@ class Collection(Generic[DatabaseType]):
         ix = self.indexers.get(index_name)
         if not ix:
             raise ValueError(f"No index named {index_name}")
+        logger.debug(f"Using indexer {type(ix)} with name {index_name}")
+        if ix_coll.size() == 0:
+            logger.info(f"Index {index_name} is empty; indexing all objects")
+            all_objs = self.find(limit=-1).rows
+            self.index_objects(all_objs, index_name, replace=True, **kwargs)
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
         index_col = ix.index_field
         # TODO: optimize this for large indexes
@@ -518,6 +524,7 @@ class Collection(Generic[DatabaseType]):
             del r[1][index_col]
         new_qr = QueryResult(num_rows=len(results))
         new_qr.ranked_rows = results
+        new_qr.rows = [r[1] for r in results]
         return new_qr
 
     @property
@@ -562,6 +569,7 @@ class Collection(Generic[DatabaseType]):
                     format=source.format,
                     expected_type=source.expected_type,
                     compression=source.compression,
+                    select_query=source.select_query,
                     **kwargs,
                 )
             elif metadata.source.url:
@@ -570,9 +578,12 @@ class Collection(Generic[DatabaseType]):
                     format=source.format,
                     expected_type=source.expected_type,
                     compression=source.compression,
+                    select_query=source.select_query,
                     **kwargs,
                 )
-        self.insert(objects)
+            else:
+                raise ValueError("No source local_path or url provided")
+            self.insert(objects)
 
     def _check_if_initialized(self) -> bool:
         return self._initialized
@@ -628,6 +639,14 @@ class Collection(Generic[DatabaseType]):
                 raise ValueError(f"No objects derived from {coll.name}")
             self.insert(tr_objs)
             self.commit()
+
+    def size(self) -> int:
+        """
+        Return the number of objects in the collection.
+
+        :return: The number of objects in the collection.
+        """
+        return self.find({}, limit=1).num_rows
 
     def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
         """
@@ -777,6 +796,8 @@ class Collection(Generic[DatabaseType]):
         sv: SchemaView = self.parent.schema_view
         if sv:
             cls = sv.get_class(self.target_class_name)
+            # if not cls:
+            #     logger.warning(f"{self.target_class_name} not in {sv.all_classes().keys()} ")
             # cls = sv.schema.classes[self.target_class_name]
             if cls and not cls.attributes:
                 if not sv.class_induced_slots(cls.name):
@@ -900,11 +921,14 @@ class Collection(Generic[DatabaseType]):
                     exact_dimensions_list.append(v.shape)
                     break
                 if isinstance(v, list):
+                    # sample first item. TODO: more robust strategy
                     v = v[0] if v else None
                     multivalueds.append(True)
                 elif isinstance(v, dict):
-                    v = list(v.values())[0]
-                    multivalueds.append(True)
+                    pass
+                    # TODO: check if this is a nested object or key-value list
+                    # v = list(v.values())[0]
+                    # multivalueds.append(True)
                 else:
                     multivalueds.append(False)
                 if not v:
@@ -933,10 +957,19 @@ class Collection(Generic[DatabaseType]):
             #    raise AssertionError(f"Empty rngs for {k} = {vs}")
             rng = rngs[0] if rngs else None
             for other_rng in rngs:
+                coercions = {
+                    ("integer", "float"): "float",
+                }
                 if rng != other_rng:
-                    raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
+                    if (rng, other_rng) in coercions:
+                        rng = coercions[(rng, other_rng)]
+                    elif (other_rng, rng) in coercions:
+                        rng = coercions[(other_rng, rng)]
+                    else:
+                        raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
             logger.debug(f"Inducing {k} as {rng} {multivalued} {inlined}")
-            cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined)
+            inlined_as_list = inlined and multivalued
+            cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined, inlined_as_list=inlined_as_list)
             if exact_dimensions_list:
                 array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
                 cd.attributes[k].array = array_expr

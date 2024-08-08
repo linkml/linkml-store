@@ -707,12 +707,23 @@ class Database(ABC, Generic[CollectionType]):
         """
         raise NotImplementedError()
 
-    def import_database(self, location: str, source_format: Optional[Union[str, Format]] = None, **kwargs):
+    def import_database(self, location: str, source_format: Optional[Union[str, Format]] = None, collection_name: Optional[str] = None, **kwargs):
         """
         Import a database from a file or location.
 
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.import_database("tests/input/iris.csv", Format.CSV, collection_name="iris")
+        >>> db.list_collection_names()
+        ['iris']
+        >>> collection = db.get_collection("iris")
+        >>> collection.find({}).num_rows
+        150
+
         :param location: location of the file
         :param source_format: source format
+        :param collection_name: (Optional) name of the collection, for data that is flat
         :param kwargs: additional arguments
         """
         if isinstance(source_format, str):
@@ -732,8 +743,12 @@ class Database(ABC, Generic[CollectionType]):
                 self.store(obj)
                 return
         objects = load_objects(location, format=source_format)
-        for obj in objects:
-            self.store(obj)
+        if collection_name:
+            collection = self.get_collection(collection_name, create_if_not_exists=True)
+            collection.insert(objects)
+        else:
+            for obj in objects:
+                self.store(obj)
 
     def export_database(self, location: str, target_format: Optional[Union[str, Format]] = None, **kwargs):
         """

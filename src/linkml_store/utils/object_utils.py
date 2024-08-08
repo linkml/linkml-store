@@ -29,7 +29,7 @@ def object_path_update(
     """
     if isinstance(obj, BaseModel):
         typ = type(obj)
-        obj = obj.dict()
+        obj = obj.model_dump(exclude_none=True)
         obj = object_path_update(obj, path, value)
         return typ(**obj)
     obj = deepcopy(obj)
@@ -45,6 +45,8 @@ def object_path_update(
                 obj.append({})
             obj = obj[index]
         else:
+            if part in obj and obj[part] is None:
+                del obj[part]
             obj = obj.setdefault(part, {})
     last_part = parts[-1]
     if "[" in last_part:
