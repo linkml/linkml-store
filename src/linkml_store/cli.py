@@ -16,8 +16,8 @@ from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.predict import get_predictor
-from linkml_store.predict.predictor_config import PredictorConfig
+from linkml_store.inference import get_predictor
+from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
@@ -483,13 +483,15 @@ def describe(ctx, where, output_type, output, limit):
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default=Format.YAML.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--target-attribute", "-T", type=click.STRING, multiple=True,
+              help="Target attributes for inference")
 @click.option(
     "--predictor-type", "-t", default="rag", show_default=True, type=click.STRING,
     help="Type of predictor"
 )
 @click.option("--query", "-q", required=True, type=click.STRING, help="query term")
 @click.pass_context
-def predict(ctx, query, predictor_type, output_type, output):
+def infer(ctx, query, predictor_type, target_attribute, output_type, output):
     """
     Predict a complete object from a partial object.
 
@@ -497,11 +499,11 @@ def predict(ctx, query, predictor_type, output_type, output):
 
     ## RAG:
 
-    The RAG approach will use Retrieval Augmented Generation to predict the missing attributes of an object.
+    The RAG approach will use Retrieval Augmented Generation to inference the missing attributes of an object.
 
     Example:
 
-        linkml-store  -i countries.jsonl predict -t rag  -q 'name: Uruguay'
+        linkml-store  -i countries.jsonl inference -t rag  -q 'name: Uruguay'
 
     Result:
 
@@ -509,21 +511,24 @@ def predict(ctx, query, predictor_type, output_type, output):
 
     You can pass in configurations as follows:
 
-        linkml-store  -i countries.jsonl predict -t rag:llm_config.model_name=llama-3  -q 'name: Uruguay'
+        linkml-store  -i countries.jsonl inference -t rag:llm_config.model_name=llama-3  -q 'name: Uruguay'
 
     ## SKLearn:
 
     This uses scikit-learn (defaulting to simple decision trees) to do the prediction.
 
-        linkml-store -i tests/input/iris.csv predict -t sklearn \
+        linkml-store -i tests/input/iris.csv inference -t sklearn \
            -q '{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}'
     """
     query_obj = yaml.safe_load(query)
     collection = ctx.obj["settings"].collection
     atts = collection.class_definition().attributes.keys()
     features = query_obj.keys()
-    target_attributes = [att for att in atts if att not in features]
-    config = PredictorConfig(target_attributes=target_attributes, feature_attributes=features)
+    if target_attribute:
+        target_attributes = list(target_attribute)
+    else:
+        target_attributes = [att for att in atts if att not in features]
+    config = InferenceConfig(target_attributes=target_attributes, feature_attributes=features)
     predictor = get_predictor(predictor_type, config=config)
     predictor.load_and_split_data(collection)
     predictor.initialize_model()

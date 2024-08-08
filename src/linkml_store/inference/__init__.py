@@ -4,19 +4,19 @@ predictor package.
 
 from typing import Type
 
-from linkml_store.predict.predictor import Predictor
-from linkml_store.predict.predictor_config import PredictorConfig
-from linkml_store.predict.rag_predictor import RAGPredictor
-from linkml_store.predict.sklearn_predictor import SklearnPredictor
+from linkml_store.inference.inference_engine import InferenceEngine
+from linkml_store.inference.inference_config import InferenceConfig
+from linkml_store.inference.rag_inference_engine import RAGInferenceEngine
+from linkml_store.inference.sklearn_inference_engine import SklearnInferenceEngine
 from linkml_store.utils.object_utils import object_path_update
 
 PREDICTOR_CLASSES = {
-    "sklearn": SklearnPredictor,
-    "rag": RAGPredictor,
+    "sklearn": SklearnInferenceEngine,
+    "rag": RAGInferenceEngine,
 }
 
 
-def get_predictor_class(name: str) -> Type[Predictor]:
+def get_predictor_class(name: str) -> Type[InferenceEngine]:
     """
     Get an predictor class by name.
 
@@ -28,7 +28,7 @@ def get_predictor_class(name: str) -> Type[Predictor]:
     return PREDICTOR_CLASSES[name]
 
 
-def get_predictor(predictor_type: str, config: PredictorConfig=None, **kwargs) -> Predictor:
+def get_predictor(predictor_type: str, config: InferenceConfig=None, **kwargs) -> InferenceEngine:
     """
     Get a predictor by name.
 
@@ -43,7 +43,7 @@ def get_predictor(predictor_type: str, config: PredictorConfig=None, **kwargs) -
     if ":" in predictor_type:
         predictor_type, conf_args = predictor_type.split(":", 1)
         if config is None:
-            config = PredictorConfig()
+            config = InferenceConfig()
         for arg in conf_args.split(","):
             k, v = arg.split("=")
             config = object_path_update(config, k, v)

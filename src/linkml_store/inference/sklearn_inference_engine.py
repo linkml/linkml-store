@@ -1,20 +1,19 @@
 import logging
-from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Optional
 
 import pandas as pd
 
 from linkml_store.api.collection import OBJECT
-from linkml_store.predict.predictor_config import PredictorConfig, Prediction
-from linkml_store.predict.predictor import Predictor
+from linkml_store.inference.inference_config import InferenceConfig, Inference
+from linkml_store.inference.inference_engine import InferenceEngine
 
 logger = logging.getLogger(__name__)
 
 @dataclass
-class SklearnPredictor(Predictor):
+class SklearnInferenceEngine(InferenceEngine):
     """
-    scikit-learn based predictor.
+    scikit-learn based inference engine.
 
 
     >>> from linkml_store.api.client import Client
@@ -29,11 +28,11 @@ class SklearnPredictor(Predictor):
     150
 
     >>> features = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
-    >>> config = PredictorConfig(target_attributes=["species"], feature_attributes=features)
-    >>> predictor = SklearnPredictor(config=config)
-    >>> predictor.load_and_split_data(collection)
-    >>> predictor.initialize_model()
-    >>> prediction = predictor.derive({"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2})
+    >>> config = InferenceConfig(target_attributes=["species"], feature_attributes=features)
+    >>> ie = SklearnInferenceEngine(config=config)
+    >>> ie.load_and_split_data(collection)
+    >>> ie.initialize_model()
+    >>> prediction = ie.derive({"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2})
     >>> prediction.predicted_object
     {'species': 'setosa'}
 
@@ -78,7 +77,7 @@ class SklearnPredictor(Predictor):
         self.classifier = clf
         self.encoders = encoders
 
-    def derive(self, object: OBJECT) -> Optional[Prediction]:
+    def derive(self, object: OBJECT) -> Optional[Inference]:
         from sklearn.tree import DecisionTreeClassifier
         encoders = self.encoders
         target_attributes = self.config.target_attributes
@@ -97,5 +96,5 @@ class SklearnPredictor(Predictor):
             v = predictions
         predicted_object = {target_attribute: v[0]}
         logger.info(f"Predicted object: {predicted_object}")
-        return Prediction(predicted_object=predicted_object)
+        return Inference(predicted_object=predicted_object)
 

@@ -6,7 +6,7 @@ import pandas as pd
 from pydantic import BaseModel, Field, ConfigDict
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.predict.predictor_config import PredictorConfig, Prediction
+from linkml_store.inference.inference_config import InferenceConfig, Inference
 
 
 class CollectionSlice(BaseModel):
@@ -32,14 +32,14 @@ class CollectionSlice(BaseModel):
             raise ValueError("No dataframe or collection provided")
 
 @dataclass
-class Predictor(ABC):
+class InferenceEngine(ABC):
     """
-    Base class for predictors.
+    Base class for all inference engine.
 
-    A predictor is capable of predicting the outcome of a given input.
+    An InferenceEngine is capable of deriving inferences from input objects and a collection.
     """
     predictor_type: Optional[str] = None
-    config: PredictorConfig = None
+    config: InferenceConfig = None
 
     training_data: CollectionSlice = None
 
@@ -63,7 +63,7 @@ class Predictor(ABC):
         """
         raise NotImplementedError("Initialize model method must be implemented by subclass")
 
-    def derive(self, object: OBJECT) -> Optional[Prediction]:
+    def derive(self, object: OBJECT) -> Optional[Inference]:
         """
         Derive the prediction for the given object.
 

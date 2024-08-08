@@ -6,13 +6,13 @@ import yaml
 from llm import get_key
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.predict.predictor_config import PredictorConfig, Prediction, LLMConfig
-from linkml_store.predict.predictor import Predictor
+from linkml_store.inference.inference_config import InferenceConfig, Inference, LLMConfig
+from linkml_store.inference.inference_engine import InferenceEngine
 
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """
-You are a {llm_config.role}, your task is to predict the YAML
+You are a {llm_config.role}, your task is to inference the YAML
 object output given the YAML object input. I will provide you
 with a collection of examples that will provide guidance both
 on the desired structure of the response, as well as the kind
@@ -23,14 +23,14 @@ You should return ONLY valid YAML in your response.
 
 
 @dataclass
-class RAGPredictor(Predictor):
+class RAGInferenceEngine(InferenceEngine):
     """
     AI Retrieval Augmented Generation (RAG) based predictor.
 
 
     >>> from linkml_store.api.client import Client
     >>> from linkml_store.utils.format_utils import Format
-    >>> from linkml_store.predict.predictor_config import LLMConfig
+    >>> from linkml_store.inference.inference_config import LLMConfig
     >>> client = Client()
     >>> db = client.attach_database("duckdb", alias="test")
     >>> db.import_database("tests/input/countries/countries.jsonl", Format.JSONL, collection_name="countries")
@@ -40,11 +40,11 @@ class RAGPredictor(Predictor):
     >>> features = ["name"]
     >>> targets = ["code", "capital", "continent", "languages"]
     >>> llm_config = LLMConfig(model_name="gpt-4o-mini",)
-    >>> config = PredictorConfig(target_attributes=targets, feature_attributes=features, llm_config=llm_config)
-    >>> predictor = RAGPredictor(config=config)
-    >>> predictor.load_and_split_data(collection)
-    >>> predictor.initialize_model()
-    >>> prediction = predictor.derive({"name": "Uruguay"})
+    >>> config = InferenceConfig(target_attributes=targets, feature_attributes=features, llm_config=llm_config)
+    >>> ie = RAGInferenceEngine(config=config)
+    >>> ie.load_and_split_data(collection)
+    >>> ie.initialize_model()
+    >>> prediction = ie.derive({"name": "Uruguay"})
     >>> prediction.predicted_object
     {'capital': 'Montevideo', 'code': 'UY', 'continent': 'South America', 'languages': ['Spanish']}
 
@@ -57,7 +57,7 @@ class RAGPredictor(Predictor):
 
     def __post_init__(self):
         if not self.config:
-            self.config = PredictorConfig()
+            self.config = InferenceConfig()
         if not self.config.llm_config:
             self.config.llm_config = LLMConfig()
 
@@ -90,7 +90,7 @@ class RAGPredictor(Predictor):
     def object_to_text(self, object: OBJECT) -> str:
         return yaml.dump(object)
 
-    def derive(self, object: OBJECT) -> Optional[Prediction]:
+    def derive(self, object: OBJECT) -> Optional[Inference]:
         from linkml_store.utils.llm_utils import render_formatted_text, get_token_limit
         from tiktoken import encoding_for_model
         import llm
@@ -134,7 +134,7 @@ class RAGPredictor(Predictor):
         logger.info(f"Response: {yaml_str}")
         try:
             predicted_object = yaml.safe_load(yaml_str)
-            return Prediction(predicted_object=predicted_object)
+            return Inference(predicted_object=predicted_object)
         except yaml.parser.ParserError as e:
             logger.error(f"Error parsing response: {yaml_str}\n{e}")
             return None

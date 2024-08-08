@@ -15,12 +15,12 @@ class LLMConfig(BaseModel, extra="forbid"):
     role: str = "Domain Expert"
 
 
-class PredictorConfig(BaseModel, extra="forbid"):
+class InferenceConfig(BaseModel, extra="forbid"):
     target_attributes: Optional[List[str]] = None
     feature_attributes: Optional[List[str]] = None
     llm_config: Optional[LLMConfig] = None
 
 
-class Prediction(BaseModel, extra="forbid"):
+class Inference(BaseModel, extra="forbid"):
     predicted_object: OBJECT
     confidence: Optional[float] = None
