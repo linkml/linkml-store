@@ -3,14 +3,23 @@ CODE = src/linkml_data_browser
 
 
 test: pytest doctest
-test-full: test integration-tests
+test-core: pytest-core doctest
+test-full: pytest-full doctest
 
 install:
-	#poetry install --extras "mongodb llm validation app"
 	poetry install --no-interaction --all-extras
 
 pytest:
+	$(RUN) pytest -m "not integration"
+
+pytest-neo4j:
+	$(RUN) pytest -k only_neo4j
+
+pytest-core:
 	$(RUN) pytest
+
+pytest-full:
+	$(RUN) pytest -m ""
 
 integration-tests:
 	$(RUN) pytest -m integration

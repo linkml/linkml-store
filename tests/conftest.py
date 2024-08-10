@@ -17,7 +17,6 @@ YAML_FILE = os.path.join(TEST_DIR, "data.yaml")
 TSV_FILE = os.path.join(TEST_DIR, "data.tsv")
 CSV_FILE = os.path.join(TEST_DIR, "data.csv")
 
-
 os.makedirs(TEST_DIR, exist_ok=True)
 with open(JSON_FILE, "w") as f:
     json.dump(TEST_DATA, f)

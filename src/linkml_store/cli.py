@@ -16,7 +16,7 @@ from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
-from linkml_store.inference import get_predictor
+from linkml_store.inference import get_inference_engine
 from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
@@ -529,7 +529,7 @@ def infer(ctx, query, predictor_type, target_attribute, output_type, output):
     else:
         target_attributes = [att for att in atts if att not in features]
     config = InferenceConfig(target_attributes=target_attributes, feature_attributes=features)
-    predictor = get_predictor(predictor_type, config=config)
+    predictor = get_inference_engine(predictor_type, config=config)
     predictor.load_and_split_data(collection)
     predictor.initialize_model()
     result = predictor.derive(query_obj)

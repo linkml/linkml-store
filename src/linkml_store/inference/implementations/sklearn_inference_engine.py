@@ -1,14 +1,17 @@
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any, Optional, Dict, Union, TextIO
 
 import pandas as pd
 
 from linkml_store.api.collection import OBJECT
 from linkml_store.inference.inference_config import InferenceConfig, Inference
-from linkml_store.inference.inference_engine import InferenceEngine
+from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
+from linkml_store.utils.sklearn_utils import tree_to_nested_expression
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class SklearnInferenceEngine(InferenceEngine):
@@ -38,7 +41,8 @@ class SklearnInferenceEngine(InferenceEngine):
 
     """
     classifier: Any = None
-    encoders: dict = None
+    encoders: Optional[Dict[str, "sklearn.preprocessing.LabelEncoder"]] = None
+    strict: bool = None
 
     def initialize_model(self, **kwargs):
         from sklearn.tree import DecisionTreeClassifier
@@ -77,7 +81,21 @@ class SklearnInferenceEngine(InferenceEngine):
         self.classifier = clf
         self.encoders = encoders
 
+    def _normalize(self, object: OBJECT) -> OBJECT:
+        """
+        Normalize the object to match the feature attributes.
+
+        scikit-learn requires that the input object has the same columns as the training data.
+
+        :param object:
+        :return:
+        """
+        object = {k: object.get(k, None) for k in self.config.feature_attributes}
+        return object
+
+
     def derive(self, object: OBJECT) -> Optional[Inference]:
+        object = self._normalize(object)
         from sklearn.tree import DecisionTreeClassifier
         encoders = self.encoders
         target_attributes = self.config.target_attributes
@@ -88,7 +106,14 @@ class SklearnInferenceEngine(InferenceEngine):
         new_X = pd.DataFrame([object])
         for col in new_X.columns:
             if col in encoders:
-                new_X[col] = encoders[col].transform(new_X[col].astype(str))
+                try:
+                    encoded = encoders[col].transform(new_X[col].astype(str))
+                except ValueError as e:
+                    logger.warning(f"Failed to encode column {col} not seen in training data")
+                    encoded = None
+                    if self.strict:
+                        raise e
+                new_X[col] = encoded
         predictions = clf.predict(new_X)
         if y_encoder:
             v = y_encoder.inverse_transform(predictions)
@@ -97,4 +122,20 @@ class SklearnInferenceEngine(InferenceEngine):
         predicted_object = {target_attribute: v[0]}
         logger.info(f"Predicted object: {predicted_object}")
         return Inference(predicted_object=predicted_object)
+
+    def export_model(self,
+                     output: Optional[Union[str, Path, TextIO]],
+                     model_serialization: ModelSerialization,
+                     **kwargs):
+        def as_file():
+            if isinstance(output, (str, Path)):
+                return open(output, 'w')
+            return output
+        if model_serialization == ModelSerialization.LINKML_EXPRESSION:
+            expr = tree_to_nested_expression(self.classifier, self.config.feature_attributes, self.encoders.keys(),
+                                             feature_encoders=self.encoders,
+                                             target_encoder=self.encoders.get(self.config.target_attributes[0]))
+            as_file().write(expr)
+        else:
+            raise ValueError(f"Unsupported model serialization: {model_serialization}")
 

@@ -6,6 +6,7 @@ from linkml_store.api.stores.neo4j.neo4j_collection import DeletePolicy
 from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection
 
 
+@pytest.mark.neo4j
 @pytest.fixture(scope="function")
 def neo4j_db():
     client = Client()
@@ -19,6 +20,7 @@ def neo4j_db():
     # db.drop()
 
 
+@pytest.mark.neo4j
 @pytest.mark.parametrize(
     "edge_projection,node_projection",
     [
@@ -31,7 +33,6 @@ def neo4j_db():
         ),
     ],
 )
-@pytest.mark.integration
 def test_neo4j_adapter(neo4j_db, edge_projection, node_projection):
     # Create a collection
     collection = neo4j_db.create_collection("Node", recreate_if_exists=True)
