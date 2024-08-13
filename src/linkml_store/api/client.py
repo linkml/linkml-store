@@ -132,7 +132,7 @@ class Client:
             config = str(config)
         if isinstance(config, str):
             if not base_dir:
-               base_dir = Path(config).parent
+                base_dir = Path(config).parent
             parsed_obj = yaml.safe_load(open(config))
             config = ClientConfig(**parsed_obj)
         self.metadata = config
@@ -264,7 +264,6 @@ class Client:
         db = self._databases[name]
         self._set_database_config(db)
         return db
-
 
     @property
     def databases(self) -> Dict[str, Database]:

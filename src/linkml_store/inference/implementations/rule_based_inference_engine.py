@@ -3,17 +3,17 @@ from copy import copy
 from dataclasses import dataclass
 from io import StringIO
 from pathlib import Path
-from typing import Any, Optional, Dict, List, Union, ClassVar
+from typing import Any, ClassVar, Dict, List, Optional, Union
 
 import yaml
 from linkml_map.utils.eval_utils import eval_expr
 from linkml_runtime import SchemaView
-from linkml_runtime.linkml_model.meta import ClassRule, AnonymousClassExpression
+from linkml_runtime.linkml_model.meta import AnonymousClassExpression, ClassRule
 from linkml_runtime.utils.formatutils import underscore
 from pydantic import BaseModel
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.inference.inference_config import InferenceConfig, Inference, LLMConfig
+from linkml_store.inference.inference_config import Inference
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,6 @@ def expression_matches(ce: AnonymousClassExpression, object: OBJECT) -> bool:
     return True
 
 
-
 def apply_rule(rule: ClassRule, object: OBJECT):
     """
     Apply a rule to an object.
@@ -85,11 +84,12 @@ class RuleBasedInferenceEngine(InferenceEngine):
     TODO
 
     """
+
     class_rules: Optional[List[ClassRule]] = None
     slot_rules: Optional[Dict[str, List[ClassRule]]] = None
     slot_expressions: Optional[Dict[str, str]] = None
 
-    PERSIST_COLS: ClassVar = ['config', 'class_rules', 'slot_rules', 'slot_expressions']
+    PERSIST_COLS: ClassVar = ["config", "class_rules", "slot_rules", "slot_expressions"]
 
     def initialize_model(self, **kwargs):
         td = self.training_data
@@ -117,7 +117,6 @@ class RuleBasedInferenceEngine(InferenceEngine):
                     object[slot] = v
         return Inference(predicted_object=object)
 
-
     def import_model_from(self, inference_engine: InferenceEngine, **kwargs):
         io = StringIO()
         inference_engine.export_model(io, model_serialization=ModelSerialization.LINKML_EXPRESSION)
@@ -135,19 +134,21 @@ class RuleBasedInferenceEngine(InferenceEngine):
 
         :param output: Path to save the model
         """
+
         def _serialize_value(v: Any) -> Any:
             if isinstance(v, BaseModel):
                 return v.model_dump(exclude_unset=True)
             return v
+
         model_data = {k: _serialize_value(getattr(self, k)) for k in self.PERSIST_COLS}
-        with open(output, 'w', encoding='utf-8') as f:
+        with open(output, "w", encoding="utf-8") as f:
             yaml.dump(model_data, f)
 
     @classmethod
-    def load_model(cls, file_path: Union[str, Path]) -> 'RuleBasedInferenceEngine':
+    def load_model(cls, file_path: Union[str, Path]) -> "RuleBasedInferenceEngine":
         model_data = yaml.safe_load(open(file_path))
 
-        engine = cls(config=model_data['config'])
+        engine = cls(config=model_data["config"])
         for k, v in model_data.items():
             if k == "config":
                 continue
@@ -155,38 +156,3 @@ class RuleBasedInferenceEngine(InferenceEngine):
 
         logger.info(f"Model loaded from {file_path}")
         return engine
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

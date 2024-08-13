@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from linkml_store.graphs.graph_map import GraphProjection, EdgeProjection, NodeProjection
+from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection
 
 
 class ConfiguredBaseModel(BaseModel, extra="forbid"):
@@ -54,8 +54,6 @@ class CollectionSource(ConfiguredBaseModel):
 
     arguments: Optional[Dict[str, Any]] = None
     """Optional arguments to pass to the source"""
-
-
 
 
 class CollectionConfig(ConfiguredBaseModel):

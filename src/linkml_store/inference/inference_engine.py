@@ -3,15 +3,14 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Tuple, Union, TextIO
+from typing import Optional, TextIO, Tuple, Union
 
 import pandas as pd
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.inference.inference_config import InferenceConfig, Inference
-from linkml_store.utils.pandas_utils import flatten_dict, nested_objects_to_dataframe
-
+from linkml_store.inference.inference_config import Inference, InferenceConfig
+from linkml_store.utils.pandas_utils import nested_objects_to_dataframe
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +19,7 @@ class ModelSerialization(str, Enum):
     """
     Enum for model serialization types.
     """
+
     PICKLE = "pickle"
     ONNX = "onnx"
     PMML = "pmml"
@@ -56,7 +56,6 @@ class ModelSerialization(str, Enum):
         return extension_mapping.get(suffix, None)
 
 
-
 class CollectionSlice(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -90,6 +89,7 @@ class InferenceEngine(ABC):
 
     An InferenceEngine is capable of deriving inferences from input objects and a collection.
     """
+
     predictor_type: Optional[str] = None
     config: Optional[InferenceConfig] = None
 
@@ -122,10 +122,8 @@ class InferenceEngine(ABC):
         raise NotImplementedError("Initialize model method must be implemented by subclass")
 
     def export_model(
-            self,
-            output: Optional[Union[str, Path, TextIO]],
-            model_serialization: ModelSerialization = None,
-             **kwargs):
+        self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
+    ):
         """
         Export the model to the given output.
 
@@ -156,7 +154,7 @@ class InferenceEngine(ABC):
         raise NotImplementedError("Save model method must be implemented by subclass")
 
     @classmethod
-    def load_model(cls, file_path: Union[str, Path]) -> 'InferenceEngine':
+    def load_model(cls, file_path: Union[str, Path]) -> "InferenceEngine":
         """
         Load the model from the given file path.
 

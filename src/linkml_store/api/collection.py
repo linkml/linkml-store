@@ -969,7 +969,9 @@ class Collection(Generic[DatabaseType]):
                         raise ValueError(f"Conflict: {rng} != {other_rng} for {vs}")
             logger.debug(f"Inducing {k} as {rng} {multivalued} {inlined}")
             inlined_as_list = inlined and multivalued
-            cd.attributes[k] = SlotDefinition(k, range=rng, multivalued=multivalued, inlined=inlined, inlined_as_list=inlined_as_list)
+            cd.attributes[k] = SlotDefinition(
+                k, range=rng, multivalued=multivalued, inlined=inlined, inlined_as_list=inlined_as_list
+            )
             if exact_dimensions_list:
                 array_expr = ArrayExpression(exact_number_dimensions=len(exact_dimensions_list[0]))
                 cd.attributes[k].array = array_expr

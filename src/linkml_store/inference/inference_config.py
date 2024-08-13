@@ -4,9 +4,10 @@ from typing import List, Optional, Tuple
 from pydantic import BaseModel, ConfigDict, Field
 
 from linkml_store.api.collection import OBJECT
-from linkml_store.utils.format_utils import load_objects, Format
+from linkml_store.utils.format_utils import Format, load_objects
 
 logger = logging.getLogger(__name__)
+
 
 class LLMConfig(BaseModel, extra="forbid"):
     """
@@ -29,6 +30,7 @@ class InferenceConfig(BaseModel, extra="forbid"):
     """
     Configuration for inference engines.
     """
+
     target_attributes: Optional[List[str]] = None
     feature_attributes: Optional[List[str]] = None
     train_test_split: Optional[Tuple[float, float]] = None
@@ -55,5 +57,6 @@ class Inference(BaseModel, extra="forbid"):
     """
     Result of an inference derivation.
     """
+
     predicted_object: OBJECT = Field(..., description="The predicted object.")
     confidence: Optional[float] = Field(default=None, description="The confidence of the prediction.", le=1.0, ge=0.0)

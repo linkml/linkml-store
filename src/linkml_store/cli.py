@@ -106,7 +106,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
     help="If set then show full stacktrace on error",
 )
 @click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, input,  **kwargs):
+def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, input, **kwargs):
     """A CLI for interacting with the linkml-store."""
     if not stacktrace:
         sys.tracebacklimit = 0
@@ -484,23 +484,34 @@ def describe(ctx, where, output_type, output, limit):
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default=Format.YAML.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--target-attribute", "-T", type=click.STRING, multiple=True,
-              help="Target attributes for inference")
-@click.option("--feature-attributes", "-F", type=click.STRING,
-              help="Feature attributes for inference (comma separated)")
+@click.option("--target-attribute", "-T", type=click.STRING, multiple=True, help="Target attributes for inference")
+@click.option(
+    "--feature-attributes", "-F", type=click.STRING, help="Feature attributes for inference (comma separated)"
+)
 @click.option("--inference-config-file", "-Y", type=click.Path(), help="Path to inference configuration file")
 @click.option("--export-model", "-E", type=click.Path(), help="Export model to file")
 @click.option("--load-model", "-L", type=click.Path(), help="Load model from file")
-@click.option("--model-format", "-M", type=click.Choice([x.value for x in ModelSerialization]),
-              help="Format for model")
+@click.option("--model-format", "-M", type=click.Choice([x.value for x in ModelSerialization]), help="Format for model")
 @click.option("--training-test-data-split", "-S", type=click.Tuple([float, float]), help="Training/test data split")
 @click.option(
-    "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING,
-    help="Type of predictor"
+    "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING, help="Type of predictor"
 )
 @click.option("--query", "-q", type=click.STRING, help="query term")
 @click.pass_context
-def infer(ctx, inference_config_file, query, training_test_data_split, predictor_type, target_attribute, feature_attributes, output_type, output, model_format, export_model, load_model):
+def infer(
+    ctx,
+    inference_config_file,
+    query,
+    training_test_data_split,
+    predictor_type,
+    target_attribute,
+    feature_attributes,
+    output_type,
+    output,
+    model_format,
+    export_model,
+    load_model,
+):
     """
     Predict a complete object from a partial object.
 
@@ -572,7 +583,6 @@ def infer(ctx, inference_config_file, query, training_test_data_split, predictor
         result = predictor.derive(query_obj)
         dumped_obj = result.model_dump(exclude_none=True)
         write_output([dumped_obj], output_type, target=output)
-
 
 
 @cli.command()

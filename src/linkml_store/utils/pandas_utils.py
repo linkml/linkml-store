@@ -1,12 +1,12 @@
 import logging
-from typing import Dict, List, Tuple, Union, Any
+from typing import Any, Dict, List, Tuple, Union
 
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
 
-def flatten_dict(d: Dict[str, Any], parent_key: str = '', sep: str = '.') -> Dict[str, Any]:
+def flatten_dict(d: Dict[str, Any], parent_key: str = "", sep: str = ".") -> Dict[str, Any]:
     """
     Recursively flatten a nested dictionary.
 
@@ -54,9 +54,6 @@ def nested_objects_to_dataframe(data: List[Dict[str, Any]]) -> pd.DataFrame:
     flattened_data = [flatten_dict(item) for item in data]
     return pd.DataFrame(flattened_data)
 
-def nested_objects_to_dataframe(data):
-    flattened_data = [flatten_dict(item) for item in data]
-    return pd.DataFrame(flattened_data)
 
 def facet_summary_to_dataframe_unmelted(
     facet_summary: Dict[Union[str, Tuple[str, ...]], List[Tuple[Union[str, Tuple[str, ...]], int]]]

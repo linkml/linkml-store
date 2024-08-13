@@ -6,7 +6,7 @@ import yaml
 from llm import get_key
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.inference.inference_config import InferenceConfig, Inference, LLMConfig
+from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
 from linkml_store.inference.inference_engine import InferenceEngine
 
 logger = logging.getLogger(__name__)
@@ -49,9 +49,10 @@ class RAGInferenceEngine(InferenceEngine):
     {'capital': 'Montevideo', 'code': 'UY', 'continent': 'South America', 'languages': ['Spanish']}
 
     """
+
     classifier: Any = None
     encoders: dict = None
-    _model: "llm.Model" = None
+    _model: "llm.Model" = None  # noqa: F821
 
     rag_collection: Collection = None
 
@@ -62,7 +63,7 @@ class RAGInferenceEngine(InferenceEngine):
             self.config.llm_config = LLMConfig()
 
     @property
-    def model(self) -> "llm.Model":
+    def model(self) -> "llm.Model":  # noqa: F821
         import llm
 
         if self._model is None:
@@ -91,10 +92,12 @@ class RAGInferenceEngine(InferenceEngine):
         return yaml.dump(object)
 
     def derive(self, object: OBJECT) -> Optional[Inference]:
-        from linkml_store.utils.llm_utils import render_formatted_text, get_token_limit
-        from tiktoken import encoding_for_model
         import llm
-        model : llm.Model = self.model
+        from tiktoken import encoding_for_model
+
+        from linkml_store.utils.llm_utils import get_token_limit, render_formatted_text
+
+        model: llm.Model = self.model
         model_name = self.config.llm_config.model_name
         feature_attributes = self.config.feature_attributes
         target_attributes = self.config.target_attributes
@@ -110,18 +113,20 @@ class RAGInferenceEngine(InferenceEngine):
         for example in examples:
             input_obj = {k: example.get(k, None) for k in feature_attributes}
             output_obj = {k: example.get(k, None) for k in target_attributes}
-            prompt_clause = ("---\nExample:\n"
-                             f"## INPUT:\n{self.object_to_text(input_obj)}\n"
-                             f"## OUTPUT:\n{self.object_to_text(output_obj)}\n")
+            prompt_clause = (
+                "---\nExample:\n"
+                f"## INPUT:\n{self.object_to_text(input_obj)}\n"
+                f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
+            )
             prompt_clauses.append(prompt_clause)
         query_obj = {k: object.get(k, None) for k in feature_attributes}
         query_text = self.object_to_text(query_obj)
-        prompt_end = ("---\nQuery:\n"
-                      f"## INPUT:\n{query_text}\n"
-                      "## OUTPUT:\n")
+        prompt_end = "---\nQuery:\n" f"## INPUT:\n{query_text}\n" "## OUTPUT:\n"
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)
+
         def make_text(texts):
             return "\n".join(prompt_clauses) + prompt_end
+
         try:
             encoding = encoding_for_model(model_name)
         except KeyError:
@@ -138,37 +143,3 @@ class RAGInferenceEngine(InferenceEngine):
         except yaml.parser.ParserError as e:
             logger.error(f"Error parsing response: {yaml_str}\n{e}")
             return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -488,12 +488,13 @@ def test_induced_schema(handle, type_alias):
     ), "no explicit schema and no data to induce from"
     qr = collection.find()
     assert qr.num_rows == 0, "database should be empty"
-    objs = [{"id": 1, "name": "n1"},
-            {"id": 2, "name": "n2", "age_in_years": 30},
-            {"id": 3, "name": "n3", "aliases": ["a", "b"]},
-            {"id": 4, "name": "n4", "metadata": {"created": "2021-01-01", "editor": "joe"}},
-            {"id": 5, "name": "n5", "addresses": [{"street": "1 foo street"}]},
-            ]
+    objs = [
+        {"id": 1, "name": "n1"},
+        {"id": 2, "name": "n2", "age_in_years": 30},
+        {"id": 3, "name": "n3", "aliases": ["a", "b"]},
+        {"id": 4, "name": "n4", "metadata": {"created": "2021-01-01", "editor": "joe"}},
+        {"id": 5, "name": "n5", "addresses": [{"street": "1 foo street"}]},
+    ]
     collection.insert(objs)
     collection.commit()
     assert collection.find().num_rows == len(objs), "expected all objects to be added"

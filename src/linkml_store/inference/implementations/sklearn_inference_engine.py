@@ -1,17 +1,17 @@
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Dict, Union, TextIO, List, Type, ClassVar
+from typing import Any, ClassVar, Dict, List, Optional, TextIO, Type, Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer, OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MultiLabelBinarizer
 
 from linkml_store.api.collection import OBJECT
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
-from linkml_store.inference.inference_config import InferenceConfig, Inference
+from linkml_store.inference.inference_config import Inference, InferenceConfig
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.sklearn_utils import tree_to_nested_expression, visualize_decision_tree
 
@@ -32,42 +32,54 @@ class SklearnInferenceEngine(InferenceEngine):
 
     strict: bool = False
 
-    PERSIST_COLS: ClassVar = ['config', 'classifier', 'encoders', 'transformed_features', 'transformed_targets', 'skip_features', 'confidence']
+    PERSIST_COLS: ClassVar = [
+        "config",
+        "classifier",
+        "encoders",
+        "transformed_features",
+        "transformed_targets",
+        "skip_features",
+        "confidence",
+    ]
 
     def _get_encoder(self, v: Union[List[Any], Any]) -> Any:
         if isinstance(v, list):
             if all(isinstance(x, list) for x in v):
                 return MultiLabelBinarizer()
             elif all(isinstance(x, str) for x in v):
-                return OneHotEncoder(sparse_output=False, handle_unknown='ignore')
+                return OneHotEncoder(sparse_output=False, handle_unknown="ignore")
             elif all(isinstance(x, (int, float)) for x in v):
                 return None
             else:
                 raise ValueError("Mixed data types in the list are not supported")
         else:
-            if hasattr(v, 'dtype'):
-                if v.dtype == 'object' or v.dtype.name == 'category':
+            if hasattr(v, "dtype"):
+                if v.dtype == "object" or v.dtype.name == "category":
                     if isinstance(v.iloc[0], list):
                         return MultiLabelBinarizer()
                     elif self.categorical_encoder_class:
-                        return self.categorical_encoder_class(handle_unknown='ignore')
+                        return self.categorical_encoder_class(handle_unknown="ignore")
                     else:
-                        return OneHotEncoder(sparse_output=False, handle_unknown='ignore')
-                elif v.dtype.kind in 'biufc':
+                        return OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+                elif v.dtype.kind in "biufc":
                     return None
         raise ValueError("Unable to determine appropriate encoder for the input data")
 
     def _is_complex_column(self, column: pd.Series) -> bool:
         """Check if the column contains complex data types like lists or dicts."""
         # MV_TYPE = (list, dict)
-        MV_TYPE = (list, )
-        return (column.dtype == 'object' or column.dtype == 'category') and any(isinstance(x, MV_TYPE) for x in column.dropna())
+        MV_TYPE = (list,)
+        return (column.dtype == "object" or column.dtype == "category") and any(
+            isinstance(x, MV_TYPE) for x in column.dropna()
+        )
 
     def _get_unique_values(self, column: pd.Series) -> set:
         """Get unique values from a column, handling list-type data."""
         if self._is_complex_column(column):
             # For columns with lists, flatten the lists and get unique values
-            return set(item for sublist in column.dropna() for item in (sublist if isinstance(sublist, list) else [sublist]))
+            return set(
+                item for sublist in column.dropna() for item in (sublist if isinstance(sublist, list) else [sublist])
+            )
         else:
             return set(column.unique())
 
@@ -94,7 +106,7 @@ class SklearnInferenceEngine(InferenceEngine):
             unique_values = self._get_unique_values(X[col])
             if len(unique_values) > self.maximum_proportion_distinct_features * len(X[col]):
                 skip_features.append(col)
-            if False and (X[col].dtype == 'object' or X[col].dtype.name == 'category'):
+            if False and (X[col].dtype == "object" or X[col].dtype.name == "category"):
                 if len(X[col].unique()) > self.maximum_proportion_distinct_features * len(X[col]):
                     skip_features.append(col)
         self.skip_features = skip_features
@@ -206,11 +218,12 @@ class SklearnInferenceEngine(InferenceEngine):
     def _normalize(self, object: OBJECT) -> OBJECT:
         return {k: object.get(k, None) for k in self.config.feature_attributes}
 
-    def export_model(self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None,
-                     **kwargs):
+    def export_model(
+        self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
+    ):
         def as_file():
             if isinstance(output, (str, Path)):
-                return open(output, 'w')
+                return open(output, "w")
             return output
 
         if model_serialization is None:
@@ -220,9 +233,13 @@ class SklearnInferenceEngine(InferenceEngine):
                 model_serialization = ModelSerialization.JOBLIB
 
         if model_serialization == ModelSerialization.LINKML_EXPRESSION:
-            expr = tree_to_nested_expression(self.classifier, self.transformed_features, self.encoders.keys(),
-                                             feature_encoders=self.encoders,
-                                             target_encoder=self.encoders.get(self.config.target_attributes[0]))
+            expr = tree_to_nested_expression(
+                self.classifier,
+                self.transformed_features,
+                self.encoders.keys(),
+                feature_encoders=self.encoders,
+                target_encoder=self.encoders.get(self.config.target_attributes[0]),
+            )
             as_file().write(expr)
         elif model_serialization == ModelSerialization.JOBLIB:
             self.save_model(output)
@@ -242,6 +259,7 @@ class SklearnInferenceEngine(InferenceEngine):
         :param output: Path to save the model
         """
         import joblib
+
         if self.classifier is None:
             raise ValueError("Model has not been trained. Call initialize_model() first.")
 
@@ -251,7 +269,7 @@ class SklearnInferenceEngine(InferenceEngine):
         joblib.dump(model_data, output)
 
     @classmethod
-    def load_model(cls, file_path: Union[str, Path]) -> 'SklearnInferenceEngine':
+    def load_model(cls, file_path: Union[str, Path]) -> "SklearnInferenceEngine":
         """
         Load a trained model and related data from a file.
 
@@ -259,9 +277,10 @@ class SklearnInferenceEngine(InferenceEngine):
         :return: SklearnInferenceEngine instance with loaded model
         """
         import joblib
+
         model_data = joblib.load(file_path)
 
-        engine = cls(config=model_data['config'])
+        engine = cls(config=model_data["config"])
         for k, v in model_data.items():
             if k == "config":
                 continue

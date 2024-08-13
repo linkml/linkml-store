@@ -3,23 +3,22 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import List, Union, Optional, Dict
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from linkml_runtime.utils.formatutils import underscore
-from sklearn.tree import DecisionTreeClassifier, export_graphviz, _tree
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-import pandas as pd
+from sklearn.tree import DecisionTreeClassifier, _tree, export_graphviz
 
 logger = logging.getLogger(__name__)
 
 
 def tree_to_nested_expression(
-        tree: DecisionTreeClassifier,
-        feature_names: List[str],
-        categorical_features: Optional[List[str]] = None,
-        feature_encoders: Optional[Dict[str, Union[OneHotEncoder, LabelEncoder]]] = None,
-        target_encoder: Optional[LabelEncoder] = None
+    tree: DecisionTreeClassifier,
+    feature_names: List[str],
+    categorical_features: Optional[List[str]] = None,
+    feature_encoders: Optional[Dict[str, Union[OneHotEncoder, LabelEncoder]]] = None,
+    target_encoder: Optional[LabelEncoder] = None,
 ) -> str:
     """
     Convert a trained scikit-learn DecisionTreeClassifier to a nested Python conditional expression.
@@ -62,20 +61,19 @@ def tree_to_nested_expression(
     >>> # Convert to nested expression
     >>> feature_names = ['feature1', 'feature2_A', 'feature2_B']
     >>> categorical_features = ['feature2']
-    >>> expression = tree_to_nested_expression(clf, feature_names, categorical_features, feature_encoders, target_encoder)
+    >>> expression = tree_to_nested_expression(clf, feature_names,
+    ...                                        categorical_features, feature_encoders, target_encoder)
     >>> print(expression)
-    (("Yes" if ({feature1} <= 0.5000) else "No") if ({feature2} == "A") else ("No" if ({feature1} <= 0.5000) else "Yes"))
+    (("Yes" if ({feature1} <= 0.5000) else "No") if ({feature2} == "A")
+       else ("No" if ({feature1} <= 0.5000) else "Yes"))
     """
     tree_ = tree.tree_
-    feature_name = [
-        feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!"
-        for i in tree_.feature
-    ]
+    feature_name = [feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!" for i in tree_.feature]
 
     categorical_features = set(categorical_features or [])
 
     def get_original_feature_name(name):
-        return name.split('_')[0] if '_' in name else name
+        return name.split("_")[0] if "_" in name else name
 
     def recurse(node):
         if tree_.feature[node] != _tree.TREE_UNDEFINED:
@@ -95,7 +93,7 @@ def tree_to_nested_expression(
                 encoder = feature_encoders[original_name]
                 if isinstance(encoder, OneHotEncoder):
                     # For one-hot encoded features, we check if the specific category is present
-                    category = name.split('_', 1)[1]  # Get everything after the first underscore
+                    category = name.split("_", 1)[1]  # Get everything after the first underscore
                     condition = f'{original_name_safe} == "{category}"'
                 elif isinstance(encoder, LabelEncoder):
                     category = encoder.inverse_transform([int(threshold)])[0]
@@ -106,12 +104,12 @@ def tree_to_nested_expression(
                 if np.isinf(threshold):
                     condition = "True"
                 else:
-                    condition = f'{name_safe} <= {threshold:.4f}'
+                    condition = f"{name_safe} <= {threshold:.4f}"
 
             left_expr = recurse(tree_.children_left[node])
             right_expr = recurse(tree_.children_right[node])
 
-            return f'({left_expr} if ({condition}) else {right_expr})'
+            return f"({left_expr} if ({condition}) else {right_expr})"
         else:
             class_index = np.argmax(tree_.value[node])
             if target_encoder:
@@ -123,18 +121,18 @@ def tree_to_nested_expression(
     return recurse(0)
 
 
-
-
 def escape_label(s: str) -> str:
     """Escape special characters in label strings."""
     s = str(s)
-    return re.sub(r'([<>])', r'\\\1', s)
+    return re.sub(r"([<>])", r"\\\1", s)
 
 
-def visualize_decision_tree(clf: DecisionTreeClassifier,
-                            feature_names: List[str],
-                            class_names: List[str] = None,
-                            output_file: Union[Path, str] = "decision_tree.png") -> None:
+def visualize_decision_tree(
+    clf: DecisionTreeClassifier,
+    feature_names: List[str],
+    class_names: List[str] = None,
+    output_file: Union[Path, str] = "decision_tree.png",
+) -> None:
     """
     Generate a visualization of the decision tree and save it as a PNG file.
 
@@ -144,6 +142,7 @@ def visualize_decision_tree(clf: DecisionTreeClassifier,
     :param output_file: The name of the file to save the visualization (default: "decision_tree.png")
 
     >>> # Create a sample dataset
+    >>> import pandas as pd
     >>> data = pd.DataFrame({
     ...     'age': [25, 30, 35, 40, 45],
     ...     'income': [50000, 60000, 70000, 80000, 90000],
@@ -170,6 +169,7 @@ def visualize_decision_tree(clf: DecisionTreeClassifier,
     escaped_class_names = [escape_label(name) for name in (class_names if class_names is not None else [])]
 
     import graphviz
+
     dot_data = export_graphviz(
         clf,
         out_file=None,
@@ -177,14 +177,14 @@ def visualize_decision_tree(clf: DecisionTreeClassifier,
         class_names=escaped_class_names,
         filled=True,
         rounded=True,
-        special_characters=True
+        special_characters=True,
     )
     # dot_data = escape_label(dot_data)
     logger.info(f"Dot: {dot_data}")
-    dot_path = shutil.which('dot')
+    dot_path = shutil.which("dot")
     os.environ["GRAPHVIZ_DOT"] = dot_path
 
     graph = graphviz.Source(dot_data)
     if isinstance(output_file, Path):
         output_file = str(output_file)
-    graph.render(output_file.rsplit('.', 1)[0], format="png", cleanup=True)
+    graph.render(output_file.rsplit(".", 1)[0], format="png", cleanup=True)

@@ -707,7 +707,13 @@ class Database(ABC, Generic[CollectionType]):
         """
         raise NotImplementedError()
 
-    def import_database(self, location: str, source_format: Optional[Union[str, Format]] = None, collection_name: Optional[str] = None, **kwargs):
+    def import_database(
+        self,
+        location: str,
+        source_format: Optional[Union[str, Format]] = None,
+        collection_name: Optional[str] = None,
+        **kwargs,
+    ):
         """
         Import a database from a file or location.
 
