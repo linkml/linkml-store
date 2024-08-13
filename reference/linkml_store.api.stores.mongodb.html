@@ -303,14 +303,428 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="linkml-store-api-stores-mongodb-package">
-<h1>linkml_store.api.stores.mongodb package<a class="headerlink" href="#linkml-store-api-stores-mongodb-package" title="Link to this heading"></a></h1>
+          <section id="module-linkml_store.api.stores.mongodb">
+<span id="linkml-store-api-stores-mongodb-package"></span><h1>linkml_store.api.stores.mongodb package<a class="headerlink" href="#module-linkml_store.api.stores.mongodb" title="Link to this heading"></a></h1>
+<p>Adapter for MongoDB document store.</p>
+<p>Handles have the form: <code class="docutils literal notranslate"><span class="pre">mongodb://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;</span></code></p>
+<p>To use this, you must have the <cite>pymongo</cite> extra installed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>linkml-store<span class="o">[</span>mongodb<span class="o">]</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>linkml-store<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MongoDBCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a></p>
+<p>Adapter for collections in a MongoDB database.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You should not use or manipulate this class directly.
+Instead, use the general <code class="xref py py-class docutils literal notranslate"><span class="pre">linkml_store.api.Collection</span></code></p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.mongo_collection">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mongo_collection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Collection</span></em><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.mongo_collection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.insert">
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.insert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.insert" title="Link to this definition"></a></dt>
+<dd><p>Add one or more objects to the collection.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>)</p></li>
+<li><p><strong>kwargs</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.query" title="Link to this definition"></a></dt>
+<dd><p>Run a query against the collection.</p>
+<p>First let’s load a collection:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">load_objects</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Country&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="n">load_objects</span><span class="p">(</span><span class="s2">&quot;tests/input/countries/countries.jsonl&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s run a query:</p>
+<p>TODO</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></span>)</p></li>
+<li><p><strong>kwargs</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.Any">
+<span class="sig-name descname"><span class="pre">Any</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">typing.Any</span></em><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Any" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.Dict">
+<span class="sig-name descname"><span class="pre">Dict</span></span><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Dict" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.List">
+<span class="sig-name descname"><span class="pre">List</span></span><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.List" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.Union">
+<span class="sig-name descname"><span class="pre">Union</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">typing.Union</span></em><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Union" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.query_facets">
+<span class="sig-name descname"><span class="pre">query_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.query_facets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.query_facets" title="Link to this definition"></a></dt>
+<dd><p>Run a query to get facet counts for one or more columns.</p>
+<p>This function takes a database connection, a Query object, and a list of column names.
+It generates and executes a facet count query for each specified column and returns
+the results as a dictionary where the keys are the column names and the values are
+pandas DataFrames containing the facet counts.</p>
+<p>The facet count query is generated by modifying the original query’s WHERE clause
+to exclude conditions directly related to the facet column. This allows for counting
+the occurrences of each unique value in the facet column while still applying the
+other filtering conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>con</strong> – A DuckDB database connection.</p></li>
+<li><p><strong>query</strong> – A Query object representing the base query.</p></li>
+<li><p><strong>facet_columns</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]]]]</span>) – A list of column names to get facet counts for.</p></li>
+<li><p><strong>facet_limit</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are column names and values are tuples
+containing the facet counts for each unique value in the respective column.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete one or more objects from the collection.</p>
+<p>First let’s set up a collection:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>Now let’s delete an object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>Deleting the same object again should have no effect:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>)</p></li>
+<li><p><strong>kwargs</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.delete_where">
+<span class="sig-name descname"><span class="pre">delete_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.delete_where"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete_where" title="Link to this definition"></a></dt>
+<dd><p>Delete objects that match a query.</p>
+<p>First let’s set up a collection:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s delete an object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete_where</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>Match everything:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete_where</span><span class="p">({})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>where</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span>) – where conditions</p></li>
+<li><p><strong>missing_ok</strong> – if True, do not raise an error if the collection does not exist</p></li>
+<li><p><strong>kwargs</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of objects deleted (or -1 if unsupported)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MongoDBDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<p>An adapter for MongoDB databases.</p>
+<p>The LinkML-Store Database abstraction combines mongodb Client and Database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.collection_class">
+<span class="sig-name descname"><span class="pre">collection_class</span></span><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.collection_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection" title="linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">MongoDBCollection</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.native_client">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">native_client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MongoClient</span></em><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.native_client" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.native_db">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">native_db</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Database</span></em><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.native_db" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.commit" title="Link to this definition"></a></dt>
+<dd><p>Commit pending changes to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.close" title="Link to this definition"></a></dt>
+<dd><p>Close the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.drop">
+<span class="sig-name descname"><span class="pre">drop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.drop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.drop" title="Link to this definition"></a></dt>
+<dd><p>Drop the database and all collections.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/test.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;duckdb:///</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">({</span><span class="s2">&quot;persons&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">}]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///tmp/test.db&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – additional arguments</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.query" title="Link to this definition"></a></dt>
+<dd><p>Run a query against the database.</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<span class="go">&#39;P1&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type query<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></span></p>
+</dd>
+<dt class="field-even">param query<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></span></p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.init_collections">
+<span class="sig-name descname"><span class="pre">init_collections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.init_collections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.init_collections" title="Link to this definition"></a></dt>
+<dd><p>Initialize collections.</p>
+<p>TODO: Not typically called directly: consider making this private
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.export_database">
+<span class="sig-name descname"><span class="pre">export_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.export_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.export_database" title="Link to this definition"></a></dt>
+<dd><p>Export a database to a file or location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – location of the file</p></li>
+<li><p><strong>target_format</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Format</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>) – target format</p></li>
+<li><p><strong>kwargs</strong> – additional arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBDatabase.import_database">
+<span class="sig-name descname"><span class="pre">import_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_database.html#MongoDBDatabase.import_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.import_database" title="Link to this definition"></a></dt>
+<dd><p>Import a database from a file or location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – location of the file</p></li>
+<li><p><strong>source_format</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – source format</p></li>
+<li><p><strong>kwargs</strong> – additional arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html">linkml_store.api.stores.mongodb.mongodb_collection module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html">linkml_store.api.stores.mongodb.mongodb_database module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html">linkml_store.api.stores.mongodb.mongodb_collection module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.mongo_collection"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.mongo_collection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.insert"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.insert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.query"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.Any"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Any</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.Dict"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Dict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.List"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.List</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.Union"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Union</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query_facets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete_where()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html">linkml_store.api.stores.mongodb.mongodb_database module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.collection_class"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.collection_class</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.__init__"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.native_client"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.native_client</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.native_db"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.native_db</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.commit"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.commit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.close"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.drop"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.drop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.query"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.query()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.init_collections"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.init_collections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.export_database"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.export_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.import_database"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.import_database()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -372,6 +786,33 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">linkml_store.api.stores.mongodb package</a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection</span></code></a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.mongo_collection"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.mongo_collection</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.insert"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.insert()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.query"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Any"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Any</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Dict"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Dict</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.List"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.List</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.Union"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.Union</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query_facets()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete_where()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase</span></code></a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.collection_class"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.collection_class</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.__init__"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.native_client"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.native_client</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.native_db"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.native_db</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.commit"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.commit()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.close"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.close()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.drop"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.drop()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.query"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.query()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.init_collections"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.init_collections()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.export_database"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.export_database()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase.import_database"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase.import_database()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 </ul>
 </li>

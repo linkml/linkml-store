@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -297,14 +297,140 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="linkml-store-api-stores-hdf5-hdf5-database-module">
-<h1>linkml_store.api.stores.hdf5.hdf5_database module<a class="headerlink" href="#linkml-store-api-stores-hdf5-hdf5-database-module" title="Link to this heading"></a></h1>
+          <section id="module-linkml_store.api.stores.hdf5.hdf5_database">
+<span id="linkml-store-api-stores-hdf5-hdf5-database-module"></span><h1>linkml_store.api.stores.hdf5.hdf5_database module<a class="headerlink" href="#module-linkml_store.api.stores.hdf5.hdf5_database" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HDF5Database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.collection_class">
+<span class="sig-name descname"><span class="pre">collection_class</span></span><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.collection_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection" title="linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">HDF5Collection</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.file">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">File</span></em><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.commit">
+<span class="sig-name descname"><span class="pre">commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.commit" title="Link to this definition"></a></dt>
+<dd><p>Commit pending changes to the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.close" title="Link to this definition"></a></dt>
+<dd><p>Close the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.query" title="Link to this definition"></a></dt>
+<dd><p>Run a query against the database.</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<span class="go">&#39;P1&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">type query<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></span></p>
+</dd>
+<dt class="field-even">param query<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">type kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></span></p>
+</dd>
+<dt class="field-even">return<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.init_collections">
+<span class="sig-name descname"><span class="pre">init_collections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.init_collections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.init_collections" title="Link to this definition"></a></dt>
+<dd><p>Initialize collections.</p>
+<p>TODO: Not typically called directly: consider making this private
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.induce_schema_view">
+<span class="sig-name descname"><span class="pre">induce_schema_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/hdf5/hdf5_database.html#HDF5Database.induce_schema_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.induce_schema_view" title="Link to this definition"></a></dt>
+<dd><p>Induce a schema view from a schema definition.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">([{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">},</span>
+<span class="gp">... </span>                <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema_view</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">induce_schema_view</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cd</span> <span class="o">=</span> <span class="n">schema_view</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cd</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">range</span>
+<span class="go">&#39;string&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cd</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;age_in_years&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">range</span>
+<span class="go">&#39;integer&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchemaView</span></code></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A schema view</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -350,8 +476,37 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">linkml_store.api.stores.hdf5.hdf5_database module</a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database"><code class="docutils literal notranslate"><span class="pre">HDF5Database</span></code></a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.collection_class"><code class="docutils literal notranslate"><span class="pre">HDF5Database.collection_class</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.__init__"><code class="docutils literal notranslate"><span class="pre">HDF5Database.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.file"><code class="docutils literal notranslate"><span class="pre">HDF5Database.file</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.commit"><code class="docutils literal notranslate"><span class="pre">HDF5Database.commit()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.close"><code class="docutils literal notranslate"><span class="pre">HDF5Database.close()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.query"><code class="docutils literal notranslate"><span class="pre">HDF5Database.query()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.init_collections"><code class="docutils literal notranslate"><span class="pre">HDF5Database.init_collections()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.induce_schema_view"><code class="docutils literal notranslate"><span class="pre">HDF5Database.induce_schema_view()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

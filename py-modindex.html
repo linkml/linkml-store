@@ -2,12 +2,10 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="author" title="About these documents" href="#" /><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorials" href="tutorials/index.html" /><link rel="prev" title="LinkML-Store documentation" href="index.html" />
+    <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="about.html" /><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>About - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 --><title>Python Module Index - linkml-store documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -179,7 +177,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -203,8 +201,8 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">About</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Command-Line-Tutorial.html">Tutorial: Using the Command Line Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Python-Tutorial.html">Tutorial: Using the Python API</a></li>
@@ -282,13 +280,7 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="view-this-page">
-  <a class="muted-link" href="_sources/about.rst.txt" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
-</div>
-<div class="theme-toggle-container theme-toggle-content">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
@@ -297,107 +289,166 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="about">
-<h1>About<a class="headerlink" href="#about" title="Link to this heading"></a></h1>
-<p>LinkML-Store is an early effort to provide a unifying storage layer
-over multiple different backends, unified via LinkML schemas.</p>
-<p>The overall goals are to provide:</p>
-<ul class="simple">
-<li><p>Make it easier to work with data in different forms (tabular, JSON, columnar, RDF)</p></li>
-<li><p>Expressive validation at scale, including full referential integrity validation</p></li>
-<li><p>Ability to mix and match different backends (e.g. DuckDB, MongoDB, Solr, ChromaDB, HDF5)</p></li>
-<li><p>Composability of different search indexes, including LLM textual embeddings</p></li>
-<li><p>LAMP-like stack for LinkML</p></li>
-</ul>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>At this stage we recommend installing all extras:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store[all]&quot;</span>
-</pre></div>
-</div>
-<p>Minimal implementation:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store&quot;</span>
-</pre></div>
-</div>
-<p>For developers working on the linkml-store codebase, we recommend checking out the repo, and then
-installing all packages via the <cite>make</cite> command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;URL&gt;
-<span class="nb">cd</span><span class="w"> </span>linkml-store
-make<span class="w"> </span>install
-</pre></div>
-</div>
+          
+<section class="domainindex-section">
+  <h1>Python Module Index</h1>
+  <div class="domainindex-jumpbox"><a href="#cap-a"><strong>a</strong></a></div>
 </section>
-<section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h2>
-<p>See the <span class="xref std std-ref">tutorials</span></p>
-</section>
-<section id="data-model">
-<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.client.Client" title="linkml_store.api.client.Client"><code class="xref py py-class docutils literal notranslate"><span class="pre">Client</span></code></a> provides a top-level interface over one or more databases.</p></li>
-<li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a> consists of one or more possibly heterogeneous collections.</p></li>
-<li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a> is a queryable set of objects of a similar type.</p></li>
-<li><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Indexer</span></code> creates indexes over collections to enable efficient searching.</p></li>
-</ul>
-</section>
-<section id="adapters">
-<h2>Adapters<a class="headerlink" href="#adapters" title="Link to this heading"></a></h2>
-<p>The current backends are:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb" title="linkml_store.api.stores.duckdb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DuckDB</span></code></a> (supports read and write)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.mongodb.html#module-linkml_store.api.stores.mongodb" title="linkml_store.api.stores.mongodb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">MongoDB</span></code></a> (supports read and write)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.solr.html#module-linkml_store.api.stores.solr" title="linkml_store.api.stores.solr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Solr</span></code></a> (write not yet supported)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.chromadb.html#module-linkml_store.api.stores.chromadb" title="linkml_store.api.stores.chromadb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ChromaDB</span></code></a> (pre-alpha)</p></li>
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">HDF5</span></code> (pre-alpha)</p></li>
-</ul>
-</section>
-<section id="indexing">
-<h2>Indexing<a class="headerlink" href="#indexing" title="Link to this heading"></a></h2>
-<p>This frameworks also allows <em>composable indexes</em>. Currently two indexers are supported:</p>
-<ul class="simple">
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">SimpleIndexer</span></code> Simple native trigram method</p></li>
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">LLMIndexer</span></code> LLM text embedding</p></li>
-</ul>
-</section>
-<section id="metadata-and-configuration">
-<h2>Metadata and Configuration<a class="headerlink" href="#metadata-and-configuration" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">ClientConfig</span></code> provides a structure for configuring the client</p></li>
-</ul>
-</section>
-</section>
+<table class="domainindex-table">
+  <tr class="pcap">
+    <td></td><td>&#160;</td><td></td>
+  </tr>
+  <tr class="cap" id="cap-a">
+    <td></td><td><strong>a</strong></td><td></td>
+  </tr>
+  <tr>
+    <td><img src="_static/minus.png" class="toggler"
+              id="toggle-1" style="display: none" alt="-" /></td>
+    <td>
+        <code class="xref">linkml_store.api</code></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.html#module-linkml_store.api.stores"><code class="xref">linkml_store.api.stores</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.chromadb.html#module-linkml_store.api.stores.chromadb"><code class="xref">linkml_store.api.stores.chromadb</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.chromadb.chromadb_collection.html#module-linkml_store.api.stores.chromadb.chromadb_collection"><code class="xref">linkml_store.api.stores.chromadb.chromadb_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.chromadb.chromadb_database.html#module-linkml_store.api.stores.chromadb.chromadb_database"><code class="xref">linkml_store.api.stores.chromadb.chromadb_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb"><code class="xref">linkml_store.api.stores.duckdb</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.duckdb.duckdb_collection.html#module-linkml_store.api.stores.duckdb.duckdb_collection"><code class="xref">linkml_store.api.stores.duckdb.duckdb_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.duckdb.duckdb_database.html#module-linkml_store.api.stores.duckdb.duckdb_database"><code class="xref">linkml_store.api.stores.duckdb.duckdb_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.duckdb.mappings.html#module-linkml_store.api.stores.duckdb.mappings"><code class="xref">linkml_store.api.stores.duckdb.mappings</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.filesystem.html#module-linkml_store.api.stores.filesystem"><code class="xref">linkml_store.api.stores.filesystem</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.filesystem.filesystem_collection.html#module-linkml_store.api.stores.filesystem.filesystem_collection"><code class="xref">linkml_store.api.stores.filesystem.filesystem_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.filesystem.filesystem_database.html#module-linkml_store.api.stores.filesystem.filesystem_database"><code class="xref">linkml_store.api.stores.filesystem.filesystem_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.hdf5.html#module-linkml_store.api.stores.hdf5"><code class="xref">linkml_store.api.stores.hdf5</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.hdf5.hdf5_collection.html#module-linkml_store.api.stores.hdf5.hdf5_collection"><code class="xref">linkml_store.api.stores.hdf5.hdf5_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.hdf5.hdf5_database.html#module-linkml_store.api.stores.hdf5.hdf5_database"><code class="xref">linkml_store.api.stores.hdf5.hdf5_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.mongodb.html#module-linkml_store.api.stores.mongodb"><code class="xref">linkml_store.api.stores.mongodb</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.mongodb.mongodb_collection.html#module-linkml_store.api.stores.mongodb.mongodb_collection"><code class="xref">linkml_store.api.stores.mongodb.mongodb_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.mongodb.mongodb_database.html#module-linkml_store.api.stores.mongodb.mongodb_database"><code class="xref">linkml_store.api.stores.mongodb.mongodb_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.solr.html#module-linkml_store.api.stores.solr"><code class="xref">linkml_store.api.stores.solr</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.solr.solr_collection.html#module-linkml_store.api.stores.solr.solr_collection"><code class="xref">linkml_store.api.stores.solr.solr_collection</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.solr.solr_database.html#module-linkml_store.api.stores.solr.solr_database"><code class="xref">linkml_store.api.stores.solr.solr_database</code></a></td><td>
+    <em></em></td>
+  </tr>
+  <tr class="cg-1">
+    <td></td>
+    <td>&#160;&#160;&#160;
+        <a href="reference/linkml_store.api.stores.solr.solr_utils.html#module-linkml_store.api.stores.solr.solr_utils"><code class="xref">linkml_store.api.stores.solr.solr_utils</code></a></td><td>
+    <em></em></td>
+  </tr>
+</table>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="tutorials/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Tutorials</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="index.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Home</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -416,32 +467,8 @@ make<span class="w"> </span>install
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">About</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
-<li><a class="reference internal" href="#data-model">Data Model</a></li>
-<li><a class="reference internal" href="#adapters">Adapters</a></li>
-<li><a class="reference internal" href="#indexing">Indexing</a></li>
-<li><a class="reference internal" href="#metadata-and-configuration">Metadata and Configuration</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

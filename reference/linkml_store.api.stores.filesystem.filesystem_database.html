@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -297,14 +297,115 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="linkml-store-api-stores-filesystem-filesystem-database-module">
-<h1>linkml_store.api.stores.filesystem.filesystem_database module<a class="headerlink" href="#linkml-store-api-stores-filesystem-filesystem-database-module" title="Link to this heading"></a></h1>
+          <section id="module-linkml_store.api.stores.filesystem.filesystem_database">
+<span id="linkml-store-api-stores-filesystem-filesystem-database-module"></span><h1>linkml_store.api.stores.filesystem.filesystem_database module<a class="headerlink" href="#module-linkml_store.api.stores.filesystem.filesystem_database" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FileSystemDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.collection_class">
+<span class="sig-name descname"><span class="pre">collection_class</span></span><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.collection_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="linkml_store.api.stores.filesystem.filesystem_collection.html#linkml_store.api.stores.filesystem.filesystem_collection.FileSystemCollection" title="linkml_store.api.stores.filesystem.filesystem_collection.FileSystemCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSystemCollection</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.default_file_format">
+<span class="sig-name descname"><span class="pre">default_file_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.default_file_format" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.no_backup_on_drop">
+<span class="sig-name descname"><span class="pre">no_backup_on_drop</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.no_backup_on_drop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.directory_path">
+<span class="sig-name descname"><span class="pre">directory_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.directory_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.metadata_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metadata_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.metadata_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.load_metadata">
+<span class="sig-name descname"><span class="pre">load_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.load_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.load_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.close" title="Link to this definition"></a></dt>
+<dd><p>Close the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.drop">
+<span class="sig-name descname"><span class="pre">drop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_backup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.drop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.drop" title="Link to this definition"></a></dt>
+<dd><p>Drop the database and all collections.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/test.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;duckdb:///</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">({</span><span class="s2">&quot;persons&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">}]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb:///tmp/test.db&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;persons&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – additional arguments</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.init_collections">
+<span class="sig-name descname"><span class="pre">init_collections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.init_collections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.init_collections" title="Link to this definition"></a></dt>
+<dd><p>Initialize collections.</p>
+<p>TODO: Not typically called directly: consider making this private
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.xxxinduce_schema_view">
+<span class="sig-name descname"><span class="pre">xxxinduce_schema_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/filesystem/filesystem_database.html#FileSystemDatabase.xxxinduce_schema_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.xxxinduce_schema_view" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchemaView</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -350,8 +451,40 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">linkml_store.api.stores.filesystem.filesystem_database module</a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase</span></code></a><ul>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.collection_class"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.collection_class</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.default_file_format"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.default_file_format</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.no_backup_on_drop"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.no_backup_on_drop</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.__init__"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.directory_path"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.directory_path</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.metadata_path"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.metadata_path</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.load_metadata"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.load_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.close"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.close()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.drop"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.drop()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.init_collections"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.init_collections()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase.xxxinduce_schema_view"><code class="docutils literal notranslate"><span class="pre">FileSystemDatabase.xxxinduce_schema_view()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
