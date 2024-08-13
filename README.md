@@ -43,7 +43,7 @@ linkml-store -d duckdb:///db/my.db -c persons validate
 ## The CRUDSI pattern
 
 Most database APIs implement the **CRUD** pattern: Create, Read, Update, Delete.
-LinkML-Store adds **S**earch and **I**nference to this pattern, making it **CRUDSI**.
+LinkML-Store adds **Search** and **Inference** to this pattern, making it **CRUDSI**.
 
 The notion of "Search" and "Inference" is intended to be flexible and extensible,
 including:
