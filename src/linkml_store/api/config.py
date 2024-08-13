@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from linkml_store.graphs.graph_map import GraphProjection
+from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection
 
 
 class ConfiguredBaseModel(BaseModel, extra="forbid"):
@@ -30,13 +30,30 @@ class CollectionSource(ConfiguredBaseModel):
     """
 
     url: Optional[str] = None
+    """Remote URL to fetch data from"""
+
     local_path: Optional[str] = None
+    """Local path to fetch data from"""
+
     source_location: Optional[str] = None
+
     refresh_interval_days: Optional[float] = None
+    """How often to refresh the data, in days"""
+
     expected_type: Optional[str] = None
+    """The expected type of the data, e.g list"""
+
     format: Optional[str] = None
+    """The format of the data, e.g., json, yaml, csv"""
+
     compression: Optional[str] = None
+    """The compression of the data, e.g., tgz, gzip, zip"""
+
+    select_query: Optional[str] = None
+    """A jsonpath query to preprocess the objects with"""
+
     arguments: Optional[Dict[str, Any]] = None
+    """Optional arguments to pass to the source"""
 
 
 class CollectionConfig(ConfiguredBaseModel):
@@ -81,7 +98,7 @@ class CollectionConfig(ConfiguredBaseModel):
         description="LinkML-Map derivations",
     )
     page_size: Optional[int] = Field(default=None, description="Suggested page size (items per page) in apps and APIs")
-    graph_projection: Optional[GraphProjection] = Field(
+    graph_projection: Optional[Union[EdgeProjection, NodeProjection]] = Field(
         default=None,
         description="Optional graph projection configuration",
     )

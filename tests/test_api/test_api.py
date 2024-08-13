@@ -53,6 +53,7 @@ PERSONS = [
 ]
 
 ORGANIZATIONS = [
+    # {"id": "Org1", "name": "org1", "changes": {"editor": "joe", "date": "2021-01-01"}},
     {"id": "Org1", "name": "org1"},
     {"id": "Org2", "name": "org2", "found_date": "2021-01-01"},
 ]
@@ -411,6 +412,15 @@ def test_store_nested(handle):
     ignore = ["history"]
     assert remove_none(qr.rows[0], ignore) == remove_none(obj["persons"][0], ignore)
     orgs_coll = database.get_collection("organizations")
+    if False:
+        # check induced class definition
+        sv = database.schema_view
+        for cn in sv.all_classes():
+            print(f"CLASS: {cn}")
+        slots = sv.class_induced_slots("organizations")
+        assert len(slots) == 4
+        slot = sv.induced_slot("changes", "organizations")
+        assert slot.inlined
     qr = orgs_coll.find()
     assert qr.num_rows == 2
     assert remove_none(qr.rows[0]) == obj["organizations"][0]
@@ -478,7 +488,13 @@ def test_induced_schema(handle, type_alias):
     ), "no explicit schema and no data to induce from"
     qr = collection.find()
     assert qr.num_rows == 0, "database should be empty"
-    objs = [{"id": 1, "name": "n1"}, {"id": 2, "name": "n2", "age_in_years": 30}]
+    objs = [
+        {"id": 1, "name": "n1"},
+        {"id": 2, "name": "n2", "age_in_years": 30},
+        {"id": 3, "name": "n3", "aliases": ["a", "b"]},
+        {"id": 4, "name": "n4", "metadata": {"created": "2021-01-01", "editor": "joe"}},
+        {"id": 5, "name": "n5", "addresses": [{"street": "1 foo street"}]},
+    ]
     collection.insert(objs)
     collection.commit()
     assert collection.find().num_rows == len(objs), "expected all objects to be added"
@@ -499,7 +515,7 @@ def test_induced_schema(handle, type_alias):
     assert collection.class_definition() is not None, "expected class definition to be created"
     cd = collection.class_definition()
     assert cd.attributes
-    assert sorted(cd.attributes.keys()) == ["age_in_years", "id", "name"]
+    assert sorted(cd.attributes.keys()) == ["addresses", "age_in_years", "aliases", "id", "metadata", "name"]
     assert len(database.list_collections()) == 1, "collections should be unmodified"
     assert collection.find().num_rows == len(objs), "expected no change in data"
     assert len(database.list_collections()) == 1, "collections should be unmodified"
@@ -518,14 +534,25 @@ def test_induced_schema(handle, type_alias):
     cd = sv.get_class(typ)
     assert cd is not None, "class should be named using name (even if alias is set)"
     assert cd.name == typ
-    assert len(cd.attributes) == 3, "expected 3 attributes induced from data"
+    assert len(cd.attributes) == 6, "expected 6 attributes induced from data"
     assert cd.attributes["id"].range == "integer", "expected id to be induced as integer"
     assert cd.attributes["name"].range == "string", "expected name to be induced as string"
     assert cd.attributes["age_in_years"].range == "integer", "expected age_in_years to be induced as integer"
+    assert cd.attributes["addresses"].multivalued, "expected addresses to be multivalued"
+    assert cd.attributes["addresses"].range != "string", "expected addresses range to be complex"
+    assert cd.attributes["addresses"].inlined, "expected addresses to be inlined"
+    assert cd.attributes["addresses"].inlined_as_list, "expected addresses to be inlined_as_list"
+    assert cd.attributes["metadata"].inlined, "expected metadata to be inlined"
+    # assert cd.attributes["metadata"].range != "string", "expected metadata range to be complex"
+    induced_addresses = sv.induced_slot("addresses", typ)
+    assert induced_addresses.multivalued, "expected addresses to be multivalued"
     collection.delete(objs[0])
+    collection.delete(objs[2])
+    collection.delete(objs[3])
+    collection.delete(objs[4])
     qr = collection.find()
     assert qr.num_rows == 1, "expected 1 row after delete"
-    assert remove_none(qr.rows[0]) == objs[1], "expected second object to be first after delete"
+    assert remove_none(qr.rows[0]) == objs[1], "expected last object to be first after delete"
     assert not collection.delete_where({"age_in_years": 99}), "expected 0 rows to be deleted"
     qr = collection.find()
     assert qr.num_rows == 1, "delete with no matching conditions should have no effect"

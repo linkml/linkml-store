@@ -40,4 +40,4 @@ jobs:
           mongodb-version: ${{ matrix.mongodb-version }}
         
       - name: Test with pytest and generate coverage file
-        run: poetry run pytest
+        run: poetry run pytest -m "not integration and not neo4j" --ignore=src/linkml_store/inference/implementations/rag_inference_engine.py

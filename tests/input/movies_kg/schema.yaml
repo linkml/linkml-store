@@ -1,0 +1,209 @@
+name: MoviesKG
+description: Information about movies, organized as a Property Graph
+id: https://w3id.org/linkml/examples/movieskg
+imports:
+- linkml:types
+prefixes:
+  sdo: http://schema.org/
+  movieskg: https://w3id.org/linkml/examples/movieskg/
+  linkml: https://w3id.org/linkml/
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+default_prefix: movieskg
+default_range: string
+enums:
+  ProfessionType:
+    description: profession/occupation vocabulary
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    permissible_values:
+      Actor:
+        description: acts in movies
+      Director:
+        description: directs
+      Produced:
+        description: produces or exec produces
+      CostumeDesigner:
+        description: makes the costumes
+slots:
+  id:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  name:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  category:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  aliases:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  subject:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  predicate:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  object:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  nodes:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  edges:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  professions:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  address:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  plays:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+  scored_by:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+classes:
+  Node:
+    description: A node/vertex in a graph
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    slots:
+    - id
+    - name
+    - category
+    - aliases
+    slot_usage:
+      id:
+        description: unique CURIE identifier
+        identifier: true
+        range: uriorcurie
+      name:
+        description: human-readable name/label
+        slot_uri: rdfs:label
+        range: string
+      category:
+        slot_uri: rdf:type
+        designates_type: true
+        range: uriorcurie
+      aliases:
+        range: string
+        multivalued: true
+  Edge:
+    description: An edge/triple in a graph.
+    comments:
+    - May be subclassed to add edge properties. This is a property graph data model,
+      so edges are instances
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    slots:
+    - subject
+    - predicate
+    - object
+    slot_usage:
+      subject:
+        slot_uri: rdf:subject
+        range: Node
+      predicate:
+        comments:
+        - Note that this uniquely identifiers the (reified) class
+        slot_uri: rdf:predicate
+        designates_type: true
+        range: uriorcurie
+      object:
+        slot_uri: rdf:objects
+        range: Node
+    class_uri: rdfs:Statement
+  Graph:
+    description: A collection of nodes and edges
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    slots:
+    - nodes
+    - edges
+    slot_usage:
+      nodes:
+        description: list of all nodes in the graph
+        range: Node
+        multivalued: true
+        inlined_as_list: true
+      edges:
+        description: list of all edges in the graph
+        range: Edge
+        multivalued: true
+        inlined_as_list: true
+  PersonOrGroup:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Node
+  Person:
+    description: a person living or dead
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: PersonOrGroup
+    slots:
+    - professions
+    slot_usage:
+      professions:
+        description: jobs/roles
+        range: ProfessionType
+        multivalued: true
+  CreativeWork:
+    description: A creative work like a movie
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Node
+  Movie:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: CreativeWork
+  Character:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: CreativeWork
+  Soundtrack:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: CreativeWork
+  Studio:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: PersonOrGroup
+    slots:
+    - address
+    slot_usage:
+      address: {}
+  Band:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: PersonOrGroup
+  ActedIn:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Edge
+    slots:
+    - plays
+    slot_usage:
+      subject:
+        range: Person
+      object:
+        range: Movie
+      plays:
+        description: The character or characters played by the subject (actor)
+        range: Character
+        multivalued: true
+  Directed:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Edge
+    slot_usage:
+      subject:
+        range: Person
+      object:
+        range: Movie
+  InfluencedBy:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Edge
+  MoviedInfluencedByMovie:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: InfluencedBy
+    slot_usage:
+      subject:
+        range: Movie
+      object:
+        range: Movie
+  PersonInfluencedByPerson:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: InfluencedBy
+    slot_usage:
+      subject:
+        range: Person
+      object:
+        range: Person
+  HasSoundtrack:
+    from_schema: https://w3id.org/linkml/examples/movieskg
+    is_a: Edge
+    slots:
+    - scored_by
+    slot_usage:
+      subject:
+        range: Movie
+      object:
+        range: Soundtrack
+      scored_by:
+        range: PersonOrGroup
+        multivalued: true

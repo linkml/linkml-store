@@ -1,6 +1,7 @@
 import logging
 import sys
 import warnings
+from pathlib import Path
 from typing import Optional
 
 import click
@@ -10,13 +11,21 @@ from pydantic import BaseModel
 
 from linkml_store import Client
 from linkml_store.api import Collection, Database
+from linkml_store.api.config import ClientConfig
 from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
+from linkml_store.inference import get_inference_engine
+from linkml_store.inference.inference_config import InferenceConfig
+from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
+
+DEFAULT_LOCAL_CONF_PATH = Path("linkml.yaml")
+# global path is ~/.linkml.yaml in the user's home directory
+DEFAULT_GLOBAL_CONF_PATH = Path("~/.linkml.yaml").expanduser()
 
 index_type_option = click.option(
     "--index-type",
@@ -84,6 +93,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
 @click.group()
 @click.option("--database", "-d", help="Database name")
 @click.option("--collection", "-c", help="Collection name")
+@click.option("--input", "-i", help="Input file (alternative to database/collection)")
 @click.option("--config", "-C", type=click.Path(exists=True), help="Path to the configuration file")
 @click.option("--set", help="Metadata settings in the form PATHEXPR=value", multiple=True)
 @click.option("-v", "--verbose", count=True)
@@ -96,7 +106,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
     help="If set then show full stacktrace on error",
 )
 @click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, **kwargs):
+def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, input, **kwargs):
     """A CLI for interacting with the linkml-store."""
     if not stacktrace:
         sys.tracebacklimit = 0
@@ -119,13 +129,25 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     if quiet:
         logger.setLevel(logging.ERROR)
     ctx.ensure_object(dict)
+    if input:
+        stem = Path(input).stem
+        database = "duckdb"
+        collection = stem
+        config = ClientConfig(databases={"duckdb": {"collections": {stem: {"source": {"local_path": input}}}}})
+        # collection = Path(input).stem
+        # database = f"file:{Path(input).parent}"
+    if config is None and DEFAULT_LOCAL_CONF_PATH.exists():
+        config = DEFAULT_LOCAL_CONF_PATH
+    if config is None and DEFAULT_GLOBAL_CONF_PATH.exists():
+        config = DEFAULT_GLOBAL_CONF_PATH
+    if config == ".":
+        config = None
+    if not collection and database and "::" in database:
+        database, collection = database.split("::")
+
     client = Client().from_config(config, **kwargs) if config else Client()
     settings = ContextSettings(client=client, database_name=database, collection_name=collection)
     ctx.obj["settings"] = settings
-    # DEPRECATED
-    ctx.obj["client"] = client
-    ctx.obj["database"] = database
-    ctx.obj["collection"] = collection
     if settings.database_name:
         db = client.get_database(database)
         if set:
@@ -136,12 +158,6 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
                 val = yaml.safe_load(val)
                 logger.info(f"Setting {path} to {val}")
                 db.metadata = object_path_update(db.metadata, path, val)
-        # settings.database = db
-        # DEPRECATED
-        ctx.obj["database_obj"] = db
-        if collection:
-            collection_obj = db.get_collection(collection)
-            ctx.obj["collection_obj"] = collection_obj
     if not settings.database_name:
         # if len(client.databases) != 1:
         #    raise ValueError("Database must be specified if there are multiple databases.")
@@ -323,11 +339,12 @@ def apply(ctx, patch_files, identifier_attribute):
 
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query, as YAML")
+@click.option("--select", "-s", type=click.STRING, help="SELECT clause for the query, as YAML")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.pass_context
-def query(ctx, where, limit, output_type, output):
+def query(ctx, where, select, limit, output_type, output):
     """Query objects from the specified collection.
 
 
@@ -353,7 +370,13 @@ def query(ctx, where, limit, output_type, output):
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
-    query = Query(from_table=collection.alias, where_clause=where_clause, limit=limit)
+    select_clause = yaml.safe_load(select) if select else None
+    if select_clause:
+        if isinstance(select_clause, str):
+            select_clause = [select_clause]
+        if not isinstance(select_clause, list):
+            raise ValueError(f"SELECT clause must be a list. Got: {select_clause}")
+    query = Query(from_table=collection.alias, select_cols=select_clause, where_clause=where_clause, limit=limit)
     result = collection.query(query)
     output_data = render_output(result.rows, output_type)
     if output:
@@ -456,6 +479,110 @@ def describe(ctx, where, output_type, output, limit):
     collection = ctx.obj["settings"].collection
     df = collection.find(where_clause, limit=limit).rows_dataframe
     write_output(df.describe(include="all").transpose(), output_type, target=output)
+
+
+@cli.command()
+@click.option("--output-type", "-O", type=format_choice, default=Format.YAML.value, help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--target-attribute", "-T", type=click.STRING, multiple=True, help="Target attributes for inference")
+@click.option(
+    "--feature-attributes", "-F", type=click.STRING, help="Feature attributes for inference (comma separated)"
+)
+@click.option("--inference-config-file", "-Y", type=click.Path(), help="Path to inference configuration file")
+@click.option("--export-model", "-E", type=click.Path(), help="Export model to file")
+@click.option("--load-model", "-L", type=click.Path(), help="Load model from file")
+@click.option("--model-format", "-M", type=click.Choice([x.value for x in ModelSerialization]), help="Format for model")
+@click.option("--training-test-data-split", "-S", type=click.Tuple([float, float]), help="Training/test data split")
+@click.option(
+    "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING, help="Type of predictor"
+)
+@click.option("--query", "-q", type=click.STRING, help="query term")
+@click.pass_context
+def infer(
+    ctx,
+    inference_config_file,
+    query,
+    training_test_data_split,
+    predictor_type,
+    target_attribute,
+    feature_attributes,
+    output_type,
+    output,
+    model_format,
+    export_model,
+    load_model,
+):
+    """
+    Predict a complete object from a partial object.
+
+    Currently two main prediction methods are provided: RAG and sklearn
+
+    ## RAG:
+
+    The RAG approach will use Retrieval Augmented Generation to inference the missing attributes of an object.
+
+    Example:
+
+        linkml-store  -i countries.jsonl inference -t rag  -q 'name: Uruguay'
+
+    Result:
+
+        capital: Montevideo, code: UY, continent: South America, languages: [Spanish]
+
+    You can pass in configurations as follows:
+
+        linkml-store  -i countries.jsonl inference -t rag:llm_config.model_name=llama-3  -q 'name: Uruguay'
+
+    ## SKLearn:
+
+    This uses scikit-learn (defaulting to simple decision trees) to do the prediction.
+
+        linkml-store -i tests/input/iris.csv inference -t sklearn \
+           -q '{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}'
+    """
+    if query:
+        query_obj = yaml.safe_load(query)
+    else:
+        query_obj = None
+    collection = ctx.obj["settings"].collection
+    atts = collection.class_definition().attributes.keys()
+    if model_format:
+        model_format = ModelSerialization(model_format)
+    if load_model:
+        predictor = get_inference_engine(predictor_type)
+        predictor = type(predictor).load_model(load_model)
+    else:
+        if feature_attributes:
+            features = feature_attributes.split(",")
+            features = [f.strip() for f in features]
+        else:
+            if query_obj:
+                features = query_obj.keys()
+            else:
+                features = None
+        if target_attribute:
+            target_attributes = list(target_attribute)
+        else:
+            target_attributes = [att for att in atts if att not in features]
+        if inference_config_file:
+            config = InferenceConfig.from_file(inference_config_file)
+        else:
+            config = InferenceConfig(target_attributes=target_attributes, feature_attributes=features)
+        if training_test_data_split:
+            config.train_test_split = training_test_data_split
+        predictor = get_inference_engine(predictor_type, config=config)
+        predictor.load_and_split_data(collection)
+        predictor.initialize_model()
+    if export_model:
+        logger.info(f"Exporting model to {export_model} in {model_format}")
+        predictor.export_model(export_model, model_format)
+    if not query_obj:
+        if not export_model:
+            raise ValueError("Query must be specified if not exporting model")
+    if query_obj:
+        result = predictor.derive(query_obj)
+        dumped_obj = result.model_dump(exclude_none=True)
+        write_output([dumped_obj], output_type, target=output)
 
 
 @cli.command()

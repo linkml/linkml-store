@@ -2,7 +2,7 @@
 
 An AI-ready data management and integration platform. LinkML-Store
 provides an abstraction layer over multiple different backends
-(including DuckDB, MongoDB, and local filesystems), allowing for
+(including DuckDB, MongoDB, Neo4j, and local filesystems), allowing for
 common query, index, and storage operations.
 
 For full documentation, see [https://linkml.io/linkml-store/](https://linkml.io/linkml-store/)
@@ -40,6 +40,23 @@ linkml-store -d duckdb:///db/my.db -c persons validate
 * API
 * Streamlit applications
 
+## The CRUDSI pattern
+
+Most database APIs implement the **CRUD** pattern: Create, Read, Update, Delete.
+LinkML-Store adds **Search** and **Inference** to this pattern, making it **CRUDSI**.
+
+The notion of "Search" and "Inference" is intended to be flexible and extensible,
+including:
+
+* Search
+   * Traditional keyword search
+   * Search using LLM Vector embeddings (*without* a dedicated vector database)
+   * Pluggable specialized search, e.g. genomic sequence (not yet implemented)
+* Inference (encompassing  *validation*, *repair*, and inference of missing data)
+   * Classic rule-based inference
+   * Inference using LLM Retrieval Augmented Generation (RAG)
+   * Statistical/ML inference
+
 ## Features
 
 ### Multiple Adapters
@@ -49,6 +66,8 @@ LinkML-Store is designed to work with multiple backends, giving a common abstrac
 * [MongoDB](https://linkml.io/linkml-store/how-to/Use-MongoDB.html)
 * [DuckDB](https://linkml.io/linkml-store/tutorials/Python-Tutorial.html)
 * [Solr](https://linkml.io/linkml-store/how-to/Query-Solr-using-CLI.html)
+* [Neo4j](https://linkml.io/linkml-store/how-to/Use-Neo4j.html)
+
 * Filesystem
 
 Coming soon: any RDBMS, any triplestore, Neo4J, HDF5-based stores, ChromaDB/Vector dbs ...
