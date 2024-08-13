@@ -1,9 +1,11 @@
 import importlib
 import inspect
+import os
 from typing import Type, Dict
 from linkml_store.inference.inference_engine import InferenceEngine
 from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.utils.object_utils import object_path_update
+
 
 
 class InferenceEngineRegistry:
@@ -15,7 +17,8 @@ class InferenceEngineRegistry:
 
     def get_engine_class(self, name: str) -> Type[InferenceEngine]:
         if name not in self.engines:
-            raise ValueError(f"Unknown inference engine type: {name}")
+            raise ValueError(f"Unknown inference engine type: {name}"
+                             f"Known engines: {list(self.engines.keys())}")
         return self.engines[name]
 
     def create_engine(self, engine_type: str, config: InferenceConfig = None, **kwargs) -> InferenceEngine:
@@ -33,17 +36,25 @@ class InferenceEngineRegistry:
         return engine_class(config=config, **kwargs)
 
     @classmethod
-    def load_engines(cls, module_name: str):
+    def load_engines(cls, package_path: str):
         registry = cls()
-        module = importlib.import_module(module_name)
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, InferenceEngine) and obj != InferenceEngine:
-                registry.register(name.lower().replace('inferenceengine', ''), obj)
+        package_dir = os.path.dirname(importlib.import_module(package_path).__file__)
+        for filename in os.listdir(package_dir):
+            if filename.endswith('.py') and not filename.startswith('__'):
+                module_name = f"{package_path}.{filename[:-3]}"
+                try:
+                    module = importlib.import_module(module_name)
+                    for name, obj in inspect.getmembers(module):
+                        if inspect.isclass(obj) and issubclass(obj, InferenceEngine) and obj != InferenceEngine:
+                            engine_name = name.lower().replace('inferenceengine', '')
+                            registry.register(engine_name, obj)
+                except ImportError as e:
+                    print(f"Error importing {module_name}: {e}")
         return registry
 
 
 # Initialize the registry
-registry = InferenceEngineRegistry.load_engines('linkml_store.inference')
+registry = InferenceEngineRegistry.load_engines('linkml_store.inference.implementations')
 
 
 # Function to get an inference engine (can be used as before)

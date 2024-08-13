@@ -64,6 +64,9 @@ class Format(Enum):
     def is_dump_format(self):
         return self in [Format.SQLDUMP_DUCKDB, Format.SQLDUMP_POSTGRES, Format.DUMP_MONGODB]
 
+    def is_xsv(self):
+        return self in [Format.TSV, Format.CSV]
+
 
 def load_objects_from_url(
     url: str,
@@ -141,6 +144,8 @@ def load_objects(
     """
     Load objects from a file or archive in supported formats.
     For tgz archives, it processes all files and concatenates the results.
+
+    TODO: Add schema hints for CSV/TSV parsing.
 
     :param file_path: The path to the file or archive.
     :param format: The format of the file. Can be a Format enum or a string value.

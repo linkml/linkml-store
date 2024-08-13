@@ -1,17 +1,20 @@
 import logging
 from copy import copy
 from dataclasses import dataclass
-from typing import Any, Optional, Dict, List
+from io import StringIO
+from pathlib import Path
+from typing import Any, Optional, Dict, List, Union, ClassVar
 
 import yaml
 from linkml_map.utils.eval_utils import eval_expr
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model.meta import ClassRule, AnonymousClassExpression
+from linkml_runtime.utils.formatutils import underscore
 from pydantic import BaseModel
 
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import InferenceConfig, Inference, LLMConfig
-from linkml_store.inference.inference_engine import InferenceEngine
+from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 
 logger = logging.getLogger(__name__)
 
@@ -76,18 +79,17 @@ def apply_rule(rule: ClassRule, object: OBJECT):
     return object
 
 
-
 @dataclass
 class RuleBasedInferenceEngine(InferenceEngine):
     """
     TODO
 
     """
-    attribute_rules: Optional[Dict[str, List[Rule]]] = None
     class_rules: Optional[List[ClassRule]] = None
     slot_rules: Optional[Dict[str, List[ClassRule]]] = None
     slot_expressions: Optional[Dict[str, str]] = None
 
+    PERSIST_COLS: ClassVar = ['config', 'class_rules', 'slot_rules', 'slot_expressions']
 
     def initialize_model(self, **kwargs):
         td = self.training_data
@@ -106,12 +108,53 @@ class RuleBasedInferenceEngine(InferenceEngine):
         if self.class_rules:
             for rule in self.class_rules:
                 apply_rule(rule, object)
+        object = {underscore(k): v for k, v in object.items()}
         if self.slot_expressions:
             for slot, expr in self.slot_expressions.items():
+                print(f"EVAL {object}")
                 v = eval_expr(expr, **object)
                 if v is not None:
                     object[slot] = v
-        return Inference(object=object)
+        return Inference(predicted_object=object)
+
+
+    def import_model_from(self, inference_engine: InferenceEngine, **kwargs):
+        io = StringIO()
+        inference_engine.export_model(io, model_serialization=ModelSerialization.LINKML_EXPRESSION)
+        config = inference_engine.config
+        if len(config.target_attributes) != 1:
+            raise ValueError("Can only import models with a single target attribute")
+        target_attribute = config.target_attributes[0]
+        if self.slot_expressions is None:
+            self.slot_expressions = {}
+        self.slot_expressions[target_attribute] = io.getvalue()
+
+    def save_model(self, output: Union[str, Path]) -> None:
+        """
+        Save the trained model and related data to a file.
+
+        :param output: Path to save the model
+        """
+        def _serialize_value(v: Any) -> Any:
+            if isinstance(v, BaseModel):
+                return v.model_dump(exclude_unset=True)
+            return v
+        model_data = {k: _serialize_value(getattr(self, k)) for k in self.PERSIST_COLS}
+        with open(output, 'w', encoding='utf-8') as f:
+            yaml.dump(model_data, f)
+
+    @classmethod
+    def load_model(cls, file_path: Union[str, Path]) -> 'RuleBasedInferenceEngine':
+        model_data = yaml.safe_load(open(file_path))
+
+        engine = cls(config=model_data['config'])
+        for k, v in model_data.items():
+            if k == "config":
+                continue
+            setattr(engine, k, v)
+
+        logger.info(f"Model loaded from {file_path}")
+        return engine
 
 
 

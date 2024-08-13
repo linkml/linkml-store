@@ -18,6 +18,7 @@ from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
 from linkml_store.inference import get_inference_engine
 from linkml_store.inference.inference_config import InferenceConfig
+from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
@@ -485,13 +486,21 @@ def describe(ctx, where, output_type, output, limit):
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.option("--target-attribute", "-T", type=click.STRING, multiple=True,
               help="Target attributes for inference")
+@click.option("--feature-attributes", "-F", type=click.STRING,
+              help="Feature attributes for inference (comma separated)")
+@click.option("--inference-config-file", "-Y", type=click.Path(), help="Path to inference configuration file")
+@click.option("--export-model", "-E", type=click.Path(), help="Export model to file")
+@click.option("--load-model", "-L", type=click.Path(), help="Load model from file")
+@click.option("--model-format", "-M", type=click.Choice([x.value for x in ModelSerialization]),
+              help="Format for model")
+@click.option("--training-test-data-split", "-S", type=click.Tuple([float, float]), help="Training/test data split")
 @click.option(
-    "--predictor-type", "-t", default="rag", show_default=True, type=click.STRING,
+    "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING,
     help="Type of predictor"
 )
-@click.option("--query", "-q", required=True, type=click.STRING, help="query term")
+@click.option("--query", "-q", type=click.STRING, help="query term")
 @click.pass_context
-def infer(ctx, query, predictor_type, target_attribute, output_type, output):
+def infer(ctx, inference_config_file, query, training_test_data_split, predictor_type, target_attribute, feature_attributes, output_type, output, model_format, export_model, load_model):
     """
     Predict a complete object from a partial object.
 
@@ -520,21 +529,49 @@ def infer(ctx, query, predictor_type, target_attribute, output_type, output):
         linkml-store -i tests/input/iris.csv inference -t sklearn \
            -q '{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}'
     """
-    query_obj = yaml.safe_load(query)
+    if query:
+        query_obj = yaml.safe_load(query)
+    else:
+        query_obj = None
     collection = ctx.obj["settings"].collection
     atts = collection.class_definition().attributes.keys()
-    features = query_obj.keys()
-    if target_attribute:
-        target_attributes = list(target_attribute)
+    if model_format:
+        model_format = ModelSerialization(model_format)
+    if load_model:
+        predictor = get_inference_engine(predictor_type)
+        predictor = type(predictor).load_model(load_model)
     else:
-        target_attributes = [att for att in atts if att not in features]
-    config = InferenceConfig(target_attributes=target_attributes, feature_attributes=features)
-    predictor = get_inference_engine(predictor_type, config=config)
-    predictor.load_and_split_data(collection)
-    predictor.initialize_model()
-    result = predictor.derive(query_obj)
-    dumped_obj = result.model_dump(exclude_none=True)
-    write_output([dumped_obj], output_type, target=output)
+        if feature_attributes:
+            features = feature_attributes.split(",")
+            features = [f.strip() for f in features]
+        else:
+            if query_obj:
+                features = query_obj.keys()
+            else:
+                features = None
+        if target_attribute:
+            target_attributes = list(target_attribute)
+        else:
+            target_attributes = [att for att in atts if att not in features]
+        if inference_config_file:
+            config = InferenceConfig.from_file(inference_config_file)
+        else:
+            config = InferenceConfig(target_attributes=target_attributes, feature_attributes=features)
+        if training_test_data_split:
+            config.train_test_split = training_test_data_split
+        predictor = get_inference_engine(predictor_type, config=config)
+        predictor.load_and_split_data(collection)
+        predictor.initialize_model()
+    if export_model:
+        logger.info(f"Exporting model to {export_model} in {model_format}")
+        predictor.export_model(export_model, model_format)
+    if not query_obj:
+        if not export_model:
+            raise ValueError("Query must be specified if not exporting model")
+    if query_obj:
+        result = predictor.derive(query_obj)
+        dumped_obj = result.model_dump(exclude_none=True)
+        write_output([dumped_obj], output_type, target=output)
 
 
 
