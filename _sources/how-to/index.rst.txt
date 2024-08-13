@@ -17,4 +17,5 @@ How-To Guides
    Store-an-Ontology
    Index-Phenopackets
    Index-GO-CAMs
+   Predict-Missing-Data
 

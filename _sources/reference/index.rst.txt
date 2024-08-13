@@ -10,6 +10,7 @@ Reference
    linkml_store.api
    linkml_store.api.stores
    linkml_store.index
+   linkml_store.inference
    linkml_store.utils
 
 

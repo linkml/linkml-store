@@ -3,13 +3,14 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Reference" href="../reference/index.html" /><link rel="prev" title="How to index GO-CAMs with LinkML-Store" href="Index-GO-CAMs.html" />
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>Data Model - linkml-store documentation</title>
+        <title>How to predict missing data - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -179,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -203,24 +204,24 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/Command-Line-Tutorial.html">Tutorial: Using the Command Line Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/Python-Tutorial.html">Tutorial: Using the Python API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../how-to/index.html">How-To Guides</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of How-To Guides</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Use-MongoDB.html">How to use MongoDB with LinkML-Store</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Use-Semantic-Search.html">How to use Semantic Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Query-the-Monarch-KG.html">How to query the Monarch-KG</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Query-Solr-using-CLI.html">How to query Solr using the Command Line</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Use-Neo4j.html">How to use Neo4J with LinkML-Store</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Check-Referential-Integrity.html">How to Check Referential Integrity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Store-an-Ontology.html">Example: Storing an ontology</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">How-To Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of How-To Guides</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Use-MongoDB.html">How to use MongoDB with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Semantic-Search.html">How to use Semantic Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-the-Monarch-KG.html">How to query the Monarch-KG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-Solr-using-CLI.html">How to query Solr using the Command Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Neo4j.html">How to use Neo4J with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Check-Referential-Integrity.html">How to Check Referential Integrity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Store-an-Ontology.html">Example: Storing an ontology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">How to predict missing data</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -283,7 +284,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/manual/data-model.ipynb.txt" title="View this page">
+  <a class="muted-link" href="../_sources/how-to/Predict-Missing-Data.ipynb.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -297,18 +298,205 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="Data-Model">
-<h1>Data Model<a class="headerlink" href="#Data-Model" title="Link to this heading"></a></h1>
-<p>The LinkML-Store data model is based around a three-level structure:</p>
+          <section id="How-to-predict-missing-data">
+<h1>How to predict missing data<a class="headerlink" href="#How-to-predict-missing-data" title="Link to this heading"></a></h1>
+<p>LinkML implements the “CRUDSI” design pattern. In addition to <strong>Create</strong>, <strong>Read</strong>, <strong>Update</strong>, <strong>Delete</strong>, LinkML also supports Search and <em>Inference</em>.</p>
+<p>The framework is designed to support different kinds of inference, including rule-based and LLMs. This notebooks shows simple ML-based inference using scikit-learn DecisionTrees.</p>
+<p>We will use the Iris dataset:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>describe
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+              count unique     top freq   mean       std  min  25%   50%    75%  max
+petal_length  100.0    NaN     NaN  NaN  2.861  1.449549  1.0  1.5  2.45  4.325  5.1
+petal_width   100.0    NaN     NaN  NaN  0.786  0.565153  0.1  0.2   0.8    1.3  1.8
+sepal_length  100.0    NaN     NaN  NaN  5.471  0.641698  4.3  5.0   5.4    5.9  7.0
+sepal_width   100.0    NaN     NaN  NaN  3.099  0.478739  2.0  2.8  3.05    3.4  4.4
+species         100      2  setosa   50    NaN       NaN  NaN  NaN   NaN    NaN  NaN
+</pre></div></div>
+</div>
+<section id="Training-and-Inference">
+<h2>Training and Inference<a class="headerlink" href="#Training-and-Inference" title="Link to this heading"></a></h2>
+<p>We can perform training and inference in a single step:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-T<span class="w"> </span>species<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;{petal_length: 2.5, petal_width: 0.5, sepal_length: 5.0, sepal_width: 3.5}&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sklearn/base.py:493: UserWarning: X does not have valid feature names, but DecisionTreeClassifier was fitted with feature names
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+predicted_object:
+  species: setosa
+confidence: 1.0
+</pre></div></div>
+</div>
+</section>
+<section id="Saving-the-Model">
+<h2>Saving the Model<a class="headerlink" href="#Saving-the-Model" title="Link to this heading"></a></h2>
+<p>Performing training and inference in a single step is convenient where training is fast, but more typically we’d want to save the model for later use:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-T<span class="w"> </span>species<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;tmp/iris-model.joblib&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>We can use a pre-saved model in inference:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;tmp/iris-model.joblib&quot;</span><span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;{petal_length: 2.5, petal_width: 0.5, sepal_length: 5.0, sepal_width: 3.5}&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/sklearn/base.py:493: UserWarning: X does not have valid feature names, but DecisionTreeClassifier was fitted with feature names
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+predicted_object:
+  species: setosa
+confidence: 1.0
+</pre></div></div>
+</div>
+</section>
+<section id="Exporting-models-to-explainable-visualizations">
+<h2>Exporting models to explainable visualizations<a class="headerlink" href="#Exporting-models-to-explainable-visualizations" title="Link to this heading"></a></h2>
+<p>We can export the model to a visual representation to make it more explaininable:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;tmp/iris-model.joblib&quot;</span><span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;tmp/iris-model.png&quot;</span>
+</pre></div>
+</div>
+</div>
+<p><img alt="img" src="how-to/tmp/iris-model.png" /></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-L<span class="w"> </span>tmp/iris-model.joblib<span class="w"> </span>-E<span class="w"> </span>tmp/iris-model.rulebased.yaml
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Generating-a-rule-based-model">
+<h2>Generating a rule-based model<a class="headerlink" href="#Generating-a-rule-based-model" title="Link to this heading"></a></h2>
+<p>Although traditionally ML is used for <em>statistical inference</em>, sometimes we might want to use ML (e.g. Decision Trees) to generate simple purely deterministic rule-based models.</p>
+<p>linkml-store has a different kind of inference engine that works using LinkML schemas, specifically</p>
 <ul class="simple">
-<li><p>A <code class="docutils literal notranslate"><span class="pre">Client</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rules</span></code> at the class an slot level</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expressions</span></code> that combine slot assignments logically and artithmetically</p></li>
 </ul>
+<p>We can export (some) ML models to this format:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+cat<span class="w"> </span>tmp/iris-model.rulebased.yaml
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+class_rules: null
+config:
+  feature_attributes:
+  - petal_length
+  - petal_width
+  - sepal_length
+  - sepal_width
+  target_attributes:
+  - species
+slot_expressions:
+  species: (&#34;setosa&#34; if ({petal_width} &lt;= 0.8000) else &#34;versicolor&#34;)
+slot_rules: null
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>--stacktrace<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rulebased<span class="w"> </span>-L<span class="w"> </span>tmp/iris-model.rulebased.yaml<span class="w">  </span>-q<span class="w"> </span><span class="s2">&quot;{petal_length: 2.5, petal_width: 0.5, sepal_length: 5.0, sepal_width: 3.5}&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EVAL {&#39;petal_length&#39;: 2.5, &#39;petal_width&#39;: 0.5, &#39;sepal_length&#39;: 5.0, &#39;sepal_width&#39;: 3.5}
+predicted_object:
+  petal_length: 2.5
+  petal_width: 0.5
+  sepal_length: 5.0
+  sepal_width: 3.5
+  species: setosa
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 
         </article>
@@ -316,8 +504,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="../reference/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Reference</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Index-GO-CAMs.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">How to index GO-CAMs with LinkML-Store</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -336,8 +542,30 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to predict missing data</a><ul>
+<li><a class="reference internal" href="#Training-and-Inference">Training and Inference</a></li>
+<li><a class="reference internal" href="#Saving-the-Model">Saving the Model</a></li>
+<li><a class="reference internal" href="#Exporting-models-to-explainable-visualizations">Exporting models to explainable visualizations</a></li>
+<li><a class="reference internal" href="#Generating-a-rule-based-model">Generating a rule-based model</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
