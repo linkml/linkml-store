@@ -182,6 +182,9 @@ def visualize_decision_tree(
     # dot_data = escape_label(dot_data)
     logger.info(f"Dot: {dot_data}")
     dot_path = shutil.which("dot")
+    if not dot_path:
+        logger.warning("Graphviz 'dot' executable not found in PATH. Skipping visualization.")
+        return
     os.environ["GRAPHVIZ_DOT"] = dot_path
 
     graph = graphviz.Source(dot_data)
