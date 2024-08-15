@@ -14,6 +14,9 @@ including DuckDB, MongoDB, Neo4J, and Solr.
 It is designed to make it easier to work with data in different forms (tabular, JSON, columnar, RDF),
 provide expressive validation at scale, and enable the ability to mix and match different backends.
 
+For a high-level overview, see `These slides <https://docs.google.com/presentation/d/e/2PACX-1vSgtWUNUW0qNO_ZhMAGQ6fYhlXZJjBNMYT0OiZz8DDx8oj7iG9KofRs6SeaMXBBOICGknoyMG2zaHnm/embed?start=false&loop=false&delayms=3000>`_.
+
+
 Is this a database engine?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

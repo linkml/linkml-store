@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-
 from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rag_inference_engine import RAGInferenceEngine
