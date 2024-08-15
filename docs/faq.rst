@@ -160,6 +160,13 @@ Check out the repo, and like all linkml projects, use Poetry:
 Backend Integrations
 ------------
 
+What is a database integration?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This framework provides different integrations (aka adapters or implementations) that can hook into
+your favorite backend database (if your database engine is not supported, please be patient - or
+consider contributing one as a PR!)
+
 Does linkml-store support DuckDB?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -282,3 +289,11 @@ Check back later for tutorials. For now, you can read about:
 - `Rules in LinkML <https://linkml.io/linkml/schemas/advanced.html#rules>`_
 
 In future we will provide bindings for rule engines, datalog engines, and OWL reasoners.
+
+Contributing
+------------
+
+How do I contribute to linkml-store?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We welcome contributions! Please see the `LinkML contributing guide <https://linkml.io/linkml/contributing.html>`_.
