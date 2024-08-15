@@ -36,6 +36,9 @@ class DuckDBCollection(Collection):
         logger.info(f"Inserting into: {self.alias} // T={table.name}")
         engine = self.parent.engine
         col_names = [c.name for c in table.columns]
+        bad_objs = [obj for obj in objs if not isinstance(obj, dict)]
+        if bad_objs:
+            logger.error(f"Bad objects: {bad_objs}")
         objs = [{k: obj.get(k, None) for k in col_names} for obj in objs]
         with engine.connect() as conn:
             with conn.begin():

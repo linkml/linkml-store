@@ -32,6 +32,7 @@ MODEL_TOKEN_MAPPING = {
     "code-cushman-002": 2048,
     "code-cushman-001": 2048,
     "claude": 200_000,
+    "llama-3": 200_000,
 }
 
 

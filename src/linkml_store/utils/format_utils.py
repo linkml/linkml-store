@@ -47,6 +47,7 @@ class Format(Enum):
             ".jsonl": cls.JSONL,
             ".yaml": cls.YAML,
             ".yml": cls.YAML,
+            ".yamll": cls.YAMLL,
             ".tsv": cls.TSV,
             ".csv": cls.CSV,
             ".py": cls.PYTHON,
@@ -98,6 +99,9 @@ def process_file(
     """
     Process a single file and return a list of objects.
     """
+    if format == Format.YAMLL:
+        format = Format.YAML
+        expected_type = list
     if format == Format.JSON:
         objs = json.load(f)
     elif format == Format.JSONL:
@@ -105,6 +109,8 @@ def process_file(
     elif format == Format.YAML:
         if expected_type and expected_type == list:  # noqa E721
             objs = list(yaml.safe_load_all(f))
+            # allow YAML with a `---` with no object before it
+            objs = [obj for obj in objs if obj is not None]
         else:
             objs = yaml.safe_load(f)
     elif format in [Format.TSV, Format.CSV]:

@@ -16,6 +16,7 @@ common query, index, and storage operations.
    tutorials/index
    how-to/index
    reference/index
+   faq
 
 Indices and tables
 ==================

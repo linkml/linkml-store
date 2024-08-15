@@ -212,3 +212,28 @@ def test_store_explicit_schema(cli_runner, output_dir):
     # note we have intentionally "lost" the original container
     assert len(classes) == 3
     assert set(classes.keys()) == {"about", "persons", "organizations"}
+
+
+@pytest.mark.integration
+def test_infer_using_rag(cli_runner, output_dir):
+    input_path = INPUT_DIR / "countries" / "countries.jsonl"
+    output_path = OUTPUT_DIR / "rag_inference_results.yaml"
+    # store the objects, using the schema
+    result = cli_runner.invoke(
+        cli,
+        [
+            "-i",
+            str(input_path),
+            "infer",
+            "-t",
+            "rag",
+            "-q",
+            "name: Uruguay",
+            "-o",
+            str(output_path),
+        ],
+    )
+    assert result.exit_code == 0
+    result = yaml.safe_load(open(output_path))
+    obj = result["predicted_object"]
+    assert obj["capital"] == "Montevideo"

@@ -1,4 +1,5 @@
 import logging
+import random
 from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
@@ -6,7 +7,7 @@ from pathlib import Path
 from typing import Optional, TextIO, Tuple, Union
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig
@@ -59,9 +60,25 @@ class ModelSerialization(str, Enum):
 class CollectionSlice(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    collection: Optional[Collection] = None
-    dataframe: Optional[pd.DataFrame] = None
-    slice: Tuple[Optional[int], Optional[int]] = Field(default=(None, None))
+    name: Optional[str] = None
+    base_collection: Optional[Collection] = None
+    # _dataframe: Optional[pd.DataFrame] = None
+    # slice: Tuple[Optional[int], Optional[int]] = Field(default=(None, None))
+    indices: Optional[Tuple[int, ...]] = None
+    _collection: Optional[Collection] = None
+
+    @property
+    def collection(self) -> Collection:
+        if not self._collection:
+            rows = self.base_collection.find({}, limit=-1).rows
+            # subset based on indices
+            subset = [rows[i] for i in self.indices]
+            db = self.base_collection.parent
+            subset_name = f"{self.base_collection.alias}__rag_{self.name}"
+            subset_collection = db.get_collection(subset_name, create_if_not_exists=True)
+            subset_collection.insert(subset)
+            self._collection = subset_collection
+        return self._collection
 
     def as_dataframe(self, flattened=False) -> pd.DataFrame:
         """
@@ -69,17 +86,11 @@ class CollectionSlice(BaseModel):
 
         :return:
         """
-        if self.dataframe is not None:
-            df = self.dataframe
-            return df.iloc[self.slice[0] : self.slice[1]]
-        elif self.collection is not None:
-            rs = self.collection.find({}, offset=self.slice[0], limit=self.slice[1] - self.slice[0])
-            if flattened:
-                return nested_objects_to_dataframe(rs.rows)
-            else:
-                return rs.rows_dataframe
+        rs = self.collection.find({}, limit=-1)
+        if flattened:
+            return nested_objects_to_dataframe(rs.rows)
         else:
-            raise ValueError("No dataframe or collection provided")
+            return rs.rows_dataframe
 
 
 @dataclass
@@ -96,7 +107,7 @@ class InferenceEngine(ABC):
     training_data: Optional[CollectionSlice] = None
     testing_data: Optional[CollectionSlice] = None
 
-    def load_and_split_data(self, collection: Collection, split: Optional[Tuple[float, float]] = None):
+    def load_and_split_data(self, collection: Collection, split: Optional[Tuple[float, float]] = None, randomize=True):
         """
         Load the data and split it into training and testing sets.
 
@@ -109,8 +120,24 @@ class InferenceEngine(ABC):
             split = (0.7, 0.3)
         logger.info(f"Loading and splitting data from collection {collection.alias}")
         size = collection.size()
-        self.training_data = CollectionSlice(collection=collection, slice=(0, int(size * split[0])))
-        self.testing_data = CollectionSlice(collection=collection, slice=(int(size * split[0]), size))
+        indices = range(size)
+        if randomize:
+            train_indices = random.sample(indices, int(size * split[0]))
+            test_indices = set(indices) - set(train_indices)
+        else:
+            train_indices = indices[: int(size * split[0])]
+            test_indices = indices[int(size * split[0]) :]
+        self.training_data = CollectionSlice(name="train", base_collection=collection, indices=train_indices)
+        self.testing_data = CollectionSlice(name="test", base_collection=collection, indices=test_indices)
+        # all_data = collection.find({}, limit=size).rows
+        # all_data_df = nested_objects_to_dataframe(all_data)
+        # all_data_df = collection.find({}, limit=size).rows_dataframe
+        # randomize/shuffle order of rows in dataframe
+        # all_data_df = all_data_df.sample(frac=1).reset_index(drop=True)
+        # self.training_data = CollectionSlice(dataframe=all_data_df[: int(size * split[0])])
+        # self.testing_data = CollectionSlice(dataframe=all_data_df[int(size * split[0]) : size])
+        # self.training_data = CollectionSlice(base_collection=collection, slice=(0, int(size * split[0])))
+        # self.testing_data = CollectionSlice(base_collection=collection, slice=(int(size * split[0]), size))
 
     def initialize_model(self, **kwargs):
         """

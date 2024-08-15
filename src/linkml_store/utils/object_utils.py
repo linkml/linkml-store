@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -60,6 +60,41 @@ def object_path_update(
     return ret_obj
 
 
+def object_path_get(obj: Union[BaseModel, Dict[str, Any]], path: str, default_value=None) -> Any:
+    """
+    Retrieves a value from a nested object based on a path description. The path to the
+    desired field is given in dot and bracket notation (e.g., 'a[0].b.c[1]').
+
+    :param obj: The dictionary object to be updated.
+    :type obj: Dict[str, Any]
+    :param path: The path string indicating where to place the value within the object.
+    :type path: str
+    :return: The value at the specified path.
+    :rtype: Any
+
+    **Example**::
+
+    >>> data = {'persons': [{'foo': {'bar': 1}}]}
+    >>> object_path_get(data, 'persons[0].foo.bar')
+    1
+    >>> object_path_get(data, 'persons[0].foo')
+    {'bar': 1}
+    >>> object_path_get({}, 'not there', "NA")
+    'NA'
+    """
+    if isinstance(obj, BaseModel):
+        obj = obj.dict()
+    parts = path.split(".")
+    for part in parts:
+        if "[" in part:
+            key, index = part[:-1].split("[")
+            index = int(index)
+            obj = obj[key][index]
+        else:
+            obj = obj.get(part, default_value)
+    return obj
+
+
 def parse_update_expression(expr: str) -> Union[tuple[str, Any], None]:
     """
     Parse a string expression of the form 'path.to.field=value' into a path and a value.
@@ -81,3 +116,67 @@ def clean_empties(value: Union[Dict, List]) -> Any:
     elif isinstance(value, list):
         value = [v for v in (clean_empties(v) for v in value) if v is not None]
     return value
+
+
+def select_nested(data: dict, paths: List[Union[str, List[str]]], current_path=None) -> Optional[dict]:
+    """
+    Select nested attributes from a complex dictionary based on selector strings.
+
+    Args:
+    data (dict): The input nested dictionary.
+    selectors (list): A list of selector strings.
+
+    Returns:
+    dict: A new dictionary with the same structure, but only the selected attributes.
+
+    Example:
+    >>> data = {
+    ...     "person": {
+    ...         "name": "John Doe",
+    ...         "age": 30,
+    ...         "address": {
+    ...             "street": "123 Main St",
+    ...             "city": "Anytown",
+    ...             "country": "USA"
+    ...         },
+    ...         "phones": [
+    ...             {"type": "home", "number": "555-1234"},
+    ...             {"type": "work", "number": "555-5678"}
+    ...         ]
+    ...     },
+    ...     "company": {
+    ...         "name": "Acme Inc",
+    ...         "location": "New York"
+    ...     }
+    ... }
+    >>> select_nested(data, ["person.address.street", "person.address.city"])
+    {'person': {'address': {'street': '123 Main St', 'city': 'Anytown'}}}
+    >>> select_nested(data, ["person.phones.number", "person.phones.type"])
+    {'person': {'phones': [{'type': 'home', 'number': '555-1234'}, {'type': 'work', 'number': '555-5678'}]}}
+    >>> select_nested(data, ["person"])
+    {'person': {'name': 'John Doe', 'age': 30, 'address': {'street': '123 Main St', 'city': 'Anytown',
+     'country': 'USA'}, 'phones': [{'type': 'home', 'number': '555-1234'}, {'type': 'work', 'number': '555-5678'}]}}
+    >>> select_nested(data, ["person.phones.type"])
+    {'person': {'phones': [{'type': 'home'}, {'type': 'work'}]}}
+    """
+    if current_path is None:
+        current_path = []
+    matching_paths = []
+    for path in paths:
+        if isinstance(path, str):
+            path = path.split(".")
+        if path == current_path:
+            return data
+        if path[: len(current_path)] == current_path:
+            matching_paths.append(path)
+    if not matching_paths:
+        return None
+    if isinstance(data, dict):
+        new_obj = {k: select_nested(v, matching_paths, current_path + [k]) for k, v in data.items()}
+        new_obj = {k: v for k, v in new_obj.items() if v is not None}
+        return new_obj
+    if isinstance(data, list):
+        new_obj = [select_nested(v, matching_paths, current_path + []) for i, v in enumerate(data)]
+        new_obj = [v for v in new_obj if v is not None]
+        return new_obj
+    return data
