@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="author" title="About these documents" href="#" /><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorials" href="tutorials/index.html" /><link rel="prev" title="LinkML-Store documentation" href="index.html" />
+<link rel="author" title="About these documents" href="about.html" /><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="linkml_store.api.stores.chromadb.chromadb_database module" href="reference/linkml_store.api.stores.chromadb.chromadb_database.html" />
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>About - linkml-store documentation</title>
+        <title>Frequently Asked Questions - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
@@ -204,7 +204,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Command-Line-Tutorial.html">Tutorial: Using the Command Line Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Python-Tutorial.html">Tutorial: Using the Python API</a></li>
@@ -263,7 +263,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html#indices-and-tables">Indices and tables</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Frequently Asked Questions</a></li>
 </ul>
 
 </div>
@@ -284,7 +284,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/about.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/faq.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -304,73 +304,247 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="about">
-<span id="id1"></span><h1>About<a class="headerlink" href="#about" title="Link to this heading"></a></h1>
-<p>LinkML-Store is an early effort to provide a unifying storage layer
-over multiple different backends, unified via LinkML schemas.</p>
-<p>The overall goals are to provide:</p>
+          <section id="frequently-asked-questions">
+<span id="faq"></span><h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading"></a></h1>
+<section id="general">
+<h2>General<a class="headerlink" href="#general" title="Link to this heading"></a></h2>
+<section id="what-is-this-project">
+<h3>What is this project?<a class="headerlink" href="#what-is-this-project" title="Link to this heading"></a></h3>
+<p>linkml-store is a data management solution that provides a common interface to multiple backends,
+including DuckDB, MongoDB, Neo4J, and Solr.
+It is designed to make it easier to work with data in different forms (tabular, JSON, columnar, RDF),
+provide expressive validation at scale, and enable the ability to mix and match different backends.</p>
+<p>For a high-level overview, see <a class="reference external" href="https://docs.google.com/presentation/d/e/2PACX-1vSgtWUNUW0qNO_ZhMAGQ6fYhlXZJjBNMYT0OiZz8DDx8oj7iG9KofRs6SeaMXBBOICGknoyMG2zaHnm/embed?start=false&amp;loop=false&amp;delayms=3000">These slides</a>.</p>
+</section>
+<section id="is-this-a-database-engine">
+<h3>Is this a database engine?<a class="headerlink" href="#is-this-a-database-engine" title="Link to this heading"></a></h3>
+<p>No, linkml-store is not a database engine in itself. It is designed to be used <em>in combination</em>
+with your favorite database engines.</p>
+</section>
+<section id="do-i-need-to-know-linkml-to-use-this">
+<h3>Do I need to know LinkML to use this?<a class="headerlink" href="#do-i-need-to-know-linkml-to-use-this" title="Link to this heading"></a></h3>
+<p>No, you do not need to know LinkML to use linkml-store. In fact you can use linkml-store in
+“YOLO mode” where you don’t even specify a schema (a schema will be induced as far as possible).</p>
+<p>However, for serious applications we recommend you always provide a LinkML schema for your
+different datasets.</p>
+<p>For more information on LinkML, see the <a class="reference external" href="https://linkml.io/linkml/">LinkML documentation</a>.</p>
+</section>
+<section id="can-i-use-the-command-line">
+<h3>Can I use the command line?<a class="headerlink" href="#can-i-use-the-command-line" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store provides a command line interface.</p>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/tutorials/Command-Line-Tutorial.html">Command Line Tutorial</a> for examples.</p>
+<p>All commands can be used via the base <code class="docutils literal notranslate"><span class="pre">linkml-store</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>linkml-store<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>Note some command line options may change in future until this package is 1.0.0</p>
+</section>
+<section id="can-i-use-the-python-api">
+<h3>Can I use the Python API?<a class="headerlink" href="#can-i-use-the-python-api" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store provides a Python API.</p>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/tutorials/Python-Tutorial.html">Python Tutorial</a> for examples.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
+<span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">attach_collection</span><span class="p">(</span><span class="s2">&quot;my_collection&quot;</span><span class="p">)</span>
+<span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">})</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="can-i-use-a-web-api">
+<h3>Can I use a web API?<a class="headerlink" href="#can-i-use-a-web-api" title="Link to this heading"></a></h3>
+<p>Yes, you can stand up a web API.</p>
+<p>To start you should first create a config file, e.g. <code class="docutils literal notranslate"><span class="pre">db/conf.yaml</span></code>:</p>
+<p>Then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LINKML_STORE_CONFIG</span><span class="o">=</span>./db/conf.yaml
+make<span class="w"> </span>api
+</pre></div>
+</div>
+</section>
+<section id="can-i-use-a-web-ui">
+<h3>Can I use a web UI?<a class="headerlink" href="#can-i-use-a-web-ui" title="Link to this heading"></a></h3>
+<p>We provide a <em>very rudimentary</em> web UI. To start you should first create a config file, e.g. <code class="docutils literal notranslate"><span class="pre">db/conf.yaml</span></code>:</p>
+<p>Then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LINKML_STORE_CONFIG</span><span class="o">=</span>./db/conf.yaml
+make<span class="w"> </span>app
+</pre></div>
+</div>
+</section>
+<section id="what-is-crudsi">
+<h3>What is CRUDSI?<a class="headerlink" href="#what-is-crudsi" title="Link to this heading"></a></h3>
+<p>CRUDSI is our not particularly serious name for the design pattern that linkml-store follows.</p>
+<p>Many database engines and database solutions implement a CRUD layer:</p>
 <ul class="simple">
-<li><p>Make it easier to work with data in different forms (tabular, JSON, columnar, RDF)</p></li>
-<li><p>Expressive validation at scale, including full referential integrity validation</p></li>
-<li><p>Ability to mix and match different backends (e.g. DuckDB, MongoDB, Solr, ChromaDB, HDF5)</p></li>
-<li><p>Composability of different search indexes, including LLM textual embeddings</p></li>
-<li><p>LAMP-like stack for LinkML</p></li>
+<li><p>Create</p></li>
+<li><p>Read</p></li>
+<li><p>Update</p></li>
+<li><p>Delete</p></li>
 </ul>
+<p>linkml-store adds two more operations:</p>
+<ul class="simple">
+<li><p>Search</p></li>
+<li><p>Inference</p></li>
+</ul>
+</section>
+<section id="is-this-an-ai-machine-learning-llm-vector-database-platform">
+<h3>Is this an AI/Machine Learning/LLM/Vector database platform?<a class="headerlink" href="#is-this-an-ai-machine-learning-llm-vector-database-platform" title="Link to this heading"></a></h3>
+<p>linkml-store is first and foremost a <em>data management</em> platform. However,
+we do provide optional integrations to AI and ML tooling. In particular, you can plug and
+play different solutions for implementing search indexes, including LLM textual embeddings.</p>
+<p>Additionally, we believe that robust data management using rich and expressive semantic
+schemas (in combination with the database engine of your choice) is the key to
+making data <strong>AI-ready</strong>.</p>
+</section>
+<section id="is-linkml-store-production-ready">
+<h3>Is linkml-store production ready?<a class="headerlink" href="#is-linkml-store-production-ready" title="Link to this heading"></a></h3>
+<p>linkml-store is currently not as mature as the core LinkML products. Be warned that
+the API and command line options may change. However, things may be moving fast,
+and you are invited to check back in here later!</p>
+</section>
+<section id="are-there-tutorials">
+<h3>Are there tutorials?<a class="headerlink" href="#are-there-tutorials" title="Link to this heading"></a></h3>
+<p>See <span class="xref std std-ref">tutorials</span></p>
+</section>
+</section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>At this stage we recommend installing all extras:</p>
+<section id="how-do-i-install-linkml-store">
+<h3>How do I install linkml-store?<a class="headerlink" href="#how-do-i-install-linkml-store" title="Link to this heading"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store[all]&quot;</span>
 </pre></div>
 </div>
-<p>Minimal implementation:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;linkml-store&quot;</span>
-</pre></div>
-</div>
-<p>For developers working on the linkml-store codebase, we recommend checking out the repo, and then
-installing all packages via the <cite>make</cite> command:</p>
+<p>This installs both necessary and optional dependencies. We recommend this for now.</p>
+</section>
+<section id="as-a-developer-how-do-i-install-linkml-store">
+<h3>As a developer, how do I install linkml-store?<a class="headerlink" href="#as-a-developer-how-do-i-install-linkml-store" title="Link to this heading"></a></h3>
+<p>Check out the repo, and like all linkml projects, use Poetry:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;URL&gt;
 <span class="nb">cd</span><span class="w"> </span>linkml-store
 make<span class="w"> </span>install
 </pre></div>
 </div>
 </section>
-<section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h2>
-<p>See the <span class="xref std std-ref">tutorials</span></p>
+</section>
+<section id="backend-integrations">
+<h2>Backend Integrations<a class="headerlink" href="#backend-integrations" title="Link to this heading"></a></h2>
+<section id="what-is-a-database-integration">
+<h3>What is a database integration?<a class="headerlink" href="#what-is-a-database-integration" title="Link to this heading"></a></h3>
+<p>This framework provides different integrations (aka adapters or implementations) that can hook into
+your favorite backend database (if your database engine is not supported, please be patient - or
+consider contributing one as a PR!)</p>
+</section>
+<section id="does-linkml-store-support-duckdb">
+<h3>Does linkml-store support DuckDB?<a class="headerlink" href="#does-linkml-store-support-duckdb" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store supports DuckDB as a backend. DuckDB is a modern columnar in-memory database</p>
+<p>See the <span class="xref std std-ref">tutorial</span> for examples.</p>
+<p>Note that currently for DuckDB we bypass the <a class="reference external" href="https://linkml.io/linkml/generators/sqltable.html">standard linkml to SQL to relational mapping</a> step,
+and instead use DuckDB more like a data frame store. Nested objects and lists are stored directly
+(using DuckDB’s json integrations behind the scenes), rather than fully normalized.</p>
+</section>
+<section id="does-linkml-store-support-mongodb">
+<h3>Does linkml-store support MongoDB?<a class="headerlink" href="#does-linkml-store-support-mongodb" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store supports MongoDB as a backend. MongoDB is a popular NoSQL database.</p>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/how-to/Use-MongoDB.html">MongoDB how-to guide</a> for examples.</p>
+</section>
+<section id="does-linkml-store-support-neo4j">
+<h3>Does linkml-store support Neo4J?<a class="headerlink" href="#does-linkml-store-support-neo4j" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store supports Neo4J as a backend. Neo4J is a popular graph database.</p>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/how-to/Use-Neo4J.html">Neo4J how-to guide</a> for examples.</p>
+</section>
+<section id="does-linkml-store-support-solr">
+<h3>Does linkml-store support Solr?<a class="headerlink" href="#does-linkml-store-support-solr" title="Link to this heading"></a></h3>
+<p>Currently we provide only read support for Solr. We are working on write support.</p>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/how-to/Query-Solr-using-CLI.html">Solr how-to guide</a> for examples.</p>
+</section>
+<section id="can-i-use-linkml-store-with-my-favorite-triplestore">
+<h3>Can I use linkml-store with my favorite triplestore?<a class="headerlink" href="#can-i-use-linkml-store-with-my-favorite-triplestore" title="Link to this heading"></a></h3>
+<p>Not yet! This is a surprising omission given LinkML’s roots in the semantic web community. However,
+this is planned soon, so check back later.</p>
+</section>
 </section>
 <section id="data-model">
-<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<h2>Data model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<section id="what-is-the-data-model-in-linkml-store">
+<h3>What is the data model in linkml-store?<a class="headerlink" href="#what-is-the-data-model-in-linkml-store" title="Link to this heading"></a></h3>
+<p>linkml-store has a simple data model:</p>
 <ul class="simple">
 <li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.client.Client" title="linkml_store.api.client.Client"><code class="xref py py-class docutils literal notranslate"><span class="pre">Client</span></code></a> provides a top-level interface over one or more databases.</p></li>
 <li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.database.Database" title="linkml_store.api.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a> consists of one or more possibly heterogeneous collections.</p></li>
 <li><p>A <a class="reference internal" href="reference/linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a> is a queryable set of objects of a similar type.</p></li>
-<li><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Indexer</span></code> creates indexes over collections to enable efficient searching.</p></li>
 </ul>
 </section>
-<section id="adapters">
-<h2>Adapters<a class="headerlink" href="#adapters" title="Link to this heading"></a></h2>
-<p>The current backends are:</p>
+</section>
+<section id="search">
+<h2>Search<a class="headerlink" href="#search" title="Link to this heading"></a></h2>
+<section id="can-i-use-llm-vector-embeddings-for-search">
+<h3>Can I use LLM vector embeddings for search?<a class="headerlink" href="#can-i-use-llm-vector-embeddings-for-search" title="Link to this heading"></a></h3>
+<p>Yes, you can use LLM vector embeddings for search. This is an optional feature.</p>
+<p>See <a class="reference external" href="https://linkml.io/linkml-store/how-to/Use-Semantic-Search.html">How to use semantic search</a> for examples.</p>
+</section>
+<section id="do-i-need-to-use-an-llm-for-search">
+<h3>Do I need to use an LLM for search<a class="headerlink" href="#do-i-need-to-use-an-llm-for-search" title="Link to this heading"></a></h3>
+<p>No, but currently other options are limited. You can use a naive tripartite index, or if your backend
+supports search out the box (e.g. Solr) then linkml-store should directly wire into this.</p>
+</section>
+</section>
+<section id="validation">
+<h2>Validation<a class="headerlink" href="#validation" title="Link to this heading"></a></h2>
+<section id="does-linkml-store-provide-validation">
+<h3>Does linkml-store provide validation?<a class="headerlink" href="#does-linkml-store-provide-validation" title="Link to this heading"></a></h3>
+<p>Yes, linkml-store provides expressive validation using the LinkML framework.</p>
+<p>Note that currently validation primarily leverages json-schema integrations, but the intent is to
+provide validation integrations directly with underlying backend stores.</p>
+</section>
+<section id="does-linkml-store-provide-referential-integrity-validation">
+<h3>Does linkml-store provide referential integrity validation?<a class="headerlink" href="#does-linkml-store-provide-referential-integrity-validation" title="Link to this heading"></a></h3>
+<p>See <a class="reference external" href="https://linkml.io/linkml-store/how-to/Check-Referential-Integrity.html">Check Referential Integrity</a> for examples.</p>
+</section>
+</section>
+<section id="inference">
+<h2>Inference<a class="headerlink" href="#inference" title="Link to this heading"></a></h2>
+<section id="what-is-inference-in-linkml-store">
+<h3>What is inference in linkml-store?<a class="headerlink" href="#what-is-inference-in-linkml-store" title="Link to this heading"></a></h3>
+<p>We have a very flexible notion of inference. It can encompass:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.duckdb.html#module-linkml_store.api.stores.duckdb" title="linkml_store.api.stores.duckdb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DuckDB</span></code></a> (supports read and write)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.mongodb.html#module-linkml_store.api.stores.mongodb" title="linkml_store.api.stores.mongodb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">MongoDB</span></code></a> (supports read and write)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.solr.html#module-linkml_store.api.stores.solr" title="linkml_store.api.stores.solr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Solr</span></code></a> (write not yet supported)</p></li>
-<li><p><a class="reference internal" href="reference/linkml_store.api.stores.chromadb.html#module-linkml_store.api.stores.chromadb" title="linkml_store.api.stores.chromadb"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ChromaDB</span></code></a> (pre-alpha)</p></li>
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">HDF5</span></code> (pre-alpha)</p></li>
+<li><p>Statistical or Machine Learning (ML) inference, e.g. via supervised learning</p></li>
+<li><p>Ontological inference, e.g. via reasoning over an ontology</p></li>
+<li><p>Rule-based or procedural inference</p></li>
+<li><p>LLM-based inference</p></li>
 </ul>
 </section>
-<section id="indexing">
-<h2>Indexing<a class="headerlink" href="#indexing" title="Link to this heading"></a></h2>
-<p>This frameworks also allows <em>composable indexes</em>. Currently two indexers are supported:</p>
-<ul class="simple">
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">SimpleIndexer</span></code> Simple native trigram method</p></li>
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">LLMIndexer</span></code> LLM text embedding</p></li>
-</ul>
+<section id="how-do-i-do-standard-ml-inference">
+<h3>How do I do standard ML inference?<a class="headerlink" href="#how-do-i-do-standard-ml-inference" title="Link to this heading"></a></h3>
+<p>Currently we provide integrations to scikit-learn, but only expose DecisionTree classifiers for now.
+Remember, linkml-store is not a full fledged ML platform; you should use packages like XGBoost, PyTorch,
+or scikit-learn directly for more complex ML tasks.</p>
+<p>See <a class="reference external" href="https://linkml.io/linkml-store/how-to/Predict-Missing-Data.html">Predict Missing Data</a> for examples.</p>
+<p>See also the <a class="reference external" href="https://linkml.io/linkml-store/tutorials/Command-Line-Tutorial.html">Command Line Tutorial</a> for
+a simple example.</p>
 </section>
-<section id="metadata-and-configuration">
-<h2>Metadata and Configuration<a class="headerlink" href="#metadata-and-configuration" title="Link to this heading"></a></h2>
+<section id="how-do-i-do-llm-inference">
+<h3>How do I do LLM inference?<a class="headerlink" href="#how-do-i-do-llm-inference" title="Link to this heading"></a></h3>
+<p>See the <a class="reference external" href="https://linkml.io/linkml-store/tutorials/Command-Line-Tutorial.html">Command Line Tutorial</a> (see
+the final section) for an example.</p>
+</section>
+<section id="how-do-i-do-rule-based-inference">
+<h3>How do I do rule-based inference?<a class="headerlink" href="#how-do-i-do-rule-based-inference" title="Link to this heading"></a></h3>
+<p>Check back later for tutorials. For now, you can read about:</p>
 <ul class="simple">
-<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">ClientConfig</span></code> provides a structure for configuring the client</p></li>
+<li><p>the <a class="reference external" href="https://linkml.io/linkml/schemas/expression-language.html">LinkML expression language</a></p></li>
+<li><p><a class="reference external" href="https://linkml.io/linkml/schemas/advanced.html#rules">Rules in LinkML</a></p></li>
 </ul>
+<p>In future we will provide bindings for rule engines, datalog engines, and OWL reasoners.</p>
+</section>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h2>
+<section id="how-do-i-contribute-to-linkml-store">
+<h3>How do I contribute to linkml-store?<a class="headerlink" href="#how-do-i-contribute-to-linkml-store" title="Link to this heading"></a></h3>
+<p>We welcome contributions! Please see the <a class="reference external" href="https://linkml.io/linkml/contributing.html">LinkML contributing guide</a>.</p>
+</section>
 </section>
 </section>
 
@@ -379,23 +553,15 @@ make<span class="w"> </span>install
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="tutorials/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Tutorials</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="index.html">
+          
+          <a class="prev-page" href="reference/linkml_store.api.stores.chromadb.chromadb_database.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">linkml_store.api.stores.chromadb.chromadb_database module</div>
                 
               </div>
             </a>
@@ -429,13 +595,60 @@ make<span class="w"> </span>install
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">About</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
-<li><a class="reference internal" href="#data-model">Data Model</a></li>
-<li><a class="reference internal" href="#adapters">Adapters</a></li>
-<li><a class="reference internal" href="#indexing">Indexing</a></li>
-<li><a class="reference internal" href="#metadata-and-configuration">Metadata and Configuration</a></li>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#general">General</a><ul>
+<li><a class="reference internal" href="#what-is-this-project">What is this project?</a></li>
+<li><a class="reference internal" href="#is-this-a-database-engine">Is this a database engine?</a></li>
+<li><a class="reference internal" href="#do-i-need-to-know-linkml-to-use-this">Do I need to know LinkML to use this?</a></li>
+<li><a class="reference internal" href="#can-i-use-the-command-line">Can I use the command line?</a></li>
+<li><a class="reference internal" href="#can-i-use-the-python-api">Can I use the Python API?</a></li>
+<li><a class="reference internal" href="#can-i-use-a-web-api">Can I use a web API?</a></li>
+<li><a class="reference internal" href="#can-i-use-a-web-ui">Can I use a web UI?</a></li>
+<li><a class="reference internal" href="#what-is-crudsi">What is CRUDSI?</a></li>
+<li><a class="reference internal" href="#is-this-an-ai-machine-learning-llm-vector-database-platform">Is this an AI/Machine Learning/LLM/Vector database platform?</a></li>
+<li><a class="reference internal" href="#is-linkml-store-production-ready">Is linkml-store production ready?</a></li>
+<li><a class="reference internal" href="#are-there-tutorials">Are there tutorials?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#how-do-i-install-linkml-store">How do I install linkml-store?</a></li>
+<li><a class="reference internal" href="#as-a-developer-how-do-i-install-linkml-store">As a developer, how do I install linkml-store?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backend-integrations">Backend Integrations</a><ul>
+<li><a class="reference internal" href="#what-is-a-database-integration">What is a database integration?</a></li>
+<li><a class="reference internal" href="#does-linkml-store-support-duckdb">Does linkml-store support DuckDB?</a></li>
+<li><a class="reference internal" href="#does-linkml-store-support-mongodb">Does linkml-store support MongoDB?</a></li>
+<li><a class="reference internal" href="#does-linkml-store-support-neo4j">Does linkml-store support Neo4J?</a></li>
+<li><a class="reference internal" href="#does-linkml-store-support-solr">Does linkml-store support Solr?</a></li>
+<li><a class="reference internal" href="#can-i-use-linkml-store-with-my-favorite-triplestore">Can I use linkml-store with my favorite triplestore?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-model">Data model</a><ul>
+<li><a class="reference internal" href="#what-is-the-data-model-in-linkml-store">What is the data model in linkml-store?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#search">Search</a><ul>
+<li><a class="reference internal" href="#can-i-use-llm-vector-embeddings-for-search">Can I use LLM vector embeddings for search?</a></li>
+<li><a class="reference internal" href="#do-i-need-to-use-an-llm-for-search">Do I need to use an LLM for search</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#validation">Validation</a><ul>
+<li><a class="reference internal" href="#does-linkml-store-provide-validation">Does linkml-store provide validation?</a></li>
+<li><a class="reference internal" href="#does-linkml-store-provide-referential-integrity-validation">Does linkml-store provide referential integrity validation?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inference">Inference</a><ul>
+<li><a class="reference internal" href="#what-is-inference-in-linkml-store">What is inference in linkml-store?</a></li>
+<li><a class="reference internal" href="#how-do-i-do-standard-ml-inference">How do I do standard ML inference?</a></li>
+<li><a class="reference internal" href="#how-do-i-do-llm-inference">How do I do LLM inference?</a></li>
+<li><a class="reference internal" href="#how-do-i-do-rule-based-inference">How do I do rule-based inference?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contributing">Contributing</a><ul>
+<li><a class="reference internal" href="#how-do-i-contribute-to-linkml-store">How do I contribute to linkml-store?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
