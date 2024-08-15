@@ -1,5 +1,7 @@
 import logging
 
+import pytest
+
 from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rag_inference_engine import RAGInferenceEngine
@@ -29,6 +31,7 @@ def make_rule_based(ie: InferenceEngine) -> RuleBasedInferenceEngine:
     return ie2
 
 
+@pytest.mark.integration
 def test_inference_nested():
     client = Client()
     db = client.attach_database("duckdb", alias="test")
