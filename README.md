@@ -7,6 +7,8 @@ common query, index, and storage operations.
 
 For full documentation, see [https://linkml.io/linkml-store/](https://linkml.io/linkml-store/)
 
+See [these slides](https://docs.google.com/presentation/d/e/2PACX-1vSgtWUNUW0qNO_ZhMAGQ6fYhlXZJjBNMYT0OiZz8DDx8oj7iG9KofRs6SeaMXBBOICGknoyMG2zaHnm/embed?start=false&loop=false&delayms=3000) for a high level overview.
+
 __Warning__ LinkML-Store is still undergoing changes and refactoring,
 APIs and command line options are subject to change!
 
@@ -132,3 +134,4 @@ make app
 ## Background
 
 See [these slides](https://docs.google.com/presentation/d/e/2PACX-1vSgtWUNUW0qNO_ZhMAGQ6fYhlXZJjBNMYT0OiZz8DDx8oj7iG9KofRs6SeaMXBBOICGknoyMG2zaHnm/embed?start=false&loop=false&delayms=3000) for more details
+
