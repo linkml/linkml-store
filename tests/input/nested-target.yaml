@@ -1,0 +1,60 @@
+-
+  paper:
+    abstract: eric likes cheese, dave likes football
+  triples:
+    - subject: eric
+      predicate: likes
+      object: cheese
+    - subject: dave
+      predicate: likes
+      object: football
+-
+  paper:
+    abstract: birds have feathers. mammals have fur
+  triples:
+    - subject: bird
+      predicate: has_part
+      object: feather
+    - subject: mammal
+      predicate: has_part
+      object: fur
+-
+  paper:
+    abstract: nothing relevant here
+  triples: []
+-
+  paper:
+    abstract: pizza is a food, pizza has cheese topping
+  triples:
+    - subject: pizza
+      predicate: is_a
+      object: food
+    - subject: pizza
+      predicate: has_topping
+      object: cheese
+-
+  paper:
+    abstract: jose is an aardvark, he likes motorhead, they wrote ace of spades
+  triples:
+    - subject: jose
+      predicate: is_a
+      object: aardvark
+    - subject: jose
+      predicate: likes
+      object: motorhead
+    - subject: motorhead
+      predicate: created
+      object: ace of spades (song)
+-
+  paper:
+    abstract: sharks eat seals, seals eat starfish
+  triples:
+    - subject: shark
+      predicate: consumes
+      object: seal
+    - subject: seal
+      predicate: consumes
+      object: starfish
+      
+      
+  
