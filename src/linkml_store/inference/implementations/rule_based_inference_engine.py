@@ -13,7 +13,7 @@ from linkml_runtime.utils.formatutils import underscore
 from pydantic import BaseModel
 
 from linkml_store.api.collection import OBJECT, Collection
-from linkml_store.inference.inference_config import Inference
+from linkml_store.inference.inference_config import Inference, InferenceConfig
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 
 logger = logging.getLogger(__name__)
@@ -111,11 +111,16 @@ class RuleBasedInferenceEngine(InferenceEngine):
         object = {underscore(k): v for k, v in object.items()}
         if self.slot_expressions:
             for slot, expr in self.slot_expressions.items():
-                print(f"EVAL {object}")
                 v = eval_expr(expr, **object)
                 if v is not None:
                     object[slot] = v
-        return Inference(predicted_object=object)
+        if self.config and self.config.target_attributes:
+            predicted_object = {k: object.get(k, None) for k in self.config.target_attributes}
+        else:
+            predicted_object = object
+        if all(v is None for v in predicted_object.values()):
+            return None
+        return Inference(predicted_object=predicted_object)
 
     def import_model_from(self, inference_engine: InferenceEngine, **kwargs):
         io = StringIO()
@@ -127,6 +132,8 @@ class RuleBasedInferenceEngine(InferenceEngine):
         if self.slot_expressions is None:
             self.slot_expressions = {}
         self.slot_expressions[target_attribute] = io.getvalue()
+        if not self.config:
+            self.config = inference_engine.config
 
     def save_model(self, output: Union[str, Path]) -> None:
         """
@@ -148,7 +155,11 @@ class RuleBasedInferenceEngine(InferenceEngine):
     def load_model(cls, file_path: Union[str, Path]) -> "RuleBasedInferenceEngine":
         model_data = yaml.safe_load(open(file_path))
 
-        engine = cls(config=model_data["config"])
+        if model_data["config"]:
+            config = InferenceConfig(**model_data["config"])
+        else:
+            config = None
+        engine = cls(config=config)
         for k, v in model_data.items():
             if k == "config":
                 continue

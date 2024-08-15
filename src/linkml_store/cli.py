@@ -7,6 +7,7 @@ from typing import Optional
 import click
 import yaml
 from linkml_runtime.dumpers import json_dumper
+from linkml_runtime.utils.formatutils import underscore
 from pydantic import BaseModel
 
 from linkml_store import Client
@@ -17,10 +18,11 @@ from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
 from linkml_store.inference import get_inference_engine
+from linkml_store.inference.evaluation import score_match, evaluate_predictor, score_text_overlap
 from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
-from linkml_store.utils.object_utils import object_path_update
+from linkml_store.utils.object_utils import object_path_update, select_nested
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
 
 DEFAULT_LOCAL_CONF_PATH = Path("linkml.yaml")
@@ -130,7 +132,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         logger.setLevel(logging.ERROR)
     ctx.ensure_object(dict)
     if input:
-        stem = Path(input).stem
+        stem = underscore(Path(input).stem)
         database = "duckdb"
         collection = stem
         config = ClientConfig(databases={"duckdb": {"collections": {stem: {"source": {"local_path": input}}}}})
@@ -496,12 +498,16 @@ def describe(ctx, where, output_type, output, limit):
 @click.option(
     "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING, help="Type of predictor"
 )
+@click.option("--evaluation-count", "-n",
+                type=click.INT,
+                help="Number of examples to evaluate over")
 @click.option("--query", "-q", type=click.STRING, help="query term")
 @click.pass_context
 def infer(
     ctx,
     inference_config_file,
     query,
+    evaluation_count,
     training_test_data_split,
     predictor_type,
     target_attribute,
@@ -546,24 +552,24 @@ def infer(
         query_obj = None
     collection = ctx.obj["settings"].collection
     atts = collection.class_definition().attributes.keys()
+    if feature_attributes:
+        features = feature_attributes.split(",")
+        features = [f.strip() for f in features]
+    else:
+        if query_obj:
+            features = query_obj.keys()
+        else:
+            features = None
+    if target_attribute:
+        target_attributes = list(target_attribute)
+    else:
+        target_attributes = [att for att in atts if att not in features]
     if model_format:
         model_format = ModelSerialization(model_format)
     if load_model:
         predictor = get_inference_engine(predictor_type)
         predictor = type(predictor).load_model(load_model)
     else:
-        if feature_attributes:
-            features = feature_attributes.split(",")
-            features = [f.strip() for f in features]
-        else:
-            if query_obj:
-                features = query_obj.keys()
-            else:
-                features = None
-        if target_attribute:
-            target_attributes = list(target_attribute)
-        else:
-            target_attributes = [att for att in atts if att not in features]
         if inference_config_file:
             config = InferenceConfig.from_file(inference_config_file)
         else:
@@ -577,8 +583,11 @@ def infer(
         logger.info(f"Exporting model to {export_model} in {model_format}")
         predictor.export_model(export_model, model_format)
     if not query_obj:
-        if not export_model:
-            raise ValueError("Query must be specified if not exporting model")
+        if not export_model and not evaluation_count:
+            raise ValueError("Query or evaluate must be specified if not exporting model")
+    if evaluation_count:
+        outcome = evaluate_predictor(predictor, target_attributes, evaluation_count=evaluation_count, match_function=score_text_overlap)
+        print(f"Outcome: {outcome} // accuracy: {outcome.accuracy}")
     if query_obj:
         result = predictor.derive(query_obj)
         dumped_obj = result.model_dump(exclude_none=True)

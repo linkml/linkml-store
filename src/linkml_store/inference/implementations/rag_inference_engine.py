@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 import yaml
 from llm import get_key
@@ -8,6 +8,7 @@ from llm import get_key
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
 from linkml_store.inference.inference_engine import InferenceEngine
+from linkml_store.utils.object_utils import object_path_get, select_nested
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,11 @@ of content.
 
 You should return ONLY valid YAML in your response.
 """
+
+
+#def select_object(obj: OBJECT, key_paths: List[str]) -> OBJECT:
+    # return {k: obj.get(k, None) for k in keys}
+    # return {k: object_path_get(obj, k, None) for k in key_paths}
 
 
 @dataclass
@@ -76,15 +82,7 @@ class RAGInferenceEngine(InferenceEngine):
 
     def initialize_model(self, **kwargs):
         td = self.training_data
-        s = td.slice
-        if not s[0] and not s[1]:
-            rag_collection = td.collection
-        else:
-            base_collection = td.collection
-            objs = base_collection.find({}, offset=s[0], limit=s[1] - s[0]).rows
-            db = base_collection.parent
-            rag_collection = db.get_collection(f"{base_collection.alias}__rag_{s[0]}_{s[1]}", create_if_not_exists=True)
-            rag_collection.insert(objs)
+        rag_collection = self.training_data.collection
         rag_collection.attach_indexer("llm", auto_index=False)
         self.rag_collection = rag_collection
 
@@ -111,15 +109,18 @@ class RAGInferenceEngine(InferenceEngine):
             raise ValueError(f"No examples found for {query_text}; size = {self.rag_collection.size()}")
         prompt_clauses = []
         for example in examples:
-            input_obj = {k: example.get(k, None) for k in feature_attributes}
-            output_obj = {k: example.get(k, None) for k in target_attributes}
+            # input_obj = {k: example.get(k, None) for k in feature_attributes}
+            input_obj = select_nested(example, feature_attributes)
+            # output_obj = {k: example.get(k, None) for k in target_attributes}
+            output_obj = select_nested(example, target_attributes)
             prompt_clause = (
                 "---\nExample:\n"
                 f"## INPUT:\n{self.object_to_text(input_obj)}\n"
                 f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
             )
             prompt_clauses.append(prompt_clause)
-        query_obj = {k: object.get(k, None) for k in feature_attributes}
+        # query_obj = {k: object.get(k, None) for k in feature_attributes}
+        query_obj = select_nested(object, feature_attributes)
         query_text = self.object_to_text(query_obj)
         prompt_end = "---\nQuery:\n" f"## INPUT:\n{query_text}\n" "## OUTPUT:\n"
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)

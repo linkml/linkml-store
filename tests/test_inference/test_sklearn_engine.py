@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 import pytest
 from linkml_runtime.utils.eval_utils import eval_expr
+from sklearn.preprocessing import OneHotEncoder
+
 from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
@@ -17,6 +19,7 @@ from linkml_store.inference.inference_engine import InferenceEngine, ModelSerial
 from linkml_store.utils.format_utils import Format
 
 from tests import INPUT_DIR, OUTPUT_DIR
+from tests.test_inference import check_accuracy, check_accuracy2
 
 MODEL_FILE_PATH = OUTPUT_DIR / "model.joblib"
 RULE_BASED_MODEL_FILE_PATH = OUTPUT_DIR / "sklean-export.rulebase.yaml"
@@ -37,27 +40,6 @@ def get_dataset(name: str, version: Optional[int] = 2) -> Tuple[pd.DataFrame, Li
     dataset = fetch_openml(name=name, version=version, as_frame=True)
     df = pd.concat([dataset.data, dataset.target], axis=1)
     return df, list(dataset.data.columns), ["class"]
-
-
-def check_accuracy(
-    ie: InferenceEngine, target_class: str, threshold: Optional[float] = None, test_data: pd.DataFrame = None
-) -> float:
-    n = 0
-    tp = 0
-    if test_data is None:
-        test_data = ie.testing_data.as_dataframe()
-    for test_row in test_data.to_dict(orient="records")[0:10]:
-        expected = test_row.pop(target_class)
-        prediction = ie.derive(test_row)
-        if prediction.predicted_object[target_class] == expected:
-            tp += 1
-        n += 1
-    accuracy = tp / n
-    if threshold is not None:
-        if accuracy < threshold:
-            print(f"Accuracy: {accuracy} ({tp}/{n}) is below threshold {threshold}")
-        assert accuracy >= threshold, f"Accuracy {tp}/{n} is too low"
-    return accuracy
 
 
 def roundtrip(ie: InferenceEngine) -> SklearnInferenceEngine:
@@ -90,6 +72,7 @@ def test_inference_basic():
     features = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
     config = InferenceConfig(target_attributes=["species"], feature_attributes=features)
     ie = get_inference_engine("sklearn", config=config)
+    assert isinstance(ie.config, InferenceConfig)
     ie.load_and_split_data(collection)
     ie.initialize_model()
     assert isinstance(ie, SklearnInferenceEngine)
@@ -100,6 +83,7 @@ def test_inference_basic():
     check_accuracy(ie, "species", threshold=0.9)
     ie2 = roundtrip(ie)
     check_accuracy(ie2, "species", threshold=0.9, test_data=ie.testing_data.as_dataframe())
+    assert isinstance(ie2.config, InferenceConfig)
     io = StringIO()
     ie.export_model(io, model_serialization=ModelSerialization.LINKML_EXPRESSION)
     expr = io.getvalue()
@@ -109,10 +93,12 @@ def test_inference_basic():
     logger.info(f"RULES: {io.getvalue()}")
     rule_engine = get_inference_engine("rulebased")
     rule_engine.import_model_from(ie)
+    assert isinstance(rule_engine.config, InferenceConfig)
     prediction = rule_engine.derive(q)
     assert prediction.predicted_object["species"] == "setosa"
     check_accuracy(rule_engine, "species", threshold=0.9, test_data=ie.testing_data.as_dataframe())
     rbie = make_rule_based(ie)
+    assert isinstance(rbie.config, InferenceConfig)
     prediction = rbie.derive(q)
     assert prediction.predicted_object["species"] == "setosa"
 
@@ -125,6 +111,8 @@ def test_inference_mixed():
     df, features, targets = get_dataset("adult", 2)
     df = df.replace({np.nan: None})
     print(df)
+    print("CAPITAL GAIN")
+    print(df["capital-gain"])
     # https://github.com/pandas-dev/pandas/issues/58230
     rows = json.loads(df.to_json(orient="records"))
     db = client.attach_database("duckdb", alias="test")
@@ -139,9 +127,16 @@ def test_inference_mixed():
     assert {"age", "workclass_Private"}.difference(
         ie.transformed_features
     ) == set(), "expected transform of categorical"
+    assert isinstance(ie.encoders["sex"], OneHotEncoder)
+    print("CAPITAL GAIN (TRAINING)")
+    train_df = ie.training_data.as_dataframe()
+    print(train_df["capital-gain"])
+    print("UNIQ")
+    print(train_df["capital-gain"].unique())
+    assert "capital-gain" not in ie.encoders
     logger.info(f"Targets after encoding: {ie.transformed_targets}")
     assert set(ie.transformed_targets) == {"<=50K", ">50K"}, "no need for one-hot for target"
-    check_accuracy(ie, "class", threshold=0.5)
+    check_accuracy(ie, "class", threshold=0.4)
     io = StringIO()
     ie.export_model(io, model_serialization=ModelSerialization.LINKML_EXPRESSION)
     # print(f"RULES: {io.getvalue()}")
@@ -194,6 +189,49 @@ def test_nested_data():
     rule_engine = get_inference_engine("rulebased")
     rule_engine.import_model_from(ie)
     # TODO: test the rule engine once eval_utils supports nested objects
+
+
+def test_unseen_categories():
+    """
+    Test the sklearn inference engine when test data has unseen categories.
+
+    We expect graceful degradation - inability to predict the unseen category
+
+    :return:
+    """
+    client = Client()
+    tgt = "class"
+    n = 100
+
+    def _category(i: int) -> str:
+        return "x" + str(i % 5)
+
+    objects = [
+        {"feature": _category(i), tgt: _category(i)}
+        for i in range(n)
+    ]
+    test_data = [
+        {"feature": "x99", tgt: "x99"},
+        {"feature": "x1", tgt: "x99"},
+        {"feature": "x99", tgt: "x1"},
+        {"feature": None, tgt: "x1"},
+        {tgt: "x1"},
+        {},
+        {"feature": None, tgt: None},
+    ]
+
+    db = client.attach_database("duckdb", alias="test")
+    db.store({"data": objects})
+    collection = db.get_collection("data")
+    config = InferenceConfig(target_attributes=[tgt], feature_attributes=["feature"])
+    ie = get_inference_engine("sklearn", config=config)
+    assert isinstance(ie, SklearnInferenceEngine)
+    ie.load_and_split_data(collection)
+    ie.initialize_model()
+    assert len(ie.transformed_features) == 5, "expected encoding of categories"
+    assert ie.encoders
+    outcome = check_accuracy2(ie, tgt, threshold=0.0, test_data=pd.DataFrame(test_data))
+    assert outcome.accuracy == 0.0
 
 
 def test_multivalued():

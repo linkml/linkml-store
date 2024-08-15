@@ -174,6 +174,7 @@ class SklearnInferenceEngine(InferenceEngine):
             if col in self.encoders:
                 encoder = self.encoders[col]
                 if isinstance(encoder, OneHotEncoder):
+                    print(f"Encoding: {col} v={object[col]} df={new_X[[col]]} encoder={encoder}")
                     encoded = encoder.transform(new_X[[col]])
                     feature_names = encoder.get_feature_names_out([col])
                     for i, name in enumerate(feature_names):
@@ -216,7 +217,12 @@ class SklearnInferenceEngine(InferenceEngine):
         return Inference(predicted_object=predicted_object, confidence=self.confidence)
 
     def _normalize(self, object: OBJECT) -> OBJECT:
-        return {k: object.get(k, None) for k in self.config.feature_attributes}
+        np_map = {
+            np.nan: None
+        }
+        def _tr(x: Any):
+            return np_map.get(x, x)
+        return {k: _tr(object.get(k, None)) for k in self.config.feature_attributes}
 
     def export_model(
         self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
