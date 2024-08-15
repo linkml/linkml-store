@@ -9,14 +9,13 @@ import numpy as np
 import pandas as pd
 import pytest
 from linkml_runtime.utils.eval_utils import eval_expr
-from sklearn.preprocessing import OneHotEncoder
-
 from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
 from linkml_store.inference.implementations.sklearn_inference_engine import SklearnInferenceEngine
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.format_utils import Format
+from sklearn.preprocessing import OneHotEncoder
 
 from tests import INPUT_DIR, OUTPUT_DIR
 from tests.test_inference import check_accuracy, check_accuracy2
@@ -206,10 +205,7 @@ def test_unseen_categories():
     def _category(i: int) -> str:
         return "x" + str(i % 5)
 
-    objects = [
-        {"feature": _category(i), tgt: _category(i)}
-        for i in range(n)
-    ]
+    objects = [{"feature": _category(i), tgt: _category(i)} for i in range(n)]
     test_data = [
         {"feature": "x99", tgt: "x99"},
         {"feature": "x1", tgt: "x99"},

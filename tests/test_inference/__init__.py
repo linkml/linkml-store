@@ -1,17 +1,20 @@
 import logging
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import pandas as pd
-
 from linkml_store.inference import InferenceEngine
-from linkml_store.inference.evaluation import score_match, evaluate_predictor, Outcome
+from linkml_store.inference.evaluation import Outcome, evaluate_predictor, score_match
 from linkml_store.utils.object_utils import select_nested
-
 
 logger = logging.getLogger(__name__)
 
+
 def check_accuracy(
-    ie: InferenceEngine, target_class: Union[str, List[str]], threshold: Optional[float] = None, features: List[str] = None, test_data: pd.DataFrame = None
+    ie: InferenceEngine,
+    target_class: Union[str, List[str]],
+    threshold: Optional[float] = None,
+    features: List[str] = None,
+    test_data: pd.DataFrame = None,
 ) -> float:
     n = 0
     tp = 0
@@ -45,7 +48,12 @@ def check_accuracy(
 
 
 def check_accuracy2(
-    ie: InferenceEngine, target_classes: List[str], threshold: Optional[float] = None, features: List[str] = None, test_data: pd.DataFrame = None, **kwargs
+    ie: InferenceEngine,
+    target_classes: List[str],
+    threshold: Optional[float] = None,
+    features: List[str] = None,
+    test_data: pd.DataFrame = None,
+    **kwargs,
 ) -> Outcome:
     if test_data is None:
         test_data = ie.testing_data.as_dataframe()

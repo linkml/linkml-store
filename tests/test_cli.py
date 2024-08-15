@@ -237,4 +237,3 @@ def test_infer_using_rag(cli_runner, output_dir):
     result = yaml.safe_load(open(output_path))
     obj = result["predicted_object"]
     assert obj["capital"] == "Montevideo"
-

@@ -217,11 +217,11 @@ class SklearnInferenceEngine(InferenceEngine):
         return Inference(predicted_object=predicted_object, confidence=self.confidence)
 
     def _normalize(self, object: OBJECT) -> OBJECT:
-        np_map = {
-            np.nan: None
-        }
+        np_map = {np.nan: None}
+
         def _tr(x: Any):
             return np_map.get(x, x)
+
         return {k: _tr(object.get(k, None)) for k in self.config.feature_attributes}
 
     def export_model(

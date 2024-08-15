@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional, TextIO, Tuple, Union
 
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig
@@ -129,13 +129,13 @@ class InferenceEngine(ABC):
             test_indices = indices[int(size * split[0]) :]
         self.training_data = CollectionSlice(name="train", base_collection=collection, indices=train_indices)
         self.testing_data = CollectionSlice(name="test", base_collection=collection, indices=test_indices)
-        #all_data = collection.find({}, limit=size).rows
-        #all_data_df = nested_objects_to_dataframe(all_data)
-        #all_data_df = collection.find({}, limit=size).rows_dataframe
+        # all_data = collection.find({}, limit=size).rows
+        # all_data_df = nested_objects_to_dataframe(all_data)
+        # all_data_df = collection.find({}, limit=size).rows_dataframe
         # randomize/shuffle order of rows in dataframe
-        #all_data_df = all_data_df.sample(frac=1).reset_index(drop=True)
-        #self.training_data = CollectionSlice(dataframe=all_data_df[: int(size * split[0])])
-        #self.testing_data = CollectionSlice(dataframe=all_data_df[int(size * split[0]) : size])
+        # all_data_df = all_data_df.sample(frac=1).reset_index(drop=True)
+        # self.training_data = CollectionSlice(dataframe=all_data_df[: int(size * split[0])])
+        # self.testing_data = CollectionSlice(dataframe=all_data_df[int(size * split[0]) : size])
         # self.training_data = CollectionSlice(base_collection=collection, slice=(0, int(size * split[0])))
         # self.testing_data = CollectionSlice(base_collection=collection, slice=(int(size * split[0]), size))
 

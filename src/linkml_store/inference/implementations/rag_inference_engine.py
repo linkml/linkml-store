@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional, List
+from typing import Any, Optional
 
 import yaml
 from llm import get_key
@@ -8,7 +8,7 @@ from llm import get_key
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
 from linkml_store.inference.inference_engine import InferenceEngine
-from linkml_store.utils.object_utils import object_path_get, select_nested
+from linkml_store.utils.object_utils import select_nested
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +23,9 @@ You should return ONLY valid YAML in your response.
 """
 
 
-#def select_object(obj: OBJECT, key_paths: List[str]) -> OBJECT:
-    # return {k: obj.get(k, None) for k in keys}
-    # return {k: object_path_get(obj, k, None) for k in key_paths}
+# def select_object(obj: OBJECT, key_paths: List[str]) -> OBJECT:
+# return {k: obj.get(k, None) for k in keys}
+# return {k: object_path_get(obj, k, None) for k in key_paths}
 
 
 @dataclass
@@ -81,7 +81,6 @@ class RAGInferenceEngine(InferenceEngine):
         return self._model
 
     def initialize_model(self, **kwargs):
-        td = self.training_data
         rag_collection = self.training_data.collection
         rag_collection.attach_indexer("llm", auto_index=False)
         self.rag_collection = rag_collection

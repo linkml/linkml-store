@@ -1,16 +1,16 @@
 import logging
 from collections.abc import Callable
-from typing import Optional, Any, List
+from typing import Any, List, Optional
 
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-from linkml_store.api.collection import OBJECT
 from linkml_store.inference import InferenceEngine
 from linkml_store.utils.object_utils import select_nested
 
 logger = logging.getLogger(__name__)
+
 
 def score_match(target: Optional[Any], candidate: Optional[Any], match_function: Optional[Callable] = None) -> float:
     """
@@ -85,10 +85,14 @@ class Outcome(BaseModel):
         return self.true_positive_count / self.total_count
 
 
-
-def evaluate_predictor(predictor: InferenceEngine, target_attributes: List[str], feature_attributes: Optional[List[str]] = None,
-                       test_data: pd.DataFrame = None,
-                       evaluation_count: Optional[int] = 10, match_function: Optional[Callable] = None) -> Outcome:
+def evaluate_predictor(
+    predictor: InferenceEngine,
+    target_attributes: List[str],
+    feature_attributes: Optional[List[str]] = None,
+    test_data: pd.DataFrame = None,
+    evaluation_count: Optional[int] = 10,
+    match_function: Optional[Callable] = None,
+) -> Outcome:
     """
     Evaluate a predictor by comparing its predictions to the expected values in the testing data.
 
@@ -159,7 +163,7 @@ def find_longest_overlap(str1: str, str2: str):
     ('', 0)
     """
     if not str1 or not str2:
-        return '', 0
+        return "", 0
 
     # Create a table to store lengths of matching substrings
     m, n = len(str1), len(str2)
@@ -172,8 +176,8 @@ def find_longest_overlap(str1: str, str2: str):
     # Fill the dp table
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            if str1[i-1] == str2[j-1]:
-                dp[i][j] = dp[i-1][j-1] + 1
+            if str1[i - 1] == str2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
                 if dp[i][j] > max_length:
                     max_length = dp[i][j]
                     end_pos = i

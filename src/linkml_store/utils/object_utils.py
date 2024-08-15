@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -118,12 +118,6 @@ def clean_empties(value: Union[Dict, List]) -> Any:
     return value
 
 
-import re
-
-
-
-
-
 def select_nested(data: dict, paths: List[Union[str, List[str]]], current_path=None) -> Optional[dict]:
     """
     Select nested attributes from a complex dictionary based on selector strings.
@@ -160,7 +154,8 @@ def select_nested(data: dict, paths: List[Union[str, List[str]]], current_path=N
     >>> select_nested(data, ["person.phones.number", "person.phones.type"])
     {'person': {'phones': [{'type': 'home', 'number': '555-1234'}, {'type': 'work', 'number': '555-5678'}]}}
     >>> select_nested(data, ["person"])
-    {'person': {'name': 'John Doe', 'age': 30, 'address': {'street': '123 Main St', 'city': 'Anytown', 'country': 'USA'}, 'phones': [{'type': 'home', 'number': '555-1234'}, {'type': 'work', 'number': '555-5678'}]}}
+    {'person': {'name': 'John Doe', 'age': 30, 'address': {'street': '123 Main St', 'city': 'Anytown',
+     'country': 'USA'}, 'phones': [{'type': 'home', 'number': '555-1234'}, {'type': 'work', 'number': '555-5678'}]}}
     >>> select_nested(data, ["person.phones.type"])
     {'person': {'phones': [{'type': 'home'}, {'type': 'work'}]}}
     """

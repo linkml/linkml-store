@@ -1,31 +1,19 @@
-import json
 import logging
-import random
-from io import StringIO
-from random import randint
-from typing import List, Optional, Tuple
 
-import numpy as np
-import pandas as pd
-import pytest
-from linkml_runtime.utils.eval_utils import eval_expr
 from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
-from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
 from linkml_store.inference.implementations.rag_inference_engine import RAGInferenceEngine
+from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.format_utils import Format
 
 from tests import INPUT_DIR, OUTPUT_DIR
-from tests.test_inference import check_accuracy, check_accuracy2
+from tests.test_inference import check_accuracy2
 
 MODEL_FILE_PATH = OUTPUT_DIR / "model.yaml"
 RULE_BASED_MODEL_FILE_PATH = OUTPUT_DIR / "sklean-export.rulebase.yaml"
 
 logger = logging.getLogger(__name__)
-
-
-
 
 
 def roundtrip(ie: InferenceEngine) -> RAGInferenceEngine:

@@ -18,11 +18,11 @@ from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.index.indexer import Indexer
 from linkml_store.inference import get_inference_engine
-from linkml_store.inference.evaluation import score_match, evaluate_predictor, score_text_overlap
+from linkml_store.inference.evaluation import evaluate_predictor, score_text_overlap
 from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
-from linkml_store.utils.object_utils import object_path_update, select_nested
+from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
 
 DEFAULT_LOCAL_CONF_PATH = Path("linkml.yaml")
@@ -498,9 +498,7 @@ def describe(ctx, where, output_type, output, limit):
 @click.option(
     "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING, help="Type of predictor"
 )
-@click.option("--evaluation-count", "-n",
-                type=click.INT,
-                help="Number of examples to evaluate over")
+@click.option("--evaluation-count", "-n", type=click.INT, help="Number of examples to evaluate over")
 @click.option("--query", "-q", type=click.STRING, help="query term")
 @click.pass_context
 def infer(
@@ -586,7 +584,9 @@ def infer(
         if not export_model and not evaluation_count:
             raise ValueError("Query or evaluate must be specified if not exporting model")
     if evaluation_count:
-        outcome = evaluate_predictor(predictor, target_attributes, evaluation_count=evaluation_count, match_function=score_text_overlap)
+        outcome = evaluate_predictor(
+            predictor, target_attributes, evaluation_count=evaluation_count, match_function=score_text_overlap
+        )
         print(f"Outcome: {outcome} // accuracy: {outcome.accuracy}")
     if query_obj:
         result = predictor.derive(query_obj)
