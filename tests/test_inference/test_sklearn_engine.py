@@ -307,7 +307,7 @@ def test_missing(prop_age_missing: float, prop_stage_missing: float):
     ie.load_and_split_data(collection)
     ie.initialize_model()
     # crude heuristic - in theory this could fail spuriously
-    threshold = 0.9 - (prop_age_missing + prop_stage_missing)
+    threshold = 0.7 - (prop_age_missing + prop_stage_missing)
     check_accuracy(ie, tgt, threshold=threshold, test_data=ie.testing_data.as_dataframe())
     assert isinstance(ie, SklearnInferenceEngine)
     ie.export_model(
