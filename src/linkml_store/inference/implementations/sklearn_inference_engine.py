@@ -217,10 +217,22 @@ class SklearnInferenceEngine(InferenceEngine):
         return Inference(predicted_object=predicted_object, confidence=self.confidence)
 
     def _normalize(self, object: OBJECT) -> OBJECT:
+        """
+        Normalize the input object to ensure it has all the expected attributes.
+
+        Also remove any numpy/pandas oddities
+
+        :param object:
+        :return:
+        """
         np_map = {np.nan: None}
 
         def _tr(x: Any):
-            return np_map.get(x, x)
+            # TODO: figure a more elegant way to do this
+            try:
+                return np_map.get(x, x)
+            except TypeError:
+                return x
 
         return {k: _tr(object.get(k, None)) for k in self.config.feature_attributes}
 
