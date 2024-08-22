@@ -239,7 +239,6 @@ class Collection(Generic[DatabaseType]):
             # TODO: make this more efficient by only deleting modified
             ix_collection.delete_where({})
 
-
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
         Delete one or more objects from the collection.
@@ -686,7 +685,9 @@ class Collection(Generic[DatabaseType]):
         """
         return [(n, obj) for n, obj in enumerate(self.rows_iter())]
 
-    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs) -> Indexer:
+    def attach_indexer(
+        self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs
+    ) -> Indexer:
         """
         Attach an index to the collection.
 

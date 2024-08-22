@@ -153,7 +153,7 @@ def test_nested_data(seed):
 
     {"person": {"name": "Person 1", "age": 21}, "twin": {"name": "Twin 1", "age": 21}}
     """
-    local_random = random.Random(seed)
+    # local_random = random.Random(seed)
     client = Client()
     tgt = "twin.age"
     n = 100

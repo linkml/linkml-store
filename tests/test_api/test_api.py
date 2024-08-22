@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pystow
 import pytest
-from attr import attributes
 from linkml_runtime import SchemaView
 from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.linkml_model import SlotDefinition
@@ -22,7 +21,6 @@ from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.sql_utils import introspect_schema
-from sqlalchemy.orm.collections import collection
 
 from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR, PERSONINFO_SCHEMA
 
@@ -852,8 +850,8 @@ def test_search(handle, countries_schema_view, auto_index, indexer_type):
     # ensure index updates on delete
     num_objects = len(objects)
     assert num_objects
-    first_half = objects[:(num_objects // 2)]
-    second_half = objects[(num_objects // 2):]
+    first_half = objects[: (num_objects // 2)]
+    second_half = objects[(num_objects // 2) :]
     assert len(first_half) + len(second_half) == num_objects
     collection.delete(first_half)
     # check deletion worked
@@ -872,7 +870,6 @@ def test_search(handle, countries_schema_view, auto_index, indexer_type):
         assert any(r for r in result_objs if r["code"] == row["code"]), "undeleted object should be in results"
 
 
-
 @pytest.mark.parametrize("auto_index", [True, False])
 @pytest.mark.parametrize("indexer_type", ["simple"])
 @pytest.mark.parametrize("handle", SCHEMES)
@@ -886,9 +883,7 @@ def test_search_multiple_indexes(handle, countries_schema_view, auto_index, inde
     default_indexer = get_indexer(indexer_type, name="default")
     name_indexer = get_indexer(indexer_type, name="name_indexer", index_attributes=["name"])
     fstring_indexer = get_indexer(indexer_type, name="fstring_indexer", text_template="{name} :: {code} :: {capital}")
-    indexers = {
-        ixr.name: ixr for ixr in [default_indexer, name_indexer, fstring_indexer]
-    }
+    indexers = {ixr.name: ixr for ixr in [default_indexer, name_indexer, fstring_indexer]}
     ix_collection_name_to_indexer_name = {}
     for indexer_name, indexer in indexers.items():
         collection.attach_indexer(indexer, auto_index=auto_index)

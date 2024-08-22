@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-from linkml_store.api.client import Client
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rag_inference_engine import RAGInferenceEngine
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
@@ -62,8 +61,8 @@ def test_inference_nested(handle):
     """
     client = create_client(handle)
     db = client.get_database()
-    #client = Client()
-    #db = client.attach_database("duckdb", alias="test")
+    # client = Client()
+    # db = client.attach_database("duckdb", alias="test")
     db.import_database(INPUT_DIR / "nested-target.yaml", Format.YAML, collection_name="test_rag")
     # assert db.list_collection_names() == ["test_rag"]
     collection = db.get_collection("test_rag")
@@ -100,4 +99,3 @@ def test_inference_nested(handle):
     ie.load_and_split_data(collection)
     ie.initialize_model()
     # check_accuracy2(ie2, targets, threshold=0.33, features=features, test_data=ie.testing_data.as_dataframe())
-

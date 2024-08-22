@@ -2,17 +2,16 @@ import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Union, ClassVar, List, TextIO
+from typing import ClassVar, List, Optional, TextIO, Union
 
 import yaml
-
 from llm import get_key
+from pydantic import BaseModel
 
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.object_utils import select_nested
-from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +24,7 @@ of content.
 
 You should return ONLY valid YAML in your response.
 """
+
 
 class TrainedModel(BaseModel, extra="forbid"):
     rag_collection_rows: List[OBJECT]
@@ -139,9 +139,7 @@ class RAGInferenceEngine(InferenceEngine):
                 )
             output_obj = select_nested(example, target_attributes)
             prompt_clause = (
-                "---\nExample:\n"
-                f"## INPUT:\n{input_obj_text}\n"
-                f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
+                "---\nExample:\n" f"## INPUT:\n{input_obj_text}\n" f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
             )
             prompt_clauses.append(prompt_clause)
 
@@ -177,7 +175,7 @@ class RAGInferenceEngine(InferenceEngine):
             return None
 
     def export_model(
-            self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
+        self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
     ):
         self.save_model(output)
 
@@ -187,9 +185,6 @@ class RAGInferenceEngine(InferenceEngine):
 
         :param output: Path to save the model
         """
-
-        # Use self.PERSIST_COLS
-        model_data = {k: getattr(self, k) for k in self.PERSIST_COLS}
 
         # trigger index
         _qr = self.rag_collection.search("*", limit=1)
@@ -206,7 +201,7 @@ class RAGInferenceEngine(InferenceEngine):
         assert len(ix_rows) > 0
         tm = TrainedModel(rag_collection_rows=rows, index_rows=ix_rows, config=self.config)
         # tm = TrainedModel(rag_collection_rows=rows, index_rows=ix_rows)
-        with(open(output, "w", encoding="utf-8")) as f:
+        with open(output, "w", encoding="utf-8") as f:
             json.dump(tm.model_dump(), f)
 
     @classmethod
@@ -221,6 +216,7 @@ class RAGInferenceEngine(InferenceEngine):
             model_data = json.load(f)
         tm = TrainedModel(**model_data)
         from linkml_store.api import Client
+
         client = Client()
         db = client.attach_database("duckdb", alias="training")
         db.store({"data": tm.rag_collection_rows})
@@ -234,6 +230,3 @@ class RAGInferenceEngine(InferenceEngine):
         ie = cls(config=tm.config)
         ie.rag_collection = collection
         return ie
-
-
-

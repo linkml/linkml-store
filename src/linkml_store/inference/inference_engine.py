@@ -86,7 +86,6 @@ class CollectionSlice(BaseModel):
             self._collection = subset_collection
         return self._collection
 
-
     @property
     def slice_alias(self) -> str:
         return f"{self.base_collection.alias}__rag_{self.name}"
@@ -146,8 +145,6 @@ class InferenceEngine(ABC):
             test_indices = indices[int(size * split[0]) :]
         self.training_data = CollectionSlice(name="train", base_collection=collection, indices=train_indices)
         self.testing_data = CollectionSlice(name="test", base_collection=collection, indices=test_indices)
-
-
 
     def initialize_model(self, **kwargs):
         """
