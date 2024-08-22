@@ -40,7 +40,9 @@ class FacetCountResult(BaseModel):
 
 class QueryResult(BaseModel):
     """
-    A query result
+    A query result.
+
+    TODO: make this a subclass of Collection
     """
 
     query: Optional[Query] = None

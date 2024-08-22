@@ -1,13 +1,16 @@
+import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from pathlib import Path
+from typing import ClassVar, List, Optional, TextIO, Union
 
 import yaml
 from llm import get_key
+from pydantic import BaseModel
 
 from linkml_store.api.collection import OBJECT, Collection
 from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
-from linkml_store.inference.inference_engine import InferenceEngine
+from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.object_utils import select_nested
 
 logger = logging.getLogger(__name__)
@@ -23,9 +26,10 @@ You should return ONLY valid YAML in your response.
 """
 
 
-# def select_object(obj: OBJECT, key_paths: List[str]) -> OBJECT:
-# return {k: obj.get(k, None) for k in keys}
-# return {k: object_path_get(obj, k, None) for k in key_paths}
+class TrainedModel(BaseModel, extra="forbid"):
+    rag_collection_rows: List[OBJECT]
+    index_rows: List[OBJECT]
+    config: Optional[InferenceConfig] = None
 
 
 @dataclass
@@ -54,13 +58,22 @@ class RAGInferenceEngine(InferenceEngine):
     >>> prediction.predicted_object
     {'capital': 'Montevideo', 'code': 'UY', 'continent': 'South America', 'languages': ['Spanish']}
 
+    The "model" can be saved for later use:
+
+    >>> ie.export_model("tests/output/countries.rag_model.json")
+
+    Note in this case the model is not the underlying LLM, but the "RAG Model" which is the vectorized
+    representation of training set objects.
+
     """
 
-    classifier: Any = None
-    encoders: dict = None
     _model: "llm.Model" = None  # noqa: F821
 
     rag_collection: Collection = None
+
+    PERSIST_COLS: ClassVar[List[str]] = [
+        "config",
+    ]
 
     def __post_init__(self):
         if not self.config:
@@ -81,9 +94,11 @@ class RAGInferenceEngine(InferenceEngine):
         return self._model
 
     def initialize_model(self, **kwargs):
-        rag_collection = self.training_data.collection
-        rag_collection.attach_indexer("llm", auto_index=False)
-        self.rag_collection = rag_collection
+        logger.info(f"Initializing model {self.model}")
+        if self.training_data:
+            rag_collection = self.training_data.collection
+            rag_collection.attach_indexer("llm", auto_index=False)
+            self.rag_collection = rag_collection
 
     def object_to_text(self, object: OBJECT) -> str:
         return yaml.dump(object)
@@ -100,27 +115,34 @@ class RAGInferenceEngine(InferenceEngine):
         target_attributes = self.config.target_attributes
         num_examples = self.config.llm_config.number_of_few_shot_examples or 5
         query_text = self.object_to_text(object)
-        if not self.rag_collection.indexers:
-            raise ValueError("RAG collection must have an indexer attached")
-        rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm")
-        examples = rs.rows
-        if not examples:
-            raise ValueError(f"No examples found for {query_text}; size = {self.rag_collection.size()}")
+        if not self.rag_collection:
+            # TODO: zero-shot mode
+            examples = []
+        else:
+            if not self.rag_collection.indexers:
+                raise ValueError("RAG collection must have an indexer attached")
+            rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm")
+            examples = rs.rows
+            if not examples:
+                raise ValueError(f"No examples found for {query_text}; size = {self.rag_collection.size()}")
         prompt_clauses = []
-        for example in examples:
-            # input_obj = {k: example.get(k, None) for k in feature_attributes}
-            input_obj = select_nested(example, feature_attributes)
-            # output_obj = {k: example.get(k, None) for k in target_attributes}
-            output_obj = select_nested(example, target_attributes)
-            prompt_clause = (
-                "---\nExample:\n"
-                f"## INPUT:\n{self.object_to_text(input_obj)}\n"
-                f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
-            )
-            prompt_clauses.append(prompt_clause)
-        # query_obj = {k: object.get(k, None) for k in feature_attributes}
         query_obj = select_nested(object, feature_attributes)
         query_text = self.object_to_text(query_obj)
+        for example in examples:
+            input_obj = select_nested(example, feature_attributes)
+            input_obj_text = self.object_to_text(input_obj)
+            if input_obj_text == query_text:
+                raise ValueError(
+                    f"Query object {query_text} is the same as example object {input_obj_text}\n"
+                    "This indicates possible test data leakage\n."
+                    "TODO: allow an option that allows user to treat this as a basic lookup\n"
+                )
+            output_obj = select_nested(example, target_attributes)
+            prompt_clause = (
+                "---\nExample:\n" f"## INPUT:\n{input_obj_text}\n" f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
+            )
+            prompt_clauses.append(prompt_clause)
+
         prompt_end = "---\nQuery:\n" f"## INPUT:\n{query_text}\n" "## OUTPUT:\n"
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)
 
@@ -137,9 +159,74 @@ class RAGInferenceEngine(InferenceEngine):
         response = model.prompt(prompt, system_prompt)
         yaml_str = response.text()
         logger.info(f"Response: {yaml_str}")
+        return Inference(predicted_object=self._parse_yaml_payload(yaml_str))
+
+    def _parse_yaml_payload(self, yaml_str: str, strict=False) -> Optional[OBJECT]:
+        if "```" in yaml_str:
+            yaml_str = yaml_str.split("```")[1].strip()
+            if yaml_str.startswith("yaml"):
+                yaml_str = yaml_str[4:].strip()
         try:
-            predicted_object = yaml.safe_load(yaml_str)
-            return Inference(predicted_object=predicted_object)
-        except yaml.parser.ParserError as e:
-            logger.error(f"Error parsing response: {yaml_str}\n{e}")
+            return yaml.safe_load(yaml_str)
+        except Exception as e:
+            if strict:
+                raise e
+            logger.error(f"Error parsing YAML: {yaml_str}\n{e}")
             return None
+
+    def export_model(
+        self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs
+    ):
+        self.save_model(output)
+
+    def save_model(self, output: Union[str, Path]) -> None:
+        """
+        Save the trained model and related data to a file.
+
+        :param output: Path to save the model
+        """
+
+        # trigger index
+        _qr = self.rag_collection.search("*", limit=1)
+        assert len(_qr.ranked_rows) > 0
+
+        rows = self.rag_collection.find(limit=-1).rows
+
+        indexers = self.rag_collection.indexers
+        assert len(indexers) == 1
+        ix = self.rag_collection.indexers["llm"]
+        ix_coll = self.rag_collection.parent.get_collection(self.rag_collection.get_index_collection_name(ix))
+
+        ix_rows = ix_coll.find(limit=-1).rows
+        assert len(ix_rows) > 0
+        tm = TrainedModel(rag_collection_rows=rows, index_rows=ix_rows, config=self.config)
+        # tm = TrainedModel(rag_collection_rows=rows, index_rows=ix_rows)
+        with open(output, "w", encoding="utf-8") as f:
+            json.dump(tm.model_dump(), f)
+
+    @classmethod
+    def load_model(cls, file_path: Union[str, Path]) -> "RAGInferenceEngine":
+        """
+        Load a trained model and related data from a file.
+
+        :param file_path: Path to the saved model
+        :return: SklearnInferenceEngine instance with loaded model
+        """
+        with open(file_path, "r", encoding="utf-8") as f:
+            model_data = json.load(f)
+        tm = TrainedModel(**model_data)
+        from linkml_store.api import Client
+
+        client = Client()
+        db = client.attach_database("duckdb", alias="training")
+        db.store({"data": tm.rag_collection_rows})
+        collection = db.get_collection("data")
+        ix = collection.attach_indexer("llm", auto_index=False)
+        assert ix.name
+        ix_coll_name = collection.get_index_collection_name(ix)
+        assert ix_coll_name
+        ix_coll = db.get_collection(ix_coll_name, create_if_not_exists=True)
+        ix_coll.insert(tm.index_rows)
+        ie = cls(config=tm.config)
+        ie.rag_collection = collection
+        return ie

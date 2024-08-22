@@ -50,8 +50,9 @@ class DuckDBCollection(Collection):
         if not isinstance(objs, list):
             objs = [objs]
         cd = self.class_definition()
-        if not cd:
+        if not cd or not cd.attributes:
             cd = self.induce_class_definition_from_objects(objs)
+        assert cd.attributes
         table = self._sqla_table(cd)
         engine = self.parent.engine
         with engine.connect() as conn:
@@ -61,7 +62,8 @@ class DuckDBCollection(Collection):
                 stmt = stmt.compile(engine)
                 conn.execute(stmt)
                 conn.commit()
-        return
+        self._post_delete_hook()
+        return None
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> Optional[int]:
         logger.info(f"Deleting from {self.target_class_name} where: {where}")
@@ -87,6 +89,7 @@ class DuckDBCollection(Collection):
             if deleted_rows_count == 0 and not missing_ok:
                 raise ValueError(f"No rows found for {where}")
             conn.commit()
+            self._post_delete_hook()
             return deleted_rows_count if deleted_rows_count > -1 else None
 
     def query_facets(

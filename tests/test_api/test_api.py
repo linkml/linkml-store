@@ -817,6 +817,99 @@ def test_validate_referential_integrity(personinfo_schema_view, handle):
     assert len(results) == 2
 
 
+@pytest.mark.parametrize("auto_index", [True, False])
+@pytest.mark.parametrize("indexer_type", ["simple"])
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_search(handle, countries_schema_view, auto_index, indexer_type):
+    client = create_client(handle)
+    database = client.get_database()
+    database.set_schema_view(countries_schema_view)
+    objects = load_objects(COUNTRIES_DATA_JSONL)
+    collection = database.create_collection("Country", recreate_if_exists=True)
+    collection.insert(objects)
+    indexer = get_indexer(indexer_type)
+    collection.attach_indexer(indexer, auto_index=auto_index)
+    ix_collection_name = collection.get_index_collection_name(indexer)
+    ix_collection = database.get_collection(ix_collection_name)
+    ix_collection_size = ix_collection.size()
+    if auto_index:
+        assert ix_collection_size == collection.size(), "expected index to be pre-populated"
+    else:
+        assert ix_collection_size == 0, "expected delayed population of index"
+    for row in collection.find(limit=5).rows:
+        search_term = str(row)
+        results = collection.search(search_term, limit=5)
+        scores = [score for score, _ in results.ranked_rows]
+        assert scores, "expected scores for search"
+        # ensure for any consecutive pair of scores, the first is greater than the second
+        for i in range(len(scores) - 1):
+            assert scores[i] >= scores[i + 1], "results should be ranked"
+        result_objs = [r for _, r in results.ranked_rows]
+        assert any(r for r in result_objs if r["code"] == row["code"]), "query should be in results"
+        assert result_objs == results.rows, "results should be same regardless of method"
+    # ensure index updates on delete
+    num_objects = len(objects)
+    assert num_objects
+    first_half = objects[: (num_objects // 2)]
+    second_half = objects[(num_objects // 2) :]
+    assert len(first_half) + len(second_half) == num_objects
+    collection.delete(first_half)
+    # check deletion worked
+    assert collection.find(limit=-1).num_rows == len(second_half)
+    assert collection.size() == len(second_half)
+    for row in first_half:
+        search_term = str(row)
+        results = collection.search(search_term, limit=5)
+        result_objs = [r for _, r in results.ranked_rows]
+        assert not any(r for r in result_objs if r["code"] == row["code"]), "deleted object should not be results"
+    for row in second_half:
+        search_term = str(row)
+        results = collection.search(search_term, limit=5)
+        result_objs = [r for _, r in results.ranked_rows]
+        assert result_objs
+        assert any(r for r in result_objs if r["code"] == row["code"]), "undeleted object should be in results"
+
+
+@pytest.mark.parametrize("auto_index", [True, False])
+@pytest.mark.parametrize("indexer_type", ["simple"])
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_search_multiple_indexes(handle, countries_schema_view, auto_index, indexer_type):
+    client = create_client(handle)
+    database = client.get_database()
+    database.set_schema_view(countries_schema_view)
+    objects = load_objects(COUNTRIES_DATA_JSONL)
+    collection = database.create_collection("Country", recreate_if_exists=True)
+    collection.insert(objects)
+    default_indexer = get_indexer(indexer_type, name="default")
+    name_indexer = get_indexer(indexer_type, name="name_indexer", index_attributes=["name"])
+    fstring_indexer = get_indexer(indexer_type, name="fstring_indexer", text_template="{name} :: {code} :: {capital}")
+    indexers = {ixr.name: ixr for ixr in [default_indexer, name_indexer, fstring_indexer]}
+    ix_collection_name_to_indexer_name = {}
+    for indexer_name, indexer in indexers.items():
+        collection.attach_indexer(indexer, auto_index=auto_index)
+        ix_collection_name = collection.get_index_collection_name(indexer)
+        ix_collection = database.get_collection(ix_collection_name)
+        ix_collection_size = ix_collection.size()
+        ix_collection_name_to_indexer_name[ix_collection_name] = indexer_name
+        if auto_index:
+            assert ix_collection_size == collection.size(), "expected index to be pre-populated"
+        else:
+            assert ix_collection_size == 0, "expected delayed population of index"
+    assert len(ix_collection_name_to_indexer_name) == len(indexers), "expected 1-1 mapping"
+    for row in collection.find(limit=5).rows:
+        for indexer in indexers.values():
+            search_term = indexer.object_to_text(row)
+            results = collection.search(search_term, index_name=indexer.name, limit=5)
+            scores = [score for score, _ in results.ranked_rows]
+            assert scores, "expected scores for search"
+            # ensure for any consecutive pair of scores, the first is greater than the second
+            for i in range(len(scores) - 1):
+                assert scores[i] >= scores[i + 1], "results should be ranked"
+            result_objs = [r for _, r in results.ranked_rows]
+            assert any(r for r in result_objs if r["code"] == row["code"]), "query should be in results"
+            assert result_objs == results.rows, "results should be same regardless of method"
+
+
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_from_config_object(handle):
     """

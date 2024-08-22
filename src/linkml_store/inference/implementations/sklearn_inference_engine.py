@@ -153,7 +153,7 @@ class SklearnInferenceEngine(InferenceEngine):
             y = y_encoder.fit_transform(y.values.ravel())  # Convert to 1D numpy array
             self.transformed_targets = y_encoder.classes_
 
-        logger.info(f"Fitting model with features: {X.columns}")
+        # print(f"Fitting model with features: {X.columns}")
         clf = DecisionTreeClassifier(random_state=42)
         clf.fit(X, y)
         self.classifier = clf

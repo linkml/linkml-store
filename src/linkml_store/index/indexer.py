@@ -36,6 +36,54 @@ def cosine_similarity(vector1, vector2) -> float:
 class Indexer(BaseModel):
     """
     An indexer operates on a collection in order to search for objects.
+
+    You should use a subcllass of this; this can be looked up dynqamically:
+
+    >>> from linkml_store.index import get_indexer
+    >>> indexer = get_indexer("simple")
+
+    You can customize how objects are indexed by passing in a text template.
+    For example, if your collection has objects with "name" and "profession" attributes,
+    you can index them as "{name} {profession}".
+
+    >>> indexer = get_indexer("simple", text_template="{name} :: {profession}")
+
+    By default, python fstrings are assumed.
+
+    We can test this works using the :ref:`object_to_text` method (normally
+    you would never need to call this directly, but it's useful for testing):
+
+    >>> obj = {"name": "John", "profession": "doctor"}
+    >>> indexer.object_to_text(obj)
+    'John :: doctor'
+
+    You can also use Jinja2 templates; this gives more flexibility and logic,
+    e.g. conditional formatting:
+
+    >>> tmpl = "{{name}}{% if profession %} :: {{profession}}{% endif %}"
+    >>> indexer = get_indexer("simple", text_template=tmpl, text_template_syntax=TemplateSyntaxEnum.jinja2)
+    >>> indexer.object_to_text(obj)
+    'John :: doctor'
+    >>> indexer.object_to_text({"name": "John"})
+    'John'
+
+    You can also specify which attributes to index:
+
+    >>> indexer = get_indexer("simple", index_attributes=["name"])
+    >>> indexer.object_to_text(obj)
+    'John'
+
+    The purpose of an indexer is to translate a collection of objects into a collection of objects
+    such as vectors for purposes such as search. Unless you are implementing your own indexer, you
+    generally don't need to use the methods that return vectors, but we can examine their behavior
+    to get a sense of how they work.
+
+    >>> vectors = indexer.objects_to_vectors([{"name": "Aardvark"}, {"name": "Aardwolf"}, {"name": "Zesty"}])
+    >>> assert cosine_similarity(vectors[0], vectors[1]) > cosine_similarity(vectors[0], vectors[2])
+
+    Note you should consult the documentation for the specific indexer you are using for more details on
+    how text is converted to vectors.
+
     """
 
     name: Optional[str] = None
@@ -122,7 +170,9 @@ class Indexer(BaseModel):
         self, query: str, vectors: List[Tuple[str, INDEX_ITEM]], limit: Optional[int] = None
     ) -> List[Tuple[float, Any]]:
         """
-        Search the index for a query string
+        Use the indexer to search against a database of vectors.
+
+        Note: this is a low-level method, typically you would use the :ref:`search` method on a :ref:`Collection`.
 
         :param query: The query string to search for
         :param vectors: A list of indexed items, where each item is a tuple of (id, vector)
