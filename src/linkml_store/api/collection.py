@@ -226,6 +226,19 @@ class Collection(Generic[DatabaseType]):
         self._initialized = True
         patches = [{"op": "add", "path": "/0", "value": obj} for obj in objs]
         self._broadcast(patches, **kwargs)
+        self._post_modification_hook(**kwargs)
+
+    def _post_delete_hook(self, **kwargs):
+        self._post_modification_hook(**kwargs)
+
+    def _post_modification_hook(self, **kwargs):
+        for indexer in self.indexers.values():
+            ix_collection_name = self.get_index_collection_name(indexer)
+            ix_collection = self.parent.get_collection(ix_collection_name)
+            # Currently updating the source triggers complete reindexing
+            # TODO: make this more efficient by only deleting modified
+            ix_collection.delete_where({})
+
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
@@ -476,7 +489,7 @@ class Collection(Generic[DatabaseType]):
         Now let's index, using the simple trigram-based index
 
         >>> index = get_indexer("simple")
-        >>> collection.attach_indexer(index)
+        >>> _ = collection.attach_indexer(index)
 
         Now let's find all objects:
 
@@ -514,7 +527,10 @@ class Collection(Generic[DatabaseType]):
         if ix_coll.size() == 0:
             logger.info(f"Index {index_name} is empty; indexing all objects")
             all_objs = self.find(limit=-1).rows
-            self.index_objects(all_objs, index_name, replace=True, **kwargs)
+            if all_objs:
+                # print(f"Index {index_name} is empty; indexing all objects {len(all_objs)}")
+                self.index_objects(all_objs, index_name, replace=True, **kwargs)
+                assert ix_coll.size() > 0
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
         index_col = ix.index_field
         # TODO: optimize this for large indexes
@@ -648,7 +664,29 @@ class Collection(Generic[DatabaseType]):
         """
         return self.find({}, limit=1).num_rows
 
-    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs):
+    def rows_iter(self) -> Iterable[OBJECT]:
+        """
+        Return an iterator over the objects in the collection.
+
+        :return:
+        """
+        yield from self.find({}, limit=-1).rows
+
+    def rows(self) -> List[OBJECT]:
+        """
+        Return a list of objects in the collection.
+
+        :return:
+        """
+        return list(self.rows_iter())
+
+    def ranked_rows(self) -> List[Tuple[float, OBJECT]]:
+        """
+        Return a list of objects in the collection, with scores.
+        """
+        return [(n, obj) for n, obj in enumerate(self.rows_iter())]
+
+    def attach_indexer(self, index: Union[Indexer, str], name: Optional[str] = None, auto_index=True, **kwargs) -> Indexer:
         """
         Attach an index to the collection.
 
@@ -669,8 +707,8 @@ class Collection(Generic[DatabaseType]):
         >>> full_index.name = "full"
         >>> name_index = get_indexer("simple", text_template="{name}")
         >>> name_index.name = "name"
-        >>> collection.attach_indexer(full_index)
-        >>> collection.attach_indexer(name_index)
+        >>> _ = collection.attach_indexer(full_index)
+        >>> _ = collection.attach_indexer(name_index)
 
         Now let's find objects using the full index, using the string "France".
         We expect the country France to be the top hit, but the score will
@@ -713,6 +751,10 @@ class Collection(Generic[DatabaseType]):
             all_objs = self.find(limit=-1).rows
             logger.info(f"Auto-indexing {len(all_objs)} objects")
             self.index_objects(all_objs, index_name, replace=True, **kwargs)
+        return index
+
+    def get_index_collection_name(self, indexer: Indexer) -> str:
+        return self._index_collection_name(indexer.name)
 
     def _index_collection_name(self, index_name: str) -> str:
         """

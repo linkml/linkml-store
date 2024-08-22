@@ -76,6 +76,8 @@ class ContextSettings(BaseModel):
         if name is None:
             # if len(self.database.list_collections()) > 1:
             #    raise ValueError("Collection must be specified if there are multiple collections.")
+            if not self.database:
+                return None
             if not self.database.list_collections():
                 return None
             name = list(self.database.list_collections())[0]
@@ -218,7 +220,10 @@ def insert(ctx, files, object, format):
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
 @click.pass_context
 def store(ctx, files, object, format):
-    """Store objects from files (JSON, YAML, TSV) into the specified collection."""
+    """Store objects from files (JSON, YAML, TSV) into the database.
+
+    Note: this is similar to insert, but a collection does not need to be specified
+    """
     settings = ctx.obj["settings"]
     db = settings.database
     if not files and not object:
@@ -499,6 +504,7 @@ def describe(ctx, where, output_type, output, limit):
     "--predictor-type", "-t", default="sklearn", show_default=True, type=click.STRING, help="Type of predictor"
 )
 @click.option("--evaluation-count", "-n", type=click.INT, help="Number of examples to evaluate over")
+@click.option("--evaluation-match-function", help="Name of function to use for matching objects in eval")
 @click.option("--query", "-q", type=click.STRING, help="query term")
 @click.pass_context
 def infer(
@@ -506,6 +512,7 @@ def infer(
     inference_config_file,
     query,
     evaluation_count,
+    evaluation_match_function,
     training_test_data_split,
     predictor_type,
     target_attribute,
@@ -549,7 +556,10 @@ def infer(
     else:
         query_obj = None
     collection = ctx.obj["settings"].collection
-    atts = collection.class_definition().attributes.keys()
+    if collection:
+        atts = collection.class_definition().attributes.keys()
+    else:
+        atts = []
     if feature_attributes:
         features = feature_attributes.split(",")
         features = [f.strip() for f in features]
@@ -575,7 +585,8 @@ def infer(
         if training_test_data_split:
             config.train_test_split = training_test_data_split
         predictor = get_inference_engine(predictor_type, config=config)
-        predictor.load_and_split_data(collection)
+        if collection:
+            predictor.load_and_split_data(collection)
         predictor.initialize_model()
     if export_model:
         logger.info(f"Exporting model to {export_model} in {model_format}")
@@ -584,8 +595,14 @@ def infer(
         if not export_model and not evaluation_count:
             raise ValueError("Query or evaluate must be specified if not exporting model")
     if evaluation_count:
+        if evaluation_match_function == "score_text_overlap":
+            match_function_fn = score_text_overlap
+        elif evaluation_match_function is not None:
+            raise ValueError(f"Unknown match function: {evaluation_match_function}")
+        else:
+            match_function_fn = None
         outcome = evaluate_predictor(
-            predictor, target_attributes, evaluation_count=evaluation_count, match_function=score_text_overlap
+            predictor, target_attributes, evaluation_count=evaluation_count, match_function=match_function_fn
         )
         print(f"Outcome: {outcome} // accuracy: {outcome.accuracy}")
     if query_obj:

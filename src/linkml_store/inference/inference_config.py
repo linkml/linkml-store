@@ -35,6 +35,7 @@ class InferenceConfig(BaseModel, extra="forbid"):
     feature_attributes: Optional[List[str]] = None
     train_test_split: Optional[Tuple[float, float]] = None
     llm_config: Optional[LLMConfig] = None
+    random_seed: Optional[int] = None
 
     @classmethod
     def from_file(cls, file_path: str, format: Optional[Format] = None) -> "InferenceConfig":

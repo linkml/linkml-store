@@ -268,7 +268,7 @@ class Database(ABC, Generic[CollectionType]):
         metadata: Optional[CollectionConfig] = None,
         recreate_if_exists=False,
         **kwargs,
-    ) -> CollectionType:
+    ) -> Collection:
         """
         Create a new collection in the current database.
 
@@ -759,6 +759,12 @@ class Database(ABC, Generic[CollectionType]):
     def export_database(self, location: str, target_format: Optional[Union[str, Format]] = None, **kwargs):
         """
         Export a database to a file or location.
+
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.import_database("tests/input/iris.csv", Format.CSV, collection_name="iris")
+        >>> db.export_database("/tmp/iris.yaml", Format.YAML)
 
         :param location: location of the file
         :param target_format: target format

@@ -29,6 +29,7 @@ class ModelSerialization(str, Enum):
     PNG = "png"
     LINKML_EXPRESSION = "linkml_expression"
     RULE_BASED = "rulebased"
+    RAG_INDEX = "rag_index"
 
     @classmethod
     def from_filepath(cls, file_path: str) -> Optional["ModelSerialization"]:
@@ -58,7 +59,7 @@ class ModelSerialization(str, Enum):
 
 
 class CollectionSlice(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
 
     name: Optional[str] = None
     base_collection: Optional[Collection] = None
@@ -69,16 +70,26 @@ class CollectionSlice(BaseModel):
 
     @property
     def collection(self) -> Collection:
+        if not self._collection and not self.indices:
+            return self.base_collection
         if not self._collection:
             rows = self.base_collection.find({}, limit=-1).rows
-            # subset based on indices
             subset = [rows[i] for i in self.indices]
             db = self.base_collection.parent
-            subset_name = f"{self.base_collection.alias}__rag_{self.name}"
+            subset_name = self.slice_alias
             subset_collection = db.get_collection(subset_name, create_if_not_exists=True)
+            # ensure the collection has the same schema type as the base collection;
+            # this ensures that column/attribute types are preserved
+            subset_collection.metadata.type = self.base_collection.target_class_name
+            subset_collection.delete_where({})
             subset_collection.insert(subset)
             self._collection = subset_collection
         return self._collection
+
+
+    @property
+    def slice_alias(self) -> str:
+        return f"{self.base_collection.alias}__rag_{self.name}"
 
     def as_dataframe(self, flattened=False) -> pd.DataFrame:
         """
@@ -113,31 +124,30 @@ class InferenceEngine(ABC):
 
         :param collection:
         :param split:
+        :param randomize:
         :return:
         """
+        local_random = random.Random(self.config.random_seed) if self.config.random_seed else random.Random()
         split = split or self.config.train_test_split
         if not split:
             split = (0.7, 0.3)
+        if split[0] == 1.0:
+            self.training_data = CollectionSlice(name="train", base_collection=collection, indices=None)
+            self.testing_data = None
+            return
         logger.info(f"Loading and splitting data from collection {collection.alias}")
         size = collection.size()
         indices = range(size)
         if randomize:
-            train_indices = random.sample(indices, int(size * split[0]))
+            train_indices = local_random.sample(indices, int(size * split[0]))
             test_indices = set(indices) - set(train_indices)
         else:
             train_indices = indices[: int(size * split[0])]
             test_indices = indices[int(size * split[0]) :]
         self.training_data = CollectionSlice(name="train", base_collection=collection, indices=train_indices)
         self.testing_data = CollectionSlice(name="test", base_collection=collection, indices=test_indices)
-        # all_data = collection.find({}, limit=size).rows
-        # all_data_df = nested_objects_to_dataframe(all_data)
-        # all_data_df = collection.find({}, limit=size).rows_dataframe
-        # randomize/shuffle order of rows in dataframe
-        # all_data_df = all_data_df.sample(frac=1).reset_index(drop=True)
-        # self.training_data = CollectionSlice(dataframe=all_data_df[: int(size * split[0])])
-        # self.testing_data = CollectionSlice(dataframe=all_data_df[int(size * split[0]) : size])
-        # self.training_data = CollectionSlice(base_collection=collection, slice=(0, int(size * split[0])))
-        # self.testing_data = CollectionSlice(base_collection=collection, slice=(int(size * split[0]), size))
+
+
 
     def initialize_model(self, **kwargs):
         """

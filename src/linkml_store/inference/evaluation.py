@@ -20,6 +20,8 @@ def score_match(target: Optional[Any], candidate: Optional[Any], match_function:
     1.0
     >>> score_match("a", "b")
     0.0
+    >>> score_match("abcd", "abcde")
+    0.0
     >>> score_match("a", None)
     0.0
     >>> score_match(None, "a")
@@ -52,7 +54,7 @@ def score_match(target: Optional[Any], candidate: Optional[Any], match_function:
 
     :param target:
     :param candidate:
-    :param match_function:
+    :param match_function: defaults to struct
     :return:
     """
     if target == candidate:
@@ -99,7 +101,8 @@ def evaluate_predictor(
     :param predictor:
     :param target_attributes:
     :param feature_attributes:
-    :param evaluation_count:
+    :param evaluation_count: max iterations
+    :param match_function: function to use for matching
     :return:
     """
     n = 0
@@ -113,8 +116,8 @@ def evaluate_predictor(
         else:
             test_obj = row
         result = predictor.derive(test_obj)
-        logger.info(f"Predicted: {result.predicted_object} Expected: {expected_obj}")
         tp += score_match(result.predicted_object, expected_obj, match_function)
+        logger.info(f"TP={tp} MF={match_function} Predicted: {result.predicted_object} Expected: {expected_obj}")
         n += 1
         if evaluation_count is not None and n >= evaluation_count:
             break
@@ -124,6 +127,9 @@ def evaluate_predictor(
 def score_text_overlap(str1: Any, str2: Any) -> float:
     """
     Compute the overlap score between two strings.
+
+    >>> score_text_overlap("abc", "bcde")
+    0.5
 
     :param str1:
     :param str2:

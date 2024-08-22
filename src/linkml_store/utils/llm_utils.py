@@ -20,6 +20,7 @@ MODEL_TOKEN_MAPPING = {
     "gpt-3.5-turbo-instruct": 4096,
     "text-ada-001": 2049,
     "ada": 2049,
+    "ada-002": 8192,
     "text-babbage-001": 2040,
     "babbage": 2049,
     "text-curie-001": 2049,

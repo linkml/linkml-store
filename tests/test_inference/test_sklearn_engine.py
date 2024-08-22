@@ -102,22 +102,24 @@ def test_inference_basic():
     assert prediction.predicted_object["species"] == "setosa"
 
 
-def test_inference_mixed():
+@pytest.mark.parametrize("seed", [42])
+def test_inference_mixed(seed):
     """
     Test the sklearn inference engine using mixed categorical and numerical data.
     """
     client = Client()
     df, features, targets = get_dataset("adult", 2)
     df = df.replace({np.nan: None})
-    print(df)
-    print("CAPITAL GAIN")
-    print(df["capital-gain"])
     # https://github.com/pandas-dev/pandas/issues/58230
     rows = json.loads(df.to_json(orient="records"))
+    for row in rows:
+        assert isinstance(row["capital-gain"], int), "expected all ints for capital-gain"
     db = client.attach_database("duckdb", alias="test")
     db.store({"data": rows})
     collection = db.get_collection("data")
-    config = InferenceConfig(target_attributes=targets, feature_attributes=features)
+    for row in collection.find({}, limit=-1).rows:
+        assert isinstance(row["capital-gain"], int), "expected all ints for capital-gain after storage in db"
+    config = InferenceConfig(target_attributes=targets, feature_attributes=features, random_seed=seed)
     ie = get_inference_engine("sklearn", config=config)
     assert isinstance(ie, SklearnInferenceEngine)
     ie.load_and_split_data(collection)
@@ -127,11 +129,6 @@ def test_inference_mixed():
         ie.transformed_features
     ) == set(), "expected transform of categorical"
     assert isinstance(ie.encoders["sex"], OneHotEncoder)
-    print("CAPITAL GAIN (TRAINING)")
-    train_df = ie.training_data.as_dataframe()
-    print(train_df["capital-gain"])
-    print("UNIQ")
-    print(train_df["capital-gain"].unique())
     assert "capital-gain" not in ie.encoders
     logger.info(f"Targets after encoding: {ie.transformed_targets}")
     assert set(ie.transformed_targets) == {"<=50K", ">50K"}, "no need for one-hot for target"
@@ -144,7 +141,8 @@ def test_inference_mixed():
     check_accuracy(rule_engine, "class", threshold=0.1, test_data=ie.testing_data.as_dataframe())
 
 
-def test_nested_data():
+@pytest.mark.parametrize("seed", [42, 101])
+def test_nested_data(seed):
     """
     Test the sklearn inference engine with nested data.
 
@@ -155,6 +153,7 @@ def test_nested_data():
 
     {"person": {"name": "Person 1", "age": 21}, "twin": {"name": "Twin 1", "age": 21}}
     """
+    local_random = random.Random(seed)
     client = Client()
     tgt = "twin.age"
     n = 100
@@ -170,6 +169,7 @@ def test_nested_data():
     db.store({"data": objects})
     collection = db.get_collection("data")
     config = InferenceConfig(target_attributes=[tgt], feature_attributes=["person.name", "person.age"])
+    config.random_seed = seed
     # TODO: infer feature cols for nested
     # config = InferenceConfig(target_attributes=[tgt])
     ie = get_inference_engine("sklearn", config=config)

@@ -1,11 +1,13 @@
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
 
 from linkml_store.api.config import CollectionConfig
 from linkml_store.index.indexer import INDEX_ITEM, Indexer
+from linkml_store.utils.llm_utils import get_token_limit, render_formatted_text
+from tiktoken import encoding_for_model
 
 if TYPE_CHECKING:
     import llm
@@ -29,6 +31,7 @@ class LLMIndexer(Indexer):
     cached_embeddings_database: str = None
     cached_embeddings_collection: str = None
     cache_queries: bool = False
+    truncation_method: Optional[str] = None
 
     @property
     def embedding_model(self):
@@ -62,6 +65,20 @@ class LLMIndexer(Indexer):
         """
         logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
+        token_limit = get_token_limit(model.model_id)
+        encoding = encoding_for_model("gpt-4o")
+        def truncate_text(text: str) -> str:
+            # split into tokens every 1000 chars:
+            parts = [text[i:i + 1000] for i in range(0, len(text), 1000)]
+            return render_formatted_text(
+                lambda x: "".join(x),
+                parts,
+                encoding,
+                token_limit,
+            )
+
+        texts = [truncate_text(text) for text in texts]
+
         if self.cached_embeddings_database and (cache is None or cache or self.cache_queries):
             model_id = model.model_id
             if not model_id:
@@ -88,7 +105,7 @@ class LLMIndexer(Indexer):
                 embeddings_collection = embeddings_db.create_collection(coll_name, metadata=config)
             else:
                 embeddings_collection = embeddings_db.create_collection(coll_name, metadata=config)
-            texts = list(texts)
+
             embeddings = list([None] * len(texts))
             uncached_texts = []
             n = 0
