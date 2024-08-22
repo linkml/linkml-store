@@ -220,6 +220,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -360,8 +361,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
         <span class="n">cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cd</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cd</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cd</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
             <span class="n">cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">induce_class_definition_from_objects</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">cd</span><span class="o">.</span><span class="n">attributes</span>
         <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqla_table</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span>
         <span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">engine</span>
         <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
@@ -371,7 +373,8 @@
                 <span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-        <span class="k">return</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post_delete_hook</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="DuckDBCollection.delete_where">
@@ -400,6 +403,7 @@
             <span class="k">if</span> <span class="n">deleted_rows_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">missing_ok</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No rows found for </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_post_delete_hook</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">deleted_rows_count</span> <span class="k">if</span> <span class="n">deleted_rows_count</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 

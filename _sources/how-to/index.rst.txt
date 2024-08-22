@@ -18,4 +18,5 @@ How-To Guides
    Index-Phenopackets
    Index-GO-CAMs
    Predict-Missing-Data
+   Perform-RAG-Inference
 

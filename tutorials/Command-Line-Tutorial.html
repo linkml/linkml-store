@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
-    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -222,6 +222,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../how-to/Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -355,9 +356,9 @@ Commands:
   import            Imports a database from a dump.
   index             Create an index over a collection.
   indexes           Show the indexes for a collection.
+  infer             Predict a complete object from a partial object.
   insert            Insert objects from files (JSON, YAML, TSV) into the...
   list-collections
-  predict           Predict a complete object from a partial object.
   query             Query objects from the specified collection.
   schema            Show the schema for a database
   search            Search objects in the specified collection.
@@ -440,14 +441,6 @@ rm<span class="w"> </span>-rf<span class="w"> </span>tmp/countries.db
 linkml-store<span class="w"> </span>--database<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>--collection<span class="w"> </span>countries<span class="w"> </span>insert<span class="w"> </span>../../tests/input/countries/countries.jsonl
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-08-07 20:14:26,739 - linkml_store.api.collection - WARNING - countries not in dict_keys([])
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
@@ -670,8 +663,8 @@ linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/coun
     &#34;Europe&#34;: 5,
     &#34;Africa&#34;: 3,
     &#34;North America&#34;: 3,
-    &#34;Oceania&#34;: 2,
-    &#34;South America&#34;: 2
+    &#34;South America&#34;: 2,
+    &#34;Oceania&#34;: 2
   }
 }
 </pre></div></div>
@@ -695,8 +688,8 @@ linkml-store<span class="w"> </span>--stacktrace<span class="w"> </span>-d<span 
 |------------------+-------------+-------------|
 | Europe           |           5 |         nan |
 | Asia             |           5 |         nan |
-| Africa           |           3 |         nan |
 | North America    |           3 |         nan |
+| Africa           |           3 |         nan |
 | South America    |           2 |         nan |
 | Oceania          |           2 |         nan |
 | English          |         nan |           8 |
@@ -709,19 +702,19 @@ linkml-store<span class="w"> </span>--stacktrace<span class="w"> </span>-d<span 
 | Portuguese       |         nan |           1 |
 | Māori            |         nan |           1 |
 | Xhosa            |         nan |           1 |
+| Zulu             |         nan |           1 |
+| Tsonga           |         nan |           1 |
 | German           |         nan |           1 |
 | Korean           |         nan |           1 |
 | Northern Sotho   |         nan |           1 |
 | Venda            |         nan |           1 |
 | Southern Ndebele |         nan |           1 |
+| Hindi            |         nan |           1 |
+| Swazi            |         nan |           1 |
 | Japanese         |         nan |           1 |
 | Indonesian       |         nan |           1 |
 | Arabic           |         nan |           1 |
 | Afrikaans        |         nan |           1 |
-| Zulu             |         nan |           1 |
-| Tsonga           |         nan |           1 |
-| Hindi            |         nan |           1 |
-| Swazi            |         nan |           1 |
 +------------------+-------------+-------------+
 </pre></div></div>
 </div>
@@ -766,8 +759,8 @@ Options:
 </pre></div></div>
 </div>
 <p>Next we’ll make a (default) index</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -775,20 +768,12 @@ linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/coun
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-08-07 20:14:45,678 - linkml_store.api.collection - WARNING - internal__index__countries__simple not in dict_keys([&#39;countries&#39;])
-</pre></div></div>
-</div>
 </section>
 <section id="Searching-a-collection-using-an-index">
 <h3>Searching a collection using an index<a class="headerlink" href="#Searching-a-collection-using-an-index" title="Link to this heading"></a></h3>
 <p>Let’s explore the <code class="docutils literal notranslate"><span class="pre">search</span></code> command</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -820,7 +805,7 @@ Options:
 </div>
 <p>Now we’ll search for countries in the North where both English and French are spoken. We’ll pose this as a natural language query, but the default index is only picking up on trigram tokens in the strings.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -856,22 +841,14 @@ score,name,code,capital,continent,languages
 </div>
 <p>You will also need an OpenAI account.</p>
 <p>If this is too much, you can just skip this section!</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
 linkml-store<span class="w"> </span>-d<span class="w"> </span>duckdb:///tmp/countries.db<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>index<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span>-E<span class="w"> </span>tmp/llm_countries_cache.db
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-2024-08-07 20:14:50,765 - linkml_store.api.collection - WARNING - internal__index__countries__llm not in dict_keys([&#39;countries&#39;, &#39;internal__index__countries__simple&#39;])
-</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:

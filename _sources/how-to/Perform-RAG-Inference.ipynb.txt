@@ -1,0 +1,1096 @@
+{
+ "cells": [
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "# Perform RAG Inference\n",
+    "\n",
+    "This notebook demonstrates how to perform inference using RAG (Retrieval-Augmented Generation).\n",
+    "\n",
+    "Note that linkml-store is a data-first framework, the main emphasis is not on AI or LLMs. However, it does support a pluggable **Inference** framework, and one of the integrations is a simple RAG-based inference engine.\n",
+    "\n",
+    "For this notebook, we will be using the command line interface, but the same can be done programmatically using the Python API."
+   ],
+   "id": "113e1f5d2f048e03"
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Loading the data into duckdb",
+   "id": "966de1b52f388b87"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:28.992417Z",
+     "start_time": "2024-08-21T22:53:25.449555Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "mkdir -p tmp\n",
+    "rm -rf tmp/countries.ddb\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries insert ../../tests/input/countries/countries.jsonl"
+   ],
+   "id": "da1ed3b6811477ee",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 20 objects from ../../tests/input/countries/countries.jsonl into collection 'countries'.\n"
+     ]
+    }
+   ],
+   "execution_count": 1
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "Let's check what this looks like by using `describe` and examining the first entry:",
+   "id": "88191ea890186dc9"
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "",
+   "id": "6ec8e511c6d465a4"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:31.506844Z",
+     "start_time": "2024-08-21T22:53:28.997931Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb describe"
+   ],
+   "id": "af9d9160e75afed4",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "          count unique               top freq\n",
+      "capital      20     20  Washington, D.C.    1\n",
+      "code         20     20                US    1\n",
+      "continent    20      6            Europe    5\n",
+      "languages    20     15         [English]    4\n",
+      "name         20     20     United States    1\n"
+     ]
+    }
+   ],
+   "execution_count": 2
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:34.133244Z",
+     "start_time": "2024-08-21T22:53:31.595517Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb query --limit 1 -O yaml"
+   ],
+   "id": "45da9e5fd1353ccb",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "name: United States\n",
+      "code: US\n",
+      "capital: Washington, D.C.\n",
+      "continent: North America\n",
+      "languages:\n",
+      "- English\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 3
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "First we will check we don't already have the country we will use for testing in the database\n",
+    "(the `countries.jsonl` file is intentionally incomplete)"
+   ],
+   "id": "3c48cefc91936587"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:34.139594Z",
+     "start_time": "2024-08-21T22:53:34.138220Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "",
+   "id": "e16642d6ff6e8d41",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:36.623611Z",
+     "start_time": "2024-08-21T22:53:34.144978Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries query -w \"name: Uruguay\""
+   ],
+   "id": "a0c1dff5eb9e6528",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[]\n"
+     ]
+    }
+   ],
+   "execution_count": 4
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Inferring a specific field",
+   "id": "5723b14db6ae067f"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:55:46.001102Z",
+     "start_time": "2024-08-21T22:55:41.459988Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag -T languages -q \"name: Uruguay\""
+   ],
+   "id": "e3b5b54814c56690",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 18
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "The RAG engine works by first indexing the countries collection by embedding each entry. The top N results matching the query are fetched and used as *context* for the LLM query.\n",
+    "\n",
+    "Note that in this particular case, we have a very small collection of twenty entries, and it's not even necessary to perform RAG at all, as the entire collection can easily fit within the context window of the LLM query. However, this small set is useful for demo purposes."
+   ],
+   "id": "1a3c35ac1b902a86"
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Inferring a whole object",
+   "id": "4695228dca721456"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:44.984216Z",
+     "start_time": "2024-08-21T22:53:41.075755Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag -q \"name: Uruguay\""
+   ],
+   "id": "f0c9a8f8dd5e319c",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Montevideo\n",
+      "  code: UY\n",
+      "  continent: South America\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 6
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Inferring from multiple fields",
+   "id": "53615fc0697e0c39"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:02:33.338749Z",
+     "start_time": "2024-08-21T23:02:29.166889Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag  -q \"{continent: South America, languages: [Dutch]}\""
+   ],
+   "id": "cf1d1e39a0d4b56f",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Paramaribo\n",
+      "  code: SR\n",
+      "  name: Suriname\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 27
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "## RAG configuration - using a different model\n",
+    "\n",
+    "The datasette llm framework is used under the hood. This means that you can use the `llm` command to list the available models and configurations, as well as install new ones."
+   ],
+   "id": "8c65369fed257b0b"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:02:42.141357Z",
+     "start_time": "2024-08-21T23:02:41.334264Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "llm models"
+   ],
+   "id": "bf740ea5beb16d2a",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "OpenAI Chat: gpt-3.5-turbo (aliases: 3.5, chatgpt)\n",
+      "OpenAI Chat: gpt-3.5-turbo-16k (aliases: chatgpt-16k, 3.5-16k)\n",
+      "OpenAI Chat: gpt-4 (aliases: 4, gpt4)\n",
+      "OpenAI Chat: gpt-4-32k (aliases: 4-32k)\n",
+      "OpenAI Chat: gpt-4-1106-preview\n",
+      "OpenAI Chat: gpt-4-0125-preview\n",
+      "OpenAI Chat: gpt-4-turbo-2024-04-09\n",
+      "OpenAI Chat: gpt-4-turbo (aliases: gpt-4-turbo-preview, 4-turbo, 4t)\n",
+      "OpenAI Chat: gpt-4o (aliases: 4o)\n",
+      "OpenAI Chat: gpt-4o-mini (aliases: 4o-mini)\n",
+      "OpenAI Completion: gpt-3.5-turbo-instruct (aliases: 3.5-instruct, chatgpt-instruct)\n",
+      "OpenAI Chat: gpt-4-vision-preview (aliases: 4V, gpt-4-vision)\n",
+      "OpenAI Chat: litellm-mixtral\n",
+      "OpenAI Chat: litellm-llama3\n",
+      "OpenAI Chat: litellm-llama3-chatqa\n",
+      "OpenAI Chat: litellm-groq-mixtral\n",
+      "OpenAI Chat: litellm-groq-llama\n",
+      "OpenAI Chat: gpt-4o-2024-05-13 (aliases: 4o, gpt-4o)\n",
+      "OpenAI Chat: lbl/llama-3\n",
+      "OpenAI Chat: lbl/claude-opus\n",
+      "OpenAI Chat: lbl/claude-sonnet\n",
+      "OpenAI Chat: lbl/gpt-4o\n",
+      "OpenAI Chat: lbl/llama-3\n",
+      "Anthropic Messages: claude-3-opus-20240229 (aliases: claude-3-opus)\n",
+      "Anthropic Messages: claude-3-sonnet-20240229 (aliases: claude-3-sonnet)\n",
+      "Anthropic Messages: claude-3-haiku-20240307 (aliases: claude-3-haiku)\n",
+      "Anthropic Messages: claude-3-5-sonnet-20240620 (aliases: claude-3.5-sonnet)\n"
+     ]
+    }
+   ],
+   "execution_count": 28
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "We'll try `claude-3-haiku`, a small model. This may not be powerful enough for extraction tasks, but general knowledge about countries should be within its capabilities.",
+   "id": "d543d1a2277951f8"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:02:47.027628Z",
+     "start_time": "2024-08-21T23:02:42.160752Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag:llm_config.model_name=claude-3-haiku -q \"name: Uruguay\" "
+   ],
+   "id": "77210bae9000f5b8",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Montevideo\n",
+      "  code: UY\n",
+      "  continent: South America\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 29
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Persisting the RAG model",
+   "id": "e5aa22d2d79ddfcf"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:05:44.704010Z",
+     "start_time": "2024-08-21T23:05:39.504800Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag -q \"name: Uruguay\" -E tmp/countries.rag.json"
+   ],
+   "id": "2c0253b043877be5",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Montevideo\n",
+      "  code: UY\n",
+      "  continent: South America\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 44
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:06:06.484062Z",
+     "start_time": "2024-08-21T23:06:06.456550Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "ls -l tmp/countries.rag.json"
+   ],
+   "id": "57e0399eeb033544",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "-rw-r--r--  1 cjm  staff  498212 Aug 21 16:05 tmp/countries.rag.json\n"
+     ]
+    }
+   ],
+   "execution_count": 45
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:06:35.105523Z",
+     "start_time": "2024-08-21T23:06:30.767533Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag -q \"name: Uruguay\" -L tmp/countries.rag.json"
+   ],
+   "id": "f357aca421d3f29",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Montevideo\n",
+      "  code: UY\n",
+      "  continent: South America\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 46
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "## Evaluation",
+   "id": "56a938a3cfd88ac9"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-22T02:00:08.927287Z",
+     "start_time": "2024-08-22T02:00:00.774789Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag  -T languages -T code -F name -n 5"
+   ],
+   "id": "c6f50474a64adc8e",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Outcome: true_positive_count=5.0 total_count=5 // accuracy: 1.0\n"
+     ]
+    }
+   ],
+   "execution_count": 55
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "## How RAG indexing works under the hood\n",
+    "\n",
+    "Behind the scenes, whenever you use the RAG inference engine, a separate collection is automatically created for a test dataset; additionally, an index is also created in the same database. This is true regardless of the database backend (DuckDB, MongoDB, etc.).\n",
+    "\n",
+    "(note: if you are using an in-memory duckdb instance then the index is forgotten after each run, which\n",
+    "could get expensive if you have a large collection).\n",
+    "\n",
+    "Let's examine our database to see the new collection and index. We will use the Jupyter SQL magic to query the database."
+   ],
+   "id": "ef995b7df9dc2425"
+  },
+  {
+   "metadata": {},
+   "cell_type": "code",
+   "outputs": [],
+   "execution_count": null,
+   "source": "",
+   "id": "bbe5f552d3c239e8"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:50.219582Z",
+     "start_time": "2024-08-21T23:03:50.212113Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%load_ext sql\n",
+    "%config SqlMagic.autopandas = True\n",
+    "%config SqlMagic.feedback = False\n",
+    "%config SqlMagic.displaycon = False"
+   ],
+   "id": "ac5fd025661ef7ec",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The sql extension is already loaded. To reload it, use:\n",
+      "  %reload_ext sql\n"
+     ]
+    }
+   ],
+   "execution_count": 38
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:50.864378Z",
+     "start_time": "2024-08-21T23:03:50.850251Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "cp tmp/countries.ddb tmp/countries-copy.ddb"
+   ],
+   "id": "20e500fe878072b3",
+   "outputs": [],
+   "execution_count": 39
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:51.483877Z",
+     "start_time": "2024-08-21T23:03:51.416823Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "%sql duckdb:///tmp/countries-copy.ddb",
+   "id": "4452ee3d4c8f718f",
+   "outputs": [],
+   "execution_count": 40
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:52.224522Z",
+     "start_time": "2024-08-21T23:03:52.085675Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%sql\n",
+    "SELECT * FROM information_schema.tables"
+   ],
+   "id": "9a06cb5c358797cd",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "    table_catalog table_schema                                  table_name  \\\n",
+       "0  countries-copy         main                                   countries   \n",
+       "1  countries-copy         main                        countries__rag_train   \n",
+       "2  countries-copy         main  internal__index__countries__rag_train__llm   \n",
+       "\n",
+       "   table_type self_referencing_column_name reference_generation  \\\n",
+       "0  BASE TABLE                         None                 None   \n",
+       "1  BASE TABLE                         None                 None   \n",
+       "2  BASE TABLE                         None                 None   \n",
+       "\n",
+       "  user_defined_type_catalog user_defined_type_schema user_defined_type_name  \\\n",
+       "0                      None                     None                   None   \n",
+       "1                      None                     None                   None   \n",
+       "2                      None                     None                   None   \n",
+       "\n",
+       "  is_insertable_into is_typed commit_action TABLE_COMMENT  \n",
+       "0                YES       NO          None          None  \n",
+       "1                YES       NO          None          None  \n",
+       "2                YES       NO          None          None  "
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>table_catalog</th>\n",
+       "      <th>table_schema</th>\n",
+       "      <th>table_name</th>\n",
+       "      <th>table_type</th>\n",
+       "      <th>self_referencing_column_name</th>\n",
+       "      <th>reference_generation</th>\n",
+       "      <th>user_defined_type_catalog</th>\n",
+       "      <th>user_defined_type_schema</th>\n",
+       "      <th>user_defined_type_name</th>\n",
+       "      <th>is_insertable_into</th>\n",
+       "      <th>is_typed</th>\n",
+       "      <th>commit_action</th>\n",
+       "      <th>TABLE_COMMENT</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>countries-copy</td>\n",
+       "      <td>main</td>\n",
+       "      <td>countries</td>\n",
+       "      <td>BASE TABLE</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>YES</td>\n",
+       "      <td>NO</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>countries-copy</td>\n",
+       "      <td>main</td>\n",
+       "      <td>countries__rag_train</td>\n",
+       "      <td>BASE TABLE</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>YES</td>\n",
+       "      <td>NO</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>countries-copy</td>\n",
+       "      <td>main</td>\n",
+       "      <td>internal__index__countries__rag_train__llm</td>\n",
+       "      <td>BASE TABLE</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "      <td>YES</td>\n",
+       "      <td>NO</td>\n",
+       "      <td>None</td>\n",
+       "      <td>None</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 41
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:53.030257Z",
+     "start_time": "2024-08-21T23:03:52.863279Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%sql\n",
+    "select * from internal__index__countries__rag_train__llm limit 5"
+   ],
+   "id": "d16b905ca3e0c87",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "            name code           capital      continent         languages  \\\n",
+       "0      Argentina   AR      Buenos Aires  South America         [Spanish]   \n",
+       "1    South Korea   KR             Seoul           Asia          [Korean]   \n",
+       "2  United States   US  Washington, D.C.  North America         [English]   \n",
+       "3        Nigeria   NG             Abuja         Africa         [English]   \n",
+       "4          India   IN         New Delhi           Asia  [Hindi, English]   \n",
+       "\n",
+       "                                           __index__  \n",
+       "0  [-0.009016353, 0.02336632, 0.007532564, -0.008...  \n",
+       "1  [3.8781454e-05, 0.013463534, 0.017664365, -0.0...  \n",
+       "2  [-0.0077237985, 0.016569635, -0.0042663547, -0...  \n",
+       "3  [-0.0055540577, 0.0037728157, -0.003473751, -0...  \n",
+       "4  [-0.0031975685, 0.025214365, 0.002862445, 0.00...  "
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>name</th>\n",
+       "      <th>code</th>\n",
+       "      <th>capital</th>\n",
+       "      <th>continent</th>\n",
+       "      <th>languages</th>\n",
+       "      <th>__index__</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Argentina</td>\n",
+       "      <td>AR</td>\n",
+       "      <td>Buenos Aires</td>\n",
+       "      <td>South America</td>\n",
+       "      <td>[Spanish]</td>\n",
+       "      <td>[-0.009016353, 0.02336632, 0.007532564, -0.008...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>South Korea</td>\n",
+       "      <td>KR</td>\n",
+       "      <td>Seoul</td>\n",
+       "      <td>Asia</td>\n",
+       "      <td>[Korean]</td>\n",
+       "      <td>[3.8781454e-05, 0.013463534, 0.017664365, -0.0...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>United States</td>\n",
+       "      <td>US</td>\n",
+       "      <td>Washington, D.C.</td>\n",
+       "      <td>North America</td>\n",
+       "      <td>[English]</td>\n",
+       "      <td>[-0.0077237985, 0.016569635, -0.0042663547, -0...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Nigeria</td>\n",
+       "      <td>NG</td>\n",
+       "      <td>Abuja</td>\n",
+       "      <td>Africa</td>\n",
+       "      <td>[English]</td>\n",
+       "      <td>[-0.0055540577, 0.0037728157, -0.003473751, -0...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>India</td>\n",
+       "      <td>IN</td>\n",
+       "      <td>New Delhi</td>\n",
+       "      <td>Asia</td>\n",
+       "      <td>[Hindi, English]</td>\n",
+       "      <td>[-0.0031975685, 0.025214365, 0.002862445, 0.00...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 42,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 42
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:56.796051Z",
+     "start_time": "2024-08-21T23:03:56.676322Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%sql\n",
+    "select count(*) from internal__index__countries__rag_train__llm"
+   ],
+   "id": "8412b7da0370589a",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "   count_star()\n",
+       "0            14"
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count_star()</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>14</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 43
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:56:01.557505Z",
+     "start_time": "2024-08-21T22:56:01.413646Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%sql\n",
+    "select count(*) from countries"
+   ],
+   "id": "9b369a4364d3225a",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "   count_star()\n",
+       "0            20"
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count_star()</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>20</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 25
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "## Configuring the training/test split\n",
+    "\n",
+    "By default, the infer command will split your data in collection into a test and train set. This is useful for evaluation, but if you want to use the entire dataset, or you want to configure the split size, you can use `--training-test-data-split` (`-S`).\n"
+   ],
+   "id": "60fc1b7bc202a874"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:52.422228Z",
+     "start_time": "2024-08-21T22:53:52.362385Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "",
+   "id": "d1e222f9928ce487",
+   "outputs": [],
+   "execution_count": 16
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T22:53:52.445754Z",
+     "start_time": "2024-08-21T22:53:52.444399Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "",
+   "id": "d283afe27a797857",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:03:36.178653Z",
+     "start_time": "2024-08-21T23:03:31.285675Z"
+    }
+   },
+   "cell_type": "code",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  capital: Montevideo\n",
+      "  code: UY\n",
+      "  continent: South America\n",
+      "  languages:\n",
+      "  - Spanish\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 37,
+   "source": [
+    "%%bash\n",
+    "linkml-store  -d duckdb:///tmp/countries.ddb -c countries infer -t rag -S 1.0 0.0 -q \"name: Uruguay\" "
+   ],
+   "id": "c6b938a6f63fc481"
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "## Extraction tasks\n",
+    "\n",
+    "We can also use this engine for *extraction tasks* - this involves extracting structured data or knowledge from\n",
+    "textual or unstructured data.\n",
+    "\n",
+    "In fact, we don't need any new capabilities here - extraction can just be seen as a special case of inference,\n",
+    "where the feature set includes or is restricted to text, and the target set is the whole object.\n",
+    "\n",
+    "We can demonstrate this with a simple zero-shot example:"
+   ],
+   "id": "1cea5554183cdd77"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:32:29.163733Z",
+     "start_time": "2024-08-21T23:32:29.146032Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "echo '{text: I saw the cat sitting on the mat, subject: cat, predicate: sits-on, object: mat}' > tmp/extraction-examples.yaml"
+   ],
+   "id": "d0e36617f7d6dab7",
+   "outputs": [],
+   "execution_count": 53
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2024-08-21T23:32:34.057806Z",
+     "start_time": "2024-08-21T23:32:29.702387Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store -i tmp/extraction-examples.yaml infer -t rag -q \"text: the Earth rotates around the Sun\""
+   ],
+   "id": "22d81129ff484935",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "predicted_object:\n",
+      "  object: Sun\n",
+      "  predicate: rotates-around\n",
+      "  subject: Earth\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 54
+  },
+  {
+   "metadata": {},
+   "cell_type": "code",
+   "outputs": [],
+   "execution_count": null,
+   "source": "",
+   "id": "8844aa25ae33472"
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

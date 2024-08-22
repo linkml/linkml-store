@@ -220,6 +220,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -537,6 +538,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">patches</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;op&quot;</span><span class="p">:</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/0&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post_modification_hook</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post_delete_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_post_modification_hook</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_post_modification_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">indexer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ix_collection_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_index_collection_name</span><span class="p">(</span><span class="n">indexer</span><span class="p">)</span>
+            <span class="n">ix_collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ix_collection_name</span><span class="p">)</span>
+            <span class="c1"># Currently updating the source triggers complete reindexing</span>
+            <span class="c1"># TODO: make this more efficient by only deleting modified</span>
+            <span class="n">ix_collection</span><span class="o">.</span><span class="n">delete_where</span><span class="p">({})</span>
 
 <div class="viewcode-block" id="Collection.delete">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.delete">[docs]</a>
@@ -816,7 +829,7 @@
 <span class="sd">        Now let&#39;s index, using the simple trigram-based index</span>
 
 <span class="sd">        &gt;&gt;&gt; index = get_indexer(&quot;simple&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; collection.attach_indexer(index)</span>
+<span class="sd">        &gt;&gt;&gt; _ = collection.attach_indexer(index)</span>
 
 <span class="sd">        Now let&#39;s find all objects:</span>
 
@@ -854,7 +867,10 @@
         <span class="k">if</span> <span class="n">ix_coll</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Index </span><span class="si">{</span><span class="n">index_name</span><span class="si">}</span><span class="s2"> is empty; indexing all objects&quot;</span><span class="p">)</span>
             <span class="n">all_objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rows</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">index_objects</span><span class="p">(</span><span class="n">all_objs</span><span class="p">,</span> <span class="n">index_name</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">all_objs</span><span class="p">:</span>
+                <span class="c1"># print(f&quot;Index {index_name} is empty; indexing all objects {len(all_objs)}&quot;)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index_objects</span><span class="p">(</span><span class="n">all_objs</span><span class="p">,</span> <span class="n">index_name</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">ix_coll</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="n">qr</span> <span class="o">=</span> <span class="n">ix_coll</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">index_col</span> <span class="o">=</span> <span class="n">ix</span><span class="o">.</span><span class="n">index_field</span>
         <span class="c1"># TODO: optimize this for large indexes</span>
@@ -998,9 +1014,42 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">num_rows</span></div>
 
 
+<div class="viewcode-block" id="Collection.rows_iter">
+<a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.rows_iter">[docs]</a>
+    <span class="k">def</span> <span class="nf">rows_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an iterator over the objects in the collection.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rows</span></div>
+
+
+<div class="viewcode-block" id="Collection.rows">
+<a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of objects in the collection.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows_iter</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Collection.ranked_rows">
+<a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.ranked_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">ranked_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">OBJECT</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of objects in the collection, with scores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows_iter</span><span class="p">())]</span></div>
+
+
 <div class="viewcode-block" id="Collection.attach_indexer">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.attach_indexer">[docs]</a>
-    <span class="k">def</span> <span class="nf">attach_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Indexer</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">attach_indexer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Indexer</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Indexer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Attach an index to the collection.</span>
 
@@ -1021,8 +1070,8 @@
 <span class="sd">        &gt;&gt;&gt; full_index.name = &quot;full&quot;</span>
 <span class="sd">        &gt;&gt;&gt; name_index = get_indexer(&quot;simple&quot;, text_template=&quot;{name}&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; name_index.name = &quot;name&quot;</span>
-<span class="sd">        &gt;&gt;&gt; collection.attach_indexer(full_index)</span>
-<span class="sd">        &gt;&gt;&gt; collection.attach_indexer(name_index)</span>
+<span class="sd">        &gt;&gt;&gt; _ = collection.attach_indexer(full_index)</span>
+<span class="sd">        &gt;&gt;&gt; _ = collection.attach_indexer(name_index)</span>
 
 <span class="sd">        Now let&#39;s find objects using the full index, using the string &quot;France&quot;.</span>
 <span class="sd">        We expect the country France to be the top hit, but the score will</span>
@@ -1064,7 +1113,14 @@
         <span class="k">if</span> <span class="n">auto_index</span><span class="p">:</span>
             <span class="n">all_objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rows</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auto-indexing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_objs</span><span class="p">)</span><span class="si">}</span><span class="s2"> objects&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">index_objects</span><span class="p">(</span><span class="n">all_objs</span><span class="p">,</span> <span class="n">index_name</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_objects</span><span class="p">(</span><span class="n">all_objs</span><span class="p">,</span> <span class="n">index_name</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="Collection.get_index_collection_name">
+<a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.get_index_collection_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">:</span> <span class="n">Indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_collection_name</span><span class="p">(</span><span class="n">indexer</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
