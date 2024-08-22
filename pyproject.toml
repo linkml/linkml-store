@@ -20,6 +20,7 @@ seaborn = { version = "*", optional = true }
 plotly = { version = "*", optional = true }
 pystow = "^0.5.4"
 black = { version=">=24.0.0", optional = true }
+ruff = { version=">=0.6.2", optional = true }
 llm = { version="*", optional = true }
 tiktoken = { version="*", optional = true }
 pymongo = { version="*", optional = true }
@@ -72,7 +73,7 @@ numpy = [
 [tool.poetry.extras]
 analytics = ["pandas", "matplotlib", "seaborn", "plotly"]
 app = ["streamlit"]
-tests = ["black"]
+tests = ["black", "ruff"]
 llm = ["llm", "tiktoken"]
 mongodb = ["pymongo"]
 neo4j = ["neo4j", "py2neo", "networkx"]
@@ -123,27 +124,13 @@ extend-exclude = [
 ]
 force-exclude = true
 line-length = 120
-extend-ignore = ["E203"]
-select = [
+lint.extend-ignore = ["E203"]
+lint.select = [
   "E",  # pycodestyle errors
   "F",  # Pyflakes
   "I",  # isort
 ]
-# Assume Python 3.8
-target-version = "py38"
 
-[tool.ruff.per-file-ignores]
-# These templates can have long lines
-"linkml/generators/sqlalchemy/sqlalchemy_declarative_template.py" = ["E501"]
-"linkml/generators/sqlalchemy/sqlalchemy_imperative_template.py" = ["E501"]
-
-# Notebooks can have unsorted imports
-"tests/test_notebooks/input/*" = ["E402"]
-
-
-[tool.ruff.mccabe]
-# Unlike Flake8, default to a complexity level of 10.
-max-complexity = 10
 
 
 [tool.codespell]
