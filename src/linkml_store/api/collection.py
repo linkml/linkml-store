@@ -470,6 +470,7 @@ class Collection(Generic[DatabaseType]):
         where: Optional[Any] = None,
         index_name: Optional[str] = None,
         limit: Optional[int] = None,
+        mmr_relevance_factor: Optional[float] = None,
         **kwargs,
     ) -> QueryResult:
         """
@@ -534,7 +535,7 @@ class Collection(Generic[DatabaseType]):
         index_col = ix.index_field
         # TODO: optimize this for large indexes
         vector_pairs = [(row, np.array(row[index_col], dtype=float)) for row in qr.rows]
-        results = ix.search(query, vector_pairs, limit=limit)
+        results = ix.search(query, vector_pairs, limit=limit, mmr_relevance_factor=mmr_relevance_factor, **kwargs)
         for r in results:
             del r[1][index_col]
         new_qr = QueryResult(num_rows=len(results))

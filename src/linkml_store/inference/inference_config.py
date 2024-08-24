@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -36,6 +36,7 @@ class InferenceConfig(BaseModel, extra="forbid"):
     train_test_split: Optional[Tuple[float, float]] = None
     llm_config: Optional[LLMConfig] = None
     random_seed: Optional[int] = None
+    validate_results: Optional[bool] = None
 
     @classmethod
     def from_file(cls, file_path: str, format: Optional[Format] = None) -> "InferenceConfig":
@@ -58,6 +59,7 @@ class Inference(BaseModel, extra="forbid"):
     """
     Result of an inference derivation.
     """
-
+    query: Optional[OBJECT] = Field(default=None, description="The query object.")
     predicted_object: OBJECT = Field(..., description="The predicted object.")
     confidence: Optional[float] = Field(default=None, description="The confidence of the prediction.", le=1.0, ge=0.0)
+    explanation: Optional[Any] = Field(default=None, description="Explanation of the prediction.")
