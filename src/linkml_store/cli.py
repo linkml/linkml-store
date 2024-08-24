@@ -1,8 +1,9 @@
 import logging
 import sys
 import warnings
+from collections import defaultdict
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple, Any
 
 import click
 import yaml
@@ -415,14 +416,6 @@ def list_collections(ctx, **kwargs):
 def fq(ctx, where, limit, columns, output_type, wide, output):
     """
     Query facets from the specified collection.
-
-    :param ctx:
-    :param where:
-    :param limit:
-    :param columns:
-    :param output_type:
-    :param output:
-    :return:
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
@@ -486,6 +479,41 @@ def describe(ctx, where, output_type, output, limit):
     collection = ctx.obj["settings"].collection
     df = collection.find(where_clause, limit=limit).rows_dataframe
     write_output(df.describe(include="all").transpose(), output_type, target=output)
+
+
+@cli.command()
+@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
+@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--index", "-I", help="Attributes to index on in pivot")
+@click.option("--columns", "-A", help="Attributes to use as columns in pivot")
+@click.option("--values", "-V", help="Attributes to use as values in pivot")
+@click.pass_context
+def pivot(ctx, where, limit, index, columns, values, output_type, output):
+    collection = ctx.obj["settings"].collection
+    where_clause = yaml.safe_load(where) if where else None
+    column_atts = columns.split(",") if columns else None
+    value_atts = values.split(",") if values else None
+    index_atts = index.split(",") if index else None
+    results = collection.find(where_clause, limit=limit)
+    pivoted = defaultdict(dict)
+    for row in results.rows:
+        index_key = tuple([row.get(att) for att in index_atts])
+        column_key = tuple([row.get(att) for att in column_atts])
+        value_key = tuple([row.get(att) for att in value_atts])
+        pivoted[index_key][column_key] = value_key
+    pivoted_objs = []
+    def detuple(t: Tuple) -> Any:
+        if len(t) == 1:
+            return t[0]
+        return str(t)
+    for index_key, data in pivoted.items():
+        obj = {att: key for att, key in zip(index_atts, index_key)}
+        for column_key, value_key in data.items():
+            obj[detuple(column_key)] = detuple(value_key)
+        pivoted_objs.append(obj)
+    write_output(pivoted_objs, output_type, target=output)
 
 
 @cli.command()

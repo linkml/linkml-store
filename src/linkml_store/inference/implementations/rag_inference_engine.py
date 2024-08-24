@@ -15,6 +15,10 @@ from linkml_store.utils.object_utils import select_nested
 
 logger = logging.getLogger(__name__)
 
+MAX_ITERATIONS = 5
+DEFAULT_NUM_EXAMPLES = 20
+DEFAULT_MMR_RELEVANCE_FACTOR = 0.8
+
 SYSTEM_PROMPT = """
 You are a {llm_config.role}, your task is to inference the YAML
 object output given the YAML object input. I will provide you
@@ -30,6 +34,10 @@ class TrainedModel(BaseModel, extra="forbid"):
     rag_collection_rows: List[OBJECT]
     index_rows: List[OBJECT]
     config: Optional[InferenceConfig] = None
+
+
+class RAGInference(Inference):
+    iterations: int = 0
 
 
 @dataclass
@@ -103,7 +111,7 @@ class RAGInferenceEngine(InferenceEngine):
     def object_to_text(self, object: OBJECT) -> str:
         return yaml.dump(object)
 
-    def derive(self, object: OBJECT) -> Optional[Inference]:
+    def derive(self, object: OBJECT, iteration=0, additional_prompt_texts: Optional[List[str]] = None) -> Optional[RAGInference]:
         import llm
         from tiktoken import encoding_for_model
 
@@ -113,15 +121,17 @@ class RAGInferenceEngine(InferenceEngine):
         model_name = self.config.llm_config.model_name
         feature_attributes = self.config.feature_attributes
         target_attributes = self.config.target_attributes
-        num_examples = self.config.llm_config.number_of_few_shot_examples or 5
+        num_examples = self.config.llm_config.number_of_few_shot_examples or DEFAULT_NUM_EXAMPLES
         query_text = self.object_to_text(object)
+        mmr_relevance_factor = DEFAULT_MMR_RELEVANCE_FACTOR
         if not self.rag_collection:
             # TODO: zero-shot mode
             examples = []
         else:
             if not self.rag_collection.indexers:
                 raise ValueError("RAG collection must have an indexer attached")
-            rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm")
+            rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm",
+                                            mmr_relevance_factor=mmr_relevance_factor)
             examples = rs.rows
             if not examples:
                 raise ValueError(f"No examples found for {query_text}; size = {self.rag_collection.size()}")
@@ -143,23 +153,43 @@ class RAGInferenceEngine(InferenceEngine):
             )
             prompt_clauses.append(prompt_clause)
 
-        prompt_end = "---\nQuery:\n" f"## INPUT:\n{query_text}\n" "## OUTPUT:\n"
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)
+        system_prompt += "\n".join(additional_prompt_texts or [])
+        prompt_end = "---\nQuery:\n" f"## INPUT:\n{query_text}\n" "## OUTPUT:\n"
 
-        def make_text(texts):
-            return "\n".join(prompt_clauses) + prompt_end
+        def make_text(texts: List[str]):
+            return "\n".join(texts) + prompt_end
 
         try:
             encoding = encoding_for_model(model_name)
         except KeyError:
             encoding = encoding_for_model("gpt-4")
         token_limit = get_token_limit(model_name)
-        prompt = render_formatted_text(make_text, prompt_clauses, encoding, token_limit)
+        prompt = render_formatted_text(make_text, values=prompt_clauses,
+                                       encoding=encoding, token_limit=token_limit,
+                                       additional_text=system_prompt)
         logger.info(f"Prompt: {prompt}")
         response = model.prompt(prompt, system_prompt)
         yaml_str = response.text()
         logger.info(f"Response: {yaml_str}")
-        return Inference(predicted_object=self._parse_yaml_payload(yaml_str))
+        predicted_object = self._parse_yaml_payload(yaml_str, strict=True)
+        if self.config.validate_results:
+            base_collection = self.training_data.base_collection
+            errs = list(base_collection.iter_validate_collection([predicted_object]))
+            if errs:
+                print(f"{iteration} // FAILED TO VALIDATE: {yaml_str}")
+                print(f"PARSED: {predicted_object}")
+                print(f"ERRORS: {errs}")
+                if iteration > MAX_ITERATIONS:
+                    raise ValueError(f"Validation errors: {errs}")
+                extra_texts = [
+                    "Make sure results conform to the schema. Previously you provided:\n",
+                    yaml_str,
+                    "\nThis was invalid.\n",
+                    "Validation errors:\n",
+                ] + [self.object_to_text(e) for e in errs]
+                return self.derive(object, iteration=iteration+1, additional_prompt_texts=extra_texts)
+        return RAGInference(predicted_object=predicted_object, iterations=iteration+1, query=object)
 
     def _parse_yaml_payload(self, yaml_str: str, strict=False) -> Optional[OBJECT]:
         if "```" in yaml_str:
