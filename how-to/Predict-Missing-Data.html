@@ -310,9 +310,10 @@
 <h1>How to predict missing data<a class="headerlink" href="#How-to-predict-missing-data" title="Link to this heading"></a></h1>
 <p>LinkML implements the “CRUDSI” design pattern. In addition to <strong>Create</strong>, <strong>Read</strong>, <strong>Update</strong>, <strong>Delete</strong>, LinkML also supports Search and <em>Inference</em>.</p>
 <p>The framework is designed to support different kinds of inference, including rule-based and LLMs. This notebooks shows simple ML-based inference using scikit-learn DecisionTrees.</p>
-<p>We will use the Iris dataset:</p>
+<p>This how-to walks through the basic operations of using the <code class="docutils literal notranslate"><span class="pre">linkml-store</span></code> command line tool to perform training and inference using scikit-learn DecisionTrees. This uses the command line interface, but the same operations can be performed programmatically using the Python API, or via the Web API.</p>
+<p>We will use a subset of the classic <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/datasets/plot_iris_dataset.html">Iris dataset</a>, converted to jsonl (JSON Lines) format:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -333,11 +334,95 @@ sepal_width   100.0    NaN     NaN  NaN  3.099  0.478739  2.0  2.8  3.05    3.4 
 species         100      2  setosa   50    NaN       NaN  NaN  NaN   NaN    NaN  NaN
 </pre></div></div>
 </div>
+<section id="The-Infer-Command">
+<h2>The Infer Command<a class="headerlink" href="#The-Infer-Command" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>infer<span class="w"> </span>--help
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Usage: linkml-store infer [OPTIONS]
+
+  Predict a complete object from a partial object.
+
+  Currently two main prediction methods are provided: RAG and sklearn
+
+  ## RAG:
+
+  The RAG approach will use Retrieval Augmented Generation to inference the
+  missing attributes of an object.
+
+  Example:
+
+      linkml-store  -i countries.jsonl inference -t rag  -q &#39;name: Uruguay&#39;
+
+  Result:
+
+      capital: Montevideo, code: UY, continent: South America, languages:
+      [Spanish]
+
+  You can pass in configurations as follows:
+
+      linkml-store  -i countries.jsonl inference -t
+      rag:llm_config.model_name=llama-3  -q &#39;name: Uruguay&#39;
+
+  ## SKLearn:
+
+  This uses scikit-learn (defaulting to simple decision trees) to do the
+  prediction.
+
+      linkml-store -i tests/input/iris.csv inference -t sklearn            -q
+      &#39;{&#34;sepal_length&#34;: 5.1, &#34;sepal_width&#34;: 3.5, &#34;petal_length&#34;: 1.4,
+      &#34;petal_width&#34;: 0.2}&#39;
+
+Options:
+  -O, --output-type [json|jsonl|yaml|yamll|tsv|csv|python|parquet|formatted|table|duckdb|postgres|mongodb]
+                                  Output format
+  -o, --output PATH               Output file path
+  -T, --target-attribute TEXT     Target attributes for inference
+  -F, --feature-attributes TEXT   Feature attributes for inference (comma
+                                  separated)
+  -Y, --inference-config-file PATH
+                                  Path to inference configuration file
+  -E, --export-model PATH         Export model to file
+  -L, --load-model PATH           Load model from file
+  -M, --model-format [pickle|onnx|pmml|pfa|joblib|png|linkml_expression|rulebased|rag_index]
+                                  Format for model
+  -S, --training-test-data-split &lt;FLOAT FLOAT&gt;...
+                                  Training/test data split
+  -t, --predictor-type TEXT       Type of predictor  [default: sklearn]
+  -n, --evaluation-count INTEGER  Number of examples to evaluate over
+  --evaluation-match-function TEXT
+                                  Name of function to use for matching objects
+                                  in eval
+  -q, --query TEXT                query term
+  --help                          Show this message and exit.
+</pre></div></div>
+</div>
+</section>
 <section id="Training-and-Inference">
 <h2>Training and Inference<a class="headerlink" href="#Training-and-Inference" title="Link to this heading"></a></h2>
-<p>We can perform training and inference in a single step:</p>
+<p>We can perform training and inference in a single step.</p>
+<p>For feature labels, we use:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">petal_length</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">petal_width</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sepal_length</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sepal_width</span></code></p></li>
+</ul>
+<p>These can be explicitly specified using <code class="docutils literal notranslate"><span class="pre">-F</span></code>, but in this case we are specifying a query, so the feature labels are inferred from the query.</p>
+<p>We specify the target label using <code class="docutils literal notranslate"><span class="pre">-T</span></code>. In this case, we are predicting the <code class="docutils literal notranslate"><span class="pre">species</span></code> of the iris.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
@@ -362,12 +447,15 @@ linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/
 predicted_object:
   species: setosa
 confidence: 1.0
+
 </pre></div></div>
 </div>
+<p>The data model for the output consists of a <code class="docutils literal notranslate"><span class="pre">predicted_object</span></code> slot and a <code class="docutils literal notranslate"><span class="pre">confidence</span></code>. Note that for standard ML operations, the predicted object will typically have one attribute only, but other kinds of inference (OWL reasoning, LLMs) may be able to predict complex objects.</p>
 </section>
 <section id="Saving-the-Model">
 <h2>Saving the Model<a class="headerlink" href="#Saving-the-Model" title="Link to this heading"></a></h2>
-<p>Performing training and inference in a single step is convenient where training is fast, but more typically we’d want to save the model for later use:</p>
+<p>Performing training and inference in a single step is convenient where training is fast, but more typically we’d want to save the model for later use.</p>
+<p>We can do this with the <code class="docutils literal notranslate"><span class="pre">-E</span></code> option:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -411,24 +499,15 @@ confidence: 1.0
 <h2>Exporting models to explainable visualizations<a class="headerlink" href="#Exporting-models-to-explainable-visualizations" title="Link to this heading"></a></h2>
 <p>We can export the model to a visual representation to make it more explaininable:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;tmp/iris-model.joblib&quot;</span><span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;tmp/iris-model.png&quot;</span>
+linkml-store<span class="w"> </span>--stacktrace<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-T<span class="w"> </span>species<span class="w"> </span>-L<span class="w"> </span>tmp/iris-model.joblib<span class="w"> </span>-E<span class="w"> </span>input/iris-model.png
 </pre></div>
 </div>
 </div>
-<p><img alt="img" src="how-to/tmp/iris-model.png" /></p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-L<span class="w"> </span>tmp/iris-model.joblib<span class="w"> </span>-E<span class="w"> </span>tmp/iris-model.rulebased.yaml
-</pre></div>
-</div>
-</div>
+<p><img alt="img" src="../_images/iris-model.png" /></p>
 </section>
 <section id="Generating-a-rule-based-model">
 <h2>Generating a rule-based model<a class="headerlink" href="#Generating-a-rule-based-model" title="Link to this heading"></a></h2>
@@ -440,10 +519,11 @@ linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/
 </ul>
 <p>We can export (some) ML models to this format:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-i<span class="w"> </span>../../tests/input/iris.jsonl<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>sklearn<span class="w"> </span>-T<span class="w"> </span>species<span class="w"> </span>-L<span class="w"> </span>tmp/iris-model.joblib<span class="w"> </span>-E<span class="w"> </span>tmp/iris-model.rulebased.yaml
 cat<span class="w"> </span>tmp/iris-model.rulebased.yaml
 </pre></div>
 </div>
@@ -467,6 +547,7 @@ slot_expressions:
 slot_rules: null
 </pre></div></div>
 </div>
+<p>We can then apply this model to new data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
@@ -490,6 +571,12 @@ predicted_object:
   species: setosa
 </pre></div></div>
 </div>
+</section>
+<section id="More-advanced-ML-models">
+<h2>More advanced ML models<a class="headerlink" href="#More-advanced-ML-models" title="Link to this heading"></a></h2>
+<p>Currently only Decision Trees are supported. Additionally, most of the underlying functionality of scikit-learn is hidden.</p>
+<p>For more advanced ML, you are encouraged to use linkml-store for <em>data management</em> and then exporting to standard tabular ot dataframe formats in order to do more advanced ML in Python. linkml-store is <em>not</em> intended as an ML platform. Instead a limited set of operations are provided to assist with data exploration and assisting in construction of deterministic rules.</p>
+<p>For inference using LLMs and Retrieval Augmented Generation, see the how-to guide on those topics.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -557,10 +644,12 @@ predicted_object:
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">How to predict missing data</a><ul>
+<li><a class="reference internal" href="#The-Infer-Command">The Infer Command</a></li>
 <li><a class="reference internal" href="#Training-and-Inference">Training and Inference</a></li>
 <li><a class="reference internal" href="#Saving-the-Model">Saving the Model</a></li>
 <li><a class="reference internal" href="#Exporting-models-to-explainable-visualizations">Exporting models to explainable visualizations</a></li>
 <li><a class="reference internal" href="#Generating-a-rule-based-model">Generating a rule-based model</a></li>
+<li><a class="reference internal" href="#More-advanced-ML-models">More advanced ML models</a></li>
 </ul>
 </li>
 </ul>
