@@ -7,7 +7,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.chromadb.chromadb_collection module - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -299,200 +299,14 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-linkml_store.api.stores.chromadb.chromadb_collection">
-<span id="linkml-store-api-stores-chromadb-chromadb-collection-module"></span><h1>linkml_store.api.stores.chromadb.chromadb_collection module<a class="headerlink" href="#module-linkml_store.api.stores.chromadb.chromadb_collection" title="Link to this heading"></a></h1>
-<p>ChromaDB Collection</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ChromaDBCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="linkml_store.api.html#linkml_store.api.collection.Collection" title="linkml_store.api.collection.Collection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a></p>
-<p>A wrapper for ChromaDB collections.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.native_collection">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">native_collection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Collection</span></em><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.native_collection" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.insert">
-<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection.insert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.insert" title="Link to this definition"></a></dt>
-<dd><p>Add one or more objects to the collection.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>)</p></li>
-<li><p><strong>kwargs</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete">
-<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete" title="Link to this definition"></a></dt>
-<dd><p>Delete one or more objects from the collection.</p>
-<p>First let’s set up a collection:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
-<span class="go">2</span>
-</pre></div>
-</div>
-<p>Now let’s delete an object:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
-<span class="go">1</span>
-</pre></div>
-</div>
-<p>Deleting the same object again should have no effect:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
-<span class="go">1</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>objs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]]</span>)</p></li>
-<li><p><strong>kwargs</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete_where">
-<span class="sig-name descname"><span class="pre">delete_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection.delete_where"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete_where" title="Link to this definition"></a></dt>
-<dd><p>Delete objects that match a query.</p>
-<p>First let’s set up a collection:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Person&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P2&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;age_in_years&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">}]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now let’s delete an object:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete_where</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;P1&quot;</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
-<span class="go">1</span>
-</pre></div>
-</div>
-<p>Match everything:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">delete_where</span><span class="p">({})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">find</span><span class="p">({})</span><span class="o">.</span><span class="n">num_rows</span>
-<span class="go">0</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>where</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span>) – where conditions</p></li>
-<li><p><strong>missing_ok</strong> – if True, do not raise an error if the collection does not exist</p></li>
-<li><p><strong>kwargs</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>number of objects deleted (or -1 if unsupported)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query">
-<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query" title="Link to this definition"></a></dt>
-<dd><p>Run a query against the collection.</p>
-<p>First let’s load a collection:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">load_objects</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;duckdb&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Country&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">objs</span> <span class="o">=</span> <span class="n">load_objects</span><span class="p">(</span><span class="s2">&quot;tests/input/countries/countries.jsonl&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collection</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now let’s run a query:</p>
-<p>TODO</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></span>)</p></li>
-<li><p><strong>kwargs</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query_facets">
-<span class="sig-name descname"><span class="pre">query_facets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facet_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/chromadb/chromadb_collection.html#ChromaDBCollection.query_facets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query_facets" title="Link to this definition"></a></dt>
-<dd><p>Run a query to get facet counts for one or more columns.</p>
-<p>This function takes a database connection, a Query object, and a list of column names.
-It generates and executes a facet count query for each specified column and returns
-the results as a dictionary where the keys are the column names and the values are
-pandas DataFrames containing the facet counts.</p>
-<p>The facet count query is generated by modifying the original query’s WHERE clause
-to exclude conditions directly related to the facet column. This allows for counting
-the occurrences of each unique value in the facet column while still applying the
-other filtering conditions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>con</strong> – A DuckDB database connection.</p></li>
-<li><p><strong>query</strong> – A Query object representing the base query.</p></li>
-<li><p><strong>facet_columns</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – A list of column names to get facet counts for.</p></li>
-<li><p><strong>facet_limit</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary where keys are column names and values are tuples
-containing the facet counts for each unique value in the respective column.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+          <section id="linkml-store-api-stores-chromadb-chromadb-collection-module">
+<h1>linkml_store.api.stores.chromadb.chromadb_collection module<a class="headerlink" href="#linkml-store-api-stores-chromadb-chromadb-collection-module" title="Link to this heading"></a></h1>
 </section>
 
         </article>
@@ -538,35 +352,8 @@ containing the facet counts for each unique value in the respective column.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">linkml_store.api.stores.chromadb.chromadb_collection module</a><ul>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection</span></code></a><ul>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.native_collection"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.native_collection</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.insert"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.insert()</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.delete()</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.delete_where()</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.query()</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.stores.chromadb.chromadb_collection.ChromaDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">ChromaDBCollection.query_facets()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

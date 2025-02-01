@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.duckdb.duckdb_collection - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,37 +299,37 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.stores.duckdb.duckdb_collection</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">sqlalchemy</span> <span class="k">as</span> <span class="nn">sqla</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model</span> <span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Table</span><span class="p">,</span> <span class="n">delete</span><span class="p">,</span> <span class="n">insert</span><span class="p">,</span> <span class="n">inspect</span><span class="p">,</span> <span class="n">text</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy.sql.ddl</span> <span class="kn">import</span> <span class="n">CreateTable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sqla</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Table</span><span class="p">,</span> <span class="n">delete</span><span class="p">,</span> <span class="n">insert</span><span class="p">,</span> <span class="n">inspect</span><span class="p">,</span> <span class="n">text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.sql.ddl</span><span class="w"> </span><span class="kn">import</span> <span class="n">CreateTable</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Collection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.collection</span> <span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="n">OBJECT</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.duckdb.mappings</span> <span class="kn">import</span> <span class="n">TMAP</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.sql_utils</span> <span class="kn">import</span> <span class="n">facet_count_sql</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="n">OBJECT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.duckdb.mappings</span><span class="w"> </span><span class="kn">import</span> <span class="n">TMAP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.sql_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">facet_count_sql</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="DuckDBCollection">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection">[docs]</a>
-<span class="k">class</span> <span class="nc">DuckDBCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DuckDBCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
     <span class="n">_table_created</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="DuckDBCollection.__init__">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DuckDBCollection.insert">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.insert">[docs]</a>
-    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inserting </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
@@ -357,7 +357,7 @@
 
 <div class="viewcode-block" id="DuckDBCollection.delete">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.delete">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
         <span class="n">cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span>
@@ -379,7 +379,7 @@
 
 <div class="viewcode-block" id="DuckDBCollection.delete_where">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.delete_where">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleting from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_class_name</span><span class="si">}</span><span class="s2"> where: </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">where</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">where</span> <span class="o">=</span> <span class="p">{}</span>
@@ -409,7 +409,7 @@
 
 <div class="viewcode-block" id="DuckDBCollection.query_facets">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.query_facets">[docs]</a>
-    <span class="k">def</span> <span class="nf">query_facets</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_facets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_limit</span><span class="o">=</span><span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -433,7 +433,7 @@
             <span class="k">return</span> <span class="n">results</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_sqla_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cd</span><span class="p">:</span> <span class="n">ClassDefinition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sqla_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cd</span><span class="p">:</span> <span class="n">ClassDefinition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
         <span class="n">schema_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">schema_view</span>
         <span class="n">metadata_obj</span> <span class="o">=</span> <span class="n">sqla</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
@@ -450,7 +450,7 @@
         <span class="n">t</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span> <span class="n">metadata_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">cols</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">t</span>
 
-    <span class="k">def</span> <span class="nf">_check_if_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_if_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="c1"># if self._initialized:</span>
         <span class="c1">#    return True</span>
         <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
@@ -461,7 +461,7 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cd</span><span class="p">:</span> <span class="n">ClassDefinition</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cd</span><span class="p">:</span> <span class="n">ClassDefinition</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_created</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">is_prepopulated</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Already have table for: </span><span class="si">{</span><span class="n">cd</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span>

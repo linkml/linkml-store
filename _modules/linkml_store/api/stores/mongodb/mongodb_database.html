@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.mongodb.mongodb_database - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -301,26 +301,26 @@
           <h1>Source code for linkml_store.api.stores.mongodb.mongodb_database</h1><div class="highlight"><pre>
 <span></span><span class="c1"># mongodb_database.py</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
-<span class="kn">from</span> <span class="nn">pymongo.database</span> <span class="kn">import</span> <span class="n">Database</span> <span class="k">as</span> <span class="n">NativeDatabase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymongo</span><span class="w"> </span><span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymongo.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span> <span class="k">as</span> <span class="n">NativeDatabase</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.mongodb.mongodb_collection</span> <span class="kn">import</span> <span class="n">MongoDBCollection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.file_utils</span> <span class="kn">import</span> <span class="n">safe_remove_directory</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">Format</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.mongodb_utils</span> <span class="kn">import</span> <span class="n">import_mongodb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.mongodb.mongodb_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">MongoDBCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_remove_directory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.mongodb_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_mongodb</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="MongoDBDatabase">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase">[docs]</a>
-<span class="k">class</span> <span class="nc">MongoDBDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MongoDBDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An adapter for MongoDB databases.</span>
 
@@ -333,7 +333,7 @@
 
 <div class="viewcode-block" id="MongoDBDatabase.__init__">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="s2">&quot;mongodb://localhost:27017/test&quot;</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="o">==</span> <span class="s2">&quot;mongodb&quot;</span><span class="p">:</span>
@@ -342,7 +342,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_db_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">:</span>
             <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -350,13 +350,13 @@
         <span class="k">return</span> <span class="n">db</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">native_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MongoClient</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">native_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MongoClient</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_native_client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_client</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">native_db</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NativeDatabase</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">native_db</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NativeDatabase</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_db</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">alias</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">alias</span><span class="p">:</span>
@@ -366,26 +366,26 @@
 
 <div class="viewcode-block" id="MongoDBDatabase.commit">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.commit">[docs]</a>
-    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="MongoDBDatabase.close">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.close">[docs]</a>
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_client</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_native_client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="MongoDBDatabase.drop">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.drop">[docs]</a>
-    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">native_client</span><span class="o">.</span><span class="n">drop_database</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">native_db</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MongoDBDatabase.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">:</span>
             <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -395,7 +395,7 @@
 
 <div class="viewcode-block" id="MongoDBDatabase.init_collections">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.init_collections">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_collections</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -407,12 +407,12 @@
 
 <div class="viewcode-block" id="MongoDBDatabase.export_database">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.export_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">target_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">DUMP_MONGODB</span><span class="o">.</span><span class="n">value</span> <span class="ow">or</span> <span class="n">target_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">DUMP_MONGODB</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                 <span class="n">safe_remove_directory</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">no_backup</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">linkml_store.utils.mongodb_utils</span> <span class="kn">import</span> <span class="n">export_mongodb</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.mongodb_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_mongodb</span>
 
             <span class="n">export_mongodb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -421,7 +421,7 @@
 
 <div class="viewcode-block" id="MongoDBDatabase.import_database">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.MongoDBDatabase.import_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">import_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Import a database from a file or location.</span>
 

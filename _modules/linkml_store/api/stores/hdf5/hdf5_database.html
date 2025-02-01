@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.hdf5.hdf5_database - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -301,57 +301,57 @@
           <h1>Source code for linkml_store.api.stores.hdf5.hdf5_database</h1><div class="highlight"><pre>
 <span></span><span class="c1"># hdf5_database.py</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime</span> <span class="kn">import</span> <span class="n">SchemaView</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model</span> <span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.utils.schema_builder</span> <span class="kn">import</span> <span class="n">SchemaBuilder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.utils.schema_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaBuilder</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.hdf5.hdf5_collection</span> <span class="kn">import</span> <span class="n">HDF5Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.hdf5.hdf5_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDF5Collection</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="HDF5Database">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database">[docs]</a>
-<span class="k">class</span> <span class="nc">HDF5Database</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HDF5Database</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
     <span class="n">_file</span><span class="p">:</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">collection_class</span> <span class="o">=</span> <span class="n">HDF5Collection</span>
 
 <div class="viewcode-block" id="HDF5Database.__init__">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="s2">&quot;linkml_store.h5&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">handle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span>
 
 <div class="viewcode-block" id="HDF5Database.commit">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.commit">[docs]</a>
-    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="HDF5Database.close">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.close">[docs]</a>
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="HDF5Database.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">:</span>
             <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">collection</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -359,7 +359,7 @@
 
 <div class="viewcode-block" id="HDF5Database.init_collections">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.init_collections">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_collections</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -371,7 +371,7 @@
 
 <div class="viewcode-block" id="HDF5Database.induce_schema_view">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.induce_schema_view">[docs]</a>
-    <span class="k">def</span> <span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inducing schema view for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">sb</span> <span class="o">=</span> <span class="n">SchemaBuilder</span><span class="p">()</span>
         <span class="n">schema</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">schema</span>

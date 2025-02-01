@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.client - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,16 +299,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.client</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime</span> <span class="kn">import</span> <span class="n">SchemaView</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaView</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.config</span> <span class="kn">import</span> <span class="n">ClientConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientConfig</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -326,7 +326,7 @@
 
 <div class="viewcode-block" id="Client">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client">[docs]</a>
-<span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Client</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A client is the top-level object for interacting with databases.</span>
 
@@ -374,7 +374,7 @@
 
 <div class="viewcode-block" id="Client.__init__">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClientConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClientConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a client.</span>
 
@@ -388,11 +388,11 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">handle</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the base directory for the client.</span>
 
@@ -404,7 +404,7 @@
 
 <div class="viewcode-block" id="Client.from_config">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.from_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ClientConfig</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_attach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ClientConfig</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_attach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a client from a configuration.</span>
 
@@ -446,7 +446,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_initialize_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto_attach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto_attach</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">db_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">base_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initializing database: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, base_dir: </span><span class="si">{</span><span class="n">base_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -464,7 +464,7 @@
                 <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">db_config</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_database_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_database_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the configuration for a database.</span>
 
@@ -479,7 +479,7 @@
 
 <div class="viewcode-block" id="Client.attach_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.attach_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">attach_database</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attach_database</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">handle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">alias</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -545,7 +545,7 @@
 
 <div class="viewcode-block" id="Client.get_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.get_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Database</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Database</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a named database.</span>
 
@@ -587,7 +587,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Database</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Database</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return all attached databases</span>
 
@@ -616,7 +616,7 @@
 
 <div class="viewcode-block" id="Client.drop_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.drop_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">drop_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Drop a database.</span>
 
@@ -677,7 +677,7 @@
 
 <div class="viewcode-block" id="Client.drop_all_databases">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.client.Client.drop_all_databases">[docs]</a>
-    <span class="k">def</span> <span class="nf">drop_all_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop_all_databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Drop all databases.</span>
 

@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.collection - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -301,11 +301,11 @@
           <h1>Source code for linkml_store.api.collection</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A structure for representing collections of similar objects.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">hashlib</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">ClassVar</span><span class="p">,</span>
@@ -321,29 +321,29 @@
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime</span> <span class="kn">import</span> <span class="n">SchemaView</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model</span> <span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model.meta</span> <span class="kn">import</span> <span class="n">ArrayExpression</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model.meta</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayExpression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api.types</span> <span class="kn">import</span> <span class="n">DatabaseType</span>
-<span class="kn">from</span> <span class="nn">linkml_store.index</span> <span class="kn">import</span> <span class="n">get_indexer</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">load_objects</span><span class="p">,</span> <span class="n">load_objects_from_url</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.object_utils</span> <span class="kn">import</span> <span class="n">clean_empties</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.patch_utils</span> <span class="kn">import</span> <span class="n">PatchDict</span><span class="p">,</span> <span class="n">apply_patches_to_list</span><span class="p">,</span> <span class="n">patches_from_objects_lists</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.index</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_indexer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_objects</span><span class="p">,</span> <span class="n">load_objects_from_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.object_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">clean_empties</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.patch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">PatchDict</span><span class="p">,</span> <span class="n">apply_patches_to_list</span><span class="p">,</span> <span class="n">patches_from_objects_lists</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">linkml.validator.report</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">linkml.validator.report</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationResult</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">ValidationResult</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api.config</span> <span class="kn">import</span> <span class="n">CollectionConfig</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
-<span class="kn">from</span> <span class="nn">linkml_store.index.indexer</span> <span class="kn">import</span> <span class="n">Indexer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollectionConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.index.indexer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Indexer</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">linkml_store.api.database</span> <span class="kn">import</span> <span class="n">Database</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -356,7 +356,7 @@
 
 <div class="viewcode-block" id="Collection">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection">[docs]</a>
-<span class="k">class</span> <span class="nc">Collection</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">DatabaseType</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Collection</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">DatabaseType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collection is an organized set of objects of the same or similar type.</span>
 
@@ -386,7 +386,7 @@
 
 <div class="viewcode-block" id="Collection.__init__">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CollectionConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
@@ -403,7 +403,7 @@
         <span class="c1">#    raise ValueError(f&quot;Name mismatch: {name} != {self.metadata.name}&quot;)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hidden</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hidden</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        True if the collection is hidden.</span>
 
@@ -415,7 +415,7 @@
         <span class="c1"># return self.metadata.hidden</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">target_class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">target_class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the name of the class that this collection represents</span>
 
@@ -442,7 +442,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">alias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the primary name/alias used for the collection.</span>
 
@@ -483,7 +483,7 @@
 
 <div class="viewcode-block" id="Collection.replace">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.replace">[docs]</a>
-    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Replace entire collection with objects.</span>
 
@@ -504,7 +504,7 @@
 
 <div class="viewcode-block" id="Collection.insert">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.insert">[docs]</a>
-    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add one or more objects to the collection.</span>
 
@@ -522,28 +522,28 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_pre_query_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Query</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pre_query_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Query</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pre-query hook (state: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="si">}</span><span class="s2">; Q= </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_materialize_derivations</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_pre_insert_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pre_insert_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">validate_modifications</span><span class="p">:</span>
             <span class="n">errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_validate_collection</span><span class="p">(</span><span class="n">objs</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation errors: </span><span class="si">{</span><span class="n">errors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_post_insert_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_post_insert_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">patches</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;op&quot;</span><span class="p">:</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/0&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_post_modification_hook</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_post_delete_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_post_delete_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_post_modification_hook</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_post_modification_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_post_modification_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">indexer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">ix_collection_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_index_collection_name</span><span class="p">(</span><span class="n">indexer</span><span class="p">)</span>
             <span class="n">ix_collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">ix_collection_name</span><span class="p">)</span>
@@ -553,7 +553,7 @@
 
 <div class="viewcode-block" id="Collection.delete">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.delete">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete one or more objects from the collection.</span>
 
@@ -589,7 +589,7 @@
 
 <div class="viewcode-block" id="Collection.delete_where">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.delete_where">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete objects that match a query.</span>
 
@@ -624,7 +624,7 @@
 
 <div class="viewcode-block" id="Collection.update">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update one or more objects in the collection.</span>
 
@@ -635,12 +635,12 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Query</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Query</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Collection.query">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run a query against the collection.</span>
 
@@ -668,7 +668,7 @@
 
 <div class="viewcode-block" id="Collection.query_facets">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.query_facets">[docs]</a>
-    <span class="k">def</span> <span class="nf">query_facets</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_facets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_limit</span><span class="o">=</span><span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -696,7 +696,7 @@
 
 <div class="viewcode-block" id="Collection.get">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.get">[docs]</a>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">IDENTIFIER</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">IDENTIFIER</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get one or more objects by ID.</span>
 
@@ -715,7 +715,7 @@
 
 <div class="viewcode-block" id="Collection.get_one">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.get_one">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">IDENTIFIER</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">IDENTIFIER</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get one object by ID.</span>
 
@@ -737,7 +737,7 @@
 
 <div class="viewcode-block" id="Collection.find">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.find">[docs]</a>
-    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find objects in the collection using a where query.</span>
 
@@ -777,7 +777,7 @@
 
 <div class="viewcode-block" id="Collection.find_iter">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.find_iter">[docs]</a>
-    <span class="k">def</span> <span class="nf">find_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find objects in the collection using a where query.</span>
 
@@ -805,7 +805,7 @@
 
 <div class="viewcode-block" id="Collection.search">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.search">[docs]</a>
-    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -893,7 +893,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the collection is internal.</span>
 
@@ -908,7 +908,7 @@
 
 <div class="viewcode-block" id="Collection.exists">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.exists">[docs]</a>
-    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the collection exists.</span>
 
@@ -920,7 +920,7 @@
 
 <div class="viewcode-block" id="Collection.load_from_source">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.load_from_source">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_from_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_if_exists</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_from_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_if_exists</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load objects from the source location.</span>
 
@@ -956,10 +956,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_check_if_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_if_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span>
 
-    <span class="k">def</span> <span class="nf">_materialize_derivations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_materialize_derivations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">metadata</span><span class="o">.</span><span class="n">derived_from</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No metadata for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2">; no derivations&quot;</span><span class="p">)</span>
@@ -987,7 +987,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">mappings</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No mappings for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">target_class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_class_name</span>
-            <span class="kn">from</span> <span class="nn">linkml_map.session</span> <span class="kn">import</span> <span class="n">Session</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_map.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
             <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
             <span class="n">session</span><span class="o">.</span><span class="n">set_source_schema</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">schema_view</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span>
@@ -1013,7 +1013,7 @@
 
 <div class="viewcode-block" id="Collection.size">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.size">[docs]</a>
-    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the number of objects in the collection.</span>
 
@@ -1024,7 +1024,7 @@
 
 <div class="viewcode-block" id="Collection.rows_iter">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.rows_iter">[docs]</a>
-    <span class="k">def</span> <span class="nf">rows_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rows_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an iterator over the objects in the collection.</span>
 
@@ -1034,7 +1034,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of objects in the collection.</span>
 
@@ -1044,7 +1044,7 @@
 
 <div class="viewcode-block" id="Collection.ranked_rows">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.ranked_rows">[docs]</a>
-    <span class="k">def</span> <span class="nf">ranked_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">OBJECT</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ranked_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">OBJECT</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of objects in the collection, with scores.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1053,7 +1053,7 @@
 
 <div class="viewcode-block" id="Collection.attach_indexer">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.attach_indexer">[docs]</a>
-    <span class="k">def</span> <span class="nf">attach_indexer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attach_indexer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Indexer</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">auto_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Indexer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1125,11 +1125,11 @@
 
 <div class="viewcode-block" id="Collection.get_index_collection_name">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.get_index_collection_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">:</span> <span class="n">Indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">:</span> <span class="n">Indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_collection_name</span><span class="p">(</span><span class="n">indexer</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_index_collection_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a name for a special collection that holds index data</span>
 
@@ -1141,7 +1141,7 @@
 
 <div class="viewcode-block" id="Collection.index_objects">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.index_objects">[docs]</a>
-    <span class="k">def</span> <span class="nf">index_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="n">index_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="n">index_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Index a list of objects using a specified index.</span>
 
@@ -1177,7 +1177,7 @@
 
 <div class="viewcode-block" id="Collection.list_index_names">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.list_index_names">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_index_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_index_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of index names</span>
 
@@ -1187,7 +1187,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">indexers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Indexer</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">indexers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Indexer</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of indexers</span>
 
@@ -1197,7 +1197,7 @@
 
 <div class="viewcode-block" id="Collection.peek">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.peek">[docs]</a>
-    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the first N objects in the collection</span>
 
@@ -1210,7 +1210,7 @@
 
 <div class="viewcode-block" id="Collection.class_definition">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.class_definition">[docs]</a>
-    <span class="k">def</span> <span class="nf">class_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClassDefinition</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">class_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClassDefinition</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the class definition for the collection.</span>
 
@@ -1234,13 +1234,13 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_induce_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SlotDefinition</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_induce_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SlotDefinition</span><span class="p">]:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find</span><span class="p">({},</span> <span class="n">limit</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">induce_class_definition_from_objects</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">max_sample_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">cd</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">identifier_attribute_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">identifier_attribute_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the name of the identifier attribute for the collection.</span>
 
@@ -1257,7 +1257,7 @@
 
 <div class="viewcode-block" id="Collection.set_identifier_attribute_name">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.set_identifier_attribute_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_identifier_attribute_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_identifier_attribute_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the name of the identifier attribute for the collection.</span>
 
@@ -1291,7 +1291,7 @@
 
 <div class="viewcode-block" id="Collection.object_identifier">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.object_identifier">[docs]</a>
-    <span class="k">def</span> <span class="nf">object_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">OBJECT</span><span class="p">,</span> <span class="n">auto</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IDENTIFIER</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">object_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">OBJECT</span><span class="p">,</span> <span class="n">auto</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IDENTIFIER</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the identifier for an object.</span>
 
@@ -1313,7 +1313,7 @@
 
 <div class="viewcode-block" id="Collection.induce_class_definition_from_objects">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.induce_class_definition_from_objects">[docs]</a>
-    <span class="k">def</span> <span class="nf">induce_class_definition_from_objects</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">induce_class_definition_from_objects</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">],</span> <span class="n">max_sample_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClassDefinition</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1418,7 +1418,7 @@
 
 <div class="viewcode-block" id="Collection.import_data">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.import_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">import_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Import data from a file or stream</span>
 
@@ -1431,7 +1431,7 @@
 
 <div class="viewcode-block" id="Collection.export_data">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.export_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export data to a file or stream</span>
 
@@ -1444,7 +1444,7 @@
 
 <div class="viewcode-block" id="Collection.apply_patches">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.apply_patches">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply a patch to the collection.</span>
 
@@ -1464,7 +1464,7 @@
 
 <div class="viewcode-block" id="Collection.diff">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.diff">[docs]</a>
-    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Diff two collections.</span>
 
@@ -1483,7 +1483,7 @@
 
 <div class="viewcode-block" id="Collection.iter_validate_collection">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.iter_validate_collection">[docs]</a>
-    <span class="k">def</span> <span class="nf">iter_validate_collection</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_validate_collection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1493,7 +1493,7 @@
 <span class="sd">        :param objects: objects to validate</span>
 <span class="sd">        :return: iterator over validation results</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">linkml.validator</span> <span class="kn">import</span> <span class="n">JsonschemaValidationPlugin</span><span class="p">,</span> <span class="n">Validator</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">linkml.validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonschemaValidationPlugin</span><span class="p">,</span> <span class="n">Validator</span>
 
         <span class="n">validation_plugins</span> <span class="o">=</span> <span class="p">[</span><span class="n">JsonschemaValidationPlugin</span><span class="p">(</span><span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
         <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">schema_view</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">validation_plugins</span><span class="o">=</span><span class="n">validation_plugins</span><span class="p">)</span>
@@ -1522,7 +1522,7 @@
 
 <div class="viewcode-block" id="Collection.commit">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.collection.Collection.commit">[docs]</a>
-    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Commit changes to the collection.</span>
 
@@ -1531,7 +1531,7 @@
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>

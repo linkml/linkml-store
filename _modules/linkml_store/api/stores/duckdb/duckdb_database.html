@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.duckdb.duckdb_database - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,23 +299,23 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.stores.duckdb.duckdb_database</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">sqlalchemy</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime</span> <span class="kn">import</span> <span class="n">SchemaView</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model</span> <span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.utils.schema_builder</span> <span class="kn">import</span> <span class="n">SchemaBuilder</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">NullPool</span><span class="p">,</span> <span class="n">text</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SlotDefinition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.utils.schema_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">NullPool</span><span class="p">,</span> <span class="n">text</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Database</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.duckdb.duckdb_collection</span> <span class="kn">import</span> <span class="n">DuckDBCollection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">Format</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.sql_utils</span> <span class="kn">import</span> <span class="n">introspect_schema</span><span class="p">,</span> <span class="n">query_to_sql</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.duckdb.duckdb_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DuckDBCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.sql_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">introspect_schema</span><span class="p">,</span> <span class="n">query_to_sql</span>
 
 <span class="n">TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;VARCHAR&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -335,7 +335,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase">[docs]</a>
-<span class="k">class</span> <span class="nc">DuckDBDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DuckDBDatabase</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An adapter for DuckDB databases.</span>
 
@@ -354,7 +354,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.__init__">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="n">MEMORY_HANDLE</span>
         <span class="k">if</span> <span class="n">recreate_if_exists</span><span class="p">:</span>
@@ -365,7 +365,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">engine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Engine</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">engine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Engine</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="p">:</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;duckdb://&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
@@ -379,20 +379,20 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.commit">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.commit">[docs]</a>
-    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
             <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="DuckDBDatabase.close">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.close">[docs]</a>
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="DuckDBDatabase.drop">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.drop">[docs]</a>
-    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">==</span> <span class="n">MEMORY_HANDLE</span><span class="p">:</span>
             <span class="k">return</span>
@@ -406,7 +406,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
         <span class="n">json_encoded_cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;information_schema&quot;</span><span class="p">):</span>
@@ -467,7 +467,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.init_collections">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.init_collections">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO: unify schema introspection</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_view</span><span class="p">:</span>
             <span class="n">schema</span> <span class="o">=</span> <span class="n">introspect_schema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
@@ -484,7 +484,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.induce_schema_view">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.induce_schema_view">[docs]</a>
-    <span class="k">def</span> <span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
         <span class="c1"># TODO: unify schema introspection</span>
         <span class="c1"># TODO: handle case where schema is provided in advance</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inducing schema view for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">handle</span><span class="si">}</span><span class="s2"> // </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -529,7 +529,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.export_database">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.export_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">target_format</span> <span class="o">==</span> <span class="s2">&quot;duckdb&quot;</span> <span class="ow">or</span> <span class="n">target_format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">SQLDUMP_DUCKDB</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -544,7 +544,7 @@
 
 <div class="viewcode-block" id="DuckDBDatabase.import_database">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.import_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">import_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Import a database from a file or location.</span>
 

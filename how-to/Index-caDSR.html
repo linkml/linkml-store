@@ -7,7 +7,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>How to index the caDSR metadata element registry with LinkML-Store - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
@@ -312,8 +312,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 </pre></div>
 </div>
 </div>
@@ -354,7 +354,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">yaml</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
@@ -889,7 +889,7 @@ workflowStatus: RELEASED
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
 </pre></div>
@@ -1765,7 +1765,7 @@ workflowStatus: RELEASED
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.index.implementations.llm_indexer</span> <span class="kn">import</span> <span class="n">LLMIndexer</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.index.implementations.llm_indexer</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMIndexer</span>
 
 <span class="n">index</span> <span class="o">=</span> <span class="n">LLMIndexer</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cde&quot;</span><span class="p">,</span>

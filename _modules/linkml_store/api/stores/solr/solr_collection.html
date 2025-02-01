@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.solr.solr_collection - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -301,25 +301,25 @@
           <h1>Source code for linkml_store.api.stores.solr.solr_collection</h1><div class="highlight"><pre>
 <span></span><span class="c1"># solr_collection.py</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Collection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.collection</span> <span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SolrCollection">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.solr.solr_collection.html#linkml_store.api.stores.solr.solr_collection.SolrCollection">[docs]</a>
-<span class="k">class</span> <span class="nc">SolrCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SolrCollection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_collection_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collection_base</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">use_cores</span><span class="p">:</span>
             <span class="n">base_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -328,7 +328,7 @@
 
 <div class="viewcode-block" id="SolrCollection.search">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.solr.solr_collection.html#linkml_store.api.stores.solr.solr_collection.SolrCollection.search">[docs]</a>
-    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -356,7 +356,7 @@
 
 <div class="viewcode-block" id="SolrCollection.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.solr.solr_collection.html#linkml_store.api.stores.solr.solr_collection.SolrCollection.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
         <span class="n">solr_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_solr_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Querying Solr collection </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2"> with query: </span><span class="si">{</span><span class="n">solr_query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -372,7 +372,7 @@
 
 <div class="viewcode-block" id="SolrCollection.query_facets">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.solr.solr_collection.html#linkml_store.api.stores.solr.solr_collection.SolrCollection.query_facets">[docs]</a>
-    <span class="k">def</span> <span class="nf">query_facets</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_facets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_limit</span><span class="o">=</span><span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="n">solr_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_solr_query</span><span class="p">(</span><span class="n">where</span><span class="p">)</span>
@@ -395,7 +395,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_build_solr_query</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_solr_query</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Query</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">search_term</span><span class="o">=</span><span class="s2">&quot;*:*&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">solr_query</span> <span class="o">=</span> <span class="p">{}</span>
@@ -426,7 +426,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Built Solr query: </span><span class="si">{</span><span class="n">solr_query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">solr_query</span>
 
-    <span class="k">def</span> <span class="nf">_build_solr_where_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_solr_where_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">where_clause</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">where_clause</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">conditions</span> <span class="o">=</span> <span class="p">[]</span>

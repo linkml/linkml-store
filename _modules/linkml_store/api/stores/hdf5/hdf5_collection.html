@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.hdf5.hdf5_collection - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,30 +299,30 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.stores.hdf5.hdf5_collection</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Collection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.collection</span> <span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="n">OBJECT</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="n">OBJECT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="HDF5Collection">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection">[docs]</a>
-<span class="k">class</span> <span class="nc">HDF5Collection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HDF5Collection</span><span class="p">(</span><span class="n">Collection</span><span class="p">):</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hdf5_group</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">h5py</span><span class="o">.</span><span class="n">Group</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hdf5_group</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">h5py</span><span class="o">.</span><span class="n">Group</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">file</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
 
 <div class="viewcode-block" id="HDF5Collection.insert">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection.insert">[docs]</a>
-    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
 
@@ -340,7 +340,7 @@
 
 <div class="viewcode-block" id="HDF5Collection.delete">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection.delete">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -356,7 +356,7 @@
 
 <div class="viewcode-block" id="HDF5Collection.delete_where">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection.delete_where">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleting from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_class_name</span><span class="si">}</span><span class="s2"> where: </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">where</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">where</span> <span class="o">=</span> <span class="p">{}</span>
@@ -367,7 +367,7 @@
 
 <div class="viewcode-block" id="HDF5Collection.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">obj_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf5_group</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">obj_id</span><span class="p">}</span>
@@ -387,7 +387,7 @@
 
 <div class="viewcode-block" id="HDF5Collection.query_facets">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.hdf5.hdf5_collection.html#linkml_store.api.stores.hdf5.hdf5_collection.HDF5Collection.query_facets">[docs]</a>
-    <span class="k">def</span> <span class="nf">query_facets</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_facets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">facet_limit</span><span class="o">=</span><span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -411,7 +411,7 @@
         <span class="k">return</span> <span class="n">results</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_match_where_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">where_clause</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_match_where_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">where_clause</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">where_clause</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">where_clause</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

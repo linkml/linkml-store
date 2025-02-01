@@ -7,7 +7,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>How to use Neo4J with LinkML-Store - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
@@ -332,7 +332,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
 </pre></div>
@@ -410,7 +410,7 @@ WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: r
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.graphs.graph_map</span> <span class="kn">import</span> <span class="n">EdgeProjection</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.graphs.graph_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeProjection</span>
 
 <span class="n">edge_collection</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">graph_projection</span> <span class="o">=</span> <span class="n">EdgeProjection</span><span class="p">()</span>
 </pre></div>
@@ -495,8 +495,8 @@ WARNING:root:File &#34;schema.yaml&#34;, line 36, col 15: Unrecognized prefix: r
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.neo4j_utils</span> <span class="kn">import</span> <span class="n">draw_neo4j_graph</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.neo4j_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_neo4j_graph</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 <span class="n">draw_neo4j_graph</span><span class="p">()</span>
@@ -586,7 +586,7 @@ Validation errors: [ValidationResult(type=&#39;jsonschema validation&#39;, sever
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.api.stores.neo4j.neo4j_collection</span> <span class="kn">import</span> <span class="n">DeletePolicy</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.neo4j.neo4j_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeletePolicy</span>
 
 <span class="n">edge_collection</span><span class="o">.</span><span class="n">delete_policy</span> <span class="o">=</span> <span class="n">DeletePolicy</span><span class="o">.</span><span class="n">ERROR</span>
 
@@ -618,7 +618,7 @@ Node with identifier MOVIE:MADE_UP_NODE not found in the database.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <br/></pre></div>
 </div>
 </div>
@@ -1323,7 +1323,7 @@ Node with identifier MOVIE:MADE_UP_NODE not found in the database.
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">linkml_store.utils.pandas_utils</span> <span class="kn">import</span> <span class="n">facet_summary_to_dataframe_unmelted</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.pandas_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">facet_summary_to_dataframe_unmelted</span>
 </pre></div>
 </div>
 </div>

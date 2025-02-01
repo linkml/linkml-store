@@ -6,7 +6,7 @@
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>linkml_store.api.database - linkml-store documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -299,12 +299,12 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.database</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -319,24 +319,24 @@
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api.types</span> <span class="kn">import</span> <span class="n">CollectionType</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.format_utils</span> <span class="kn">import</span> <span class="n">Format</span><span class="p">,</span> <span class="n">load_objects</span><span class="p">,</span> <span class="n">render_output</span>
-<span class="kn">from</span> <span class="nn">linkml_store.utils.patch_utils</span> <span class="kn">import</span> <span class="n">PatchDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollectionType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Format</span><span class="p">,</span> <span class="n">load_objects</span><span class="p">,</span> <span class="n">render_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.patch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">PatchDict</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">linkml.validator.report</span> <span class="kn">import</span> <span class="n">Severity</span><span class="p">,</span> <span class="n">ValidationResult</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">linkml.validator.report</span><span class="w"> </span><span class="kn">import</span> <span class="n">Severity</span><span class="p">,</span> <span class="n">ValidationResult</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">ValidationResult</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">linkml_runtime</span> <span class="kn">import</span> <span class="n">SchemaView</span>
-<span class="kn">from</span> <span class="nn">linkml_runtime.linkml_model</span> <span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SchemaDefinition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.linkml_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDefinition</span><span class="p">,</span> <span class="n">SchemaDefinition</span>
 
-<span class="kn">from</span> <span class="nn">linkml_store.api.collection</span> <span class="kn">import</span> <span class="n">Collection</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.config</span> <span class="kn">import</span> <span class="n">CollectionConfig</span><span class="p">,</span> <span class="n">DatabaseConfig</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.queries</span> <span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollectionConfig</span><span class="p">,</span> <span class="n">DatabaseConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">linkml_store.api.client</span> <span class="kn">import</span> <span class="n">Client</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -345,7 +345,7 @@
 
 <div class="viewcode-block" id="Database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database">[docs]</a>
-<span class="k">class</span> <span class="nc">Database</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">CollectionType</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Database</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">CollectionType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A Database provides access to named collections of data.</span>
 
@@ -413,7 +413,7 @@
 
 <div class="viewcode-block" id="Database.__init__">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatabaseConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatabaseConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
         <span class="k">else</span><span class="p">:</span>
@@ -424,7 +424,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_collections</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_initialize_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">db_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
         <span class="k">if</span> <span class="n">db_config</span><span class="o">.</span><span class="n">schema_location</span><span class="p">:</span>
             <span class="n">schema_location</span> <span class="o">=</span> <span class="n">db_config</span><span class="o">.</span><span class="n">schema_location</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">base_dir</span><span class="p">)</span>
@@ -440,7 +440,7 @@
 
 <div class="viewcode-block" id="Database.from_config">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.from_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_config</span><span class="p">:</span> <span class="n">DatabaseConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_config</span><span class="p">:</span> <span class="n">DatabaseConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a database from a configuration.</span>
 
@@ -455,7 +455,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_initialize_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collections</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">collection_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -476,7 +476,7 @@
                 <span class="c1"># assert collection.class_definition() is not None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">recreate_if_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">recreate_if_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return whether to recreate the database if it already exists.</span>
 
@@ -485,7 +485,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">recreate_if_exists</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the database handle.</span>
 
@@ -500,12 +500,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">handle</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">alias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">alias</span>
 
 <div class="viewcode-block" id="Database.store">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.store">[docs]</a>
-    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store an object in the database.</span>
 
@@ -552,7 +552,7 @@
 
 <div class="viewcode-block" id="Database.commit">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.commit">[docs]</a>
-    <span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Commit pending changes to the database.</span>
 
@@ -565,7 +565,7 @@
 
 <div class="viewcode-block" id="Database.close">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.close">[docs]</a>
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Close the database.</span>
 
@@ -576,12 +576,12 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_collection_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Collection</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collection_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Collection</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Database.create_collection">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.create_collection">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_collection</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_collection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">alias</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -643,7 +643,7 @@
 
 <div class="viewcode-block" id="Database.list_collections">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.list_collections">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_internal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Collection</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_internal</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Collection</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List all collections.</span>
 
@@ -670,7 +670,7 @@
 
 <div class="viewcode-block" id="Database.list_collection_names">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.list_collection_names">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_collection_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_collection_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List all collection names.</span>
 
@@ -693,7 +693,7 @@
 
 <div class="viewcode-block" id="Database.get_collection">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.get_collection">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Collection&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -733,7 +733,7 @@
 
 <div class="viewcode-block" id="Database.init_collections">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.init_collections">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize collections.</span>
 
@@ -745,7 +745,7 @@
 
 <div class="viewcode-block" id="Database.query">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.query">[docs]</a>
-    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run a query against the database.</span>
 
@@ -777,7 +777,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a schema view for the named collection.</span>
 
@@ -811,7 +811,7 @@
 
 <div class="viewcode-block" id="Database.set_schema_view">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.set_schema_view">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_view</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">SchemaView</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_view</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">SchemaView</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the schema view for the database.</span>
 
@@ -872,7 +872,7 @@
 
 <div class="viewcode-block" id="Database.load_schema_view">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.load_schema_view">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a schema view from a file.</span>
 
@@ -906,7 +906,7 @@
 
 <div class="viewcode-block" id="Database.induce_schema_view">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.induce_schema_view">[docs]</a>
-    <span class="k">def</span> <span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">induce_schema_view</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaView</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Induce a schema view from a schema definition.</span>
 
@@ -927,7 +927,7 @@
 <span class="sd">        :return: A schema view</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inducing schema view for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">linkml_runtime.utils.schema_builder</span> <span class="kn">import</span> <span class="n">SchemaBuilder</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_runtime.utils.schema_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaBuilder</span>
 
         <span class="n">sb</span> <span class="o">=</span> <span class="n">SchemaBuilder</span><span class="p">()</span>
 
@@ -939,7 +939,7 @@
 
 <div class="viewcode-block" id="Database.iter_validate_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.iter_validate_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">iter_validate_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_validate_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate the contents of the database.</span>
 
@@ -988,7 +988,7 @@
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_referential_integrity</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_validate_referential_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_referential_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate referential integrity of the database.</span>
 
@@ -1034,7 +1034,7 @@
 
 <div class="viewcode-block" id="Database.drop">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.drop">[docs]</a>
-    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Drop the database and all collections.</span>
 
@@ -1060,7 +1060,7 @@
 
 <div class="viewcode-block" id="Database.import_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.import_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">import_database</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_database</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">source_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1112,7 +1112,7 @@
 
 <div class="viewcode-block" id="Database.export_database">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.export_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Format</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export a database to a file or location.</span>
 
@@ -1150,7 +1150,7 @@
 
 <div class="viewcode-block" id="Database.broadcast">
 <a class="viewcode-back" href="../../../reference/linkml_store.api.html#linkml_store.api.database.Database.broadcast">[docs]</a>
-    <span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">patches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">patches</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PatchDict</span><span class="p">]):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">listeners</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">for</span> <span class="n">listener</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listeners</span><span class="p">:</span>
