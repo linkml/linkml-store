@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, TextIO, Tuple, Union
+from typing import Optional, TextIO, Tuple, Union, Any
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict
@@ -67,13 +67,14 @@ class CollectionSlice(BaseModel):
     # slice: Tuple[Optional[int], Optional[int]] = Field(default=(None, None))
     indices: Optional[Tuple[int, ...]] = None
     _collection: Optional[Collection] = None
+    where: Any = None
 
     @property
     def collection(self) -> Collection:
         if not self._collection and not self.indices:
             return self.base_collection
         if not self._collection:
-            rows = self.base_collection.find({}, limit=-1).rows
+            rows = self.base_collection.rows
             subset = [rows[i] for i in self.indices]
             db = self.base_collection.parent
             subset_name = self.slice_alias
@@ -94,6 +95,7 @@ class CollectionSlice(BaseModel):
         """
         Return the slice of the collection as a dataframe.
 
+        :param flattened: flattned nested objects to give keys like foo.bar
         :return:
         """
         rs = self.collection.find({}, limit=-1)

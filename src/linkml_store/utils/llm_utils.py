@@ -1,6 +1,10 @@
-from typing import Callable, List, Optional
+import logging
+from typing import Callable, List, Optional, TYPE_CHECKING
 
-from tiktoken import Encoding
+if TYPE_CHECKING:
+    import tiktoken
+
+logger = logging.getLogger(__name__)
 
 MODEL_TOKEN_MAPPING = {
     "gpt-4o-mini": 128_000,
@@ -40,7 +44,7 @@ MODEL_TOKEN_MAPPING = {
 def render_formatted_text(
     render_func: Callable,
     values: List[str],
-    encoding: Encoding,
+    encoding: "tiktoken.Encoding",
     token_limit: int,
     additional_text: Optional[str] = None,
 ) -> str:
@@ -67,6 +71,7 @@ def render_formatted_text(
     if additional_text:
         token_limit -= len(encoding.encode(additional_text))
     text_length = len(encoding.encode(text))
+    logger.debug(f"Encoding length: {text_length} (original: {len(text)})")
     if text_length <= token_limit:
         return text
     if not values:

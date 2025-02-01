@@ -470,6 +470,7 @@ class Collection(Generic[DatabaseType]):
         where: Optional[Any] = None,
         index_name: Optional[str] = None,
         limit: Optional[int] = None,
+        select_cols: Optional[List[str]] = None,
         mmr_relevance_factor: Optional[float] = None,
         **kwargs,
     ) -> QueryResult:
@@ -503,6 +504,7 @@ class Collection(Generic[DatabaseType]):
         :param where:
         :param index_name:
         :param limit:
+        :param select_cols:
         :param kwargs:
         :return:
         """
@@ -538,6 +540,11 @@ class Collection(Generic[DatabaseType]):
         results = ix.search(query, vector_pairs, limit=limit, mmr_relevance_factor=mmr_relevance_factor, **kwargs)
         for r in results:
             del r[1][index_col]
+        if select_cols:
+            new_results = []
+            for r in results:
+                new_results.append((r[0], {k: v for k, v in r[1].items() if k in select_cols}))
+            results = new_results
         new_qr = QueryResult(num_rows=len(results))
         new_qr.ranked_rows = results
         new_qr.rows = [r[1] for r in results]
@@ -672,6 +679,7 @@ class Collection(Generic[DatabaseType]):
         """
         yield from self.find({}, limit=-1).rows
 
+    @property
     def rows(self) -> List[OBJECT]:
         """
         Return a list of objects in the collection.

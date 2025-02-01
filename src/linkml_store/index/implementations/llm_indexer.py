@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
-from tiktoken import encoding_for_model
 
 from linkml_store.api.config import CollectionConfig
 from linkml_store.index.indexer import INDEX_ITEM, Indexer
@@ -55,7 +54,7 @@ class LLMIndexer(Indexer):
 
     def texts_to_vectors(self, texts: List[str], cache: bool = None, **kwargs) -> List[INDEX_ITEM]:
         """
-        Use LLM to embed
+        Use LLM to embed.
 
         >>> indexer = LLMIndexer(cached_embeddings_database="tests/input/llm_cache.db")
         >>> vectors = indexer.texts_to_vectors(["hello", "goodbye"])
@@ -63,20 +62,24 @@ class LLMIndexer(Indexer):
         :param texts:
         :return:
         """
+        from tiktoken import encoding_for_model
         logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
-        token_limit = get_token_limit(model.model_id)
+        # TODO: make this more accurate
+        token_limit = get_token_limit(model.model_id) - 200
         encoding = encoding_for_model("gpt-4o")
 
         def truncate_text(text: str) -> str:
             # split into tokens every 1000 chars:
             parts = [text[i : i + 1000] for i in range(0, len(text), 1000)]
-            return render_formatted_text(
+            truncated = render_formatted_text(
                 lambda x: "".join(x),
                 parts,
                 encoding,
                 token_limit,
             )
+            logger.debug(f"Truncated text from {len(text)} to {len(truncated)}")
+            return truncated
 
         texts = [truncate_text(text) for text in texts]
 

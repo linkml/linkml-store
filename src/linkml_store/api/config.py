@@ -91,7 +91,7 @@ class CollectionConfig(ConfiguredBaseModel):
     )
     source: Optional[CollectionSource] = Field(
         default=None,
-        description="Metadata about the source",
+        description="Source for the collection",
     )
     derived_from: Optional[List[DerivationConfiguration]] = Field(
         default=None,
@@ -153,6 +153,10 @@ class DatabaseConfig(ConfiguredBaseModel):
     ensure_referential_integrity: bool = Field(
         default=False,
         description="Whether to ensure referential integrity",
+    )
+    source: Optional[CollectionSource] = Field(
+        default=None,
+        description="Source for the database",
     )
 
 

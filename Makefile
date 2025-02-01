@@ -18,6 +18,9 @@ pytest-neo4j:
 pytest-core:
 	$(RUN) pytest
 
+pytest-minimal:
+	$(RUN) pytest tests/test_api/test_filesystem_adapter.py
+
 pytest-full:
 	$(RUN) pytest -m ""
 
@@ -28,7 +31,8 @@ all-pytest:
 	$(RUN) pytest -m "integration or not integration"
 
 install-all:
-	poetry install -E analytics -E app -E tests -E llm -E mongodb
+	poetry install --all-extras
+#	poetry install -E analytics -E app -E tests -E llm -E mongodb
 
 DOCTEST_DIR = docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils
 doctest:

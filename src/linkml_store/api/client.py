@@ -1,3 +1,4 @@
+import importlib
 import logging
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -7,23 +8,18 @@ from linkml_runtime import SchemaView
 
 from linkml_store.api import Database
 from linkml_store.api.config import ClientConfig
-from linkml_store.api.stores.chromadb.chromadb_database import ChromaDBDatabase
-from linkml_store.api.stores.duckdb.duckdb_database import DuckDBDatabase
-from linkml_store.api.stores.filesystem.filesystem_database import FileSystemDatabase
-from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
-from linkml_store.api.stores.neo4j.neo4j_database import Neo4jDatabase
-from linkml_store.api.stores.solr.solr_database import SolrDatabase
 
 logger = logging.getLogger(__name__)
 
 
+
 HANDLE_MAP = {
-    "duckdb": DuckDBDatabase,
-    "solr": SolrDatabase,
-    "mongodb": MongoDBDatabase,
-    "chromadb": ChromaDBDatabase,
-    "neo4j": Neo4jDatabase,
-    "file": FileSystemDatabase,
+    "duckdb": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
+    "solr": "linkml_store.api.stores.solr.solr_database.SolrDatabase",
+    "mongodb": "linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase",
+    "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
+    "neo4j": "linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase",
+    "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
 }
 
 
@@ -155,6 +151,9 @@ class Client:
             if auto_attach:
                 db = self.attach_database(handle, alias=name, **kwargs)
                 db.from_config(db_config)
+            if db_config.source:
+                db = self.get_database(name)
+                db.store(db_config.source.data)
 
     def _set_database_config(self, db: Database):
         """
@@ -207,7 +206,14 @@ class Client:
             scheme, _ = handle.split(":", 1)
         if scheme not in HANDLE_MAP:
             raise ValueError(f"Unknown scheme: {scheme}")
-        cls = HANDLE_MAP[scheme]
+        module_path, class_name = HANDLE_MAP[scheme].rsplit('.', 1)
+        try:
+            module = importlib.import_module(module_path)
+            cls = getattr(module, class_name)
+        except ImportError as e:
+            raise ImportError(f"Failed to import {scheme} database. Make sure the correct extras are installed: {e}")
+
+        #cls = HANDLE_MAP[scheme]
         db = cls(handle=handle, recreate_if_exists=recreate_if_exists, **kwargs)
         if schema_view:
             db.set_schema_view(schema_view)

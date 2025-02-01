@@ -135,12 +135,17 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         logger.setLevel(logging.ERROR)
     ctx.ensure_object(dict)
     if input:
-        stem = underscore(Path(input).stem)
-        database = "duckdb"
-        collection = stem
+        database = "duckdb" # default: store in duckdb
+        if input.startswith("http"):
+            parts = input.split("/")
+            collection = parts[-1]
+            collection = collection.split(".")[0]
+        else:
+            stem = underscore(Path(input).stem)
+            collection = stem
+        logger.info(f"Using input file: {input}, "
+                    f"default storage is {database} and collection is {collection}")
         config = ClientConfig(databases={"duckdb": {"collections": {stem: {"source": {"local_path": input}}}}})
-        # collection = Path(input).stem
-        # database = f"file:{Path(input).parent}"
     if config is None and DEFAULT_LOCAL_CONF_PATH.exists():
         config = DEFAULT_LOCAL_CONF_PATH
     if config is None and DEFAULT_GLOBAL_CONF_PATH.exists():
@@ -178,10 +183,11 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
 
 @cli.command()
 @click.argument("files", type=click.Path(exists=True), nargs=-1)
+@click.option("--replace/--no-replace", default=False, show_default=True, help="Replace existing objects")
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
 @click.pass_context
-def insert(ctx, files, object, format):
+def insert(ctx, files, replace, object, format):
     """Insert objects from files (JSON, YAML, TSV) into the specified collection.
 
     Using a configuration:
@@ -195,7 +201,6 @@ def insert(ctx, files, object, format):
     collection = settings.collection
     if not collection:
         raise ValueError("Collection must be specified.")
-    objects = []
     if not files and not object:
         files = ["-"]
     for file_path in files:
@@ -204,13 +209,19 @@ def insert(ctx, files, object, format):
         else:
             objects = load_objects(file_path)
         logger.info(f"Inserting {len(objects)} objects from {file_path} into collection '{collection.alias}'.")
-        collection.insert(objects)
+        if replace:
+            collection.replace(objects)
+        else:
+            collection.insert(objects)
         click.echo(f"Inserted {len(objects)} objects from {file_path} into collection '{collection.alias}'.")
     if object:
         for object_str in object:
             logger.info(f"Parsing: {object_str}")
             objects = yaml.safe_load(object_str)
-            collection.insert(objects)
+            if replace:
+                collection.replace(objects)
+            else:
+                collection.insert(objects)
             click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{collection.alias}'.")
     collection.commit()
 
@@ -534,10 +545,12 @@ def pivot(ctx, where, limit, index, columns, values, output_type, output):
 @click.option("--evaluation-count", "-n", type=click.INT, help="Number of examples to evaluate over")
 @click.option("--evaluation-match-function", help="Name of function to use for matching objects in eval")
 @click.option("--query", "-q", type=click.STRING, help="query term")
+@click.option("--where", "-w", type=click.STRING, help="query term")
 @click.pass_context
 def infer(
     ctx,
     inference_config_file,
+    where,
     query,
     evaluation_count,
     evaluation_match_function,
@@ -579,6 +592,7 @@ def infer(
         linkml-store -i tests/input/iris.csv inference -t sklearn \
            -q '{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}'
     """
+    where_clause = yaml.safe_load(where) if where else None
     if query:
         query_obj = yaml.safe_load(query)
     else:
@@ -681,6 +695,7 @@ def schema(ctx, output_type, output):
 @cli.command()
 @click.argument("search_term")
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the search")
+@click.option("--select", "-s", type=click.STRING, help="SELECT clause for the query, as YAML")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of search results")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
@@ -689,13 +704,14 @@ def schema(ctx, output_type, output):
 )
 @index_type_option
 @click.pass_context
-def search(ctx, search_term, where, limit, index_type, output_type, output, auto_index):
+def search(ctx, search_term, where, select, limit, index_type, output_type, output, auto_index):
     """Search objects in the specified collection."""
     collection = ctx.obj["settings"].collection
     ix = get_indexer(index_type)
     logger.info(f"Attaching index to collection {collection.alias}: {ix.model_dump()}")
     collection.attach_indexer(ix, auto_index=auto_index)
-    result = collection.search(search_term, where=where, limit=limit)
+    select_cols = yaml.safe_load(select) if select else None
+    result = collection.search(search_term, where=where, select_cols=select_cols, limit=limit)
     output_data = render_output([{"score": row[0], **row[1]} for row in result.ranked_rows], output_type)
     if output:
         with open(output, "w") as f:

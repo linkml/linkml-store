@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
-from linkml.utils.schema_builder import SchemaBuilder
+from linkml_runtime.utils.schema_builder import SchemaBuilder
 from linkml_runtime import SchemaView
 
 from linkml_store.api import Database

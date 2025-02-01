@@ -12,9 +12,9 @@ from typing import IO, Any, Dict, List, Optional, TextIO, Type, Union
 
 import pandas as pd
 import pystow
+import xmltodict
 import yaml
 from pydantic import BaseModel
-from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ class Format(Enum):
     YAMLL = "yamll"
     TSV = "tsv"
     CSV = "csv"
+    XML = "xml"
     PYTHON = "python"
     PARQUET = "parquet"
     FORMATTED = "formatted"
@@ -50,6 +51,7 @@ class Format(Enum):
             ".yamll": cls.YAMLL,
             ".tsv": cls.TSV,
             ".csv": cls.CSV,
+            ".xml": cls.XML,
             ".py": cls.PYTHON,
             ".parquet": cls.PARQUET,
             ".pq": cls.PARQUET,
@@ -124,6 +126,8 @@ def process_file(
         delimiter = "\t" if format == Format.TSV else ","
         reader = csv.DictReader(f, delimiter=delimiter)
         objs = list(reader)
+    elif format == Format.XML:
+        objs = xmltodict.parse(f.read())
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
 
@@ -284,6 +288,7 @@ def render_output(
     elif format == Format.PYTHON:
         return str(data)
     elif format == Format.TABLE:
+        from tabulate import tabulate
         return tabulate(pd.DataFrame(data), headers="keys", tablefmt="psql")
     elif format == Format.YAML:
         if isinstance(data, list):
