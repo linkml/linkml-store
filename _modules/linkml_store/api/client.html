@@ -299,7 +299,8 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for linkml_store.api.client</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -308,23 +309,18 @@
 
 <span class="kn">from</span> <span class="nn">linkml_store.api</span> <span class="kn">import</span> <span class="n">Database</span>
 <span class="kn">from</span> <span class="nn">linkml_store.api.config</span> <span class="kn">import</span> <span class="n">ClientConfig</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.chromadb.chromadb_database</span> <span class="kn">import</span> <span class="n">ChromaDBDatabase</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.duckdb.duckdb_database</span> <span class="kn">import</span> <span class="n">DuckDBDatabase</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.filesystem.filesystem_database</span> <span class="kn">import</span> <span class="n">FileSystemDatabase</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.mongodb.mongodb_database</span> <span class="kn">import</span> <span class="n">MongoDBDatabase</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.neo4j.neo4j_database</span> <span class="kn">import</span> <span class="n">Neo4jDatabase</span>
-<span class="kn">from</span> <span class="nn">linkml_store.api.stores.solr.solr_database</span> <span class="kn">import</span> <span class="n">SolrDatabase</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
+
 <span class="n">HANDLE_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;duckdb&quot;</span><span class="p">:</span> <span class="n">DuckDBDatabase</span><span class="p">,</span>
-    <span class="s2">&quot;solr&quot;</span><span class="p">:</span> <span class="n">SolrDatabase</span><span class="p">,</span>
-    <span class="s2">&quot;mongodb&quot;</span><span class="p">:</span> <span class="n">MongoDBDatabase</span><span class="p">,</span>
-    <span class="s2">&quot;chromadb&quot;</span><span class="p">:</span> <span class="n">ChromaDBDatabase</span><span class="p">,</span>
-    <span class="s2">&quot;neo4j&quot;</span><span class="p">:</span> <span class="n">Neo4jDatabase</span><span class="p">,</span>
-    <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">FileSystemDatabase</span><span class="p">,</span>
+    <span class="s2">&quot;duckdb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;solr&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.solr.solr_database.SolrDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mongodb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chromadb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;neo4j&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -464,6 +460,9 @@
             <span class="k">if</span> <span class="n">auto_attach</span><span class="p">:</span>
                 <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">db_config</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db_config</span><span class="o">.</span><span class="n">source</span><span class="p">:</span>
+                <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_database</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">db_config</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_database_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -518,7 +517,14 @@
             <span class="n">scheme</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">HANDLE_MAP</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown scheme: </span><span class="si">{</span><span class="n">scheme</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">cls</span> <span class="o">=</span> <span class="n">HANDLE_MAP</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+        <span class="n">module_path</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">HANDLE_MAP</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to import </span><span class="si">{</span><span class="n">scheme</span><span class="si">}</span><span class="s2"> database. Make sure the correct extras are installed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1">#cls = HANDLE_MAP[scheme]</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">handle</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="n">recreate_if_exists</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">schema_view</span><span class="p">:</span>
             <span class="n">db</span><span class="o">.</span><span class="n">set_schema_view</span><span class="p">(</span><span class="n">schema_view</span><span class="p">)</span>
@@ -709,7 +715,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, Author 1 &lt;author@org.org&gt;
+                Copyright &#169; 2025, Author 1 &lt;author@org.org&gt;
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

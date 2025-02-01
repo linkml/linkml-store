@@ -1698,7 +1698,7 @@ containing the facet counts for each unique value in the respective column.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="linkml_store.api.collection.Collection.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mmr_relevance_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/collection.html#Collection.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.collection.Collection.search" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mmr_relevance_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/collection.html#Collection.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.collection.Collection.search" title="Link to this definition"></a></dt>
 <dd><p>Search the collection using a text-based index index.</p>
 <p>Example:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linkml_store</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -1730,6 +1730,7 @@ containing the facet counts for each unique value in the respective column.</p>
 <li><p><strong>where</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>)</p></li>
 <li><p><strong>index_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>)</p></li>
 <li><p><strong>limit</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>)</p></li>
+<li><p><strong>select_cols</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>)</p></li>
 <li><p><strong>kwargs</strong></p></li>
 </ul>
 </dd>
@@ -1811,16 +1812,13 @@ include shadow “index” collections</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="linkml_store.api.collection.Collection.rows">
-<span class="sig-name descname"><span class="pre">rows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/collection.html#Collection.rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.collection.Collection.rows" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">BaseModel</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#linkml_store.api.collection.Collection.rows" title="Link to this definition"></a></dt>
 <dd><p>Return a list of objects in the collection.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>]]</span></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2188,7 +2186,7 @@ In general it is recommended you explicitly provide a schema.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, Author 1 &lt;author@org.org&gt;
+                Copyright &#169; 2025, Author 1 &lt;author@org.org&gt;
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -2283,7 +2281,7 @@ In general it is recommended you explicitly provide a schema.</p>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.load_from_source"><code class="docutils literal notranslate"><span class="pre">Collection.load_from_source()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.size"><code class="docutils literal notranslate"><span class="pre">Collection.size()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.rows_iter"><code class="docutils literal notranslate"><span class="pre">Collection.rows_iter()</span></code></a></li>
-<li><a class="reference internal" href="#linkml_store.api.collection.Collection.rows"><code class="docutils literal notranslate"><span class="pre">Collection.rows()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.collection.Collection.rows"><code class="docutils literal notranslate"><span class="pre">Collection.rows</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.ranked_rows"><code class="docutils literal notranslate"><span class="pre">Collection.ranked_rows()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.attach_indexer"><code class="docutils literal notranslate"><span class="pre">Collection.attach_indexer()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.collection.Collection.get_index_collection_name"><code class="docutils literal notranslate"><span class="pre">Collection.get_index_collection_name()</span></code></a></li>
