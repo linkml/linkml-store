@@ -124,7 +124,7 @@ def select_nested(data: dict, paths: List[Union[str, List[str]]], current_path=N
 
     Args:
     data (dict): The input nested dictionary.
-    selectors (list): A list of selector strings.
+    paths (list): A list of selector strings.
 
     Returns:
     dict: A new dictionary with the same structure, but only the selected attributes.
@@ -162,6 +162,8 @@ def select_nested(data: dict, paths: List[Union[str, List[str]]], current_path=N
     if current_path is None:
         current_path = []
     matching_paths = []
+    if not paths:
+        raise ValueError("No paths provided")
     for path in paths:
         if isinstance(path, str):
             path = path.split(".")

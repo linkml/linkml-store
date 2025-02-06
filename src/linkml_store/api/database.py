@@ -470,6 +470,7 @@ class Database(ABC, Generic[CollectionType]):
         if not self._schema_view:
             self._initialize_schema()
         if not self._schema_view:
+            logger.info("Inducing schema view")
             self._schema_view = self.induce_schema_view()
         return self._schema_view
 
@@ -505,6 +506,7 @@ class Database(ABC, Generic[CollectionType]):
         if isinstance(schema_view, str):
             schema_view = SchemaView(schema_view)
         self._schema_view = schema_view
+        logger.info(f"Setting schema view for {self.handle}")
         # self._schema_view = SchemaView(schema_view.materialize_derived_schema())
         if not self._collections:
             return

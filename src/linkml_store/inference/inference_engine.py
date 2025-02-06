@@ -124,7 +124,7 @@ class InferenceEngine(ABC):
         Load the data and split it into training and testing sets.
 
         :param collection:
-        :param split:
+        :param split: Tuple of training and testing split ratios.
         :param randomize:
         :return:
         """
@@ -136,7 +136,7 @@ class InferenceEngine(ABC):
             self.training_data = CollectionSlice(name="train", base_collection=collection, indices=None)
             self.testing_data = None
             return
-        logger.info(f"Loading and splitting data from collection {collection.alias}")
+        logger.info(f"Loading and splitting data {split} from collection {collection.alias}")
         size = collection.size()
         indices = range(size)
         if randomize:

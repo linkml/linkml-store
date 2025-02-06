@@ -46,8 +46,9 @@ jinja2 = "^3.1.4"
 jsonlines = "^4.0.0"
 fastapi = { version="*", optional = true }
 uvicorn = { version="*", optional = true }
-xmltodict = "^0.13.0"
-jsonpatch = "^1.33"
+xmltodict = ">=0.13.0"
+jsonpatch = ">=1.33"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = {version = ">=7.1.2"}

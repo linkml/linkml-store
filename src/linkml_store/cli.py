@@ -99,6 +99,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
 @click.option("--database", "-d", help="Database name")
 @click.option("--collection", "-c", help="Collection name")
 @click.option("--input", "-i", help="Input file (alternative to database/collection)")
+@click.option("--schema", "-S", help="Path to schema (LinkML yaml)")
 @click.option("--config", "-C", type=click.Path(exists=True), help="Path to the configuration file")
 @click.option("--set", help="Metadata settings in the form PATHEXPR=value", multiple=True)
 @click.option("-v", "--verbose", count=True)
@@ -111,7 +112,7 @@ include_internal_option = click.option("--include-internal/--no-include-internal
     help="If set then show full stacktrace on error",
 )
 @click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, config, set, input, **kwargs):
+def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, schema, config, set, input, **kwargs):
     """A CLI for interacting with the linkml-store."""
     if not stacktrace:
         sys.tracebacklimit = 0
@@ -158,6 +159,9 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     client = Client().from_config(config, **kwargs) if config else Client()
     settings = ContextSettings(client=client, database_name=database, collection_name=collection)
     ctx.obj["settings"] = settings
+    if schema:
+        db = settings.database
+        db.set_schema_view(schema)
     if settings.database_name:
         db = client.get_database(database)
         if set:
@@ -534,6 +538,7 @@ def pivot(ctx, where, limit, index, columns, values, output_type, output):
 @click.option(
     "--feature-attributes", "-F", type=click.STRING, help="Feature attributes for inference (comma separated)"
 )
+@click.option("--training-collection", type=click.STRING,help="Collection to use for training")
 @click.option("--inference-config-file", "-Y", type=click.Path(), help="Path to inference configuration file")
 @click.option("--export-model", "-E", type=click.Path(), help="Export model to file")
 @click.option("--load-model", "-L", type=click.Path(), help="Load model from file")
@@ -555,6 +560,7 @@ def infer(
     evaluation_count,
     evaluation_match_function,
     training_test_data_split,
+    training_collection,
     predictor_type,
     target_attribute,
     feature_attributes,
@@ -617,6 +623,7 @@ def infer(
     if model_format:
         model_format = ModelSerialization(model_format)
     if load_model:
+        logger.info(f"Loading predictor from {load_model}")
         predictor = get_inference_engine(predictor_type)
         predictor = type(predictor).load_model(load_model)
     else:
@@ -627,13 +634,18 @@ def infer(
         if training_test_data_split:
             config.train_test_split = training_test_data_split
         predictor = get_inference_engine(predictor_type, config=config)
-        if collection:
-            predictor.load_and_split_data(collection)
+        training_collection_obj = collection
+        if training_collection:
+            training_collection_obj = ctx.obj["settings"].database.get_collection(training_collection)
+        if training_collection_obj:
+            logger.info(f"Using collection: {training_collection_obj.alias} for inference")
+            split = training_test_data_split or (1.0, 0.0)
+            predictor.load_and_split_data(training_collection_obj, split=split)
         predictor.initialize_model()
     if export_model:
         logger.info(f"Exporting model to {export_model} in {model_format}")
         predictor.export_model(export_model, model_format)
-    if not query_obj:
+    if not query_obj and where_clause is None:
         if not export_model and not evaluation_count:
             raise ValueError("Query or evaluate must be specified if not exporting model")
     if evaluation_count:
@@ -651,6 +663,12 @@ def infer(
         result = predictor.derive(query_obj)
         dumped_obj = result.model_dump(exclude_none=True)
         write_output([dumped_obj], output_type, target=output)
+    if where_clause is not None:
+        predicted_objs = []
+        for query_obj in collection.find(where_clause).rows:
+            result = predictor.derive(query_obj)
+            predicted_objs.append(result.predicted_object)
+        write_output(predicted_objs, output_type, target=output)
 
 
 @cli.command()

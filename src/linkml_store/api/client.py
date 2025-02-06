@@ -22,6 +22,10 @@ HANDLE_MAP = {
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
 }
 
+SUFFIX_MAP = {
+    "ddb": "duckdb:///{path}",
+}
+
 
 class Client:
     """
@@ -198,6 +202,12 @@ class Client:
         :return:
         """
         if ":" not in handle:
+            if alias is None:
+                alias = handle
+            suffix = handle.split(".")[-1]
+            if suffix in SUFFIX_MAP:
+                handle = SUFFIX_MAP[suffix].format(path=handle)
+        if ":" not in handle:
             scheme = handle
             handle = None
             if alias is None:
@@ -220,7 +230,9 @@ class Client:
         if not alias:
             alias = handle
         if not self._databases:
+            logger.info("Initializing databases")
             self._databases = {}
+        logger.info(f"Attaching {alias}")
         self._databases[alias] = db
         db.parent = self
         if db.alias:
@@ -263,8 +275,9 @@ class Client:
             self._databases[name] = db
         if name not in self._databases:
             if create_if_not_exists:
-                logger.info(f"Creating database: {name}")
-                self.attach_database(name, **kwargs)
+                logger.info(f"Creating/attaching database: {name}")
+                db = self.attach_database(name, **kwargs)
+                name = db.alias
             else:
                 raise ValueError(f"Database {name} does not exist")
         db = self._databases[name]

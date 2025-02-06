@@ -20,7 +20,7 @@ DEFAULT_NUM_EXAMPLES = 20
 DEFAULT_MMR_RELEVANCE_FACTOR = 0.8
 
 SYSTEM_PROMPT = """
-You are a {llm_config.role}, your task is to inference the YAML
+You are a {llm_config.role}, your task is to infer the YAML
 object output given the YAML object input. I will provide you
 with a collection of examples that will provide guidance both
 on the desired structure of the response, as well as the kind
@@ -130,23 +130,34 @@ class RAGInferenceEngine(InferenceEngine):
         else:
             if not self.rag_collection.indexers:
                 raise ValueError("RAG collection must have an indexer attached")
+            logger.info(f"Searching {self.rag_collection.alias} for examples for: {query_text}")
             rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm",
                                             mmr_relevance_factor=mmr_relevance_factor)
             examples = rs.rows
+            logger.info(f"Found {len(examples)} examples")
             if not examples:
                 raise ValueError(f"No examples found for {query_text}; size = {self.rag_collection.size()}")
         prompt_clauses = []
-        query_obj = select_nested(object, feature_attributes)
+        this_feature_attributes = feature_attributes
+        if not this_feature_attributes:
+            this_feature_attributes = list(set(object.keys()) - set(target_attributes))
+        query_obj = select_nested(object, this_feature_attributes)
         query_text = self.object_to_text(query_obj)
         for example in examples:
-            input_obj = select_nested(example, feature_attributes)
+            this_feature_attributes = feature_attributes
+            if not this_feature_attributes:
+                this_feature_attributes = list(set(example.keys()) - set(target_attributes))
+            if not this_feature_attributes:
+                raise ValueError(f"No feature attributes found in example {example}")
+            input_obj = select_nested(example, this_feature_attributes)
             input_obj_text = self.object_to_text(input_obj)
             if input_obj_text == query_text:
-                raise ValueError(
-                    f"Query object {query_text} is the same as example object {input_obj_text}\n"
-                    "This indicates possible test data leakage\n."
-                    "TODO: allow an option that allows user to treat this as a basic lookup\n"
-                )
+                continue
+                #raise ValueError(
+                #    f"Query object {query_text} is the same as example object {input_obj_text}\n"
+                #    "This indicates possible test data leakage\n."
+                #    "TODO: allow an option that allows user to treat this as a basic lookup\n"
+                #)
             output_obj = select_nested(example, target_attributes)
             prompt_clause = (
                 "---\nExample:\n" f"## INPUT:\n{input_obj_text}\n" f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
@@ -169,7 +180,7 @@ class RAGInferenceEngine(InferenceEngine):
                                        encoding=encoding, token_limit=token_limit,
                                        additional_text=system_prompt)
         logger.info(f"Prompt: {prompt}")
-        response = model.prompt(prompt, system_prompt)
+        response = model.prompt(prompt, system=system_prompt)
         yaml_str = response.text()
         logger.info(f"Response: {yaml_str}")
         predicted_object = self._parse_yaml_payload(yaml_str, strict=True)
