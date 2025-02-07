@@ -100,3 +100,18 @@ def get_token_limit(model_name: str) -> int:
         if model in model_name:
             return token_limit
     return 4096
+
+
+def parse_yaml_payload(yaml_str: str, strict=False) -> Optional[dict]:
+    import yaml
+    if "```" in yaml_str:
+        yaml_str = yaml_str.split("```")[1].strip()
+        if yaml_str.startswith("yaml"):
+            yaml_str = yaml_str[4:].strip()
+    try:
+        return yaml.safe_load(yaml_str)
+    except Exception as e:
+        if strict:
+            raise e
+        logger.error(f"Error parsing YAML: {yaml_str}\n{e}")
+        return None

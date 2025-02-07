@@ -1,0 +1,111 @@
+name: uniprot-comments
+id: http://example.org/uniprot-comments
+imports:
+- linkml:types
+prefixes:
+  linkml: https://w3id.org/linkml/
+  up: http://example.org/tuniprot-comments
+default_prefix: up
+default_range: string
+classes:
+  Entry:
+    attributes:
+      id:
+        identifier: true
+      category:
+        range: CommentCategory
+      text:
+        description: The text of the comment
+
+enums:
+  CommentCategory:
+    permissible_values:
+      FUNCTION_DISPUTED:
+        description: A caution indicating that a previously reported function has been challenged or disproven in subsequent studies; may warrant GO NOT annotation
+        examples:
+          - value: FUNCTION_DISPUTED
+            description: "Originally described for its in vitro hydrolytic activity towards dGMP, dAMP and dIMP. However, this was not confirmed in vivo"
+
+      FUNCTION_PREDICTION_ONLY:
+        description: A caution indicating function is based only on computational prediction or sequence similarity
+        examples:
+          - value: FUNCTION_PREDICTION_ONLY
+            description: "Predicted to be involved in X based on sequence similarity"
+
+      FUNCTION_LACKS_EVIDENCE:
+        description: A caution indicating insufficient experimental evidence to support predicted function
+        examples:
+          - value: FUNCTION_LACKS_EVIDENCE
+            description: "In contrast to other Macro-domain containing proteins, lacks ADP-ribose glycohydrolase activity"
+
+      FUNCTION_DEBATED:
+        description: A caution about ongoing scientific debate regarding function; differs from DISPUTED in lacking clear evidence against
+        examples:
+          - value: FUNCTION_DEBATED
+            description: "Was initially thought to act as a major regulator of cardiac hypertrophy... However, while PDE5A regulates nitric-oxide-generated cGMP, nitric oxide signaling is often depressed by heart disease, limiting its effect"
+
+      LOCALIZATION_DISPUTED:
+        description: A caution about conflicting or uncertain cellular localization evidence
+        examples:
+          - value: LOCALIZATION_DISPUTED
+            description: "Cellular localization remains to be finally defined. While most authors have deduced a localization at the basolateral side, other studies demonstrated an apical localization"
+
+      NAMING_CONFUSION:
+        description: A caution about potential confusion with similarly named proteins or historical naming issues
+        examples:
+          - value: NAMING_CONFUSION
+            description: "This protein should not be confused with the conventional myosin-1 (MYH1);Was termed importin alpha-4"
+
+      GENE_COPY_NUMBER:
+        description: A caution about gene duplication or copy number that might affect interpretation
+        examples:
+          - value: GENE_COPY_NUMBER
+            description: "Maps to a duplicated region on chromosome 15; the gene is present in at least 3 almost identical copies"
+
+      EXPRESSION_MECHANISM_UNCLEAR:
+        description: A caution about unclear or unusual mechanisms of gene expression or protein production
+        examples:
+          - value: EXPRESSION_MECHANISM_UNCLEAR
+            description: "This peptide has been shown to be biologically active but is the product of a mitochondrial gene. The mechanisms allowing the production and secretion of the peptide remain unclear"
+
+      SEQUENCE_FEATURE_MISSING:
+        description: A caution about missing or unexpected sequence features that might affect function
+        examples:
+          - value: SEQUENCE_FEATURE_MISSING
+            description: "No predictable signal peptide"
+
+      SPECIES_DIFFERENCE:
+        description: A caution about significant functional or property differences between orthologs
+        examples:
+          - value: SPECIES_DIFFERENCE
+            description: "Affinity and capacity of the transporter for endogenous substrates vary among orthologs. For endogenous compounds such as dopamine, histamine, serotonin and thiamine, mouse ortholog display higher affinity"
+
+      PUBLICATION_CONFLICT:
+        description: A caution about conflicting published evidence or interpretation
+        examples:
+          - value: PUBLICATION_CONFLICT
+            description: "Although initially reported to transport carnitine across the hepatocyte membrane, another study was unable to verify this finding"
+            
+      CLAIMS_RETRACTED:
+        description: A caution about function claims that were retracted or withdrawn
+        examples:
+          - value: CLAIMS_RETRACTED
+            description: "Has been reported to enhance netrin-induced phosphorylation of PAK1 and FYN... This article has been withdrawn by the authors"
+
+      PROTEIN_IDENTITY:
+        description: A caution about uncertainty in the identity or existence of distinct protein products
+        examples:
+          - value: PROTEIN_IDENTITY
+            description: "It is not known whether the so-called human ASE1 and human CAST proteins represent two sides of a single gene product"
+
+      FUNCTION_UNCERTAIN_INITIATION:
+        description: A caution about uncertainty in translation initiation site
+        examples:
+          - value: FUNCTION_UNCERTAIN_INITIATION
+            description: "It is uncertain whether Met-1 or Met-37 is the initiator"
+
+      PSEUDOGENE_STATUS:
+        description: A caution about whether the gene encodes a protein
+        examples:
+          - value: PSEUDOGENE_STATUS
+            description: "Could be the product of a pseudogene"
