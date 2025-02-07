@@ -10,13 +10,13 @@ install:
 	poetry install --no-interaction --all-extras
 
 pytest:
-	$(RUN) pytest -m "not integration"
+	$(RUN) pytest -m "not integration"  tests
 
 pytest-neo4j:
 	$(RUN) pytest -k only_neo4j
 
 pytest-core:
-	$(RUN) pytest
+	$(RUN) pytest tests
 
 pytest-minimal:
 	$(RUN) pytest tests/test_api/test_filesystem_adapter.py
