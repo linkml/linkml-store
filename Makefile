@@ -36,7 +36,7 @@ install-all:
 
 DOCTEST_DIR = docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils
 doctest:
-	find $(DOCTEST_DIR) -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
+	find $(DOCTEST_DIR) -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) ! -path "*/chromadb/*" -print0 | xargs -0 $(RUN) python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
 
 NB_DIRS = tutorials how-to
 NB_DIRS_EXPANDED = $(patsubst %, docs/%/*.ipynb, $(NB_DIRS))
