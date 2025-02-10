@@ -210,6 +210,23 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
+    def upsert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+        """
+        Add one or more objects to the collection.
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("mongodb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.upsert(objs)
+        
+        :param objs:
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
     def _pre_query_hook(self, query: Optional[Query] = None, **kwargs):
         logger.info(f"Pre-query hook (state: {self._initialized}; Q= {query}")
         if not self._initialized:

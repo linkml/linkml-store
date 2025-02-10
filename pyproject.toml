@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linkml-store"
-version = "0.0.0"
+version = "0.2.5.post9.dev0+29fcfc4"
 description = "linkml-store"
 authors = ["Author 1 <author@org.org>"]
 license = "MIT"
@@ -100,7 +100,7 @@ linkml-store = "linkml_store.cli:cli"
 linkml-store-api = "linkml_store.webapi.main:start"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 style = "pep440"
 
