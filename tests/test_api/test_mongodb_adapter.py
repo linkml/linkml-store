@@ -46,7 +46,6 @@ def mongodb_collection(mongodb_client):
     if collection_name not in db.list_collection_names():
         db.create_collection(collection_name)
 
-    # Correctly initialize MongoDBCollection by passing collection name
     collection = MongoDBCollection(name=collection_name, parent=db)
 
     yield collection
@@ -75,15 +74,12 @@ def test_upsert_update(mongodb_collection):
     """
     Test that the upsert method updates an existing document while preserving unchanged fields.
     """
-    # Insert initial document
+
     initial_obj = {"_id": "2", "name": "Bob", "age": 30, "occupation": "Builder"}
     mongodb_collection.mongo_collection.insert_one(initial_obj)
 
-    # Upsert with an update (modifying age only)
     updated_obj = {"_id": "2", "age": 35}
     mongodb_collection.upsert(updated_obj, filter_fields=["_id"], update_fields=["age"])
-
-    # Verify that the document was updated correctly
     result = mongodb_collection.mongo_collection.find_one({"_id": "2"})
     assert result is not None
     assert result["_id"] == "2"
@@ -98,13 +94,8 @@ def test_insert_and_query(handle):
     """
     Test inserting and querying documents in MongoDB.
     """
-    # Create a MongoDBDatabase instance
     db = MongoDBDatabase(handle=handle)
-
-    # Create a collection
     collection = db.create_collection("test_collection", recreate_if_exists=True)
-
-    # Insert multiple documents
     documents = [
         {
             "name": "Alice",
@@ -144,11 +135,8 @@ def test_insert_and_query(handle):
 
     query_result = collection.find()
     assert query_result.num_rows == len(documents)
-
-    # Query the collection
     query_result = collection.find({"age": {"$gte": 30}})
 
-    # Assert the query results
     assert query_result.num_rows == 2
     assert len(query_result.rows) == 2
     assert query_result.rows[0]["name"] == "Bob"

@@ -51,7 +51,6 @@ def test_insert_and_query(fmt):
     assert query_result.rows[0]["name"] == "Alice"
     assert query_result.rows[1]["name"] == "Jie"
     assert set(query_result.rows[0].keys()) == {"name", "age", "occupation"}
-
     query_result = collection.find({"age": {"$gte": 30}})
 
     # Assert the query results
