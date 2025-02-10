@@ -38,6 +38,19 @@ jobs:
         uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
-        
+
+      - name: Wait for MongoDB to be Ready
+        run: |
+          for i in {1..10}; do
+            if mongosh --eval "db.runCommand({ ping: 1 })"; then
+              echo "MongoDB is ready!"
+              exit 0
+            fi
+            echo "Waiting for MongoDB to start..."
+            sleep 5
+          done
+          echo "MongoDB failed to start"
+          exit 1
+
       - name: Test with pytest and generate coverage file
         run: poetry run pytest -m "not integration and not neo4j" --ignore=src/linkml_store/inference/implementations/rag_inference_engine.py tests

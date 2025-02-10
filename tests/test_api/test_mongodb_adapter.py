@@ -3,15 +3,19 @@
 import pytest
 import yaml
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
+from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from pymongo import MongoClient
-
 
 @pytest.fixture(scope="module")
 def mongodb_client():
-    client = MongoClient("mongodb://localhost:27017")
-    yield client
-    client.close()
+    """Fixture to provide a MongoDB client, skipping tests if MongoDB is unavailable."""
+    try:
+        client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)  # 2s timeout
+        client.admin.command("ping")  # Check if MongoDB is running
+    except Exception:
+        pytest.skip("MongoDB is not available. Skipping tests.")
 
+    yield
 
 @pytest.fixture(scope="function")
 def mongodb_database(mongodb_client):
