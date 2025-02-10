@@ -210,7 +210,10 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
-    def upsert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+    def upsert(self,
+               objs: Union[OBJECT, List[OBJECT]],
+               filter_fields: List[str],
+               update_fields: Union[List[str], None] = None, **kwargs):
         """
         Add one or more objects to the collection.
 
@@ -222,7 +225,10 @@ class Collection(Generic[DatabaseType]):
         >>> collection.upsert(objs)
 
         :param objs:
+        :param filter_fields: List of field names to use as the filter for matching existing collections.
+        :param update_fields: List of field names to include in the update. If None, all fields are updated.
         :param kwargs:
+
         :return:
         """
         raise NotImplementedError
@@ -234,7 +240,7 @@ class Collection(Generic[DatabaseType]):
         This is called before a query is executed. It is used to materialize derivations and indexes.
         :param query:
         :param kwargs:
-        :return
+        :return:
         """
         logger.debug(f"Pre-query hook (state: {self._initialized}; Q= {query}")  # if logging.info, this is very noisy.
         if not self._initialized:
