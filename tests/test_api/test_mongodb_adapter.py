@@ -19,6 +19,50 @@ def mongodb_database(mongodb_client):
     yield db
     db.drop_collection("test_collection")
 
+@pytest.fixture(scope="function")
+def mongodb_collection(mongodb_client):
+    db = mongodb_client["test_db"]
+    collection = db["test_collection"]
+    collection.delete_many({})  # Ensure a clean slate
+    yield MongoDBCollection(collection)
+    collection.drop()
+
+def test_upsert_insert(mongodb_collection):
+    """
+    Test that the upsert method inserts a new document if it does not exist.
+    """
+    obj = {"_id": "1", "name": "Alice", "age": 25, "occupation": "Engineer"}
+
+    # Upsert operation: should insert because no document with _id=1 exists
+    mongodb_collection.upsert(obj, filter_fields=["_id"])
+
+    # Check if the document exists in the collection
+    result = mongodb_collection.mongo_collection.find_one({"_id": "1"})
+    assert result is not None
+    assert result["name"] == "Alice"
+    assert result["age"] == 25
+    assert result["occupation"] == "Engineer"
+
+def test_upsert_update(mongodb_collection):
+    """
+    Test that the upsert method updates an existing document while preserving unchanged fields.
+    """
+    # Insert initial document
+    initial_obj = {"_id": "2", "name": "Bob", "age": 30, "occupation": "Builder"}
+    mongodb_collection.mongo_collection.insert_one(initial_obj)
+
+    # Upsert with an update (modifying age only)
+    updated_obj = {"_id": "2", "age": 35}
+    mongodb_collection.upsert(updated_obj, filter_fields=["_id"], update_fields=["age"])
+
+    # Verify that the document was updated correctly
+    result = mongodb_collection.mongo_collection.find_one({"_id": "2"})
+    assert result is not None
+    assert result["_id"] == "2"
+    assert result["age"] == 35  # Should be updated
+    assert result["name"] == "Bob"  # Should remain unchanged
+    assert result["occupation"] == "Builder"  # Should remain unchanged
+
 
 @pytest.mark.parametrize("handle", ["mongodb://localhost:27017/test_db", None, "mongodb"])
 @pytest.mark.integration
