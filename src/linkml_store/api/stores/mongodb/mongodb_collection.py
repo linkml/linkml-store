@@ -53,16 +53,7 @@ class MongoDBCollection(Collection):
 
         :params: objs (Union[Dict[str, Any], List[Dict[str, Any]]]): The document(s) to insert or update.
         :params: filter_fields (List[str]): List of field names to use as the filter for matching existing documents.
-        :params: update_fields (Union[List[str], None]): List of field names to include in the update. If None, all fields are
-        updated.
-
-        Example usage:
-        ```python
-        obj = {"_id": "123", "name": "Alice", "age": 30, "height": 5.5}
-        collection.upsert(obj, filter_fields=["_id"], update_fields=["name", "age"])
-        ```
-
-        This will upsert a document, matching by `_id` and updating only `name` and `age`.
+        :params: update_fields (Union[List[str], None]): List of field names to include in the update. If None, all fields are updated.
         """
         if not isinstance(objs, list):
             objs = [objs]
@@ -73,8 +64,11 @@ class MongoDBCollection(Collection):
             if not filter_criteria:
                 raise ValueError("At least one valid filter field must be present in each object.")
 
-            # Determine update fields
-            update_data = {field: obj[field] for field in update_fields if field in obj and obj[field] is not None}
+            # ✅ Handle None for update_fields: Update all fields if None
+            if update_fields is None:
+                update_data = {k: v for k, v in obj.items() if v is not None}
+            else:
+                update_data = {field: obj[field] for field in update_fields if field in obj and obj[field] is not None}
 
             # Use MongoDB's $set operator to update only the specified fields
             update_operation = {"$set": update_data}

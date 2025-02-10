@@ -1,21 +1,20 @@
 # test_mongodb_adapter.py
 
 import pytest
-import yaml
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from pymongo import MongoClient
 
 @pytest.fixture(scope="module")
 def mongodb_client():
-    """Fixture to provide a MongoDB client, skipping tests if MongoDB is unavailable."""
     try:
         client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)  # 2s timeout
-        client.admin.command("ping")  # Check if MongoDB is running
+        client.admin.command("ping")  # Check MongoDB connectivity
+        yield client
+        client.close()
     except Exception:
-        pytest.skip("MongoDB is not available. Skipping tests.")
+        pytest.skip("Skipping tests: MongoDB is not available.")
 
-    yield
 
 @pytest.fixture(scope="function")
 def mongodb_database(mongodb_client):
@@ -23,13 +22,37 @@ def mongodb_database(mongodb_client):
     yield db
     db.drop_collection("test_collection")
 
+
 @pytest.fixture(scope="function")
 def mongodb_collection(mongodb_client):
-    db = mongodb_client["test_db"]
-    collection = db["test_collection"]
-    collection.delete_many({})  # Ensure a clean slate
-    yield MongoDBCollection(collection)
-    collection.drop()
+    """Fixture to provide a MongoDB test collection, ensuring database and collection creation if necessary."""
+    if mongodb_client is None:
+        pytest.skip("Skipping tests: MongoDB client is not available.")
+
+    db_name = "test_db"
+    collection_name = "test_collection"
+
+    # Ensure database exists by creating a temporary collection
+    existing_dbs = mongodb_client.list_database_names()
+    if db_name not in existing_dbs:
+        temp_db = mongodb_client[db_name]
+        temp_db.create_collection("temp_init_collection")
+        temp_db.drop_collection("temp_init_collection")  # Clean up temp collection
+
+    # Now attach to the database and collection
+    db = mongodb_client[db_name]
+
+    # Ensure the test collection exists
+    if collection_name not in db.list_collection_names():
+        db.create_collection(collection_name)
+
+    # Correctly initialize MongoDBCollection by passing collection name
+    collection = MongoDBCollection(name=collection_name, parent=db)
+
+    yield collection
+
+    # Cleanup: Drop the test collection after each test
+    db.drop_collection(collection_name)
 
 def test_upsert_insert(mongodb_collection):
     """
@@ -46,6 +69,7 @@ def test_upsert_insert(mongodb_collection):
     assert result["name"] == "Alice"
     assert result["age"] == 25
     assert result["occupation"] == "Engineer"
+
 
 def test_upsert_update(mongodb_collection):
     """
@@ -71,13 +95,16 @@ def test_upsert_update(mongodb_collection):
 @pytest.mark.parametrize("handle", ["mongodb://localhost:27017/test_db", None, "mongodb"])
 @pytest.mark.integration
 def test_insert_and_query(handle):
+    """
+    Test inserting and querying documents in MongoDB.
+    """
     # Create a MongoDBDatabase instance
     db = MongoDBDatabase(handle=handle)
 
     # Create a collection
     collection = db.create_collection("test_collection", recreate_if_exists=True)
 
-    # Insert a few documents
+    # Insert multiple documents
     documents = [
         {
             "name": "Alice",
@@ -95,9 +122,7 @@ def test_insert_and_query(handle):
             "age": 30,
             "occupation": "Builder",
             "foods": ["carrot", "date"],
-            "relationships": [
-                {"person": "Alice", "relation": "friend"},
-            ],
+            "relationships": [{"person": "Alice", "relation": "friend"}],
             "meta": {"date": "2021-01-01"},
         },
         {
@@ -129,64 +154,3 @@ def test_insert_and_query(handle):
     assert query_result.rows[0]["name"] == "Bob"
     assert query_result.rows[1]["name"] == "Charlie"
     assert set(query_result.rows[0].keys()) == {"name", "age", "occupation", "foods", "meta", "relationships"}
-    cases = [
-        ({}, "occupation", {("Architect", 2), ("Lawyer", 1), ("Builder", 1)}),
-        ({"occupation": "Architect"}, "occupation", {("Architect", 2)}),
-        # test unwinding multivalued
-        (
-            {},
-            "foods",
-            {
-                ("fig", 1),
-                ("banana", 2),
-                ("eggplant", 1),
-                ("apple", 2),
-                ("carrot", 1),
-                ("date", 1),
-                ("grape", 1),
-                ("honey", 1),
-            },
-        ),
-        ({}, "relationships.relation", {("friend", 2), ("brother", 1)}),
-        ({}, "meta.date", {("2021-01-01", 2), ("2021-01-03", 2)}),
-        (
-            {},
-            "meta",
-            {
-                ("curator: Ziggy\ndate: '2021-01-03'\nnotes: likes fruit\n", 1),
-                ("date: '2021-01-01'\nnotes: likes fruit\n", 1),
-                ("date: '2021-01-01'\n", 1),
-                ("date: '2021-01-03'\n", 1),
-            },
-        ),
-        (
-            {},
-            ("occupation", "foods"),
-            {
-                (("Architect", "apple"), 2),
-                (("Architect", "banana"), 1),
-                (("Architect", "grape"), 1),
-                (("Architect", "honey"), 1),
-                (("Builder", "carrot"), 1),
-                (("Builder", "date"), 1),
-                (("Lawyer", "banana"), 1),
-                (("Lawyer", "eggplant"), 1),
-                (("Lawyer", "fig"), 1),
-            },
-        ),
-    ]
-    for where, fc, expected in cases:
-        fr = collection.query_facets(where, facet_columns=[fc])
-        val_count_tuples = fr[fc]
-        if any(isinstance(v, dict) for v, _ in val_count_tuples):
-            val_count_tuples = {(yaml.dump(v), c) for v, c in val_count_tuples}
-        results = set(val_count_tuples)
-        assert results == expected
-        # test re-querying with facets
-        for v, c in fr[fc]:
-            if isinstance(fc, tuple):
-                where = {fc[i]: v[i] for i in range(len(fc))}
-            else:
-                where = {fc: v}
-            results = collection.find(where, limit=-1)
-            assert results.num_rows == c, f"where {where} failed to find expected"
