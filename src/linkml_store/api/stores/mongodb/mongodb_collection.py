@@ -71,15 +71,12 @@ class MongoDBCollection(Collection):
 
                 if obj in indexed_fields:  # If this field is already indexed
                     field_exists = True
-                    index_to_drop = index_name_existing
+                    index_to_drop = index_name_existing if replace else None
 
-            # Drop the index if replace=True
-            if replace:
+            # Drop the index if replace=True and index_to_drop is valid
+            if index_to_drop:
                 self.mongo_collection.drop_index(index_to_drop)
                 logging.info(f"Dropped existing index: {index_to_drop}")
-            else:
-                index_name = index_name or f"index_{obj}"
-                logging.info(f"Index already exists and replace is false: {index_name}")
 
             # Create the new index only if it doesn't exist or was dropped
             if not field_exists or replace:
