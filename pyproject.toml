@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "linkml-store"
-version = "0.2.5.post9.dev0+29fcfc4"
+version = "0.0.0
 description = "linkml-store"
 authors = ["Author 1 <author@org.org>"]
 license = "MIT"
