@@ -220,7 +220,7 @@ class Collection(Generic[DatabaseType]):
         >>> collection = db.create_collection("Person")
         >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
         >>> collection.upsert(objs)
-        
+
         :param objs:
         :param kwargs:
         :return:
@@ -228,7 +228,15 @@ class Collection(Generic[DatabaseType]):
         raise NotImplementedError
 
     def _pre_query_hook(self, query: Optional[Query] = None, **kwargs):
-        logger.info(f"Pre-query hook (state: {self._initialized}; Q= {query}")
+        """
+        Pre-query hook.
+
+        This is called before a query is executed. It is used to materialize derivations and indexes.
+        :param query:
+        :param kwargs:
+        :return
+        """
+        logger.debug(f"Pre-query hook (state: {self._initialized}; Q= {query}")  # if logging.info, this is very noisy.
         if not self._initialized:
             self._materialize_derivations()
             self._initialized = True
