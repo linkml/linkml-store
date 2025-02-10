@@ -1,6 +1,8 @@
 # test_mongodb_adapter.py
 
 import pytest
+import yaml
+
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from pymongo import MongoClient

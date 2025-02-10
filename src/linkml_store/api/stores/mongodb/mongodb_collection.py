@@ -64,7 +64,7 @@ class MongoDBCollection(Collection):
             if not filter_criteria:
                 raise ValueError("At least one valid filter field must be present in each object.")
 
-            # ✅ Handle None for update_fields: Update all fields if None
+            # Handle None for update_fields: Update all fields if None
             if update_fields is None:
                 update_data = {k: v for k, v in obj.items() if v is not None}
             else:
