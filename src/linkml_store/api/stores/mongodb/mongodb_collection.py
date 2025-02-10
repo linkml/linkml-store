@@ -41,6 +41,50 @@ class MongoDBCollection(Collection):
             del obj["_id"]
         self._post_insert_hook(objs)
 
+    def upsert(
+            self,
+            objs: Union[Dict[str, Any], List[Dict[str, Any]]],
+            filter_fields: List[str],
+            update_fields: Union[List[str], None] = None,
+            **kwargs
+    ):
+        """
+        Upsert one or more documents into the MongoDB collection.
+
+        :params: objs (Union[Dict[str, Any], List[Dict[str, Any]]]): The document(s) to insert or update.
+        :params: filter_fields (List[str]): List of field names to use as the filter for matching existing documents.
+        :params: update_fields (Union[List[str], None]): List of field names to include in the update. If None, all fields are
+        updated.
+
+        Example usage:
+        ```python
+        obj = {"_id": "123", "name": "Alice", "age": 30, "height": 5.5}
+        collection.upsert(obj, filter_fields=["_id"], update_fields=["name", "age"])
+        ```
+
+        This will upsert a document, matching by `_id` and updating only `name` and `age`.
+        """
+        if not isinstance(objs, list):
+            objs = [objs]
+
+        for obj in objs:
+            # Ensure filter fields exist in the object
+            filter_criteria = {field: obj[field] for field in filter_fields if field in obj}
+            if not filter_criteria:
+                raise ValueError("At least one valid filter field must be present in each object.")
+
+            # Determine update fields
+            update_data = {field: obj[field] for field in update_fields if field in obj and obj[field] is not None}
+
+            # Use MongoDB's $set operator to update only the specified fields
+            update_operation = {"$set": update_data}
+
+            self.mongo_collection.update_one(
+                filter=filter_criteria,
+                update=update_operation,
+                upsert=True,
+            )
+
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
         limit = limit or query.limit
