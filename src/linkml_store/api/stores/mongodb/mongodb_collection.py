@@ -77,14 +77,14 @@ class MongoDBCollection(Collection):
             # Drop the index if replace=True and index_to_drop is valid
             if index_to_drop:
                 self.mongo_collection.drop_index(index_to_drop)
-                logging.info(f"Dropped existing index: {index_to_drop}")
+                logging.debug(f"Dropped existing index: {index_to_drop}")
 
             # Create the new index only if it doesn't exist or was dropped
             if not field_exists or replace:
                 self.mongo_collection.create_index(obj, name=index_name, unique=unique)
-                logging.info(f"Created new index: {index_name} on field {obj}, unique={unique}")
+                logging.debug(f"Created new index: {index_name} on field {obj}, unique={unique}")
             else:
-                logging.info(f"Index already exists for field {obj}, skipping creation.")
+                logging.debug(f"Index already exists for field {obj}, skipping creation.")
 
     def upsert(self,
                objs: Union[OBJECT, List[OBJECT]],
@@ -116,13 +116,13 @@ class MongoDBCollection(Collection):
 
                 if updates:
                     self.mongo_collection.update_one(filter_criteria, {"$set": updates})
-                    logging.info(f"Updated existing document: {filter_criteria} with {updates}")
+                    logging.debug(f"Updated existing document: {filter_criteria} with {updates}")
                 else:
-                    logging.info(f"No changes detected for document: {filter_criteria}. Skipping update.")
+                    logging.debug(f"No changes detected for document: {filter_criteria}. Skipping update.")
             else:
                 # Insert a new document
                 self.mongo_collection.insert_one(obj)
-                logging.info(f"Inserted new document: {obj}")
+                logging.debug(f"Inserted new document: {obj}")
 
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
