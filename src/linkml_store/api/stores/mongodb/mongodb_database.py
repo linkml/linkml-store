@@ -3,6 +3,7 @@
 import logging
 from pathlib import Path
 from typing import Optional, Union
+from urllib.parse import urlparse
 
 from pymongo import MongoClient
 from pymongo.database import Database as NativeDatabase
@@ -38,10 +39,13 @@ class MongoDBDatabase(Database):
     @property
     def _db_name(self) -> str:
         if self.handle:
-            db = self.handle.split("/")[-1]
+            parsed_url = urlparse(self.handle)
+            path_parts = parsed_url.path.lstrip("/").split("?")[0].split("/")
+            print(path_parts)
+            db_name = path_parts[0] if path_parts else "default"
         else:
-            db = "default"
-        return db
+            db_name = "default"
+        return db_name
 
     @property
     def native_client(self) -> MongoClient:

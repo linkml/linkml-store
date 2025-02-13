@@ -35,7 +35,8 @@ SCHEMES = [
     # "mongodb://localhost:27017/test_db",
 ]
 # SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db"]
-SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db", f"file:{OUTPUT_DIR}/api_test_fs"]
+SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db", f"file:{OUTPUT_DIR}/api_test_fs",
+                          "mongodb://localhost:27017/test_db?authSource=test_db",]
 
 DEFAULT_DB = "default"
 
