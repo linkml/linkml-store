@@ -3,7 +3,7 @@ CODE = src/linkml_data_browser
 
 
 test:
-	{RUN} pytest -m "not integration and not neo4j" --ignore=src/linkml_store/inference/implementations/rag_inference_engine.py tests
+	${RUN} pytest -m "not integration and not neo4j" --ignore=src/linkml_store/inference/implementations/rag_inference_engine.py tests
 test-core: pytest-core doctest
 test-full: pytest-full doctest
 
