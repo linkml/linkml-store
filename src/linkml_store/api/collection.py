@@ -211,8 +211,39 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
+    def upsert(self,
+               objs: Union[OBJECT, List[OBJECT]],
+               filter_fields: List[str],
+               update_fields: Union[List[str], None] = None, **kwargs):
+        """
+        Add one or more objects to the collection.
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("mongodb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
+        >>> collection.upsert(objs)
+
+        :param objs:
+        :param filter_fields: List of field names to use as the filter for matching existing collections.
+        :param update_fields: List of field names to include in the update. If None, all fields are updated.
+        :param kwargs:
+
+        :return:
+        """
+        raise NotImplementedError
+
     def _pre_query_hook(self, query: Optional[Query] = None, **kwargs):
-        logger.info(f"Pre-query hook (state: {self._initialized}; Q= {query}")
+        """
+        Pre-query hook.
+
+        This is called before a query is executed. It is used to materialize derivations and indexes.
+        :param query:
+        :param kwargs:
+        :return:
+        """
+        logger.debug(f"Pre-query hook (state: {self._initialized}; Q= {query}")  # if logging.info, this is very noisy.
         if not self._initialized:
             self._materialize_derivations()
             self._initialized = True

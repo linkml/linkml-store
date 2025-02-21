@@ -24,7 +24,7 @@ black = { version=">=24.0.0", optional = true }
 ruff = { version=">=0.6.2", optional = true }
 llm = { version="*", optional = true }
 tiktoken = { version="*", optional = true }
-pymongo = { version="*", optional = true }
+pymongo = "^4.11"
 neo4j = { version="*", optional = true }
 py2neo = { version="*", optional = true }
 networkx = { version="*", optional = true }
@@ -100,7 +100,7 @@ linkml-store = "linkml_store.cli:cli"
 linkml-store-api = "linkml_store.webapi.main:start"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 style = "pep440"
 

@@ -38,6 +38,6 @@ jobs:
         uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
-        
+
       - name: Test with pytest and generate coverage file
         run: poetry run pytest -m "not integration and not neo4j" --ignore=src/linkml_store/inference/implementations/rag_inference_engine.py tests
