@@ -211,6 +211,26 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
+    def index (
+        self,
+        objs: Union[OBJECT, List[OBJECT]],
+        index_name: Optional[str] = None,
+        replace: bool = False,
+        unique: bool = False,
+        **kwargs,
+    ) -> None:
+        """
+        Index objects in the collection.
+
+        :param objs:
+        :param index_name:
+        :param replace: replace the index, or not
+        :param unique: boolean used to declare the index unique or not
+        :param kwargs:
+        :return:
+        """
+        raise NotImplementedError
+
     def upsert(self,
                objs: Union[OBJECT, List[OBJECT]],
                filter_fields: List[str],

@@ -41,19 +41,62 @@ class MongoDBCollection(Collection):
             del obj["_id"]
         self._post_insert_hook(objs)
 
-    def upsert(
-            self,
-            objs: Union[Dict[str, Any], List[Dict[str, Any]]],
-            filter_fields: List[str],
-            update_fields: Union[List[str], None] = None,
-            **kwargs
-    ):
+
+    def index(self,
+              objs: Union[OBJECT, List[OBJECT]],
+              index_name: Optional[str] = None,
+              replace: bool = False,
+              unique: bool = False,
+              **kwargs):
+        """
+        Create indexes on the collection.
+
+        :param objs: Field(s) to index.
+        :param index_name: Optional name for the index.
+        :param replace: If True, the index will be dropped and recreated.
+        :param unique: If True, creates a unique index (default: False).
+        """
+
+        if not isinstance(objs, list):
+            objs = [objs]
+
+        existing_indexes = self.mongo_collection.index_information()
+
+        for obj in objs:
+            field_exists = False
+            index_to_drop = None
+
+            # Extract existing index details
+            for index_name_existing, index_details in existing_indexes.items():
+                indexed_fields = [field[0] for field in index_details.get("key", [])]  # Extract field names
+
+                if obj in indexed_fields:  # If this field is already indexed
+                    field_exists = True
+                    index_to_drop = index_name_existing if replace else None
+
+            # Drop the index if replace=True and index_to_drop is valid
+            if index_to_drop:
+                self.mongo_collection.drop_index(index_to_drop)
+                logging.debug(f"Dropped existing index: {index_to_drop}")
+
+            # Create the new index only if it doesn't exist or was dropped
+            if not field_exists or replace:
+                self.mongo_collection.create_index(obj, name=index_name, unique=unique)
+                logging.debug(f"Created new index: {index_name} on field {obj}, unique={unique}")
+            else:
+                logging.debug(f"Index already exists for field {obj}, skipping creation.")
+
+    def upsert(self,
+               objs: Union[OBJECT, List[OBJECT]],
+               filter_fields: List[str],
+               update_fields: Optional[List[str]] = None,
+               **kwargs):
         """
         Upsert one or more documents into the MongoDB collection.
 
-        :params: objs (Union[Dict[str, Any], List[Dict[str, Any]]]): The document(s) to insert or update.
-        :params: filter_fields (List[str]): List of field names to use as the filter for matching existing documents.
-        :params: update_fields (Union[List[str], None]): List of field names to include in the update. If None, all fields are updated.
+        :param objs: The document(s) to insert or update.
+        :param filter_fields: List of field names to use as the filter for matching existing documents.
+        :param update_fields: List of field names to include in the update. If None, all fields are updated.
         """
         if not isinstance(objs, list):
             objs = [objs]
@@ -64,20 +107,22 @@ class MongoDBCollection(Collection):
             if not filter_criteria:
                 raise ValueError("At least one valid filter field must be present in each object.")
 
-            # Handle None for update_fields: Update all fields if None
-            if update_fields is None:
-                update_data = {k: v for k, v in obj.items() if v is not None}
+            # Check if a document already exists
+            existing_doc = self.mongo_collection.find_one(filter_criteria)
+
+            if existing_doc:
+                # Update only changed fields
+                updates = {key: obj[key] for key in update_fields if key in obj and obj[key] != existing_doc.get(key)}
+
+                if updates:
+                    self.mongo_collection.update_one(filter_criteria, {"$set": updates})
+                    logging.debug(f"Updated existing document: {filter_criteria} with {updates}")
+                else:
+                    logging.debug(f"No changes detected for document: {filter_criteria}. Skipping update.")
             else:
-                update_data = {field: obj[field] for field in update_fields if field in obj and obj[field] is not None}
-
-            # Use MongoDB's $set operator to update only the specified fields
-            update_operation = {"$set": update_data}
-
-            self.mongo_collection.update_one(
-                filter=filter_criteria,
-                update=update_operation,
-                upsert=True,
-            )
+                # Insert a new document
+                self.mongo_collection.insert_one(obj)
+                logging.debug(f"Inserted new document: {obj}")
 
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)

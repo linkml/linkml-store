@@ -55,6 +55,7 @@ def mongodb_collection(mongodb_client):
     # Cleanup: Drop the test collection after each test
     db.drop_collection(collection_name)
 
+
 def test_upsert_insert(mongodb_collection):
     """
     Test that the upsert method inserts a new document if it does not exist.
@@ -205,3 +206,38 @@ def test_insert_and_query(handle):
                 where = {fc: v}
             results = collection.find(where, limit=-1)
             assert results.num_rows == c, f"where {where} failed to find expected"
+
+
+@pytest.mark.parametrize("unique_flag", [False, True])
+def test_index_creation(mongodb_collection, unique_flag):
+    """Test the index creation method in MongoDBCollection with and without unique constraint."""
+
+    index_field = "test_field"
+    index_name = f"test_index_{'unique' if unique_flag else 'non_unique'}"
+    mongodb_collection.mongo_collection.drop_indexes()
+
+    # Ensure the collection is empty before creating a unique index
+    mongodb_collection.mongo_collection.delete_many({})
+
+    # Insert **unique, non-null** values for test_field to avoid duplicate key error
+    mongodb_collection.mongo_collection.insert_many([
+        {"_id": 1, "test_field": "value1"},
+        {"_id": 2, "test_field": "value2"},
+        {"_id": 3, "test_field": "value3"}
+    ])
+
+    # Create the index using the method with the unique flag
+    mongodb_collection.index(index_field, index_name=index_name, replace=True, unique=unique_flag)
+
+    # Retrieve indexes after creation
+    created_indexes = mongodb_collection.mongo_collection.index_information()
+
+    # Verify that the new index exists
+    assert index_name in created_indexes, f"Index {index_name} was not created"
+
+    # Check if the index is unique if requested
+    if unique_flag:
+        assert created_indexes[index_name]["unique"], f"Index {index_name} should be unique"
+    else:
+        assert "unique" not in created_indexes[index_name] or not created_indexes[index_name]["unique"], \
+            f"Index {index_name} should not be unique"
