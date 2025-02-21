@@ -276,14 +276,15 @@ class Database(ABC, Generic[CollectionType]):
 
         Examples:
 
-        >>> from linkml_store.api.client import Client
-        >>> client = Client()
-        >>> db = client.attach_database("duckdb", alias="test")
-        >>> collection = db.create_collection("Person", alias="persons")
-        >>> collection.alias
-        'persons'
-        >>> collection.target_class_name
-        'Person'
+            >>> from linkml_store.api.client import Client
+            >>> client = Client()
+            >>> db = client.attach_database("duckdb", alias="test")
+            >>> collection = db.create_collection("Person", alias="persons")
+            >>> collection.alias
+            'persons'
+
+            >>> collection.target_class_name
+            'Person'
 
         If alias is not provided, it defaults to the name of the type.
 
@@ -419,7 +420,7 @@ class Database(ABC, Generic[CollectionType]):
         >>> from linkml_store.api.client import Client
         >>> from linkml_store.api.queries import Query
         >>> client = Client()
-        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db = client.attach_database("duckdb", alias="test", recreate_if_exists=True)
         >>> collection = db.create_collection("Person")
         >>> collection.insert([{"id": "P1", "name": "John"}, {"id": "P2", "name": "Alice"}])
         >>> query = Query(from_table="Person", where_clause={"name": "John"})
@@ -451,7 +452,7 @@ class Database(ABC, Generic[CollectionType]):
 
         >>> from linkml_store.api.client import Client
         >>> client = Client()
-        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db = client.attach_database("duckdb", alias="test", recreate_if_exists=True)
         >>> collection = db.create_collection("Person", alias="persons")
         >>> collection.insert([{"id": "P1", "name": "John", "age_in_years": 25}])
         >>> schema_view = db.schema_view
@@ -721,7 +722,7 @@ class Database(ABC, Generic[CollectionType]):
 
         >>> from linkml_store.api.client import Client
         >>> client = Client()
-        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db = client.attach_database("duckdb", alias="test", recreate_if_exists=True)
         >>> db.import_database("tests/input/iris.csv", Format.CSV, collection_name="iris")
         >>> db.list_collection_names()
         ['iris']
@@ -741,7 +742,9 @@ class Database(ABC, Generic[CollectionType]):
                 # import into a test instance
                 tmp_handle = source_format.value
                 client = self.parent
-                tmp_db = client.attach_database(tmp_handle, alias="tmp")
+                tmp_alias = "tmp"
+                client.drop_database(tmp_alias, missing_ok=True)
+                tmp_db = client.attach_database(tmp_handle, alias=tmp_alias, recreate_if_exists=True)
                 # TODO: check for infinite recursion
                 tmp_db.import_database(location, source_format=source_format)
                 obj = {}

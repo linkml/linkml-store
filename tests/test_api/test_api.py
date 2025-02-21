@@ -65,6 +65,9 @@ EMPLOYED_AT = [
 
 
 def is_persistent(handle: str) -> bool:
+    #if "duckdb" in handle:
+    #    # NOTE: in previous versions of duckdb, in-memory databases were not persistent
+    #    return True
     return ".db" in handle or "mongodb" in handle or "file:" in handle
 
 
@@ -287,7 +290,8 @@ def test_export(handle, location, export_format):
         database = client2.get_database()
         # database = client.attach_database("mongodb://localhost:27017/test_db_tmp")
     else:
-        database = client.attach_database("duckdb")
+        database = client.attach_database("duckdb", recreate_if_exists=True)
+    print(f"Importing from {location} to {database.handle}")
     database.import_database(location, export_format)
     persons_coll = database.get_collection("persons")
     qr = persons_coll.find()
@@ -463,31 +467,36 @@ def test_induced_schema(handle, type_alias):
 
     TODO: test partial induction case where schema is implicit but class name is in config
 
-    :param handle:
-    :param type_alias:
+    :param handle: duckdb, mongodb, etc
+    :param type_alias: a tuple of (ClassName, alias)
     :return:
     """
     typ, alias = type_alias
     client = create_client(handle)
-    assert len(client.databases) == 1, "expected single database in fresh client"
+    assert len(client.databases) == 1, "expected single (default) database in fresh client"
     database = client.get_database()
     assert database is not None, "expected singleton to be retrieved without name"
     if not isinstance(database, MongoDBDatabase):
         assert len(database.list_collections()) == 0, "fresh database should have no collections"
     if alias:
+        # test the use of alias to refer to a collection
         collection = database.create_collection(typ, alias=alias, recreate_if_exists=True)
-        assert collection.alias == alias
-        assert collection.target_class_name == typ
+        assert collection.alias == alias, "expected alias to propagate from create_collection"
+        assert collection.target_class_name == typ, "expected target_class_name to be set"
     else:
+        # no alias set - the alias is equivalent to the class name (e.g. Person)
         collection = database.create_collection(typ, recreate_if_exists=True)
-        assert collection.alias == typ
-        assert collection.target_class_name == typ
-    assert len(database.list_collections()) == 1, "expected collection to be created"
+        assert collection.alias == typ, "expected alias to default to class name"
+        assert collection.target_class_name == typ, "expected target_class_name to be set"
+    assert len(database.list_collections()) == 1, "expected single collection to be created"
     assert (
         collection.class_definition() is None or not collection.class_definition().attributes
-    ), "no explicit schema and no data to induce from"
+    ), "no explicit schema and no data to induce a schema from"
     qr = collection.find()
-    assert qr.num_rows == 0, "database should be empty"
+    assert qr.num_rows == 0, "fresh database and fresh collection should be empty"
+    # --
+    # insert data (should allow induction of schema)
+    # --
     objs = [
         {"id": 1, "name": "n1"},
         {"id": 2, "name": "n2", "age_in_years": 30},
@@ -506,7 +515,7 @@ def test_induced_schema(handle, type_alias):
     assert (
         len(collection.parent.schema_view.schema.classes.keys()) == 1
     ), "expected single class to be initialized from data"
-    print(typ, alias, collection.target_class_name, collection.parent.schema_view.schema.classes.keys())
+    # print(typ, alias, collection.target_class_name, collection.parent.schema_view.schema.classes.keys())
     assert typ in collection.parent.schema_view.schema.classes.keys(), "name of class is collection name by default"
     assert (
         collection.parent.schema_view.schema.classes[typ].name == collection.target_class_name
@@ -559,7 +568,9 @@ def test_induced_schema(handle, type_alias):
     collection.delete_where({"age_in_years": 30})
     qr = collection.find()
     assert qr.num_rows == 0
-    # recreate
+    # --
+    # new client object,
+    # --
     client = create_client(handle, recreate_if_exists=False)
     assert len(client.databases) == 1
     database = client.get_database()

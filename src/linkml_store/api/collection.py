@@ -1,6 +1,7 @@
 """A structure for representing collections of similar objects."""
 
 import hashlib
+import json
 import logging
 from collections import defaultdict
 from pathlib import Path
@@ -536,7 +537,13 @@ class Collection(Generic[DatabaseType]):
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
         index_col = ix.index_field
         # TODO: optimize this for large indexes
-        vector_pairs = [(row, np.array(row[index_col], dtype=float)) for row in qr.rows]
+        def row2array(row):
+            v = row[index_col]
+            if isinstance(v, str):
+                # sqlite stores arrays as strings
+                v = json.loads(v)
+            return np.array(v, dtype=float)
+        vector_pairs = [(row, row2array(row)) for row in qr.rows]
         results = ix.search(query, vector_pairs, limit=limit, mmr_relevance_factor=mmr_relevance_factor, **kwargs)
         for r in results:
             del r[1][index_col]
