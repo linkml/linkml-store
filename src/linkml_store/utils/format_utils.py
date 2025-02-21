@@ -3,6 +3,7 @@ import gzip
 import io
 import json
 import logging
+import re
 import sys
 import tarfile
 from enum import Enum
@@ -31,10 +32,13 @@ class Format(Enum):
     TSV = "tsv"
     CSV = "csv"
     XML = "xml"
+    OBO = "obo"
+    PKL = "pkl"
     PYTHON = "python"
     PARQUET = "parquet"
     FORMATTED = "formatted"
     TABLE = "table"
+    XLSX = "xlsx"
     SQLDUMP_DUCKDB = "duckdb"
     SQLDUMP_POSTGRES = "postgres"
     DUMP_MONGODB = "mongodb"
@@ -67,6 +71,9 @@ class Format(Enum):
     def is_dump_format(self):
         return self in [Format.SQLDUMP_DUCKDB, Format.SQLDUMP_POSTGRES, Format.DUMP_MONGODB]
 
+    def is_binary_format(self):
+        return self in [Format.PARQUET, Format.XLSX]
+
     def is_xsv(self):
         return self in [Format.TSV, Format.CSV]
 
@@ -94,6 +101,26 @@ def load_objects_from_url(
         raise ValueError(f"No objects loaded from URL: {url}")
     return objs
 
+
+def clean_pandas_value(v):
+    """Clean a single value from pandas."""
+    import math
+
+    if isinstance(v, float):
+        if math.isnan(v) or math.isinf(v):
+            return None
+        return float(v)  # Ensures proper float type
+    return v
+
+
+def clean_nested_structure(obj):
+    """Recursively clean a nested structure of dicts/lists from pandas."""
+    if isinstance(obj, dict):
+        return {k: clean_nested_structure(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_nested_structure(item) for item in obj]  # Fixed: using 'item' instead of 'v'
+    else:
+        return clean_pandas_value(obj)
 
 def process_file(
     f: IO, format: Format, expected_type: Optional[Type] = None, header_comment_token: Optional[str] = None
@@ -128,6 +155,19 @@ def process_file(
         objs = list(reader)
     elif format == Format.XML:
         objs = xmltodict.parse(f.read())
+    elif format == Format.PKL:
+        objs = pd.read_pickle(f).to_dict(orient="records")
+    elif format == Format.XLSX:
+        xls = pd.ExcelFile(f)
+        objs = {sheet: clean_nested_structure(xls.parse(sheet).to_dict(orient="records")) for sheet in xls.sheet_names}
+    elif format == Format.OBO:
+        blocks = split_document(f.read(), "\n\n")
+        id_pattern = re.compile(r"id: (\S+)")
+        def get_id(block):
+            m = id_pattern.search(block)
+            return m.group(1) if m else None
+        objs = [{"id": get_id(block), "content": block} for block in blocks]
+        objs = [obj for obj in objs if obj["id"]]
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
 
@@ -167,6 +207,14 @@ def load_objects(
     if isinstance(file_path, Path):
         file_path = str(file_path)
 
+    for url_scheme in ["http", "https", "ftp"]:
+        if file_path.startswith(f"{url_scheme}://"):
+            return load_objects_from_url(
+                file_path,
+                format=format,
+                expected_type=expected_type,
+            )
+
     if isinstance(format, str):
         format = Format(format)
 
@@ -185,9 +233,9 @@ def load_objects(
     else:
         if Path(file_path).is_dir():
             raise ValueError(f"{file_path} is a dir, which is invalid for {format}")
-        mode = "rb" if format == Format.PARQUET or compression == "gz" else "r"
         open_func = gzip.open if compression == "gz" else open
         format = Format.guess_format(file_path) if not format else format
+        mode = "rb" if (format and format.is_binary_format()) or compression == "gz" else "r"
         with open_func(file_path, mode) if file_path != "-" else sys.stdin as f:
             if compression == "gz" and mode == "r":
                 f = io.TextIOWrapper(f)
@@ -343,3 +391,14 @@ def guess_format(path: str) -> Optional[Format]:
     :return: The guessed format.
     """
     return Format.guess_format(path)
+
+
+def split_document(doc: str, delimiter: str):
+    """
+    Split a document into parts based on a delimiter.
+
+    :param doc: The document to split.
+    :param delimiter: The delimiter.
+    :return: The parts of the document.
+    """
+    return doc.split(delimiter)
