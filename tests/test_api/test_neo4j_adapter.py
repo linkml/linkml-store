@@ -1,3 +1,19 @@
+"""
+Note that neo4j must be running for these tests to pass.
+
+Example:
+
+    .. code-block:: bash
+
+       docker run \
+          --name myneo4j \
+          --publish 7474:7474 --publish 7687:7687 \
+          --volume $HOME/neo4j/data/:/data \
+          --volume $HOME/neo4j/logs/:/logs \
+          -e NEO4J_AUTH=none \
+          neo4j
+
+"""
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.utils.schema_builder import SchemaBuilder

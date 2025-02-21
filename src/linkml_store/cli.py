@@ -186,7 +186,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
 
 
 @cli.command()
-@click.argument("files", type=click.Path(exists=True), nargs=-1)
+@click.argument("files", type=click.Path(), nargs=-1)
 @click.option("--replace/--no-replace", default=False, show_default=True, help="Replace existing objects")
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")

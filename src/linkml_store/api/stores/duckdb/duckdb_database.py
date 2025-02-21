@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import pandas as pd
 import sqlalchemy
@@ -14,7 +14,7 @@ from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
 from linkml_store.utils.format_utils import Format
-from linkml_store.utils.sql_utils import introspect_schema, query_to_sql
+from linkml_store.utils.sql_utils import introspect_schema, query_to_sql, where_clause_to_sql
 
 TYPE_MAP = {
     "VARCHAR": "string",
@@ -62,7 +62,7 @@ class DuckDBDatabase(Database):
     def engine(self) -> sqlalchemy.Engine:
         if not self._engine:
             handle = self.handle
-            if not handle.startswith("duckdb://") and not handle.startswith(":"):
+            if not handle.startswith("duckdb://") and not handle.startswith(":") and "://" not in handle:
                 handle = f"duckdb:///{handle}"
             if ":memory:" not in handle:
                 # TODO: investigate this; duckdb appears to be prematurely caching
@@ -70,6 +70,10 @@ class DuckDBDatabase(Database):
             else:
                 self._engine = sqlalchemy.create_engine(handle)
         return self._engine
+
+    @property
+    def _is_sqlite(self) -> bool:
+        return self.handle and self.handle.startswith("sqlite:")
 
     def commit(self, **kwargs):
         with self.engine.connect() as conn:
@@ -89,34 +93,60 @@ class DuckDBDatabase(Database):
             if not missing_ok:
                 raise FileNotFoundError(f"Database file not found: {path}")
 
-    def query(self, query: Query, **kwargs) -> QueryResult:
+    def _table_exists(self, table: str) -> bool:
+        if self._is_sqlite:
+            if table == "sqlite_master":
+                return True
+            meta_query = Query(
+                from_table="sqlite_master",
+                where_clause={
+                    #"type": "table",
+                    "name": table,
+                }
+            )
+        else:
+            if table.startswith("information_schema"):
+                return True
+            meta_query = Query(
+                from_table="information_schema.tables",
+                where_clause={
+                    "table_type": "BASE TABLE",
+                    "table_name": table,
+                }
+            )
+
+        qr = self.query(meta_query)
+        if qr.num_rows == 0:
+            logger.debug(f"Table {self.alias} not created yet")
+            return False
+        return True
+
+    def _json_encoded_cols(self, table_name: str) -> Optional[List[str]]:
         json_encoded_cols = []
-        if query.from_table:
-            if not query.from_table.startswith("information_schema"):
-                meta_query = Query(
-                    from_table="information_schema.tables", where_clause={"table_name": query.from_table}
-                )
-                qr = self.query(meta_query)
-                if qr.num_rows == 0:
-                    logger.debug(f"Table {query.from_table} not created yet")
-                    return QueryResult(query=query, num_rows=0, rows=[])
-            if not query.from_table.startswith("information_schema"):
-                sv = self.schema_view
-            else:
-                sv = None
+        if table_name:
+            if table_name.startswith("information_schema") or table_name.startswith("sqlite"):
+                return []
+            sv = self.schema_view
             if sv:
                 cd = None
                 for c in self._collections.values():
-                    # if c.name == query.from_table or c.metadata.alias == query.from_table:
-                    if c.alias == query.from_table or c.target_class_name == query.from_table:
+                    if c.alias == table_name or c.target_class_name == table_name:
                         cd = c.class_definition()
                         break
                 if cd:
                     for att in sv.class_induced_slots(cd.name):
                         if att.inlined or att.inlined_as_list:
                             json_encoded_cols.append(att.name)
+        return json_encoded_cols
+
+    def query(self, query: Query, **kwargs) -> QueryResult:
+        if not self._table_exists(query.from_table):
+            return QueryResult(query=query, num_rows=0, rows=[])
+        json_encoded_cols = self._json_encoded_cols(query.from_table)
+
         with self.engine.connect() as conn:
             count_query_str = text(query_to_sql(query, count=True))
+            logger.debug(f"count_query_str: {count_query_str}")
             num_rows = list(conn.execute(count_query_str))[0][0]
             logger.debug(f"num_rows: {num_rows}")
             query_str = query_to_sql(query, **kwargs)  # include offset, limit
@@ -167,6 +197,9 @@ class DuckDBDatabase(Database):
         logger.info(f"Inducing schema view for {self.metadata.handle} // {self}")
         sb = SchemaBuilder()
         schema = sb.schema
+        logger.info(f"Checking if {self.metadata.handle} is sqlite: {self._is_sqlite}")
+        if self._is_sqlite:
+            return SchemaView(schema)
         query = Query(from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE"})
         qr = self.query(query)
         logger.info(f"Found {qr.num_rows} information_schema.tables // {qr.rows}")

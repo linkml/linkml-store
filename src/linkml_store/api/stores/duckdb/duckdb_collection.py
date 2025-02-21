@@ -147,16 +147,22 @@ class DuckDBCollection(Collection):
         if self._table_created or self.metadata.is_prepopulated:
             logger.info(f"Already have table for: {cd.name}")
             return
-        query = Query(
-            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
-        )
-        qr = self.parent.query(query)
-        if qr.num_rows > 0:
+        if self.parent._table_exists(self.alias):
             logger.info(f"Table already exists for {cd.name}")
             self._table_created = True
             self._initialized = True
             self.metadata.is_prepopulated = True
             return
+        # query = Query(
+        #     from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
+        # )
+        # qr = self.parent.query(query)
+        # if qr.num_rows > 0:
+        #     logger.info(f"Table already exists for {cd.name}")
+        #     self._table_created = True
+        #     self._initialized = True
+        #     self.metadata.is_prepopulated = True
+        #     return
         logger.info(f"Creating table for {cd.name}")
         t = self._sqla_table(cd)
         ct = CreateTable(t)

@@ -5,7 +5,7 @@ import sqlalchemy
 import sqlalchemy.sql.sqltypes as sqlt
 from linkml_runtime.linkml_model import SchemaDefinition, SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, quoted_name
 
 from linkml_store.api.queries import Query
 
@@ -115,7 +115,13 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
         conditions = [cond for cond in where_clause_sql.split(" AND ") if not cond.startswith(f"{facet_column} ")]
         modified_where = " AND ".join(conditions)
 
+    def make_col_safe(col):
+        return '"' + quoted_name(col, True) + '"' if ' ' in col else col
+
+    if isinstance(facet_column, str):
+        facet_column = make_col_safe(facet_column)
     if isinstance(facet_column, tuple):
+        facet_column = [make_col_safe(col) for col in facet_column]
         if multivalued:
             raise NotImplementedError("Multivalued facets are not supported for multiple columns")
         facet_column = ", ".join(facet_column)

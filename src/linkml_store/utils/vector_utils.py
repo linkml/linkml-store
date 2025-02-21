@@ -34,7 +34,7 @@ def pairwise_cosine_similarity(vector1: np.array, vector2: np.array) -> float:
     dot_product = np.dot(vector1, vector2)
     norm1 = np.linalg.norm(vector1)
     norm2 = np.linalg.norm(vector2)
-    return dot_product / (norm1 * norm2)
+    return float(dot_product / (norm1 * norm2))
 
 
 def compute_cosine_similarity_matrix(list1: LOL, list2: LOL) -> np.ndarray:

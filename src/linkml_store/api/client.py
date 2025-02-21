@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 HANDLE_MAP = {
     "duckdb": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
+    "sqlite": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
     "solr": "linkml_store.api.stores.solr.solr_database.SolrDatabase",
     "mongodb": "linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase",
     "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
@@ -24,6 +25,8 @@ HANDLE_MAP = {
 
 SUFFIX_MAP = {
     "ddb": "duckdb:///{path}",
+    "duckdb": "duckdb:///{path}",
+    "db": "duckdb:///{path}",
 }
 
 
@@ -204,9 +207,10 @@ class Client:
         if ":" not in handle:
             if alias is None:
                 alias = handle
-            suffix = handle.split(".")[-1]
-            if suffix in SUFFIX_MAP:
-                handle = SUFFIX_MAP[suffix].format(path=handle)
+            if "." in handle:
+                suffix = handle.split(".")[-1]
+                if suffix in SUFFIX_MAP:
+                    handle = SUFFIX_MAP[suffix].format(path=handle)
         if ":" not in handle:
             scheme = handle
             handle = None
