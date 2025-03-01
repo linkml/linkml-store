@@ -454,7 +454,12 @@ class Collection(Generic[DatabaseType]):
             return qr.rows[0]
         return None
 
-    def find(self, where: Optional[Any] = None, **kwargs) -> QueryResult:
+    def find(
+            self,
+            where: Optional[Any] = None,
+            select_cols: Optional[List[str] ] = None,
+            **kwargs,
+    ) -> QueryResult:
         """
         Find objects in the collection using a where query.
 
@@ -484,10 +489,14 @@ class Collection(Generic[DatabaseType]):
 
 
         :param where:
+        :param select_cols:
         :param kwargs:
         :return:
         """
-        query = self._create_query(where_clause=where)
+        query = self._create_query(
+            where_clause=where,
+            select_cols=select_cols,
+        )
         self._pre_query_hook(query)
         return self.query(query, **kwargs)
 
@@ -607,6 +616,47 @@ class Collection(Generic[DatabaseType]):
         new_qr.ranked_rows = results
         new_qr.rows = [r[1] for r in results]
         return new_qr
+
+    def group_by(
+            self,
+            group_by_fields: List[str],
+            inlined_field = "objects",
+            agg_map: Optional[Dict[str, str]] = None,
+            where: Optional[Dict] = None,
+            **kwargs,
+    ) -> QueryResult:
+        """
+        Group objects in the collection by a column.
+
+        :param group_by:
+        :param where:
+        :param kwargs:
+        :return:
+        """
+        if isinstance(group_by_fields, str):
+            group_by_fields = [group_by_fields]
+        df = self.find(where=where, limit=-1).rows_dataframe
+        pk_fields = agg_map.get("first", []) + group_by_fields
+        list_fields = agg_map.get("list", [])
+        if not list_fields:
+            list_fields = [a for a in df.columns if a not in pk_fields]
+
+        grouped_objs = defaultdict(list)
+        for _, row in df.iterrows():
+            pk = tuple(row[pk_fields])
+            grouped_objs[pk].append({k: row[k] for k in list_fields})
+        results = []
+        for pk, objs in grouped_objs.items():
+            top_obj = {k: v for k, v in zip(pk_fields, pk)}
+            top_obj[inlined_field] = objs
+            results.append(top_obj)
+        r = QueryResult(
+            num_rows=len(results),
+            rows=results
+        )
+        return r
+
+
 
     @property
     def is_internal(self) -> bool:
@@ -1062,7 +1112,7 @@ class Collection(Generic[DatabaseType]):
             multivalued = any(multivalueds)
             inlined = any(inlineds)
             if multivalued and False in multivalueds:
-                raise ValueError(f"Mixed list non list: {vs} // inferred= {multivalueds}")
+                logger.info(f"Mixed list non list: {vs} // inferred= {multivalueds}")
             # if not rngs:
             #    raise AssertionError(f"Empty rngs for {k} = {vs}")
             rng = rngs[0] if rngs else None

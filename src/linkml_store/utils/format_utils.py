@@ -1,5 +1,6 @@
 import csv
 import gzip
+import hashlib
 import io
 import json
 import logging
@@ -29,13 +30,23 @@ class Format(Enum):
     JSONL = "jsonl"
     YAML = "yaml"
     YAMLL = "yamll"
+    TOML = "toml"
     TSV = "tsv"
     CSV = "csv"
     XML = "xml"
+    TURTLE = "turtle"
+    RDFXML = "rdfxml"
+    TEXT = "text"
+    TEXTLINES = "textlines"
     OBO = "obo"
+    FASTA = "fasta"
+    GMT = "gmt"
+    MARKDOWN = "markdown"
     PKL = "pkl"
     PYTHON = "python"
     PARQUET = "parquet"
+    HDF5 = "hdf5"
+    NETCDF = "netcdf"
     FORMATTED = "formatted"
     TABLE = "table"
     XLSX = "xlsx"
@@ -55,7 +66,12 @@ class Format(Enum):
             ".yamll": cls.YAMLL,
             ".tsv": cls.TSV,
             ".csv": cls.CSV,
+            ".txt": cls.TEXT,
             ".xml": cls.XML,
+            ".owx": cls.XML,
+            ".owl": cls.RDFXML,
+            ".ttl": cls.TURTLE,
+            ".md": cls.MARKDOWN,
             ".py": cls.PYTHON,
             ".parquet": cls.PARQUET,
             ".pq": cls.PARQUET,
@@ -123,11 +139,23 @@ def clean_nested_structure(obj):
         return clean_pandas_value(obj)
 
 def process_file(
-    f: IO, format: Format, expected_type: Optional[Type] = None, header_comment_token: Optional[str] = None
+        f: IO,
+        format: Format,
+        expected_type: Optional[Type] = None,
+        header_comment_token: Optional[str] = None,
+        format_options: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Process a single file and return a list of objects.
+
+    :param f: The file object.
+    :param format: The format of the file.
+    :param expected_type: The expected type of the objects.
+    :param header_comment_token: Token used for header comments to be skipped
+    :return:
     """
+    if format_options is None:
+        format_options = {}
     if format == Format.YAMLL:
         format = Format.YAML
         expected_type = list
@@ -142,6 +170,13 @@ def process_file(
             objs = [obj for obj in objs if obj is not None]
         else:
             objs = yaml.safe_load(f)
+    elif format == Format.TOML:
+        import toml
+        objs = toml.load(f)
+        if not isinstance(objs, list):
+            objs = [objs]
+    elif format == Format.TEXTLINES:
+        objs = f.readlines()
     elif format in [Format.TSV, Format.CSV]:
         if header_comment_token:
             while True:
@@ -160,6 +195,44 @@ def process_file(
     elif format == Format.XLSX:
         xls = pd.ExcelFile(f)
         objs = {sheet: clean_nested_structure(xls.parse(sheet).to_dict(orient="records")) for sheet in xls.sheet_names}
+    elif format == Format.TEXT:
+        txt = f.read()
+        objs = [
+            {
+                "name": Path(f.name).name,
+                "path": f.name,
+                "content": txt,
+                "size": len(txt),
+                "lines": txt.count("\n") + 1,
+                "md5": hashlib.md5(txt.encode()).hexdigest(),
+            }
+        ]
+    elif format == Format.GMT:
+        objs = []
+        lib_name = Path(f.name).name
+        for line in f:
+            parts = line.strip().split("\t")
+            desc = parts[1]
+            objs.append({
+                "library": lib_name,
+                "uid": f"{lib_name}.{parts[0]}",
+                "name": parts[0],
+                "description": desc if desc else None,
+                "genes": parts[2:],
+            })
+    elif format == Format.FASTA:
+        objs = []
+        current_obj = None
+        for line in f:
+            line = line.strip()
+            if line.startswith(">"):
+                if current_obj:
+                    objs.append(current_obj)
+                current_obj = {"id": line[1:], "sequence": ""}
+            else:
+                current_obj["sequence"] += line
+        if current_obj:
+            objs.append(current_obj)
     elif format == Format.OBO:
         blocks = split_document(f.read(), "\n\n")
         id_pattern = re.compile(r"id: (\S+)")
@@ -168,6 +241,27 @@ def process_file(
             return m.group(1) if m else None
         objs = [{"id": get_id(block), "content": block} for block in blocks]
         objs = [obj for obj in objs if obj["id"]]
+    elif format in (Format.RDFXML, Format.TURTLE):
+        import lightrdf
+        parser = lightrdf.Parser()
+        objs = []
+        ext_fmt = "rdfxml"
+        if format == Format.TURTLE:
+            ext_fmt = "ttl"
+        bytesio = io.BytesIO(f.read().encode('utf-8'))
+        buffer = io.BufferedReader(bytesio)
+        for s, p, o in parser.parse(buffer, base_iri=None, format=ext_fmt):
+            obj = {
+                    "subject": s,
+                    "predicate": p,
+                    "object": o,
+                }
+            if format_options.get("pivot", False):
+                obj = {
+                    "subject": s,
+                    p: o,
+                }
+            objs.append(obj)
     elif format == Format.PARQUET:
         import pyarrow.parquet as pq
 
@@ -202,6 +296,7 @@ def load_objects(
     :param compression: The compression type. Supports 'gz' for gzip and 'tgz' for tar.gz.
     :param expected_type: The target type to load the objects into, e.g. list
     :param header_comment_token: Token used for header comments to be skipped
+    :param select_query: JSONPath query to select specific objects from the loaded data.
     :return: A list of dictionaries representing the loaded objects.
     """
     if isinstance(file_path, Path):
@@ -290,7 +385,7 @@ def write_output(
 
 
 def render_output(
-    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame], format: Optional[Union[Format, str]] = Format.YAML
+    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame, List[BaseModel]], format: Optional[Union[Format, str]] = Format.YAML
 ) -> str:
     """
     Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -322,6 +417,12 @@ def render_output(
 
     if isinstance(data, pd.DataFrame):
         data = data.to_dict(orient="records")
+
+    if isinstance(data, BaseModel):
+        data = data.model_dump()
+
+    if data and isinstance(data, list) and isinstance(data[0], BaseModel):
+        data = [d.model_dump() if isinstance(d, BaseModel) else d for d in data]
 
     if isinstance(data, dict) and format in [Format.TSV, Format.CSV]:
         data = [data]
