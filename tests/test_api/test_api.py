@@ -308,6 +308,35 @@ def test_export(handle, location, export_format):
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
+def test_group_by(handle):
+    client = create_client(handle)
+    database = client.get_database()
+    rows = [
+        {"id": 1, "name": "n1", "address": "a1", "address_city": "c1"},
+        {"id": 1, "name": "n1", "address": "a2", "address_city": "c2"},
+        {"id": 2, "name": "n2", "address": "a3", "address_city": "c3"},
+    ]
+    c = database.create_collection("PersonAddress", recreate_if_exists=True)
+    c.insert(rows)
+    qr = c.find()
+    assert qr.num_rows == 3
+    rs = c.group_by(["id"], inlined_field="addresses", agg_map={"name": "first"})
+    c2 = database.create_collection("Person", recreate_if_exists=True)
+    c2.insert(rs.rows)
+    qr = c2.find()
+    assert qr.num_rows == 2
+    for row in qr.rows:
+        if row["id"] == 1:
+            assert len(row["addresses"]) == 2
+        elif row["id"] == 2:
+            assert len(row["addresses"]) == 1
+        else:
+            assert False, f"Unexpected id: {row['id']}"
+
+
+
+
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_collections_of_same_type(handle):
     """
     Tests storing of objects in collections of the same type

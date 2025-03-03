@@ -164,6 +164,8 @@ class MongoDBCollection(Collection):
         facet_limit=DEFAULT_FACET_LIMIT,
         **kwargs,
     ) -> Dict[Union[str, Tuple[str, ...]], List[Tuple[Any, int]]]:
+        if facet_limit is None:
+            facet_limit = DEFAULT_FACET_LIMIT
         results = {}
         if not facet_columns:
             facet_columns = list(self.class_definition().attributes.keys())
