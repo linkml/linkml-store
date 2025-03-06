@@ -192,6 +192,16 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
 
 
 @cli.command()
+@click.pass_context
+def drop(ctx):
+    """
+    Drop database and all its collections.
+    """
+    database = ctx.obj["settings"].database
+    database.drop()
+
+
+@cli.command()
 @click.argument("files", type=click.Path(), nargs=-1)
 @click.option("--replace/--no-replace", default=False, show_default=True, help="Replace existing objects")
 @click.option("--format", "-f", type=format_choice, help="Input format")
