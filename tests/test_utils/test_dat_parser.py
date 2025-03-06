@@ -10,6 +10,6 @@ def test_parse_dat():
     dr1 = e1["DR"]
     assert dr1.endswith('Q46856, YQHD_ECOLI ;')
     de1 = e1["DE"]
-    assert de1 == 'alcohol dehydrogenase (NADP(+)).'
+    assert de1 == 'alcohol dehydrogenase (NADP(+))'
     cc1 = e1["CC"]
     assert len(cc1) == 4

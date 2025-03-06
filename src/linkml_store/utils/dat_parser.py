@@ -63,13 +63,20 @@ def parse_sib_format(text) -> Tuple[Optional[ENTRY], List[ENTRY]]:
         new_ccs = []
         for cc in ccs:
             if not cc.startswith('-!-') and new_ccs:
-                new_ccs[-1] += cc
+                new_ccs[-1] += " " + cc
             else:
                 new_ccs.append(cc)
         current_entry['CC'] = new_ccs
         for k, vs in current_entry.items():
             if k != 'CC':
-                current_entry[k] = ''.join(vs)
+                combined = ''.join(vs)
+                combined = combined.strip()
+                if combined.endswith("."):
+                    combined = combined.split(".")
+                    combined = [c.strip() for c in combined if c.strip()]
+                    if k == 'DE':
+                        combined = combined[0]
+                current_entry[k] = combined
 
         if 'ID' in current_entry:
             results.append(current_entry)
