@@ -102,7 +102,7 @@ linkml-store = "linkml_store.cli:cli"
 linkml-store-api = "linkml_store.webapi.main:start"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 
