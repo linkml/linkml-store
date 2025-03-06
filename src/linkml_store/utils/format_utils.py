@@ -41,6 +41,7 @@ class Format(Enum):
     OBO = "obo"
     FASTA = "fasta"
     GMT = "gmt"
+    DAT = "dat"
     MARKDOWN = "markdown"
     PKL = "pkl"
     PYTHON = "python"
@@ -241,6 +242,9 @@ def process_file(
             return m.group(1) if m else None
         objs = [{"id": get_id(block), "content": block} for block in blocks]
         objs = [obj for obj in objs if obj["id"]]
+    elif format == Format.DAT:
+        from linkml_store.utils.dat_parser import parse_sib_format
+        _, objs = parse_sib_format(f.read())
     elif format in (Format.RDFXML, Format.TURTLE):
         import lightrdf
         parser = lightrdf.Parser()
