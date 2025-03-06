@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
@@ -94,7 +94,9 @@ class DuckDBCollection(Collection):
 
     def query_facets(
         self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
-    ) -> Dict[str, Dict[str, int]]:
+    ) -> Dict[Union[str, Tuple[str, ...]], List[Tuple[Any, int]]]:
+        if facet_limit is None:
+            facet_limit = DEFAULT_FACET_LIMIT
         results = {}
         cd = self.class_definition()
         with self.parent.engine.connect() as conn:

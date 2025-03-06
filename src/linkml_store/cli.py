@@ -3,6 +3,7 @@ import sys
 import warnings
 from collections import defaultdict
 from pathlib import Path
+from tokenize import group
 from typing import Optional, Tuple, Any
 
 import click
@@ -36,6 +37,11 @@ index_type_option = click.option(
     default="simple",
     show_default=True,
     help="Type of index to create. Values: simple, llm",
+)
+json_select_query_option = click.option(
+    "--json-select-query",
+    "-J",
+    help="JSON SELECT query",
 )
 
 logger = logging.getLogger(__name__)
@@ -186,12 +192,24 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
 
 
 @cli.command()
+@click.pass_context
+def drop(ctx):
+    """
+    Drop database and all its collections.
+    """
+    database = ctx.obj["settings"].database
+    database.drop()
+
+
+@cli.command()
 @click.argument("files", type=click.Path(), nargs=-1)
 @click.option("--replace/--no-replace", default=False, show_default=True, help="Replace existing objects")
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
+@click.option("--source-field",  help="If provided, inject file path source as this field")
+@json_select_query_option
 @click.pass_context
-def insert(ctx, files, replace, object, format):
+def insert(ctx, files, replace, object, format, source_field, json_select_query):
     """Insert objects from files (JSON, YAML, TSV) into the specified collection.
 
     Using a configuration:
@@ -207,11 +225,17 @@ def insert(ctx, files, replace, object, format):
         raise ValueError("Collection must be specified.")
     if not files and not object:
         files = ["-"]
+    load_objects_args = {}
+    if json_select_query:
+        load_objects_args["select_query"] = json_select_query
     for file_path in files:
         if format:
-            objects = load_objects(file_path, format=format)
+            objects = load_objects(file_path, format=format, **load_objects_args)
         else:
-            objects = load_objects(file_path)
+            objects = load_objects(file_path, **load_objects_args)
+        if source_field:
+            for obj in objects:
+                obj[source_field] = str(file_path)
         logger.info(f"Inserting {len(objects)} objects from {file_path} into collection '{collection.alias}'.")
         if replace:
             collection.replace(objects)
@@ -234,21 +258,41 @@ def insert(ctx, files, replace, object, format):
 @click.argument("files", type=click.Path(exists=True), nargs=-1)
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
+@json_select_query_option
 @click.pass_context
-def store(ctx, files, object, format):
+def store(ctx, files, object, format, json_select_query):
     """Store objects from files (JSON, YAML, TSV) into the database.
 
-    Note: this is similar to insert, but a collection does not need to be specified
+    Note: this is similar to insert, but a collection does not need to be specified.
+
+    For example, assume that `my-collection` is a dict with multiple keys,
+    and we want one collection per key:
+
+        linkml-store -d my.ddb store my-collection.yaml
+
+    Loading JSON (e.g OBO-JSON), with a --json-select-query:
+
+        linkml-store -d cl.ddb  store -J graphs  cl.obo.json
+
+    Loading XML (e.g OWL-XML), with a --json-select-query:
+
+        linkml-store -d cl.ddb  store -J Ontology  cl.owx
+
+    Because the XML uses a top level Ontology, with multiple
+
     """
     settings = ctx.obj["settings"]
     db = settings.database
     if not files and not object:
         files = ["-"]
+    load_objects_args = {}
+    if json_select_query:
+        load_objects_args["select_query"] = json_select_query
     for file_path in files:
         if format:
-            objects = load_objects(file_path, format=format)
+            objects = load_objects(file_path, format=format, **load_objects_args)
         else:
-            objects = load_objects(file_path)
+            objects = load_objects(file_path, **load_objects_args)
         logger.info(f"Inserting {len(objects)} objects from {file_path} into database '{db}'.")
         for obj in objects:
             db.store(obj)
@@ -422,15 +466,32 @@ def list_collections(ctx, **kwargs):
 
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
-@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
+@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return per facet")
+@click.option("--facet-min-count", "-M", type=click.INT, help="Minimum count for a facet to be included")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--columns", "-S", help="Columns to facet on")
+@click.option("--columns", "-S", help="Columns to facet on. Comma-separated, join combined facets with +")
 @click.option("--wide/--no-wide", "-U/--no-U", default=False, show_default=True, help="Wide table")
 @click.pass_context
-def fq(ctx, where, limit, columns, output_type, wide, output):
+def fq(ctx, where, limit, columns, output_type, wide, output, **kwargs):
     """
-    Query facets from the specified collection.
+    Query facet counts from the specified collection.
+
+    Assuming your .linkml.yaml includes an entry mapping `phenopackets` to a
+    mongodb
+
+    Facet counts (all columns)
+
+        linkml-store -d phenopackets fq
+
+    Nested columns:
+
+        linkml-store -d phenopackets fq subject.timeAtLastEncounter.age
+
+    Compound keys:
+
+        linkml-store -d phenopackets fq subject.sex+subject.timeAtLastEncounter.age
+
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
@@ -439,7 +500,7 @@ def fq(ctx, where, limit, columns, output_type, wide, output):
         columns = [col.strip() for col in columns]
         columns = [(tuple(col.split("+")) if "+" in col else col) for col in columns]
     logger.info(f"Faceting on columns: {columns}")
-    results = collection.query_facets(where_clause, facet_columns=columns, limit=limit)
+    results = collection.query_facets(where_clause, facet_columns=columns, facet_limit=limit, **kwargs)
     logger.info(f"Facet results: {results}")
 
     def _untuple(key):
@@ -463,6 +524,56 @@ def fq(ctx, where, limit, columns, output_type, wide, output):
                 value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}
                 results_obj[_untuple(key)] = value_as_dict
     output_data = render_output(results_obj, output_type)
+    if output:
+        with open(output, "w") as f:
+            f.write(output_data)
+        click.echo(f"Query results saved to {output}")
+    else:
+        click.echo(output_data)
+
+
+@cli.command()
+@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
+@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return per facet")
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--columns", "-S", help="Columns to facet on. Comma-separated, join combined facets with +")
+@click.pass_context
+def groupby(ctx, where, limit, columns, output_type, output, **kwargs):
+    """
+    Group by columns in the specified collection.
+
+    Assume a simple triple model:
+
+        linkml-store -d cl.ddb -c triple insert cl.owl
+
+    This makes a flat subject/predicate/object table
+
+    This can be grouped, e.g by subject:
+
+        linkml-store -d cl.ddb -c triple groupby -s subject
+
+    Or subject and predicate:
+
+        linkml-store -d cl.ddb -c triple groupby -s '[subject,predicate]'
+
+    """
+    collection = ctx.obj["settings"].collection
+    where_clause = yaml.safe_load(where) if where else None
+    columns = columns.split(",") if columns else None
+    if columns:
+        columns = [col.strip() for col in columns]
+        columns = [(tuple(col.split("+")) if "+" in col else col) for col in columns]
+    logger.info(f"Group by: {columns}")
+    result = collection.group_by(
+        group_by_fields=columns,
+        where_clause=where_clause,
+        agg_map={},
+        limit=limit,
+        **kwargs,
+    )
+    logger.info(f"Group by results: {result}")
+    output_data = render_output(result.rows, output_type)
     if output:
         with open(output, "w") as f:
             f.write(output_data)
@@ -530,6 +641,45 @@ def pivot(ctx, where, limit, index, columns, values, output_type, output):
         pivoted_objs.append(obj)
     write_output(pivoted_objs, output_type, target=output)
 
+
+@cli.command()
+@click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
+@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
+@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--sample-field", "-I", help="Field to use as the sample identifier")
+@click.option("--classification-field", "-L", help="Field to use as for classification")
+@click.option("--p-value-threshold", "-P", type=click.FLOAT,
+              default=0.05, show_default=True,
+              help="P-value threshold for enrichment")
+@click.option("--multiple-testing-correction", "-M", type=click.STRING,
+              default="bh", show_default=True,
+              help="Multiple test correction method")
+@click.argument("samples", type=click.STRING, nargs=-1)
+@click.pass_context
+def enrichment(ctx, where, limit, output_type, output, sample_field, classification_field, samples, **kwargs):
+    from linkml_store.utils.enrichment_analyzer import EnrichmentAnalyzer
+    collection = ctx.obj["settings"].collection
+    where_clause = yaml.safe_load(where) if where else None
+    column_atts = [sample_field, classification_field]
+    results = collection.find(where_clause, select_cols=column_atts, limit=-1)
+    df = results.rows_dataframe
+    ea = EnrichmentAnalyzer(df, sample_key=sample_field, classification_key=classification_field)
+    if not samples:
+        samples = df[sample_field].unique()
+    enrichment_results = []
+    for sample in samples:
+        enriched = ea.find_enriched_categories(sample, **kwargs)
+        for e in enriched:
+            obj = {"sample": sample, **e.model_dump()}
+            enrichment_results.append(obj)
+    output_data = render_output(enrichment_results, output_type)
+    if output:
+        with open(output, "w") as f:
+            f.write(output_data)
+        click.echo(f"Search results saved to {output}")
+    else:
+        click.echo(output_data)
 
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default=Format.YAML.value, help="Output format")
