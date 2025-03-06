@@ -8,8 +8,8 @@ def test_parse_dat():
     assert len(entries) == 2
     e1 = entries[0]
     dr1 = e1["DR"]
-    assert 'Q46856, YQHD_ECOLI ;' in dr1
+    assert dr1.endswith('Q46856, YQHD_ECOLI ;')
     de1 = e1["DE"]
-    assert de1 == ['alcohol dehydrogenase (NADP(+)).']
+    assert de1 == 'alcohol dehydrogenase (NADP(+)).'
     cc1 = e1["CC"]
     assert len(cc1) == 4

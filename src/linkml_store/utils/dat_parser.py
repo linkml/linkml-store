@@ -67,6 +67,9 @@ def parse_sib_format(text) -> Tuple[Optional[ENTRY], List[ENTRY]]:
             else:
                 new_ccs.append(cc)
         current_entry['CC'] = new_ccs
+        for k, vs in current_entry.items():
+            if k != 'CC':
+                current_entry[k] = ''.join(vs)
 
         if 'ID' in current_entry:
             results.append(current_entry)
