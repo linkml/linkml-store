@@ -105,6 +105,7 @@ def get_token_limit(model_name: str) -> int:
 
 def parse_yaml_payload(yaml_str: str, strict=False) -> Optional[dict]:
     import yaml
+
     if "```" in yaml_str:
         yaml_str = yaml_str.split("```")[1].strip()
         if yaml_str.startswith("yaml"):

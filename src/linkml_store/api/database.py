@@ -617,7 +617,9 @@ class Database(ABC, Generic[CollectionType]):
         """
         return list(self.iter_validate_database(**kwargs))
 
-    def iter_validate_database(self, ensure_referential_integrity: bool = None, **kwargs) -> Iterator["ValidationResult"]:
+    def iter_validate_database(
+        self, ensure_referential_integrity: bool = None, **kwargs
+    ) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the database.
 

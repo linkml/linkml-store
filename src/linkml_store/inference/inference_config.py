@@ -59,6 +59,7 @@ class Inference(BaseModel, extra="forbid"):
     """
     Result of an inference derivation.
     """
+
     query: Optional[OBJECT] = Field(default=None, description="The query object.")
     predicted_object: OBJECT = Field(..., description="The predicted object.")
     confidence: Optional[float] = Field(default=None, description="The confidence of the prediction.", le=1.0, ge=0.0)

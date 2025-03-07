@@ -12,7 +12,6 @@ from linkml_store.api.config import ClientConfig
 logger = logging.getLogger(__name__)
 
 
-
 HANDLE_MAP = {
     "duckdb": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
     "sqlite": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
@@ -220,14 +219,14 @@ class Client:
             scheme, _ = handle.split(":", 1)
         if scheme not in HANDLE_MAP:
             raise ValueError(f"Unknown scheme: {scheme}")
-        module_path, class_name = HANDLE_MAP[scheme].rsplit('.', 1)
+        module_path, class_name = HANDLE_MAP[scheme].rsplit(".", 1)
         try:
             module = importlib.import_module(module_path)
             cls = getattr(module, class_name)
         except ImportError as e:
             raise ImportError(f"Failed to import {scheme} database. Make sure the correct extras are installed: {e}")
 
-        #cls = HANDLE_MAP[scheme]
+        # cls = HANDLE_MAP[scheme]
         db = cls(handle=handle, recreate_if_exists=recreate_if_exists, **kwargs)
         if schema_view:
             db.set_schema_view(schema_view)

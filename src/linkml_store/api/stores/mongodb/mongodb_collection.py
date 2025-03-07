@@ -41,13 +41,14 @@ class MongoDBCollection(Collection):
             del obj["_id"]
         self._post_insert_hook(objs)
 
-
-    def index(self,
-              objs: Union[OBJECT, List[OBJECT]],
-              index_name: Optional[str] = None,
-              replace: bool = False,
-              unique: bool = False,
-              **kwargs):
+    def index(
+        self,
+        objs: Union[OBJECT, List[OBJECT]],
+        index_name: Optional[str] = None,
+        replace: bool = False,
+        unique: bool = False,
+        **kwargs,
+    ):
         """
         Create indexes on the collection.
 
@@ -86,11 +87,13 @@ class MongoDBCollection(Collection):
             else:
                 logging.debug(f"Index already exists for field {obj}, skipping creation.")
 
-    def upsert(self,
-               objs: Union[OBJECT, List[OBJECT]],
-               filter_fields: List[str],
-               update_fields: Optional[List[str]] = None,
-               **kwargs):
+    def upsert(
+        self,
+        objs: Union[OBJECT, List[OBJECT]],
+        filter_fields: List[str],
+        update_fields: Optional[List[str]] = None,
+        **kwargs,
+    ):
         """
         Upsert one or more documents into the MongoDB collection.
 

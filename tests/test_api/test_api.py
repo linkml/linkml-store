@@ -65,7 +65,7 @@ EMPLOYED_AT = [
 
 
 def is_persistent(handle: str) -> bool:
-    #if "duckdb" in handle:
+    # if "duckdb" in handle:
     #    # NOTE: in previous versions of duckdb, in-memory databases were not persistent
     #    return True
     return ".db" in handle or "mongodb" in handle or "file:" in handle
@@ -332,8 +332,6 @@ def test_group_by(handle):
             assert len(row["addresses"]) == 1
         else:
             assert False, f"Unexpected id: {row['id']}"
-
-
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)

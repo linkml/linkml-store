@@ -14,6 +14,7 @@ Example:
           neo4j
 
 """
+
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.utils.schema_builder import SchemaBuilder

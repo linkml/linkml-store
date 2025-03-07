@@ -111,7 +111,9 @@ class RAGInferenceEngine(InferenceEngine):
     def object_to_text(self, object: OBJECT) -> str:
         return yaml.dump(object)
 
-    def derive(self, object: OBJECT, iteration=0, additional_prompt_texts: Optional[List[str]] = None) -> Optional[RAGInference]:
+    def derive(
+        self, object: OBJECT, iteration=0, additional_prompt_texts: Optional[List[str]] = None
+    ) -> Optional[RAGInference]:
         import llm
         from tiktoken import encoding_for_model
 
@@ -131,8 +133,9 @@ class RAGInferenceEngine(InferenceEngine):
             if not self.rag_collection.indexers:
                 raise ValueError("RAG collection must have an indexer attached")
             logger.info(f"Searching {self.rag_collection.alias} for examples for: {query_text}")
-            rs = self.rag_collection.search(query_text, limit=num_examples, index_name="llm",
-                                            mmr_relevance_factor=mmr_relevance_factor)
+            rs = self.rag_collection.search(
+                query_text, limit=num_examples, index_name="llm", mmr_relevance_factor=mmr_relevance_factor
+            )
             examples = rs.rows
             logger.info(f"Found {len(examples)} examples")
             if not examples:
@@ -153,11 +156,11 @@ class RAGInferenceEngine(InferenceEngine):
             input_obj_text = self.object_to_text(input_obj)
             if input_obj_text == query_text:
                 continue
-                #raise ValueError(
+                # raise ValueError(
                 #    f"Query object {query_text} is the same as example object {input_obj_text}\n"
                 #    "This indicates possible test data leakage\n."
                 #    "TODO: allow an option that allows user to treat this as a basic lookup\n"
-                #)
+                # )
             output_obj = select_nested(example, target_attributes)
             prompt_clause = (
                 "---\nExample:\n" f"## INPUT:\n{input_obj_text}\n" f"## OUTPUT:\n{self.object_to_text(output_obj)}\n"
@@ -176,9 +179,9 @@ class RAGInferenceEngine(InferenceEngine):
         except KeyError:
             encoding = encoding_for_model("gpt-4")
         token_limit = get_token_limit(model_name)
-        prompt = render_formatted_text(make_text, values=prompt_clauses,
-                                       encoding=encoding, token_limit=token_limit,
-                                       additional_text=system_prompt)
+        prompt = render_formatted_text(
+            make_text, values=prompt_clauses, encoding=encoding, token_limit=token_limit, additional_text=system_prompt
+        )
         logger.info(f"Prompt: {prompt}")
         response = model.prompt(prompt, system=system_prompt)
         yaml_str = response.text()
@@ -199,8 +202,8 @@ class RAGInferenceEngine(InferenceEngine):
                     "\nThis was invalid.\n",
                     "Validation errors:\n",
                 ] + [self.object_to_text(e) for e in errs]
-                return self.derive(object, iteration=iteration+1, additional_prompt_texts=extra_texts)
-        return RAGInference(predicted_object=predicted_object, iterations=iteration+1, query=object)
+                return self.derive(object, iteration=iteration + 1, additional_prompt_texts=extra_texts)
+        return RAGInference(predicted_object=predicted_object, iterations=iteration + 1, query=object)
 
     def _parse_yaml_payload(self, yaml_str: str, strict=False) -> Optional[OBJECT]:
         if "```" in yaml_str:

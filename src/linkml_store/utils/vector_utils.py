@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 LOL = List[List[float]]
 
+
 def pairwise_cosine_similarity(vector1: np.array, vector2: np.array) -> float:
     """
     Calculate the cosine similarity between two vectors.
@@ -77,9 +78,7 @@ def top_matches(cosine_similarity_matrix: np.ndarray) -> Tuple[np.ndarray, np.nd
     return top_match_indices, top_match_values
 
 
-def top_n_matches(
-    cosine_similarity_matrix: np.ndarray, n: int = 10
-) -> Tuple[np.ndarray, np.ndarray]:
+def top_n_matches(cosine_similarity_matrix: np.ndarray, n: int = 10) -> Tuple[np.ndarray, np.ndarray]:
     # Find the indices that would sort each row in descending order
     sorted_indices = np.argsort(-cosine_similarity_matrix, axis=1)
 
@@ -136,10 +135,7 @@ def mmr_diversified_search(
                     max_sim_to_selected = max(
                         [
                             np.dot(document_vectors[idx], document_vectors[s])
-                            / (
-                                np.linalg.norm(document_vectors[idx])
-                                * np.linalg.norm(document_vectors[s])
-                            )
+                            / (np.linalg.norm(document_vectors[idx]) * np.linalg.norm(document_vectors[s]))
                             for s in selected_indices
                         ]
                     )
@@ -160,6 +156,3 @@ def mmr_diversified_search(
         selected_indices.add(best_index)
 
     return result_indices
-
-
-

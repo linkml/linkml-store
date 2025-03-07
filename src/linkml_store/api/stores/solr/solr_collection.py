@@ -63,11 +63,11 @@ class SolrCollection(Collection):
 
     def query_facets(
         self,
-            where: Optional[Dict] = None,
-            facet_columns: List[str] = None,
-            facet_limit=DEFAULT_FACET_LIMIT,
-            facet_min_count: int = 1,
-            **kwargs
+        where: Optional[Dict] = None,
+        facet_columns: List[str] = None,
+        facet_limit=DEFAULT_FACET_LIMIT,
+        facet_min_count: int = 1,
+        **kwargs,
     ) -> Dict[str, Dict[str, int]]:
         solr_query = self._build_solr_query(where)
         solr_query["facet"] = "true"

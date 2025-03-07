@@ -139,12 +139,13 @@ def clean_nested_structure(obj):
     else:
         return clean_pandas_value(obj)
 
+
 def process_file(
-        f: IO,
-        format: Format,
-        expected_type: Optional[Type] = None,
-        header_comment_token: Optional[str] = None,
-        format_options: Optional[Dict[str, Any]] = None,
+    f: IO,
+    format: Format,
+    expected_type: Optional[Type] = None,
+    header_comment_token: Optional[str] = None,
+    format_options: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Process a single file and return a list of objects.
@@ -173,6 +174,7 @@ def process_file(
             objs = yaml.safe_load(f)
     elif format == Format.TOML:
         import toml
+
         objs = toml.load(f)
         if not isinstance(objs, list):
             objs = [objs]
@@ -214,13 +216,15 @@ def process_file(
         for line in f:
             parts = line.strip().split("\t")
             desc = parts[1]
-            objs.append({
-                "library": lib_name,
-                "uid": f"{lib_name}.{parts[0]}",
-                "name": parts[0],
-                "description": desc if desc else None,
-                "genes": parts[2:],
-            })
+            objs.append(
+                {
+                    "library": lib_name,
+                    "uid": f"{lib_name}.{parts[0]}",
+                    "name": parts[0],
+                    "description": desc if desc else None,
+                    "genes": parts[2:],
+                }
+            )
     elif format == Format.FASTA:
         objs = []
         current_obj = None
@@ -237,29 +241,33 @@ def process_file(
     elif format == Format.OBO:
         blocks = split_document(f.read(), "\n\n")
         id_pattern = re.compile(r"id: (\S+)")
+
         def get_id(block):
             m = id_pattern.search(block)
             return m.group(1) if m else None
+
         objs = [{"id": get_id(block), "content": block} for block in blocks]
         objs = [obj for obj in objs if obj["id"]]
     elif format == Format.DAT:
         from linkml_store.utils.dat_parser import parse_sib_format
+
         _, objs = parse_sib_format(f.read())
     elif format in (Format.RDFXML, Format.TURTLE):
         import lightrdf
+
         parser = lightrdf.Parser()
         objs = []
         ext_fmt = "rdfxml"
         if format == Format.TURTLE:
             ext_fmt = "ttl"
-        bytesio = io.BytesIO(f.read().encode('utf-8'))
+        bytesio = io.BytesIO(f.read().encode("utf-8"))
         buffer = io.BufferedReader(bytesio)
         for s, p, o in parser.parse(buffer, base_iri=None, format=ext_fmt):
             obj = {
-                    "subject": s,
-                    "predicate": p,
-                    "object": o,
-                }
+                "subject": s,
+                "predicate": p,
+                "object": o,
+            }
             if format_options.get("pivot", False):
                 obj = {
                     "subject": s,
@@ -389,7 +397,8 @@ def write_output(
 
 
 def render_output(
-    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame, List[BaseModel]], format: Optional[Union[Format, str]] = Format.YAML
+    data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame, List[BaseModel]],
+    format: Optional[Union[Format, str]] = Format.YAML,
 ) -> str:
     """
     Render output data in JSON, JSONLines, YAML, CSV, or TSV format.
@@ -441,11 +450,14 @@ def render_output(
     elif format == Format.PYTHON:
         return str(data)
     elif format == Format.MARKDOWN:
+
         def as_markdown(obj: dict):
             return "## Object\n\n" + "\n".join([f" * {k}: {v}" for k, v in obj.items()])
+
         return "\n\n".join([as_markdown(obj) for obj in data]) if isinstance(data, list) else as_markdown(data)
     elif format == Format.TABLE:
         from tabulate import tabulate
+
         return tabulate(pd.DataFrame(data), headers="keys", tablefmt="psql")
     elif format == Format.YAML:
         if isinstance(data, list):

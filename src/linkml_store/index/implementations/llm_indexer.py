@@ -54,7 +54,9 @@ class LLMIndexer(Indexer):
         """
         return self.texts_to_vectors([text], cache=cache, **kwargs)[0]
 
-    def texts_to_vectors(self, texts: List[str], cache: bool = None, token_limit_penalty=0, **kwargs) -> List[INDEX_ITEM]:
+    def texts_to_vectors(
+        self, texts: List[str], cache: bool = None, token_limit_penalty=0, **kwargs
+    ) -> List[INDEX_ITEM]:
         """
         Use LLM to embed.
 
@@ -67,6 +69,7 @@ class LLMIndexer(Indexer):
         :return:
         """
         from tiktoken import encoding_for_model
+
         logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
         # TODO: make this more accurate

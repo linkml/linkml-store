@@ -10,6 +10,7 @@ class EnrichedCategory(BaseModel):
     """
     Information about a category enriched in a sample
     """
+
     category: str
     fold_change: float
     original_p_value: float
@@ -41,7 +42,7 @@ class EnrichmentAnalyzer:
         self.sample_cache: Dict[str, Counter] = {}
 
     @classmethod
-    def from_collection(cls, collection: Collection, sample_key: str, classification_key: str) -> 'EnrichmentAnalyzer':
+    def from_collection(cls, collection: Collection, sample_key: str, classification_key: str) -> "EnrichmentAnalyzer":
         """
         Initialize the analyzer with a Collection and key column names.
         Precomputes category frequencies for the entire dataset.
@@ -91,7 +92,7 @@ class EnrichmentAnalyzer:
         if sample_data.empty:
             raise KeyError(f"Sample ID '{sample_id}' not found")
         sample_data = sample_data.dropna()
-        #if sample_data.empty:
+        # if sample_data.empty:
         #    raise ValueError(f"Sample ID '{sample_id}' has missing values after dropping NA")
         counter = Counter()
 
@@ -104,10 +105,13 @@ class EnrichmentAnalyzer:
         self.sample_cache[sample_id] = counter
         return counter
 
-    def find_enriched_categories(self, sample_id: str,
-                                 min_occurrences: int = 5,
-                                 p_value_threshold: float = 0.05,
-                                 multiple_testing_correction: str = 'bh') -> List[EnrichedCategory]:
+    def find_enriched_categories(
+        self,
+        sample_id: str,
+        min_occurrences: int = 5,
+        p_value_threshold: float = 0.05,
+        multiple_testing_correction: str = "bh",
+    ) -> List[EnrichedCategory]:
         """
         Find categories that are enriched in the given sample.
 
@@ -135,14 +139,18 @@ class EnrichmentAnalyzer:
             # Calculate fold change
             sample_freq = sample_count / total_sample_annotations
             global_freq = global_count / total_global_annotations
-            fold_change = sample_freq / global_freq if global_freq > 0 else float('inf')
+            fold_change = sample_freq / global_freq if global_freq > 0 else float("inf")
 
             # Perform Fisher's exact test
-            contingency_table = np.array([
-                [sample_count, global_count - sample_count],
-                [total_sample_annotations - sample_count,
-                 total_global_annotations - total_sample_annotations - (global_count - sample_count)]
-            ])
+            contingency_table = np.array(
+                [
+                    [sample_count, global_count - sample_count],
+                    [
+                        total_sample_annotations - sample_count,
+                        total_global_annotations - total_sample_annotations - (global_count - sample_count),
+                    ],
+                ]
+            )
 
             _, p_value = stats.fisher_exact(contingency_table)
 
@@ -158,12 +166,12 @@ class EnrichmentAnalyzer:
         # Apply multiple testing correction
         categories, fold_changes, p_values = zip(*results)
 
-        if multiple_testing_correction.lower() == 'bonf':
+        if multiple_testing_correction.lower() == "bonf":
             # Bonferroni correction
             n_tests = len(self.global_stats)  # Total number of categories tested
             adjusted_p_values = [min(1.0, p * n_tests) for p in p_values]
 
-        elif multiple_testing_correction.lower() == 'bh':
+        elif multiple_testing_correction.lower() == "bh":
             # Benjamini-Hochberg correction
             n = len(p_values)
             sorted_indices = np.argsort(p_values)
@@ -192,12 +200,7 @@ class EnrichmentAnalyzer:
         # Filter by adjusted p-value threshold and create final results
         # Create EnrichedCategory objects
         final_results = [
-            EnrichedCategory(
-                category=cat,
-                fold_change=fc,
-                original_p_value=p,
-                adjusted_p_value=adj_p
-            )
+            EnrichedCategory(category=cat, fold_change=fc, original_p_value=p, adjusted_p_value=adj_p)
             for cat, fc, p, adj_p in zip(categories, fold_changes, p_values, adjusted_p_values)
             if adj_p < p_value_threshold
         ]
@@ -205,6 +208,7 @@ class EnrichmentAnalyzer:
         # Sort by adjusted p-value
         final_results.sort(key=lambda x: x.adjusted_p_value)
         return final_results
+
 
 # Example usage:
 # analyzer = EnrichmentAnalyzer(df, 'sample_id', 'categories')
