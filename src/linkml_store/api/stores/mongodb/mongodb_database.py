@@ -42,6 +42,8 @@ class MongoDBDatabase(Database):
             parsed_url = urlparse(self.handle)
             path_parts = parsed_url.path.lstrip("/").split("?")[0].split("/")
             db_name = path_parts[0] if path_parts else "default"
+            if not db_name:
+                db_name = self.alias
         else:
             db_name = "default"
         return db_name

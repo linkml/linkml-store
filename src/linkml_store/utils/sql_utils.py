@@ -116,7 +116,7 @@ def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], mul
         modified_where = " AND ".join(conditions)
 
     def make_col_safe(col):
-        return '"' + quoted_name(col, True) + '"' if ' ' in col else col
+        return '"' + quoted_name(col, True) + '"' if " " in col else col
 
     if isinstance(facet_column, str):
         facet_column = make_col_safe(facet_column)

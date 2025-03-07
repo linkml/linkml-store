@@ -142,7 +142,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         logger.setLevel(logging.ERROR)
     ctx.ensure_object(dict)
     if input:
-        database = "duckdb" # default: store in duckdb
+        database = "duckdb"  # default: store in duckdb
         if input.startswith("http"):
             parts = input.split("/")
             collection = parts[-1]
@@ -150,8 +150,7 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
         else:
             stem = underscore(Path(input).stem)
             collection = stem
-        logger.info(f"Using input file: {input}, "
-                    f"default storage is {database} and collection is {collection}")
+        logger.info(f"Using input file: {input}, " f"default storage is {database} and collection is {collection}")
         config = ClientConfig(databases={"duckdb": {"collections": {stem: {"source": {"local_path": input}}}}})
     if config is None and DEFAULT_LOCAL_CONF_PATH.exists():
         config = DEFAULT_LOCAL_CONF_PATH
@@ -206,7 +205,7 @@ def drop(ctx):
 @click.option("--replace/--no-replace", default=False, show_default=True, help="Replace existing objects")
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
-@click.option("--source-field",  help="If provided, inject file path source as this field")
+@click.option("--source-field", help="If provided, inject file path source as this field")
 @json_select_query_option
 @click.pass_context
 def insert(ctx, files, replace, object, format, source_field, json_select_query):
@@ -246,6 +245,8 @@ def insert(ctx, files, replace, object, format, source_field, json_select_query)
         for object_str in object:
             logger.info(f"Parsing: {object_str}")
             objects = yaml.safe_load(object_str)
+            if not isinstance(objects, list):
+                objects = [objects]
             if replace:
                 collection.replace(objects)
             else:
@@ -630,10 +631,12 @@ def pivot(ctx, where, limit, index, columns, values, output_type, output):
         value_key = tuple([row.get(att) for att in value_atts])
         pivoted[index_key][column_key] = value_key
     pivoted_objs = []
+
     def detuple(t: Tuple) -> Any:
         if len(t) == 1:
             return t[0]
         return str(t)
+
     for index_key, data in pivoted.items():
         obj = {att: key for att, key in zip(index_atts, index_key)}
         for column_key, value_key in data.items():
@@ -649,16 +652,27 @@ def pivot(ctx, where, limit, index, columns, values, output_type, output):
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.option("--sample-field", "-I", help="Field to use as the sample identifier")
 @click.option("--classification-field", "-L", help="Field to use as for classification")
-@click.option("--p-value-threshold", "-P", type=click.FLOAT,
-              default=0.05, show_default=True,
-              help="P-value threshold for enrichment")
-@click.option("--multiple-testing-correction", "-M", type=click.STRING,
-              default="bh", show_default=True,
-              help="Multiple test correction method")
+@click.option(
+    "--p-value-threshold",
+    "-P",
+    type=click.FLOAT,
+    default=0.05,
+    show_default=True,
+    help="P-value threshold for enrichment",
+)
+@click.option(
+    "--multiple-testing-correction",
+    "-M",
+    type=click.STRING,
+    default="bh",
+    show_default=True,
+    help="Multiple test correction method",
+)
 @click.argument("samples", type=click.STRING, nargs=-1)
 @click.pass_context
 def enrichment(ctx, where, limit, output_type, output, sample_field, classification_field, samples, **kwargs):
     from linkml_store.utils.enrichment_analyzer import EnrichmentAnalyzer
+
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
     column_atts = [sample_field, classification_field]
@@ -681,6 +695,7 @@ def enrichment(ctx, where, limit, output_type, output, sample_field, classificat
     else:
         click.echo(output_data)
 
+
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default=Format.YAML.value, help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
@@ -688,7 +703,7 @@ def enrichment(ctx, where, limit, output_type, output, sample_field, classificat
 @click.option(
     "--feature-attributes", "-F", type=click.STRING, help="Feature attributes for inference (comma separated)"
 )
-@click.option("--training-collection", type=click.STRING,help="Collection to use for training")
+@click.option("--training-collection", type=click.STRING, help="Collection to use for training")
 @click.option("--inference-config-file", "-Y", type=click.Path(), help="Path to inference configuration file")
 @click.option("--export-model", "-E", type=click.Path(), help="Export model to file")
 @click.option("--load-model", "-L", type=click.Path(), help="Load model from file")
@@ -903,12 +918,28 @@ def indexes(ctx):
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option(
+    "--collection-only/--no-collection-only",
+    default=False,
+    show_default=True,
+    help="Only validate specified collection",
+)
+@click.option(
+    "--ensure-referential-integrity/--no-ensure-referential-integrity",
+    default=True,
+    show_default=True,
+    help="Ensure referential integrity",
+)
 @click.pass_context
-def validate(ctx, output_type, output):
+def validate(ctx, output_type, output, collection_only, **kwargs):
     """Validate objects in the specified collection."""
-    collection = ctx.obj["settings"].collection
-    logger.info(f"Validating collection {collection.alias}")
-    validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection()]
+    if collection_only:
+        collection = ctx.obj["settings"].collection
+        logger.info(f"Validating collection {collection.alias}")
+        validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection(**kwargs)]
+    else:
+        db = ctx.obj["settings"].database
+        validation_results = [json_dumper.to_dict(x) for x in db.validate_database(**kwargs)]
     output_data = render_output(validation_results, output_type)
     if output:
         with open(output, "w") as f:

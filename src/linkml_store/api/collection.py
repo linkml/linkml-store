@@ -211,7 +211,7 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
-    def index (
+    def index(
         self,
         objs: Union[OBJECT, List[OBJECT]],
         index_name: Optional[str] = None,
@@ -231,10 +231,13 @@ class Collection(Generic[DatabaseType]):
         """
         raise NotImplementedError
 
-    def upsert(self,
-               objs: Union[OBJECT, List[OBJECT]],
-               filter_fields: List[str],
-               update_fields: Union[List[str], None] = None, **kwargs):
+    def upsert(
+        self,
+        objs: Union[OBJECT, List[OBJECT]],
+        filter_fields: List[str],
+        update_fields: Union[List[str], None] = None,
+        **kwargs,
+    ):
         """
         Add one or more objects to the collection.
 
@@ -455,10 +458,10 @@ class Collection(Generic[DatabaseType]):
         return None
 
     def find(
-            self,
-            where: Optional[Any] = None,
-            select_cols: Optional[List[str] ] = None,
-            **kwargs,
+        self,
+        where: Optional[Any] = None,
+        select_cols: Optional[List[str]] = None,
+        **kwargs,
     ) -> QueryResult:
         """
         Find objects in the collection using a where query.
@@ -596,6 +599,7 @@ class Collection(Generic[DatabaseType]):
                 assert ix_coll.size() > 0
         qr = ix_coll.find(where=where, limit=-1, **kwargs)
         index_col = ix.index_field
+
         # TODO: optimize this for large indexes
         def row2array(row):
             v = row[index_col]
@@ -603,6 +607,7 @@ class Collection(Generic[DatabaseType]):
                 # sqlite stores arrays as strings
                 v = json.loads(v)
             return np.array(v, dtype=float)
+
         vector_pairs = [(row, row2array(row)) for row in qr.rows]
         results = ix.search(query, vector_pairs, limit=limit, mmr_relevance_factor=mmr_relevance_factor, **kwargs)
         for r in results:
@@ -618,12 +623,12 @@ class Collection(Generic[DatabaseType]):
         return new_qr
 
     def group_by(
-            self,
-            group_by_fields: List[str],
-            inlined_field = "objects",
-            agg_map: Optional[Dict[str, str]] = None,
-            where: Optional[Dict] = None,
-            **kwargs,
+        self,
+        group_by_fields: List[str],
+        inlined_field="objects",
+        agg_map: Optional[Dict[str, str]] = None,
+        where: Optional[Dict] = None,
+        **kwargs,
     ) -> QueryResult:
         """
         Group objects in the collection by a column.
@@ -650,13 +655,8 @@ class Collection(Generic[DatabaseType]):
             top_obj = {k: v for k, v in zip(pk_fields, pk)}
             top_obj[inlined_field] = objs
             results.append(top_obj)
-        r = QueryResult(
-            num_rows=len(results),
-            rows=results
-        )
+        r = QueryResult(num_rows=len(results), rows=results)
         return r
-
-
 
     @property
     def is_internal(self) -> bool:

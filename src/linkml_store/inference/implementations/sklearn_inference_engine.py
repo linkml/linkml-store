@@ -94,6 +94,8 @@ class SklearnInferenceEngine(InferenceEngine):
         if not feature_cols:
             feature_cols = df.columns.difference(target_cols).tolist()
             self.config.feature_attributes = feature_cols
+            if not feature_cols:
+                raise ValueError("No features found in the data")
         target_col = target_cols[0]
         logger.info(f"Feature columns: {feature_cols}")
         X = df[feature_cols].copy()
@@ -102,6 +104,8 @@ class SklearnInferenceEngine(InferenceEngine):
 
         # find list of features to skip (categorical with > N categories)
         skip_features = []
+        if not len(X.columns):
+            raise ValueError("No features to train on")
         for col in X.columns:
             unique_values = self._get_unique_values(X[col])
             if len(unique_values) > self.maximum_proportion_distinct_features * len(X[col]):
@@ -115,6 +119,8 @@ class SklearnInferenceEngine(InferenceEngine):
 
         # Encode features
         encoded_features = []
+        if not len(X.columns):
+            raise ValueError(f"No features to train on from after skipping {skip_features}")
         for col in X.columns:
             logger.info(f"Checking whether to encode: {col}")
             col_encoder = self._get_encoder(X[col])
@@ -153,7 +159,7 @@ class SklearnInferenceEngine(InferenceEngine):
             y = y_encoder.fit_transform(y.values.ravel())  # Convert to 1D numpy array
             self.transformed_targets = y_encoder.classes_
 
-        # print(f"Fitting model with features: {X.columns}")
+        # print(f"Fitting model with features: {X.columns}, y={y}, X={X}")
         clf = DecisionTreeClassifier(random_state=42)
         clf.fit(X, y)
         self.classifier = clf

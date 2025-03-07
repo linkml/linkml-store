@@ -56,7 +56,7 @@ def nested_objects_to_dataframe(data: List[Dict[str, Any]]) -> pd.DataFrame:
 
 
 def facet_summary_to_dataframe_unmelted(
-    facet_summary: Dict[Union[str, Tuple[str, ...]], List[Tuple[Union[str, Tuple[str, ...]], int]]]
+    facet_summary: Dict[Union[str, Tuple[str, ...]], List[Tuple[Union[str, Tuple[str, ...]], int]]],
 ) -> pd.DataFrame:
     rows = []
 

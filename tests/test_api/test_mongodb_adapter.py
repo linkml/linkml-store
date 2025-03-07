@@ -7,6 +7,7 @@ from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from pymongo import MongoClient
 
+
 @pytest.fixture(scope="module")
 def mongodb_client():
     try:
@@ -220,11 +221,9 @@ def test_index_creation(mongodb_collection, unique_flag):
     mongodb_collection.mongo_collection.delete_many({})
 
     # Insert **unique, non-null** values for test_field to avoid duplicate key error
-    mongodb_collection.mongo_collection.insert_many([
-        {"_id": 1, "test_field": "value1"},
-        {"_id": 2, "test_field": "value2"},
-        {"_id": 3, "test_field": "value3"}
-    ])
+    mongodb_collection.mongo_collection.insert_many(
+        [{"_id": 1, "test_field": "value1"}, {"_id": 2, "test_field": "value2"}, {"_id": 3, "test_field": "value3"}]
+    )
 
     # Create the index using the method with the unique flag
     mongodb_collection.index(index_field, index_name=index_name, replace=True, unique=unique_flag)
@@ -239,5 +238,6 @@ def test_index_creation(mongodb_collection, unique_flag):
     if unique_flag:
         assert created_indexes[index_name]["unique"], f"Index {index_name} should be unique"
     else:
-        assert "unique" not in created_indexes[index_name] or not created_indexes[index_name]["unique"], \
-            f"Index {index_name} should not be unique"
+        assert (
+            "unique" not in created_indexes[index_name] or not created_indexes[index_name]["unique"]
+        ), f"Index {index_name} should not be unique"

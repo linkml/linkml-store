@@ -105,7 +105,6 @@ def test_inference_nested(handle):
     # check_accuracy2(ie2, targets, threshold=0.33, features=features, test_data=ie.testing_data.as_dataframe())
 
 
-
 @pytest.mark.integration
 @pytest.mark.parametrize("handle", SCHEMES)
 def test_with_validation(handle):
@@ -172,7 +171,9 @@ def test_with_validation(handle):
     sb.add_slot("predicate", range="PredicateType", replace_if_present=True)
     sv = SchemaView(sb.schema)
     collection.parent.set_schema_view(sv)
-    errs = list(collection.iter_validate_collection([{"triples": [{"subject": "a", "predicate": "unknown", "object": "b"}]}]))
+    errs = list(
+        collection.iter_validate_collection([{"triples": [{"subject": "a", "predicate": "unknown", "object": "b"}]}])
+    )
     assert len(errs) == 1
     result = ie.derive({"paper": {"abstract": "Mark Hamill played a starring role in the movie Star Wars"}})
     assert result
@@ -184,7 +185,3 @@ def test_with_validation(handle):
     # (note that in future this unit test could conceivably be used in training models, in which case
     # it will need to be modified to a different hard-to-guess predicate)
     assert result.iterations > 1
-
-
-
-

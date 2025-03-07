@@ -100,9 +100,9 @@ class DuckDBDatabase(Database):
             meta_query = Query(
                 from_table="sqlite_master",
                 where_clause={
-                    #"type": "table",
+                    # "type": "table",
                     "name": table,
-                }
+                },
             )
         else:
             if table.startswith("information_schema"):
@@ -112,7 +112,7 @@ class DuckDBDatabase(Database):
                 where_clause={
                     "table_type": "BASE TABLE",
                     "table_name": table,
-                }
+                },
             )
 
         qr = self.query(meta_query)

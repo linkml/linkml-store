@@ -79,21 +79,24 @@ class LLMInferenceEngine(InferenceEngine):
     def _schema_str(self) -> str:
         db = self.training_data.base_collection.parent
         from linkml_runtime.dumpers import json_dumper
+
         schema_dict = json_dumper.to_dict(db.schema_view.schema)
         return yaml.dump(schema_dict)
 
-    def derive(self, object: OBJECT, iteration=0, additional_prompt_texts: Optional[List[str]] = None) -> Optional[LLMInference]:
+    def derive(
+        self, object: OBJECT, iteration=0, additional_prompt_texts: Optional[List[str]] = None
+    ) -> Optional[LLMInference]:
         import llm
 
         model: llm.Model = self.model
-        #model_name = self.config.llm_config.model_name
-        #feature_attributes = self.config.feature_attributes
+        # model_name = self.config.llm_config.model_name
+        # feature_attributes = self.config.feature_attributes
         target_attributes = self.config.target_attributes
         query_text = self.object_to_text(object)
 
         if not target_attributes:
             target_attributes = [k for k, v in object.items() if v is None or v == ""]
-        #if not feature_attributes:
+        # if not feature_attributes:
         #    feature_attributes = [k for k, v in object.items() if v is not None and v != ""]
 
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)
@@ -107,7 +110,9 @@ class LLMInferenceEngine(InferenceEngine):
             "```yaml\n"
             f"{stub}\n"
             "```\n"
-            "---\nQuery:\n" f"## INCOMPLETE OBJECT:\n{query_text}\n" "## OUTPUT:\n"
+            "---\nQuery:\n"
+            f"## INCOMPLETE OBJECT:\n{query_text}\n"
+            "## OUTPUT:\n"
         )
         logger.info(f"Prompt: {prompt}")
         response = model.prompt(prompt, system=system_prompt)
@@ -130,9 +135,8 @@ class LLMInferenceEngine(InferenceEngine):
                     "\nThis was invalid.\n",
                     "Validation errors:\n",
                 ] + [self.object_to_text(e) for e in errs]
-                return self.derive(object, iteration=iteration+1, additional_prompt_texts=extra_texts)
-        return LLMInference(predicted_object=predicted_object, iterations=iteration+1, query=object)
-
+                return self.derive(object, iteration=iteration + 1, additional_prompt_texts=extra_texts)
+        return LLMInference(predicted_object=predicted_object, iterations=iteration + 1, query=object)
 
     def export_model(
         self, output: Optional[Union[str, Path, TextIO]], model_serialization: ModelSerialization = None, **kwargs

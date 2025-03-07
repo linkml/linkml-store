@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
+import openai
 
 from linkml_store.api.config import CollectionConfig
 from linkml_store.index.indexer import INDEX_ITEM, Indexer
@@ -11,6 +12,7 @@ from linkml_store.utils.llm_utils import get_token_limit, render_formatted_text
 if TYPE_CHECKING:
     import llm
 
+CHUNK_SIZE = 1000
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ class LLMIndexer(Indexer):
     >>> vector = indexer.text_to_vector("hello")
     """
 
-    embedding_model_name: str = "ada-002"
+    embedding_model_name: str = "text-embedding-ada-002"
     _embedding_model: "llm.EmbeddingModel" = None
     cached_embeddings_database: str = None
     cached_embeddings_collection: str = None
@@ -52,7 +54,9 @@ class LLMIndexer(Indexer):
         """
         return self.texts_to_vectors([text], cache=cache, **kwargs)[0]
 
-    def texts_to_vectors(self, texts: List[str], cache: bool = None, **kwargs) -> List[INDEX_ITEM]:
+    def texts_to_vectors(
+        self, texts: List[str], cache: bool = None, token_limit_penalty=0, **kwargs
+    ) -> List[INDEX_ITEM]:
         """
         Use LLM to embed.
 
@@ -60,18 +64,22 @@ class LLMIndexer(Indexer):
         >>> vectors = indexer.texts_to_vectors(["hello", "goodbye"])
 
         :param texts:
+        :param cache:
+        :param token_limit_penalty:
         :return:
         """
         from tiktoken import encoding_for_model
+
         logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
         # TODO: make this more accurate
-        token_limit = get_token_limit(model.model_id) - 200
-        encoding = encoding_for_model("gpt-4o")
+        token_limit = get_token_limit(model.model_id) - token_limit_penalty
+        logging.info(f"Token limit for {model.model_id}: {token_limit}")
+        encoding = encoding_for_model(self.embedding_model_name)
 
         def truncate_text(text: str) -> str:
             # split into tokens every 1000 chars:
-            parts = [text[i : i + 1000] for i in range(0, len(text), 1000)]
+            parts = [text[i : i + CHUNK_SIZE] for i in range(0, len(text), CHUNK_SIZE)]
             truncated = render_formatted_text(
                 lambda x: "".join(x),
                 parts,
@@ -140,5 +148,5 @@ class LLMIndexer(Indexer):
                 embeddings_collection.commit()
         else:
             logger.info(f"Embedding {len(texts)} texts")
-            embeddings = model.embed_multi(texts)
+            embeddings = list(model.embed_multi(texts, batch_size=1))
         return [np.array(v, dtype=float) for v in embeddings]

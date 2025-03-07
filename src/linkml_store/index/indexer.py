@@ -154,8 +154,11 @@ class Indexer(BaseModel):
         return str(obj)
 
     def search(
-        self, query: str, vectors: List[Tuple[str, INDEX_ITEM]], limit: Optional[int] = None,
-            mmr_relevance_factor: Optional[float] = None
+        self,
+        query: str,
+        vectors: List[Tuple[str, INDEX_ITEM]],
+        limit: Optional[int] = None,
+        mmr_relevance_factor: Optional[float] = None,
     ) -> List[Tuple[float, Any]]:
         """
         Use the indexer to search against a database of vectors.
@@ -175,8 +178,8 @@ class Indexer(BaseModel):
             vlist = [v for _, v in vectors]
             idlist = [id for id, _ in vectors]
             sorted_indices = mmr_diversified_search(
-                query_vector, vlist,
-                relevance_factor=mmr_relevance_factor, top_n=limit)
+                query_vector, vlist, relevance_factor=mmr_relevance_factor, top_n=limit
+            )
             results = []
             # TODO: this is inefficient when limit is high
             for i in range(limit):

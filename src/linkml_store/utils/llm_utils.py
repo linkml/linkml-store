@@ -76,6 +76,7 @@ def render_formatted_text(
         return text
     if not values:
         raise ValueError(f"Cannot fit text into token limit: {text_length} > {token_limit}")
+    # remove last element and try again
     return render_formatted_text(render_func, values[0:-1], encoding=encoding, token_limit=token_limit)
 
 
@@ -104,6 +105,7 @@ def get_token_limit(model_name: str) -> int:
 
 def parse_yaml_payload(yaml_str: str, strict=False) -> Optional[dict]:
     import yaml
+
     if "```" in yaml_str:
         yaml_str = yaml_str.split("```")[1].strip()
         if yaml_str.startswith("yaml"):
