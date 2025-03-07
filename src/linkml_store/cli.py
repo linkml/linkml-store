@@ -246,6 +246,8 @@ def insert(ctx, files, replace, object, format, source_field, json_select_query)
         for object_str in object:
             logger.info(f"Parsing: {object_str}")
             objects = yaml.safe_load(object_str)
+            if not isinstance(objects, list):
+                objects = [objects]
             if replace:
                 collection.replace(objects)
             else:
@@ -903,12 +905,18 @@ def indexes(ctx):
 @cli.command()
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
+@click.option("--collection-only/--no-collection-only", default=False, show_default=True, help="Only validate specified collection")
+@click.option("--ensure-referential-integrity/--no-ensure-referential-integrity", default=True, show_default=True, help="Ensure referential integrity")
 @click.pass_context
-def validate(ctx, output_type, output):
+def validate(ctx, output_type, output, collection_only, **kwargs):
     """Validate objects in the specified collection."""
-    collection = ctx.obj["settings"].collection
-    logger.info(f"Validating collection {collection.alias}")
-    validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection()]
+    if collection_only:
+        collection = ctx.obj["settings"].collection
+        logger.info(f"Validating collection {collection.alias}")
+        validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection(**kwargs)]
+    else:
+        db = ctx.obj["settings"].database
+        validation_results = [json_dumper.to_dict(x) for x in db.validate_database(**kwargs)]
     output_data = render_output(validation_results, output_type)
     if output:
         with open(output, "w") as f:

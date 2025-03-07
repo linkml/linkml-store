@@ -76,6 +76,7 @@ def render_formatted_text(
         return text
     if not values:
         raise ValueError(f"Cannot fit text into token limit: {text_length} > {token_limit}")
+    # remove last element and try again
     return render_formatted_text(render_func, values[0:-1], encoding=encoding, token_limit=token_limit)
 
 

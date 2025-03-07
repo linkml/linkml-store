@@ -440,6 +440,10 @@ def render_output(
         return "\n".join(json.dumps(obj) for obj in data)
     elif format == Format.PYTHON:
         return str(data)
+    elif format == Format.MARKDOWN:
+        def as_markdown(obj: dict):
+            return "## Object\n\n" + "\n".join([f" * {k}: {v}" for k, v in obj.items()])
+        return "\n\n".join([as_markdown(obj) for obj in data]) if isinstance(data, list) else as_markdown(data)
     elif format == Format.TABLE:
         from tabulate import tabulate
         return tabulate(pd.DataFrame(data), headers="keys", tablefmt="psql")

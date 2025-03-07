@@ -595,7 +595,29 @@ class Database(ABC, Generic[CollectionType]):
             sb.add_class(coll.target_class_name)
         return SchemaView(sb.schema)
 
-    def iter_validate_database(self, **kwargs) -> Iterator["ValidationResult"]:
+    def validate_database(self, **kwargs) -> List["ValidationResult"]:
+        """
+        Validate the contents of the database.
+
+        As `iter_validate_database`, but returns a list of validation results.
+
+        :param kwargs:
+        :return:
+        """
+        return list(self.iter_validate_database(**kwargs))
+
+    def validate_database(self, **kwargs) -> List["ValidationResult"]:
+        """
+        Validate the contents of the database.
+
+        As `iter_validate_database`, but returns a list of validation results.
+
+        :param kwargs:
+        :return:
+        """
+        return list(self.iter_validate_database(**kwargs))
+
+    def iter_validate_database(self, ensure_referential_integrity: bool = None, **kwargs) -> Iterator["ValidationResult"]:
         """
         Validate the contents of the database.
 
@@ -635,12 +657,14 @@ class Database(ABC, Generic[CollectionType]):
         'capital' is a required property
         'continent' is a required proper
 
+        :param ensure_referential_integrity: ensure referential integrity
         :param kwargs:
         :return: iterator over validation results
         """
         for collection in self.list_collections():
             yield from collection.iter_validate_collection(**kwargs)
-        if self.metadata.ensure_referential_integrity:
+        if self.metadata.ensure_referential_integrity or ensure_referential_integrity:
+            logger.info(f"Validating referential integrity on {self.alias}")
             yield from self._validate_referential_integrity(**kwargs)
 
     def _validate_referential_integrity(self, **kwargs) -> Iterator["ValidationResult"]:
@@ -661,7 +685,9 @@ class Database(ABC, Generic[CollectionType]):
             induced_slots = sv.class_induced_slots(cd.name)
             slot_map = {s.name: s for s in induced_slots}
             # rmap = {s.name: s.range for s in induced_slots}
+            # map slot ranges to a collection where that range is stored
             sr_to_coll = {s.name: cmap.get(s.range, []) for s in induced_slots if s.range}
+            logger.debug(f"Validating referential integrity for {collection.target_class_name} // {sr_to_coll}")
             for obj in collection.find_iter():
                 for k, v in obj.items():
                     if k not in sr_to_coll:

@@ -56,3 +56,4 @@ def test_index(index_class, texts):
         # Ensure the queried text appears at the top of the search results
         exact_matches = [r[1] for r in results if np.isclose(r[0], 1.0, rtol=1e-3)]
         assert text_id in exact_matches, f"Exact match not found in : {results}"
+
