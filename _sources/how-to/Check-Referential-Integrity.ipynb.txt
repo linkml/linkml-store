@@ -14,8 +14,6 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
-   "outputs": [],
    "source": [
     "from linkml_store import Client\n",
     "\n",
@@ -24,36 +22,50 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.760981Z",
-     "start_time": "2024-05-04T19:51:08.378243Z"
+     "end_time": "2025-03-07T02:08:28.986444Z",
+     "start_time": "2025-03-07T02:08:27.758566Z"
     }
    },
-   "id": "initial_id"
+   "id": "initial_id",
+   "outputs": [],
+   "execution_count": 1
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
-   "outputs": [],
    "source": [
-    "db = client.attach_database(\"mongodb://localhost:27017\", \"test\")\n",
+    "db = client.attach_database(\"mongodb://localhost:27017\", \"test-ri\")\n",
     "db.metadata.ensure_referential_integrity = True\n",
-    "db.set_schema_view(\"../../tests/input/countries/countries.linkml.yaml\")\n",
-    "countries_coll = db.create_collection(\"Country\", alias=\"countries\", recreate_if_exists=True)\n",
-    "routes_coll = db.create_collection(\"Route\", alias=\"routes\", recreate_if_exists=True)"
+    "db.set_schema_view(\"../../tests/input/countries/countries.linkml.yaml\")\n"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.788932Z",
-     "start_time": "2024-05-04T19:51:09.771112Z"
+     "end_time": "2025-03-07T02:08:29.030994Z",
+     "start_time": "2025-03-07T02:08:28.989892Z"
     }
    },
-   "id": "cc164c0acbe4c39d"
+   "id": "cc164c0acbe4c39d",
+   "outputs": [],
+   "execution_count": 2
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:08:29.335618Z",
+     "start_time": "2025-03-07T02:08:29.318131Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "countries_coll = db.create_collection(\"Country\", alias=\"countries\", recreate_if_exists=True)\n",
+    "routes_coll = db.create_collection(\"Route\", alias=\"routes\", recreate_if_exists=True)"
+   ],
+   "id": "cec53323f880da30",
+   "outputs": [],
+   "execution_count": 5
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
-   "outputs": [],
    "source": [
     "COUNTRIES = \"../../tests/input/countries/countries.jsonl\"\n",
     "ROUTES = \"../../tests/input/countries/routes.csv\""
@@ -61,25 +73,16 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.789681Z",
-     "start_time": "2024-05-04T19:51:09.786454Z"
+     "end_time": "2025-03-07T02:08:29.343921Z",
+     "start_time": "2025-03-07T02:08:29.341972Z"
     }
    },
-   "id": "5286ef4e9dd0f316"
+   "id": "5286ef4e9dd0f316",
+   "outputs": [],
+   "execution_count": 6
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
-   "outputs": [
-    {
-     "data": {
-      "text/plain": "[{'origin': 'DE', 'destination': 'FR', 'method': 'rail'}]"
-     },
-     "execution_count": 4,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
    "source": [
     "from linkml_store.utils.format_utils import load_objects\n",
     "\n",
@@ -90,16 +93,27 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.795894Z",
-     "start_time": "2024-05-04T19:51:09.790413Z"
+     "end_time": "2025-03-07T02:08:29.353362Z",
+     "start_time": "2025-03-07T02:08:29.349890Z"
     }
    },
-   "id": "2e21988e4fc13f58"
+   "id": "2e21988e4fc13f58",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[{'origin': 'DE', 'destination': 'FR', 'method': 'rail'}]"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 7
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
-   "outputs": [],
    "source": [
     "countries_coll.insert(countries)\n",
     "routes_coll.insert(routes)"
@@ -107,41 +121,43 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.803272Z",
-     "start_time": "2024-05-04T19:51:09.798758Z"
+     "end_time": "2025-03-07T02:08:29.583920Z",
+     "start_time": "2025-03-07T02:08:29.359788Z"
     }
    },
-   "id": "668e59a8f28e7bfe"
+   "id": "668e59a8f28e7bfe",
+   "outputs": [],
+   "execution_count": 8
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
-   "outputs": [
-    {
-     "data": {
-      "text/plain": "[{'origin': 'DE', 'destination': 'FR', 'method': 'rail'}]"
-     },
-     "execution_count": 6,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
    "source": [
     "routes_coll.find().rows"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.810617Z",
-     "start_time": "2024-05-04T19:51:09.804004Z"
+     "end_time": "2025-03-07T02:08:29.596327Z",
+     "start_time": "2025-03-07T02:08:29.591085Z"
     }
    },
-   "id": "995e63f873ea9353"
+   "id": "995e63f873ea9353",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[{'origin': 'DE', 'destination': 'FR', 'method': 'rail'}]"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 9
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
-   "outputs": [],
    "source": [
     "for result in db.iter_validate_database():\n",
     "    print(result)"
@@ -149,11 +165,13 @@
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.956191Z",
-     "start_time": "2024-05-04T19:51:09.809082Z"
+     "end_time": "2025-03-07T02:08:29.737342Z",
+     "start_time": "2025-03-07T02:08:29.602408Z"
     }
    },
-   "id": "a8ef16a3fbc6bfe6"
+   "id": "a8ef16a3fbc6bfe6",
+   "outputs": [],
+   "execution_count": 10
   },
   {
    "cell_type": "markdown",
@@ -169,72 +187,463 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
-   "outputs": [],
    "source": [
     "routes_coll.insert({\"origin\": \"ZZZ\", \"destination\": \"YYY\", \"method\": \"rail\"})"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.961815Z",
-     "start_time": "2024-05-04T19:51:09.956721Z"
+     "end_time": "2025-03-07T02:08:29.747005Z",
+     "start_time": "2025-03-07T02:08:29.743644Z"
     }
    },
-   "id": "f712a82be775f413"
+   "id": "f712a82be775f413",
+   "outputs": [],
+   "execution_count": 11
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
-   "outputs": [
-    {
-     "data": {
-      "text/plain": "  origin destination method\n0     DE          FR   rail\n1    ZZZ         YYY   rail",
-      "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>origin</th>\n      <th>destination</th>\n      <th>method</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>DE</td>\n      <td>FR</td>\n      <td>rail</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>ZZZ</td>\n      <td>YYY</td>\n      <td>rail</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
-     },
-     "execution_count": 9,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
    "source": [
     "routes_coll.find().rows_dataframe"
    ],
    "metadata": {
     "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:51:09.974226Z",
-     "start_time": "2024-05-04T19:51:09.961675Z"
+     "end_time": "2025-03-07T02:08:29.766855Z",
+     "start_time": "2025-03-07T02:08:29.753525Z"
     }
    },
-   "id": "18ffa996e3893b96"
+   "id": "18ffa996e3893b96",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "  origin destination method\n",
+       "0     DE          FR   rail\n",
+       "1    ZZZ         YYY   rail"
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>origin</th>\n",
+       "      <th>destination</th>\n",
+       "      <th>method</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>DE</td>\n",
+       "      <td>FR</td>\n",
+       "      <td>rail</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>ZZZ</td>\n",
+       "      <td>YYY</td>\n",
+       "      <td>rail</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 12
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
+   "source": "results = list(db.iter_validate_database())",
+   "metadata": {
+    "collapsed": false,
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:08:29.880295Z",
+     "start_time": "2025-03-07T02:08:29.792681Z"
+    }
+   },
+   "id": "c67517aece5d47c5",
    "outputs": [
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='ZZZ' instance_index=None instantiates='Country'\n",
-      "type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='YYY' instance_index=None instantiates='Country'\n"
+      "type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='ZZZ' instance_index=None instantiates='Country' context=[] source=None\n",
+      "type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='YYY' instance_index=None instantiates='Country' context=[] source=None\n"
      ]
     }
    ],
-   "source": [
-    "results = list(db.iter_validate_database())\n",
-    "for result in results:\n",
-    "    print(result)"
-   ],
+   "execution_count": 13
+  },
+  {
    "metadata": {
-    "collapsed": false,
     "ExecuteTime": {
-     "end_time": "2024-05-04T19:52:20.044928Z",
-     "start_time": "2024-05-04T19:52:19.996008Z"
+     "end_time": "2025-03-07T02:09:42.929682Z",
+     "start_time": "2025-03-07T02:09:42.926860Z"
     }
    },
-   "id": "c67517aece5d47c5"
+   "cell_type": "code",
+   "source": "assert any(r for r in results if \"Referential integrity\" in r.message)",
+   "id": "ab65fa35df1319fa",
+   "outputs": [],
+   "execution_count": 14
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:09:59.275684Z",
+     "start_time": "2025-03-07T02:09:59.273035Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "for result in results:\n",
+    "    print(\"Expected error: \", result)"
+   ],
+   "id": "755df23ea86fb8fe",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Expected error:  type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='ZZZ' instance_index=None instantiates='Country' context=[] source=None\n",
+      "Expected error:  type='ReferentialIntegrity' severity=<Severity.ERROR: 'ERROR'> message='Referential integrity error: Country not found' instance='YYY' instance_index=None instantiates='Country' context=[] source=None\n"
+     ]
+    }
+   ],
+   "execution_count": 16
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "## Command Line Example using DuckDB\n",
+    "\n",
+    "We'll next show a command line example; we will use DuckDB here and CSVs, but the same principles apply to other databases and formats.\n",
+    "\n",
+    "First we'll make two CSVs, one for patients and one for samples. The samples will refer to patients.\n"
+   ],
+   "id": "cbfa9918f43120bb"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:53:43.124840Z",
+     "start_time": "2025-03-07T02:53:43.120716Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "PATIENTS = \"\"\"id,name,age\n",
+    "p1,John Doe,34\n",
+    "p2,Jane Doe,65\n",
+    "\"\"\"\n",
+    "with open(\"output/patients.csv\", \"w\") as stream:\n",
+    "    stream.write(PATIENTS)"
+   ],
+   "id": "c5180f555f0d8532",
+   "outputs": [],
+   "execution_count": 81
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:53:44.072343Z",
+     "start_time": "2025-03-07T02:53:44.069087Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "SAMPLES = \"\"\"id,patient\n",
+    "s1,p1\n",
+    "s2,p2\n",
+    "s3,p2\n",
+    "\"\"\"\n",
+    "with open(\"output/samples.csv\", \"w\") as stream:\n",
+    "    stream.write(SAMPLES)"
+   ],
+   "id": "b98c49c121875d2c",
+   "outputs": [],
+   "execution_count": 82
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "Note this dataset is well-behaved, every sample refers to a patient.\n",
+    "\n",
+    "There is one issue with the data though, and that is that the default loader doesn't perform ptype inference, so the ages will\n",
+    "be treated as strings.\n",
+    "\n",
+    "Next we'll add a schema file"
+   ],
+   "id": "e59cea007cb4677a"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:03.648738Z",
+     "start_time": "2025-03-07T02:57:03.642949Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "SCHEMA = \"\"\"\n",
+    "id: http://example.org/patients\n",
+    "name: patients\n",
+    "description: Patients and samples\n",
+    "prefixes:\n",
+    "  linkml: http://w3id.org/linkml/\n",
+    "  ex: http://example.org/\n",
+    "default_prefix: ex  \n",
+    "imports:\n",
+    "  - linkml:types\n",
+    "classes:\n",
+    "  Sample:\n",
+    "    attributes:\n",
+    "      id:\n",
+    "        identifier: true\n",
+    "      patient:\n",
+    "        range: Patient\n",
+    "\n",
+    "  Patient:\n",
+    "    attributes:\n",
+    "      id:\n",
+    "        identifier: true\n",
+    "      name:\n",
+    "        required: true\n",
+    "      age:\n",
+    "        range: integer\n",
+    "\"\"\"\n",
+    "with open(\"output/patients.linkml.yaml\", \"w\") as stream:\n",
+    "    stream.write(SCHEMA)"
+   ],
+   "id": "bce56a2623bda439",
+   "outputs": [],
+   "execution_count": 86
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "### Load data into DuckDB\n",
+    "\n",
+    "We'll first clear any older databases we may have created"
+   ],
+   "id": "89949c3688a654d2"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:04.596382Z",
+     "start_time": "2025-03-07T02:57:04.593728Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "from pathlib import Path\n",
+    "\n",
+    "Path(\"output/patient_samples.ddb\").unlink(missing_ok=True)"
+   ],
+   "id": "d1688d7868c91f51",
+   "outputs": [],
+   "execution_count": 87
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "Then we'll load the data",
+   "id": "d137280f635ffdaf"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:09.101026Z",
+     "start_time": "2025-03-07T02:57:05.936337Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store \\\n",
+    "   -d output/patient_samples.ddb \\\n",
+    "   -c Patient \\\n",
+    "   insert output/patients.csv\n"
+   ],
+   "id": "3fb54173c9dc7ef6",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 2 objects from output/patients.csv into collection 'Patient'.\n"
+     ]
+    }
+   ],
+   "execution_count": 88
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:11.542085Z",
+     "start_time": "2025-03-07T02:57:09.108440Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store \\\n",
+    "  -d output/patient_samples.ddb \\\n",
+    "  -c Sample \\\n",
+    "  insert output/samples.csv"
+   ],
+   "id": "b02ecd6e707d8c4",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 3 objects from output/samples.csv into collection 'Sample'.\n"
+     ]
+    }
+   ],
+   "execution_count": 89
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "### Check Referential Integrity (no RI)\n",
+    "\n",
+    "We don't expect any referential integrity issues here\n",
+    "\n"
+   ],
+   "id": "beb5290779c89866"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:27.170889Z",
+     "start_time": "2025-03-07T02:57:24.627460Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store --schema output/patients.linkml.yaml -d output/patient_samples.ddb validate -O csv"
+   ],
+   "id": "1e2fac4b84ac1188",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "type,severity,message,instance,instance_index,instantiates,context\r\n",
+      "jsonschema validation,ERROR,\"'34' is not of type 'integer', 'null' in /age\",\"{'id': 'p1', 'name': 'John Doe', 'age': '34'}\",0,Patient,[]\r\n",
+      "jsonschema validation,ERROR,\"'65' is not of type 'integer', 'null' in /age\",\"{'id': 'p2', 'name': 'Jane Doe', 'age': '65'}\",0,Patient,[]\r\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 90
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "### Adding dangling references\n",
+    "\n",
+    "We'll deliberately add a sample that refers to a non-existent patient"
+   ],
+   "id": "fcfe323a8374efe7"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:57:51.753795Z",
+     "start_time": "2025-03-07T02:57:48.526129Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store \\\n",
+    "  -d output/patient_samples.ddb \\\n",
+    "  -c Sample \\\n",
+    "  insert --object '{\"id\": \"s4\", \"patient\": \"p3\"}'"
+   ],
+   "id": "fbd2644bdba7b35",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Inserted 1 objects from {\"id\": \"s4\", \"patient\": \"p3\"} into collection 'Sample'.\n"
+     ]
+    }
+   ],
+   "execution_count": 91
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": "And then re-validate",
+   "id": "6632297dfd6934d6"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-03-07T02:58:06.960138Z",
+     "start_time": "2025-03-07T02:58:03.546955Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "%%bash\n",
+    "linkml-store --schema output/patients.linkml.yaml --set ensure_referential_integrity=true -d output/patient_samples.ddb validate -O csv"
+   ],
+   "id": "9c572e7e68343dee",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "type,severity,message,instance,instance_index,instantiates,context\r\n",
+      "jsonschema validation,ERROR,\"'34' is not of type 'integer', 'null' in /age\",\"{'id': 'p1', 'name': 'John Doe', 'age': '34'}\",0,Patient,[]\r\n",
+      "jsonschema validation,ERROR,\"'65' is not of type 'integer', 'null' in /age\",\"{'id': 'p2', 'name': 'Jane Doe', 'age': '65'}\",0,Patient,[]\r\n",
+      "ReferentialIntegrity,ERROR,Referential integrity error: Patient not found,p3,,Patient,[]\r\n",
+      "\n"
+     ]
+    }
+   ],
+   "execution_count": 92
+  },
+  {
+   "metadata": {},
+   "cell_type": "code",
+   "outputs": [],
+   "execution_count": null,
+   "source": "",
+   "id": "edd5d9b201dbfa5f"
   }
  ],
  "metadata": {

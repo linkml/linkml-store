@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="../../../../../about.html" /><link rel="index" title="Index" href="../../../../../genindex.html" /><link rel="search" title="Search" href="../../../../../search.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.mongodb.mongodb_collection - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -221,6 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Perform-LLM-Inference.html">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -347,6 +348,98 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_post_insert_hook</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="MongoDBCollection.index">
+<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.MongoDBCollection.index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span>
+        <span class="n">index_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create indexes on the collection.</span>
+
+<span class="sd">        :param objs: Field(s) to index.</span>
+<span class="sd">        :param index_name: Optional name for the index.</span>
+<span class="sd">        :param replace: If True, the index will be dropped and recreated.</span>
+<span class="sd">        :param unique: If True, creates a unique index (default: False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
+
+        <span class="n">existing_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">index_information</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">field_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">index_to_drop</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Extract existing index details</span>
+            <span class="k">for</span> <span class="n">index_name_existing</span><span class="p">,</span> <span class="n">index_details</span> <span class="ow">in</span> <span class="n">existing_indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">index_details</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="p">[])]</span>  <span class="c1"># Extract field names</span>
+
+                <span class="k">if</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">indexed_fields</span><span class="p">:</span>  <span class="c1"># If this field is already indexed</span>
+                    <span class="n">field_exists</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">index_to_drop</span> <span class="o">=</span> <span class="n">index_name_existing</span> <span class="k">if</span> <span class="n">replace</span> <span class="k">else</span> <span class="kc">None</span>
+
+            <span class="c1"># Drop the index if replace=True and index_to_drop is valid</span>
+            <span class="k">if</span> <span class="n">index_to_drop</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">drop_index</span><span class="p">(</span><span class="n">index_to_drop</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dropped existing index: </span><span class="si">{</span><span class="n">index_to_drop</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Create the new index only if it doesn&#39;t exist or was dropped</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">field_exists</span> <span class="ow">or</span> <span class="n">replace</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">index_name</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="n">unique</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created new index: </span><span class="si">{</span><span class="n">index_name</span><span class="si">}</span><span class="s2"> on field </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">, unique=</span><span class="si">{</span><span class="n">unique</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Index already exists for field </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">, skipping creation.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MongoDBCollection.upsert">
+<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.MongoDBCollection.upsert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">upsert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">]],</span>
+        <span class="n">filter_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">update_fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Upsert one or more documents into the MongoDB collection.</span>
+
+<span class="sd">        :param objs: The document(s) to insert or update.</span>
+<span class="sd">        :param filter_fields: List of field names to use as the filter for matching existing documents.</span>
+<span class="sd">        :param update_fields: List of field names to include in the update. If None, all fields are updated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">objs</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="c1"># Ensure filter fields exist in the object</span>
+            <span class="n">filter_criteria</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">filter_fields</span> <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">filter_criteria</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one valid filter field must be present in each object.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Check if a document already exists</span>
+            <span class="n">existing_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="n">filter_criteria</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">existing_doc</span><span class="p">:</span>
+                <span class="c1"># Update only changed fields</span>
+                <span class="n">updates</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">update_fields</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">obj</span> <span class="ow">and</span> <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">existing_doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)}</span>
+
+                <span class="k">if</span> <span class="n">updates</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">update_one</span><span class="p">(</span><span class="n">filter_criteria</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;$set&quot;</span><span class="p">:</span> <span class="n">updates</span><span class="p">})</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated existing document: </span><span class="si">{</span><span class="n">filter_criteria</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">updates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No changes detected for document: </span><span class="si">{</span><span class="n">filter_criteria</span><span class="si">}</span><span class="s2">. Skipping update.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Insert a new document</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inserted new document: </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="MongoDBCollection.query">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.MongoDBCollection.query">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
@@ -392,6 +485,8 @@
         <span class="n">facet_limit</span><span class="o">=</span><span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+        <span class="k">if</span> <span class="n">facet_limit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">facet_limit</span> <span class="o">=</span> <span class="n">DEFAULT_FACET_LIMIT</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">facet_columns</span><span class="p">:</span>
             <span class="n">facet_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -531,7 +626,7 @@
 </div><script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/scripts/furo.js?v=5fa4622c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

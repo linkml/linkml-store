@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Perform LLM Inference" href="Perform-LLM-Inference.html" /><link rel="prev" title="How to predict missing data" href="Predict-Missing-Data.html" />
+<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Reference" href="../reference/index.html" /><link rel="prev" title="Perform RAG Inference" href="Perform-RAG-Inference.html" />
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Perform RAG Inference - linkml-store documentation</title>
+        <title>Perform LLM Inference - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -222,8 +222,8 @@
 <li class="toctree-l2"><a class="reference internal" href="Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Predict-Missing-Data.html">How to predict missing data</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Perform RAG Inference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Perform-LLM-Inference.html">Perform LLM Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -287,7 +287,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/how-to/Perform-RAG-Inference.ipynb.txt" title="View this page">
+  <a class="muted-link" href="../_sources/how-to/Perform-LLM-Inference.ipynb.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -307,21 +307,23 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="Perform-RAG-Inference">
-<h1>Perform RAG Inference<a class="headerlink" href="#Perform-RAG-Inference" title="Link to this heading"></a></h1>
-<p>This notebook demonstrates how to perform inference using RAG (Retrieval-Augmented Generation).</p>
-<p>Note that linkml-store is a data-first framework, the main emphasis is not on AI or LLMs. However, it does support a pluggable <strong>Inference</strong> framework, and one of the integrations is a simple RAG-based inference engine.</p>
+          <section id="Perform-LLM-Inference">
+<h1>Perform LLM Inference<a class="headerlink" href="#Perform-LLM-Inference" title="Link to this heading"></a></h1>
+<p>This notebook demonstrates how to perform inference using LLMs.</p>
+<p>Whereas the <a class="reference internal" href="Perform-RAG-Inference.html"><span class="doc">previous RAG example</span></a> used existing examples, this will perform de-novo inference using a schema.</p>
+<p>Note that linkml-store is a data-first framework, the main emphasis is not on AI or LLMs. However, it does support a pluggable <strong>Inference</strong> framework, and one of the integrations is a simple LLM-based inference engine.</p>
 <p>For this notebook, we will be using the command line interface, but the same can be done programmatically using the Python API.</p>
 <section id="Loading-the-data-into-duckdb">
 <h2>Loading the data into duckdb<a class="headerlink" href="#Loading-the-data-into-duckdb" title="Link to this heading"></a></h2>
+<p>For this we will take all uniprot “caution” free text comments for human proteins and load them into a duckdb database.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
 mkdir<span class="w"> </span>-p<span class="w"> </span>tmp
-rm<span class="w"> </span>-rf<span class="w"> </span>tmp/countries.ddb
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>insert<span class="w"> </span>../../tests/input/countries/countries.jsonl
+rm<span class="w"> </span>-rf<span class="w"> </span>tmp/up.ddb
+linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/up.ddb<span class="w"> </span>-c<span class="w"> </span>Entry<span class="w"> </span>insert<span class="w"> </span>../../tests/input/uniprot/uniprot-comments.tsv
 </pre></div>
 </div>
 </div>
@@ -330,7 +332,7 @@ linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/cou
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Inserted 20 objects from ../../tests/input/countries/countries.jsonl into collection &#39;countries&#39;.
+Inserted 2390 objects from ../../tests/input/uniprot/uniprot-comments.tsv into collection &#39;Entry&#39;.
 </pre></div></div>
 </div>
 <p>Let’s check what this looks like by using <code class="docutils literal notranslate"><span class="pre">describe</span></code> and examining the first entry:</p>
@@ -339,7 +341,7 @@ Inserted 20 objects from ../../tests/input/countries/countries.jsonl into collec
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>describe
+linkml-store<span class="w"> </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>describe
 </pre></div>
 </div>
 </div>
@@ -348,52 +350,22 @@ linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/cou
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-          count unique               top freq
-capital      20     20  Washington, D.C.    1
-code         20     20                US    1
-continent    20      6            Europe    5
-languages    20     15         [English]    4
-name         20     20     United States    1
+         count unique                                   top  freq
+category  2390      1                                        2390
+id        2390   2284                            EFC2_HUMAN     4
+text      2390   1383  Could be the product of a pseudogene   259
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>query<span class="w"> </span>--limit<span class="w"> </span><span class="m">1</span><span class="w"> </span>-O<span class="w"> </span>yaml
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-name: United States
-code: US
-capital: Washington, D.C.
-continent: North America
-languages:
-- English
-
-</pre></div></div>
-</div>
-<p>First we will check we don’t already have the country we will use for testing in the database (the <code class="docutils literal notranslate"><span class="pre">countries.jsonl</span></code> file is intentionally incomplete)</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
+</section>
+<section id="Introspecting-the-schema">
+<h2>Introspecting the schema<a class="headerlink" href="#Introspecting-the-schema" title="Link to this heading"></a></h2>
+<p>Here we will use a ready-made LinkML schema that has the categories we want to assign as a LinkML enum, with examples (examples in schemas help humans <em>and</em> LLMs)</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>query<span class="w"> </span>-w<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span>
+linkml-store<span class="w"> </span>-S<span class="w"> </span>../../tests/input/uniprot/schema.yaml<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>schema
 </pre></div>
 </div>
 </div>
@@ -402,18 +374,163 @@ linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/cou
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[]
+name: uniprot-comments
+id: http://example.org/uniprot-comments
+imports:
+- linkml:types
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  up:
+    prefix_prefix: up
+    prefix_reference: http://example.org/tuniprot-comments
+default_prefix: up
+default_range: string
+enums:
+  CommentCategory:
+    name: CommentCategory
+    permissible_values:
+      FUNCTION_DISPUTED:
+        text: FUNCTION_DISPUTED
+        description: A caution indicating that a previously reported function has
+          been challenged or disproven in subsequent studies; may warrant GO NOT annotation
+        examples:
+        - value: FUNCTION_DISPUTED
+          description: Originally described for its in vitro hydrolytic activity towards
+            dGMP, dAMP and dIMP. However, this was not confirmed in vivo
+      FUNCTION_PREDICTION_ONLY:
+        text: FUNCTION_PREDICTION_ONLY
+        description: A caution indicating function is based only on computational
+          prediction or sequence similarity
+        examples:
+        - value: FUNCTION_PREDICTION_ONLY
+          description: Predicted to be involved in X based on sequence similarity
+      FUNCTION_LACKS_EVIDENCE:
+        text: FUNCTION_LACKS_EVIDENCE
+        description: A caution indicating insufficient experimental evidence to support
+          predicted function
+        examples:
+        - value: FUNCTION_LACKS_EVIDENCE
+          description: In contrast to other Macro-domain containing proteins, lacks
+            ADP-ribose glycohydrolase activity
+      FUNCTION_DEBATED:
+        text: FUNCTION_DEBATED
+        description: A caution about ongoing scientific debate regarding function;
+          differs from DISPUTED in lacking clear evidence against
+        examples:
+        - value: FUNCTION_DEBATED
+          description: Was initially thought to act as a major regulator of cardiac
+            hypertrophy... However, while PDE5A regulates nitric-oxide-generated cGMP,
+            nitric oxide signaling is often depressed by heart disease, limiting its
+            effect
+      LOCALIZATION_DISPUTED:
+        text: LOCALIZATION_DISPUTED
+        description: A caution about conflicting or uncertain cellular localization
+          evidence
+        examples:
+        - value: LOCALIZATION_DISPUTED
+          description: Cellular localization remains to be finally defined. While
+            most authors have deduced a localization at the basolateral side, other
+            studies demonstrated an apical localization
+      NAMING_CONFUSION:
+        text: NAMING_CONFUSION
+        description: A caution about potential confusion with similarly named proteins
+          or historical naming issues
+        examples:
+        - value: NAMING_CONFUSION
+          description: This protein should not be confused with the conventional myosin-1
+            (MYH1);Was termed importin alpha-4
+      GENE_COPY_NUMBER:
+        text: GENE_COPY_NUMBER
+        description: A caution about gene duplication or copy number that might affect
+          interpretation
+        examples:
+        - value: GENE_COPY_NUMBER
+          description: Maps to a duplicated region on chromosome 15; the gene is present
+            in at least 3 almost identical copies
+      EXPRESSION_MECHANISM_UNCLEAR:
+        text: EXPRESSION_MECHANISM_UNCLEAR
+        description: A caution about unclear or unusual mechanisms of gene expression
+          or protein production
+        examples:
+        - value: EXPRESSION_MECHANISM_UNCLEAR
+          description: This peptide has been shown to be biologically active but is
+            the product of a mitochondrial gene. The mechanisms allowing the production
+            and secretion of the peptide remain unclear
+      SEQUENCE_FEATURE_MISSING:
+        text: SEQUENCE_FEATURE_MISSING
+        description: A caution about missing or unexpected sequence features that
+          might affect function
+        examples:
+        - value: SEQUENCE_FEATURE_MISSING
+          description: No predictable signal peptide
+      SPECIES_DIFFERENCE:
+        text: SPECIES_DIFFERENCE
+        description: A caution about significant functional or property differences
+          between orthologs
+        examples:
+        - value: SPECIES_DIFFERENCE
+          description: Affinity and capacity of the transporter for endogenous substrates
+            vary among orthologs. For endogenous compounds such as dopamine, histamine,
+            serotonin and thiamine, mouse ortholog display higher affinity
+      PUBLICATION_CONFLICT:
+        text: PUBLICATION_CONFLICT
+        description: A caution about conflicting published evidence or interpretation
+        examples:
+        - value: PUBLICATION_CONFLICT
+          description: Although initially reported to transport carnitine across the
+            hepatocyte membrane, another study was unable to verify this finding
+      CLAIMS_RETRACTED:
+        text: CLAIMS_RETRACTED
+        description: A caution about function claims that were retracted or withdrawn
+        examples:
+        - value: CLAIMS_RETRACTED
+          description: Has been reported to enhance netrin-induced phosphorylation
+            of PAK1 and FYN... This article has been withdrawn by the authors
+      PROTEIN_IDENTITY:
+        text: PROTEIN_IDENTITY
+        description: A caution about uncertainty in the identity or existence of distinct
+          protein products
+        examples:
+        - value: PROTEIN_IDENTITY
+          description: It is not known whether the so-called human ASE1 and human
+            CAST proteins represent two sides of a single gene product
+      FUNCTION_UNCERTAIN_INITIATION:
+        text: FUNCTION_UNCERTAIN_INITIATION
+        description: A caution about uncertainty in translation initiation site
+        examples:
+        - value: FUNCTION_UNCERTAIN_INITIATION
+          description: It is uncertain whether Met-1 or Met-37 is the initiator
+      PSEUDOGENE_STATUS:
+        text: PSEUDOGENE_STATUS
+        description: A caution about whether the gene encodes a protein
+        examples:
+        - value: PSEUDOGENE_STATUS
+          description: Could be the product of a pseudogene
+classes:
+  Entry:
+    name: Entry
+    attributes:
+      id:
+        name: id
+        identifier: true
+      category:
+        name: category
+        range: CommentCategory
+      text:
+        name: text
+        description: The text of the comment
+source_file: ../../tests/input/uniprot/schema.yaml
+
 </pre></div></div>
 </div>
-</section>
-<section id="Inferring-a-specific-field">
-<h2>Inferring a specific field<a class="headerlink" href="#Inferring-a-specific-field" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-T<span class="w"> </span>languages<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span>
+linkml-store<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>-c<span class="w"> </span>cv<span class="w"> </span>insert<span class="w"> </span>../../tests/input/uniprot/uniprot-caution-cv.csv
 </pre></div>
 </div>
 </div>
@@ -422,614 +539,48 @@ linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/cou
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-predicted_object:
-  languages:
-  - Spanish
-
-</pre></div></div>
-</div>
-<p>The RAG engine works by first indexing the countries collection by embedding each entry. The top N results matching the query are fetched and used as <em>context</em> for the LLM query.</p>
-<p>Note that in this particular case, we have a very small collection of twenty entries, and it’s not even necessary to perform RAG at all, as the entire collection can easily fit within the context window of the LLM query. However, this small set is useful for demo purposes.</p>
-</section>
-<section id="Inferring-a-whole-object">
-<h2>Inferring a whole object<a class="headerlink" href="#Inferring-a-whole-object" title="Link to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Montevideo
-  code: UY
-  continent: South America
-  languages:
-  - Spanish
-
-</pre></div></div>
-</div>
-</section>
-<section id="Inferring-from-multiple-fields">
-<h2>Inferring from multiple fields<a class="headerlink" href="#Inferring-from-multiple-fields" title="Link to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w">  </span>-q<span class="w"> </span><span class="s2">&quot;{continent: South America, languages: [Dutch]}&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Paramaribo
-  code: SR
-  name: Suriname
-
-</pre></div></div>
-</div>
-</section>
-<section id="RAG-configuration---using-a-different-model">
-<h2>RAG configuration - using a different model<a class="headerlink" href="#RAG-configuration---using-a-different-model" title="Link to this heading"></a></h2>
-<p>The datasette llm framework is used under the hood. This means that you can use the <code class="docutils literal notranslate"><span class="pre">llm</span></code> command to list the available models and configurations, as well as install new ones.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-llm<span class="w"> </span>models
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-OpenAI Chat: gpt-3.5-turbo (aliases: 3.5, chatgpt)
-OpenAI Chat: gpt-3.5-turbo-16k (aliases: chatgpt-16k, 3.5-16k)
-OpenAI Chat: gpt-4 (aliases: 4, gpt4)
-OpenAI Chat: gpt-4-32k (aliases: 4-32k)
-OpenAI Chat: gpt-4-1106-preview
-OpenAI Chat: gpt-4-0125-preview
-OpenAI Chat: gpt-4-turbo-2024-04-09
-OpenAI Chat: gpt-4-turbo (aliases: gpt-4-turbo-preview, 4-turbo, 4t)
-OpenAI Chat: gpt-4o (aliases: 4o)
-OpenAI Chat: gpt-4o-mini (aliases: 4o-mini)
-OpenAI Completion: gpt-3.5-turbo-instruct (aliases: 3.5-instruct, chatgpt-instruct)
-OpenAI Chat: gpt-4-vision-preview (aliases: 4V, gpt-4-vision)
-OpenAI Chat: litellm-mixtral
-OpenAI Chat: litellm-llama3
-OpenAI Chat: litellm-llama3-chatqa
-OpenAI Chat: litellm-groq-mixtral
-OpenAI Chat: litellm-groq-llama
-OpenAI Chat: gpt-4o-2024-05-13 (aliases: 4o, gpt-4o)
-OpenAI Chat: lbl/llama-3
-OpenAI Chat: lbl/claude-opus
-OpenAI Chat: lbl/claude-sonnet
-OpenAI Chat: lbl/gpt-4o
-OpenAI Chat: lbl/llama-3
-Anthropic Messages: claude-3-opus-20240229 (aliases: claude-3-opus)
-Anthropic Messages: claude-3-sonnet-20240229 (aliases: claude-3-sonnet)
-Anthropic Messages: claude-3-haiku-20240307 (aliases: claude-3-haiku)
-Anthropic Messages: claude-3-5-sonnet-20240620 (aliases: claude-3.5-sonnet)
-</pre></div></div>
-</div>
-<p>We’ll try <code class="docutils literal notranslate"><span class="pre">claude-3-haiku</span></code>, a small model. This may not be powerful enough for extraction tasks, but general knowledge about countries should be within its capabilities.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag:llm_config.model_name<span class="o">=</span>claude-3-haiku<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Montevideo
-  code: UY
-  continent: South America
-  languages:
-  - Spanish
-
-</pre></div></div>
-</div>
-</section>
-<section id="Persisting-the-RAG-model">
-<h2>Persisting the RAG model<a class="headerlink" href="#Persisting-the-RAG-model" title="Link to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span><span class="w"> </span>-E<span class="w"> </span>tmp/countries.rag.json
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Montevideo
-  code: UY
-  continent: South America
-  languages:
-  - Spanish
-
+Inserted 15 objects from ../../tests/input/uniprot/uniprot-caution-cv.csv into collection &#39;cv&#39;.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-ls<span class="w"> </span>-l<span class="w"> </span>tmp/countries.rag.json
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
--rw-r--r--  1 cjm  staff  498212 Aug 21 16:05 tmp/countries.rag.json
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span><span class="w"> </span>-L<span class="w"> </span>tmp/countries.rag.json
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Montevideo
-  code: UY
-  continent: South America
-  languages:
-  - Spanish
-
-</pre></div></div>
-</div>
-</section>
-<section id="Evaluation">
-<h2>Evaluation<a class="headerlink" href="#Evaluation" title="Link to this heading"></a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w">  </span>-T<span class="w"> </span>languages<span class="w"> </span>-T<span class="w"> </span>code<span class="w"> </span>-F<span class="w"> </span>name<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Outcome: true_positive_count=5.0 total_count=5 // accuracy: 1.0
-</pre></div></div>
-</div>
-</section>
-<section id="How-RAG-indexing-works-under-the-hood">
-<h2>How RAG indexing works under the hood<a class="headerlink" href="#How-RAG-indexing-works-under-the-hood" title="Link to this heading"></a></h2>
-<p>Behind the scenes, whenever you use the RAG inference engine, a separate collection is automatically created for a test dataset; additionally, an index is also created in the same database. This is true regardless of the database backend (DuckDB, MongoDB, etc.).</p>
-<p>(note: if you are using an in-memory duckdb instance then the index is forgotten after each run, which could get expensive if you have a large collection).</p>
-<p>Let’s examine our database to see the new collection and index. We will use the Jupyter SQL magic to query the database.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> sql
-<span class="o">%</span><span class="k">config</span> SqlMagic.autopandas = True
-<span class="o">%</span><span class="k">config</span> SqlMagic.feedback = False
-<span class="o">%</span><span class="k">config</span> SqlMagic.displaycon = False
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-The sql extension is already loaded. To reload it, use:
-  %reload_ext sql
-</pre></div></div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-cp<span class="w"> </span>tmp/countries.ddb<span class="w"> </span>tmp/countries-copy.ddb
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">sql</span> duckdb:///tmp/countries-copy.ddb
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
-</pre></div>
-</div>
-<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
-<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>table_catalog</th>
-      <th>table_schema</th>
-      <th>table_name</th>
-      <th>table_type</th>
-      <th>self_referencing_column_name</th>
-      <th>reference_generation</th>
-      <th>user_defined_type_catalog</th>
-      <th>user_defined_type_schema</th>
-      <th>user_defined_type_name</th>
-      <th>is_insertable_into</th>
-      <th>is_typed</th>
-      <th>commit_action</th>
-      <th>TABLE_COMMENT</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>countries-copy</td>
-      <td>main</td>
-      <td>countries</td>
-      <td>BASE TABLE</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>YES</td>
-      <td>NO</td>
-      <td>None</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>countries-copy</td>
-      <td>main</td>
-      <td>countries__rag_train</td>
-      <td>BASE TABLE</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>YES</td>
-      <td>NO</td>
-      <td>None</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>countries-copy</td>
-      <td>main</td>
-      <td>internal__index__countries__rag_train__llm</td>
-      <td>BASE TABLE</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>YES</td>
-      <td>NO</td>
-      <td>None</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
-</pre></div>
-</div>
-<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
-<span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">internal__index__countries__rag_train__llm</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">5</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>name</th>
-      <th>code</th>
-      <th>capital</th>
-      <th>continent</th>
-      <th>languages</th>
-      <th>__index__</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Argentina</td>
-      <td>AR</td>
-      <td>Buenos Aires</td>
-      <td>South America</td>
-      <td>[Spanish]</td>
-      <td>[-0.009016353, 0.02336632, 0.007532564, -0.008...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>South Korea</td>
-      <td>KR</td>
-      <td>Seoul</td>
-      <td>Asia</td>
-      <td>[Korean]</td>
-      <td>[3.8781454e-05, 0.013463534, 0.017664365, -0.0...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>United States</td>
-      <td>US</td>
-      <td>Washington, D.C.</td>
-      <td>North America</td>
-      <td>[English]</td>
-      <td>[-0.0077237985, 0.016569635, -0.0042663547, -0...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Nigeria</td>
-      <td>NG</td>
-      <td>Abuja</td>
-      <td>Africa</td>
-      <td>[English]</td>
-      <td>[-0.0055540577, 0.0037728157, -0.003473751, -0...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>India</td>
-      <td>IN</td>
-      <td>New Delhi</td>
-      <td>Asia</td>
-      <td>[Hindi, English]</td>
-      <td>[-0.0031975685, 0.025214365, 0.002862445, 0.00...</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
-</pre></div>
-</div>
-<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
-<span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">internal__index__countries__rag_train__llm</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>count_star()</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>14</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
-</pre></div>
-</div>
-<div class="input_area highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">sql</span>
-<span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">countries</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>count_star()</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>20</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
-</div>
-</section>
-<section id="Configuring-the-training/test-split">
-<h2>Configuring the training/test split<a class="headerlink" href="#Configuring-the-training/test-split" title="Link to this heading"></a></h2>
-<p>By default, the infer command will split your data in collection into a test and train set. This is useful for evaluation, but if you want to use the entire dataset, or you want to configure the split size, you can use <code class="docutils literal notranslate"><span class="pre">--training-test-data-split</span></code> (<code class="docutils literal notranslate"><span class="pre">-S</span></code>).</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
-</pre></div>
-</div>
-<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w">  </span>-d<span class="w"> </span>duckdb:///tmp/countries.ddb<span class="w"> </span>-c<span class="w"> </span>countries<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-S<span class="w"> </span><span class="m">1</span>.0<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;name: Uruguay&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-predicted_object:
-  capital: Montevideo
-  code: UY
-  continent: South America
-  languages:
-  - Spanish
-
-</pre></div></div>
-</div>
-</section>
-<section id="Extraction-tasks">
-<h2>Extraction tasks<a class="headerlink" href="#Extraction-tasks" title="Link to this heading"></a></h2>
-<p>We can also use this engine for <em>extraction tasks</em> - this involves extracting structured data or knowledge from textual or unstructured data.</p>
-<p>In fact, we don’t need any new capabilities here - extraction can just be seen as a special case of inference, where the feature set includes or is restricted to text, and the target set is the whole object.</p>
-<p>We can demonstrate this with a simple zero-shot example:</p>
-<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{text: I saw the cat sitting on the mat, subject: cat, predicate: sits-on, object: mat}&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>tmp/extraction-examples.yaml
+linkml-store<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb::cv<span class="w"> </span>query<span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span><span class="w"> </span>-O<span class="w"> </span>yaml
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+TERM: FUNCTION_DISPUTED
+DEFINITION: A caution indicating that a previously reported function has been challenged
+  or disproven in subsequent studies; may warrant GO NOT annotation
+EXAMPLES: Originally described for its in vitro hydrolytic activity towards dGMP,
+  dAMP and dIMP. However, this was not confirmed in vivo
+---
+TERM: FUNCTION_PREDICTION_ONLY
+DEFINITION: A caution indicating function is based only on computational prediction
+  or sequence similarity
+EXAMPLES: Predicted to be involved in X based on sequence similarity
+---
+TERM: FUNCTION_LACKS_EVIDENCE
+DEFINITION: A caution indicating insufficient experimental evidence to support predicted
+  function
+EXAMPLES: In contrast to other Macro-domain containing proteins, lacks ADP-ribose
+  glycohydrolase activity
+
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
 </pre></div>
 </div>
 <div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
-linkml-store<span class="w"> </span>-i<span class="w"> </span>tmp/extraction-examples.yaml<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>rag<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;text: the Earth rotates around the Sun&quot;</span>
+linkml-store<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>query<span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span><span class="w"> </span>-O<span class="w"> </span>yaml
 </pre></div>
 </div>
 </div>
@@ -1038,20 +589,372 @@ linkml-store<span class="w"> </span>-i<span class="w"> </span>tmp/extraction-exa
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-predicted_object:
-  object: Sun
-  predicate: rotates-around
-  subject: Earth
+TERM: FUNCTION_DISPUTED
+DEFINITION: A caution indicating that a previously reported function has been challenged
+  or disproven in subsequent studies; may warrant GO NOT annotation
+EXAMPLES: Originally described for its in vitro hydrolytic activity towards dGMP,
+  dAMP and dIMP. However, this was not confirmed in vivo
+---
+TERM: FUNCTION_PREDICTION_ONLY
+DEFINITION: A caution indicating function is based only on computational prediction
+  or sequence similarity
+EXAMPLES: Predicted to be involved in X based on sequence similarity
+---
+TERM: FUNCTION_LACKS_EVIDENCE
+DEFINITION: A caution indicating insufficient experimental evidence to support predicted
+  function
+EXAMPLES: In contrast to other Macro-domain containing proteins, lacks ADP-ribose
+  glycohydrolase activity
 
 </pre></div></div>
 </div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-S<span class="w"> </span>../../tests/input/uniprot/schema.yaml<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>schema
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: phenopackets, base_dir: /Users/cjm
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: mgi, base_dir: /Users/cjm
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: nmdc, base_dir: /Users/cjm
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: amigo, base_dir: /Users/cjm
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: gocams, base_dir: /Users/cjm
+2025-02-04 11:08:15,383 - linkml_store.api.client - INFO - Initializing database: cadsr, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: mixs, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: mondo, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: hpoa, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: hpoa_mongo, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: hpoa_kg, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: maxoa, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: refmet, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: neo4j, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: gold, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Initializing database: nmdc_duckdb, base_dir: /Users/cjm
+2025-02-04 11:08:15,384 - linkml_store.api.client - INFO - Creating/attaching database: tmp/up.ddb
+2025-02-04 11:08:15,385 - linkml_store.api.client - INFO - Initializing databases
+2025-02-04 11:08:15,385 - linkml_store.api.client - INFO - Attaching tmp/up.ddb
+2025-02-04 11:08:15,388 - linkml_store.api.database - INFO - Setting schema view for duckdb:///tmp/up.ddb
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+name: uniprot-comments
+id: http://example.org/uniprot-comments
+imports:
+- linkml:types
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  up:
+    prefix_prefix: up
+    prefix_reference: http://example.org/tuniprot-comments
+default_prefix: up
+default_range: string
+enums:
+  CommentCategory:
+    name: CommentCategory
+    permissible_values:
+      FUNCTION_DISPUTED:
+        text: FUNCTION_DISPUTED
+        description: A caution indicating that a previously reported function has
+          been challenged or disproven in subsequent studies; may warrant GO NOT annotation
+        examples:
+        - value: FUNCTION_DISPUTED
+          description: Originally described for its in vitro hydrolytic activity towards
+            dGMP, dAMP and dIMP. However, this was not confirmed in vivo
+      FUNCTION_PREDICTION_ONLY:
+        text: FUNCTION_PREDICTION_ONLY
+        description: A caution indicating function is based only on computational
+          prediction or sequence similarity
+        examples:
+        - value: FUNCTION_PREDICTION_ONLY
+          description: Predicted to be involved in X based on sequence similarity
+      FUNCTION_LACKS_EVIDENCE:
+        text: FUNCTION_LACKS_EVIDENCE
+        description: A caution indicating insufficient experimental evidence to support
+          predicted function
+        examples:
+        - value: FUNCTION_LACKS_EVIDENCE
+          description: In contrast to other Macro-domain containing proteins, lacks
+            ADP-ribose glycohydrolase activity
+      FUNCTION_DEBATED:
+        text: FUNCTION_DEBATED
+        description: A caution about ongoing scientific debate regarding function;
+          differs from DISPUTED in lacking clear evidence against
+        examples:
+        - value: FUNCTION_DEBATED
+          description: Was initially thought to act as a major regulator of cardiac
+            hypertrophy... However, while PDE5A regulates nitric-oxide-generated cGMP,
+            nitric oxide signaling is often depressed by heart disease, limiting its
+            effect
+      LOCALIZATION_DISPUTED:
+        text: LOCALIZATION_DISPUTED
+        description: A caution about conflicting or uncertain cellular localization
+          evidence
+        examples:
+        - value: LOCALIZATION_DISPUTED
+          description: Cellular localization remains to be finally defined. While
+            most authors have deduced a localization at the basolateral side, other
+            studies demonstrated an apical localization
+      NAMING_CONFUSION:
+        text: NAMING_CONFUSION
+        description: A caution about potential confusion with similarly named proteins
+          or historical naming issues
+        examples:
+        - value: NAMING_CONFUSION
+          description: This protein should not be confused with the conventional myosin-1
+            (MYH1);Was termed importin alpha-4
+      GENE_COPY_NUMBER:
+        text: GENE_COPY_NUMBER
+        description: A caution about gene duplication or copy number that might affect
+          interpretation
+        examples:
+        - value: GENE_COPY_NUMBER
+          description: Maps to a duplicated region on chromosome 15; the gene is present
+            in at least 3 almost identical copies
+      EXPRESSION_MECHANISM_UNCLEAR:
+        text: EXPRESSION_MECHANISM_UNCLEAR
+        description: A caution about unclear or unusual mechanisms of gene expression
+          or protein production
+        examples:
+        - value: EXPRESSION_MECHANISM_UNCLEAR
+          description: This peptide has been shown to be biologically active but is
+            the product of a mitochondrial gene. The mechanisms allowing the production
+            and secretion of the peptide remain unclear
+      SEQUENCE_FEATURE_MISSING:
+        text: SEQUENCE_FEATURE_MISSING
+        description: A caution about missing or unexpected sequence features that
+          might affect function
+        examples:
+        - value: SEQUENCE_FEATURE_MISSING
+          description: No predictable signal peptide
+      SPECIES_DIFFERENCE:
+        text: SPECIES_DIFFERENCE
+        description: A caution about significant functional or property differences
+          between orthologs
+        examples:
+        - value: SPECIES_DIFFERENCE
+          description: Affinity and capacity of the transporter for endogenous substrates
+            vary among orthologs. For endogenous compounds such as dopamine, histamine,
+            serotonin and thiamine, mouse ortholog display higher affinity
+      PUBLICATION_CONFLICT:
+        text: PUBLICATION_CONFLICT
+        description: A caution about conflicting published evidence or interpretation
+        examples:
+        - value: PUBLICATION_CONFLICT
+          description: Although initially reported to transport carnitine across the
+            hepatocyte membrane, another study was unable to verify this finding
+      CLAIMS_RETRACTED:
+        text: CLAIMS_RETRACTED
+        description: A caution about function claims that were retracted or withdrawn
+        examples:
+        - value: CLAIMS_RETRACTED
+          description: Has been reported to enhance netrin-induced phosphorylation
+            of PAK1 and FYN... This article has been withdrawn by the authors
+      PROTEIN_IDENTITY:
+        text: PROTEIN_IDENTITY
+        description: A caution about uncertainty in the identity or existence of distinct
+          protein products
+        examples:
+        - value: PROTEIN_IDENTITY
+          description: It is not known whether the so-called human ASE1 and human
+            CAST proteins represent two sides of a single gene product
+      FUNCTION_UNCERTAIN_INITIATION:
+        text: FUNCTION_UNCERTAIN_INITIATION
+        description: A caution about uncertainty in translation initiation site
+        examples:
+        - value: FUNCTION_UNCERTAIN_INITIATION
+          description: It is uncertain whether Met-1 or Met-37 is the initiator
+      PSEUDOGENE_STATUS:
+        text: PSEUDOGENE_STATUS
+        description: A caution about whether the gene encodes a protein
+        examples:
+        - value: PSEUDOGENE_STATUS
+          description: Could be the product of a pseudogene
+classes:
+  Entry:
+    name: Entry
+    attributes:
+      id:
+        name: id
+        identifier: true
+      category:
+        name: category
+        range: CommentCategory
+      text:
+        name: text
+        description: The text of the comment
+source_file: ../../tests/input/uniprot/schema.yaml
+
+</pre></div></div>
+</div>
+</section>
+<section id="Inferring-a-specific-field">
+<h2>Inferring a specific field<a class="headerlink" href="#Inferring-a-specific-field" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-S<span class="w"> </span>../../tests/input/uniprot/schema.yaml<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>-c<span class="w"> </span>Entry<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span>-T<span class="w"> </span>category<span class="w"> </span>--where<span class="w"> </span><span class="s2">&quot;id: MOTSC_HUMAN&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+id: MOTSC_HUMAN
+category: EXPRESSION_MECHANISM_UNCLEAR
+text: This peptide has been shown to be biologically active but is the product of
+  a mitochondrial gene. Usage of the mitochondrial genetic code yields tandem start
+  and stop codons so translation must occur in the cytoplasm. The mechanisms allowing
+  the production and secretion of the peptide remain unclear
+
+</pre></div></div>
+</div>
+</section>
+<section id="Inferring-all-rows">
+<h2>Inferring all rows<a class="headerlink" href="#Inferring-all-rows" title="Link to this heading"></a></h2>
+<p>Here we use a <code class="docutils literal notranslate"><span class="pre">--where</span></code> clause to query all rows in our collection and pass them through the inference engine</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-S<span class="w"> </span>../../tests/input/uniprot/schema.yaml<span class="w">  </span>-d<span class="w"> </span>tmp/up.ddb<span class="w"> </span>-c<span class="w"> </span>Entry<span class="w"> </span>infer<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span>-T<span class="w"> </span>category<span class="w"> </span>--where<span class="w"> </span><span class="s2">&quot;{}&quot;</span><span class="w"> </span>-O<span class="w"> </span>csv<span class="w"> </span>-o<span class="w"> </span>tmp/up.predicted.csv
 </pre></div>
 </div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;tmp/up.predicted.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>category</th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MOTSC_HUMAN</td>
+      <td>EXPRESSION_MECHANISM_UNCLEAR</td>
+      <td>This peptide has been shown to be biologically...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>POTB3_HUMAN</td>
+      <td>GENE_COPY_NUMBER</td>
+      <td>Maps to a duplicated region on chromosome 15; ...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MYO1C_HUMAN</td>
+      <td>NAMING_CONFUSION</td>
+      <td>Represents an unconventional myosin. This prot...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>IMA4_HUMAN</td>
+      <td>NAMING_CONFUSION</td>
+      <td>Was termed importin alpha-4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>S22A1_HUMAN</td>
+      <td>LOCALIZATION_DISPUTED</td>
+      <td>Cellular localization of OCT1 in the intestine...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td>POK9_HUMAN</td>
+      <td>NaN</td>
+      <td>Truncated; frameshift leads to premature stop ...</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>UB2L3_HUMAN</td>
+      <td>PSEUDOGENE_STATUS</td>
+      <td>PubMed:10760570 reported that UBE2L1, UBE2L2 a...</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>CBX1_HUMAN</td>
+      <td>CLAIMS_RETRACTED</td>
+      <td>Was previously reported to interact with ASXL1...</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>H33_HUMAN</td>
+      <td>CLAIMS_RETRACTED</td>
+      <td>The original paper reporting lysine deaminatio...</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td>RELB_HUMAN</td>
+      <td>FUNCTION_DISPUTED</td>
+      <td>Was originally thought to inhibit the transcri...</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 3 columns</p>
+</div></div>
 </div>
 </section>
 </section>
@@ -1061,23 +964,23 @@ predicted_object:
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="Perform-LLM-Inference.html">
+          <a class="next-page" href="../reference/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Perform LLM Inference</div>
+                <div class="title">Reference</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="Predict-Missing-Data.html">
+          <a class="prev-page" href="Perform-RAG-Inference.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">How to predict missing data</div>
+                <div class="title">Perform RAG Inference</div>
                 
               </div>
             </a>
@@ -1111,17 +1014,11 @@ predicted_object:
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Perform RAG Inference</a><ul>
+<li><a class="reference internal" href="#">Perform LLM Inference</a><ul>
 <li><a class="reference internal" href="#Loading-the-data-into-duckdb">Loading the data into duckdb</a></li>
+<li><a class="reference internal" href="#Introspecting-the-schema">Introspecting the schema</a></li>
 <li><a class="reference internal" href="#Inferring-a-specific-field">Inferring a specific field</a></li>
-<li><a class="reference internal" href="#Inferring-a-whole-object">Inferring a whole object</a></li>
-<li><a class="reference internal" href="#Inferring-from-multiple-fields">Inferring from multiple fields</a></li>
-<li><a class="reference internal" href="#RAG-configuration---using-a-different-model">RAG configuration - using a different model</a></li>
-<li><a class="reference internal" href="#Persisting-the-RAG-model">Persisting the RAG model</a></li>
-<li><a class="reference internal" href="#Evaluation">Evaluation</a></li>
-<li><a class="reference internal" href="#How-RAG-indexing-works-under-the-hood">How RAG indexing works under the hood</a></li>
-<li><a class="reference internal" href="#Configuring-the-training/test-split">Configuring the training/test split</a></li>
-<li><a class="reference internal" href="#Extraction-tasks">Extraction tasks</a></li>
+<li><a class="reference internal" href="#Inferring-all-rows">Inferring all rows</a></li>
 </ul>
 </li>
 </ul>

@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Example: Storing an ontology" href="Store-an-Ontology.html" /><link rel="prev" title="How to use Neo4J with LinkML-Store" href="Use-Neo4j.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>How to Check Referential Integrity - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -223,6 +223,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Predict-Missing-Data.html">How to predict missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-LLM-Inference.html">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -323,16 +324,23 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="s2">&quot;mongodb://localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;test-ri&quot;</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">ensure_referential_integrity</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">db</span><span class="o">.</span><span class="n">set_schema_view</span><span class="p">(</span><span class="s2">&quot;../../tests/input/countries/countries.linkml.yaml&quot;</span><span class="p">)</span>
-<span class="n">countries_coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Country&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;countries&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">countries_coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Country&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;countries&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">routes_coll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="s2">&quot;Route&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;routes&quot;</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">COUNTRIES</span> <span class="o">=</span> <span class="s2">&quot;../../tests/input/countries/countries.jsonl&quot;</span>
@@ -341,7 +349,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_objects</span>
@@ -353,7 +361,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -362,7 +370,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">countries_coll</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">countries</span><span class="p">)</span>
@@ -371,7 +379,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">routes_coll</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows</span>
@@ -379,7 +387,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -388,7 +396,7 @@
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">iter_validate_database</span><span class="p">():</span>
@@ -400,7 +408,7 @@
 <h2>Inserting invalid data<a class="headerlink" href="#Inserting-invalid-data" title="Link to this heading"></a></h2>
 <p>We will intentionally insert an invalid row</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">routes_coll</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">,</span> <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="s2">&quot;YYY&quot;</span><span class="p">,</span> <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;rail&quot;</span><span class="p">})</span>
@@ -408,7 +416,7 @@
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">routes_coll</span><span class="o">.</span><span class="n">find</span><span class="p">()</span><span class="o">.</span><span class="n">rows_dataframe</span>
@@ -416,7 +424,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -461,12 +469,10 @@
 </div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">iter_validate_database</span><span class="p">())</span>
-<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -475,10 +481,240 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;ZZZ&#39; instance_index=None instantiates=&#39;Country&#39;
-type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;YYY&#39; instance_index=None instantiates=&#39;Country&#39;
+type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;ZZZ&#39; instance_index=None instantiates=&#39;Country&#39; context=[] source=None
+type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;YYY&#39; instance_index=None instantiates=&#39;Country&#39; context=[] source=None
 </pre></div></div>
 </div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="s2">&quot;Referential integrity&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Expected error: &quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Expected error:  type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;ZZZ&#39; instance_index=None instantiates=&#39;Country&#39; context=[] source=None
+Expected error:  type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;&gt; message=&#39;Referential integrity error: Country not found&#39; instance=&#39;YYY&#39; instance_index=None instantiates=&#39;Country&#39; context=[] source=None
+</pre></div></div>
+</div>
+</section>
+<section id="Command-Line-Example-using-DuckDB">
+<h2>Command Line Example using DuckDB<a class="headerlink" href="#Command-Line-Example-using-DuckDB" title="Link to this heading"></a></h2>
+<p>We’ll next show a command line example; we will use DuckDB here and CSVs, but the same principles apply to other databases and formats.</p>
+<p>First we’ll make two CSVs, one for patients and one for samples. The samples will refer to patients.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[81]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">PATIENTS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;id,name,age</span>
+<span class="s2">p1,John Doe,34</span>
+<span class="s2">p2,Jane Doe,65</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output/patients.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">PATIENTS</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[82]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">SAMPLES</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;id,patient</span>
+<span class="s2">s1,p1</span>
+<span class="s2">s2,p2</span>
+<span class="s2">s3,p2</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output/samples.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">SAMPLES</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Note this dataset is well-behaved, every sample refers to a patient.</p>
+<p>There is one issue with the data though, and that is that the default loader doesn’t perform ptype inference, so the ages will be treated as strings.</p>
+<p>Next we’ll add a schema file</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[86]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">SCHEMA</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">id: http://example.org/patients</span>
+<span class="s2">name: patients</span>
+<span class="s2">description: Patients and samples</span>
+<span class="s2">prefixes:</span>
+<span class="s2">  linkml: http://w3id.org/linkml/</span>
+<span class="s2">  ex: http://example.org/</span>
+<span class="s2">default_prefix: ex</span>
+<span class="s2">imports:</span>
+<span class="s2">  - linkml:types</span>
+<span class="s2">classes:</span>
+<span class="s2">  Sample:</span>
+<span class="s2">    attributes:</span>
+<span class="s2">      id:</span>
+<span class="s2">        identifier: true</span>
+<span class="s2">      patient:</span>
+<span class="s2">        range: Patient</span>
+
+<span class="s2">  Patient:</span>
+<span class="s2">    attributes:</span>
+<span class="s2">      id:</span>
+<span class="s2">        identifier: true</span>
+<span class="s2">      name:</span>
+<span class="s2">        required: true</span>
+<span class="s2">      age:</span>
+<span class="s2">        range: integer</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output/patients.linkml.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Load-data-into-DuckDB">
+<h3>Load data into DuckDB<a class="headerlink" href="#Load-data-into-DuckDB" title="Link to this heading"></a></h3>
+<p>We’ll first clear any older databases we may have created</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output/patient_samples.ddb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Then we’ll load the data</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[88]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span>output/patient_samples.ddb<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-c<span class="w"> </span>Patient<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>insert<span class="w"> </span>output/patients.csv
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Inserted 2 objects from output/patients.csv into collection &#39;Patient&#39;.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[89]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span>output/patient_samples.ddb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span>Sample<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>insert<span class="w"> </span>output/samples.csv
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Inserted 3 objects from output/samples.csv into collection &#39;Sample&#39;.
+</pre></div></div>
+</div>
+</section>
+<section id="Check-Referential-Integrity-(no-RI)">
+<h3>Check Referential Integrity (no RI)<a class="headerlink" href="#Check-Referential-Integrity-(no-RI)" title="Link to this heading"></a></h3>
+<p>We don’t expect any referential integrity issues here</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[90]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>--schema<span class="w"> </span>output/patients.linkml.yaml<span class="w"> </span>-d<span class="w"> </span>output/patient_samples.ddb<span class="w"> </span>validate<span class="w"> </span>-O<span class="w"> </span>csv
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type,severity,message,instance,instance_index,instantiates,context
+jsonschema validation,ERROR,&#34;&#39;34&#39; is not of type &#39;integer&#39;, &#39;null&#39; in /age&#34;,&#34;{&#39;id&#39;: &#39;p1&#39;, &#39;name&#39;: &#39;John Doe&#39;, &#39;age&#39;: &#39;34&#39;}&#34;,0,Patient,[]
+jsonschema validation,ERROR,&#34;&#39;65&#39; is not of type &#39;integer&#39;, &#39;null&#39; in /age&#34;,&#34;{&#39;id&#39;: &#39;p2&#39;, &#39;name&#39;: &#39;Jane Doe&#39;, &#39;age&#39;: &#39;65&#39;}&#34;,0,Patient,[]
+
+</pre></div></div>
+</div>
+</section>
+<section id="Adding-dangling-references">
+<h3>Adding dangling references<a class="headerlink" href="#Adding-dangling-references" title="Link to this heading"></a></h3>
+<p>We’ll deliberately add a sample that refers to a non-existent patient</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[91]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span>output/patient_samples.ddb<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span>Sample<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>insert<span class="w"> </span>--object<span class="w"> </span><span class="s1">&#39;{&quot;id&quot;: &quot;s4&quot;, &quot;patient&quot;: &quot;p3&quot;}&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Inserted 1 objects from {&#34;id&#34;: &#34;s4&#34;, &#34;patient&#34;: &#34;p3&#34;} into collection &#39;Sample&#39;.
+</pre></div></div>
+</div>
+<p>And then re-validate</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[92]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>--schema<span class="w"> </span>output/patients.linkml.yaml<span class="w"> </span>--set<span class="w"> </span><span class="nv">ensure_referential_integrity</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>-d<span class="w"> </span>output/patient_samples.ddb<span class="w"> </span>validate<span class="w"> </span>-O<span class="w"> </span>csv
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+type,severity,message,instance,instance_index,instantiates,context
+jsonschema validation,ERROR,&#34;&#39;34&#39; is not of type &#39;integer&#39;, &#39;null&#39; in /age&#34;,&#34;{&#39;id&#39;: &#39;p1&#39;, &#39;name&#39;: &#39;John Doe&#39;, &#39;age&#39;: &#39;34&#39;}&#34;,0,Patient,[]
+jsonschema validation,ERROR,&#34;&#39;65&#39; is not of type &#39;integer&#39;, &#39;null&#39; in /age&#34;,&#34;{&#39;id&#39;: &#39;p2&#39;, &#39;name&#39;: &#39;Jane Doe&#39;, &#39;age&#39;: &#39;65&#39;}&#34;,0,Patient,[]
+ReferentialIntegrity,ERROR,Referential integrity error: Patient not found,p3,,Patient,[]
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 </section>
 
@@ -539,6 +775,12 @@ type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;
             <ul>
 <li><a class="reference internal" href="#">How to Check Referential Integrity</a><ul>
 <li><a class="reference internal" href="#Inserting-invalid-data">Inserting invalid data</a></li>
+<li><a class="reference internal" href="#Command-Line-Example-using-DuckDB">Command Line Example using DuckDB</a><ul>
+<li><a class="reference internal" href="#Load-data-into-DuckDB">Load data into DuckDB</a></li>
+<li><a class="reference internal" href="#Check-Referential-Integrity-(no-RI)">Check Referential Integrity (no RI)</a></li>
+<li><a class="reference internal" href="#Adding-dangling-references">Adding dangling references</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -553,7 +795,7 @@ type=&#39;ReferentialIntegrity&#39; severity=&lt;Severity.ERROR: &#39;ERROR&#39;
 </div><script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

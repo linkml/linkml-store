@@ -1,0 +1,812 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "id": "initial_id",
+   "metadata": {
+    "collapsed": true,
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:00:38.002640Z",
+     "start_time": "2025-02-23T02:00:37.996796Z"
+    }
+   },
+   "source": [
+    "from unicodedata import category\n",
+    "\n",
+    "import yaml\n",
+    "\n",
+    "from linkml_store.utils.enrichment_analyzer import EnrichmentAnalyzer\n",
+    "\n",
+    "DB = \"mongodb://localhost:27017/metabolights\"\n",
+    "CN = \"maf\""
+   ],
+   "outputs": [],
+   "execution_count": 12
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:00:40.166191Z",
+     "start_time": "2025-02-23T02:00:38.621467Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "!pip install oaklib",
+   "id": "16d75abfe485a5c6",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: oaklib in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (0.6.21)\r\n",
+      "Requirement already satisfied: SPARQLWrapper in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.0.0)\r\n",
+      "Requirement already satisfied: SQLAlchemy>=1.4.32 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.0.38)\r\n",
+      "Requirement already satisfied: airium>=0.2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.6)\r\n",
+      "Requirement already satisfied: appdirs>=1.4.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.4.4)\r\n",
+      "Requirement already satisfied: class-resolver>=0.4.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.4)\r\n",
+      "Requirement already satisfied: click in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (8.1.8)\r\n",
+      "Requirement already satisfied: curies>=0.6.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.10.4)\r\n",
+      "Requirement already satisfied: defusedxml>=0.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.7.1)\r\n",
+      "Requirement already satisfied: eutils>=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.6.0)\r\n",
+      "Requirement already satisfied: funowl>=0.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.3)\r\n",
+      "Requirement already satisfied: jsonlines in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (4.0.0)\r\n",
+      "Requirement already satisfied: kgcl-rdflib==0.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.0)\r\n",
+      "Requirement already satisfied: kgcl-schema<0.7.0,>=0.6.9 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.6.9)\r\n",
+      "Requirement already satisfied: linkml-renderer>=0.3.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.3.1)\r\n",
+      "Requirement already satisfied: linkml-runtime>=1.5.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.8.3)\r\n",
+      "Requirement already satisfied: ndex2>=3.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.10.0)\r\n",
+      "Requirement already satisfied: networkx>=2.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.4.2)\r\n",
+      "Requirement already satisfied: ols-client>=0.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.1.4)\r\n",
+      "Requirement already satisfied: ontoportal-client>=0.0.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.0.4)\r\n",
+      "Requirement already satisfied: prefixmaps>=0.1.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.6)\r\n",
+      "Requirement already satisfied: pronto>=2.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.6.0)\r\n",
+      "Requirement already satisfied: pydantic in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.10.6)\r\n",
+      "Requirement already satisfied: pysolr<4.0.0,>=3.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.10.0)\r\n",
+      "Requirement already satisfied: pystow>=0.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.6)\r\n",
+      "Requirement already satisfied: ratelimit>=2.2.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.2.1)\r\n",
+      "Requirement already satisfied: requests-cache<2.0.0,>=1.0.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.2.1)\r\n",
+      "Requirement already satisfied: semsql>=0.3.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.4.0)\r\n",
+      "Requirement already satisfied: sssom<0.5.0,>=0.4.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.4.15)\r\n",
+      "Requirement already satisfied: tenacity>=8.2.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (9.0.0)\r\n",
+      "Requirement already satisfied: pytrie in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from curies>=0.6.6->oaklib) (0.4.0)\r\n",
+      "Requirement already satisfied: typing-extensions in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from curies>=0.6.6->oaklib) (4.12.2)\r\n",
+      "Requirement already satisfied: lxml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils>=0.6.0->oaklib) (5.3.1)\r\n",
+      "Requirement already satisfied: pytz in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils>=0.6.0->oaklib) (2025.1)\r\n",
+      "Requirement already satisfied: requests in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils>=0.6.0->oaklib) (2.32.3)\r\n",
+      "Requirement already satisfied: bcp47 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (0.1.0)\r\n",
+      "Requirement already satisfied: jsonasobj in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (1.3.1)\r\n",
+      "Requirement already satisfied: pyjsg>=0.11.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (0.11.10)\r\n",
+      "Requirement already satisfied: rdflib-shim in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (1.0.3)\r\n",
+      "Requirement already satisfied: rdflib<8,>=6.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (7.1.3)\r\n",
+      "Requirement already satisfied: rfc3987 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl>=0.2.0->oaklib) (1.3.8)\r\n",
+      "Requirement already satisfied: lark>=1.1.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from kgcl-schema<0.7.0,>=0.6.9->oaklib) (1.2.2)\r\n",
+      "Requirement already satisfied: deprecated in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (1.2.18)\r\n",
+      "Requirement already satisfied: hbreader in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (0.9.1)\r\n",
+      "Requirement already satisfied: json-flattener>=0.1.9 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (0.1.9)\r\n",
+      "Requirement already satisfied: jsonasobj2<2.dev0,>=1.0.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (1.0.4)\r\n",
+      "Requirement already satisfied: jsonschema>=3.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (4.23.0)\r\n",
+      "Requirement already satisfied: prefixcommons>=0.1.12 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (0.1.12)\r\n",
+      "Requirement already satisfied: pyyaml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime>=1.5.3->oaklib) (6.0.2)\r\n",
+      "Requirement already satisfied: six in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (1.17.0)\r\n",
+      "Requirement already satisfied: ijson in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (3.3.0)\r\n",
+      "Requirement already satisfied: requests-toolbelt in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (1.0.0)\r\n",
+      "Requirement already satisfied: urllib3>=1.16 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (2.3.0)\r\n",
+      "Requirement already satisfied: pandas in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (2.2.3)\r\n",
+      "Requirement already satisfied: numpy in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2>=3.5.0->oaklib) (2.2.3)\r\n",
+      "Requirement already satisfied: more-click in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ols-client>=0.1.1->oaklib) (0.1.2)\r\n",
+      "Requirement already satisfied: chardet~=5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto>=2.5.0->oaklib) (5.2.0)\r\n",
+      "Requirement already satisfied: fastobo~=0.13.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto>=2.5.0->oaklib) (0.13.0)\r\n",
+      "Requirement already satisfied: python-dateutil~=2.8 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto>=2.5.0->oaklib) (2.9.0.post0)\r\n",
+      "Requirement already satisfied: annotated-types>=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pydantic->oaklib) (0.7.0)\r\n",
+      "Requirement already satisfied: pydantic-core==2.27.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pydantic->oaklib) (2.27.2)\r\n",
+      "Requirement already satisfied: setuptools in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pysolr<4.0.0,>=3.9.0->oaklib) (75.8.0)\r\n",
+      "Requirement already satisfied: tqdm in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pystow>=0.5.0->oaklib) (4.67.1)\r\n",
+      "Requirement already satisfied: attrs>=21.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache<2.0.0,>=1.0.1->oaklib) (25.1.0)\r\n",
+      "Requirement already satisfied: cattrs>=22.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache<2.0.0,>=1.0.1->oaklib) (24.1.2)\r\n",
+      "Requirement already satisfied: platformdirs>=2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache<2.0.0,>=1.0.1->oaklib) (4.3.6)\r\n",
+      "Requirement already satisfied: url-normalize>=1.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache<2.0.0,>=1.0.1->oaklib) (1.4.3)\r\n",
+      "Requirement already satisfied: SQLAlchemy-Utils<0.39.0,>=0.38.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from semsql>=0.3.1->oaklib) (0.38.3)\r\n",
+      "Requirement already satisfied: deprecation<3.0.0,>=2.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (2.1.0)\r\n",
+      "Requirement already satisfied: importlib-resources<7.0.0,>=6.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (6.5.2)\r\n",
+      "Requirement already satisfied: linkml>1.7.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (1.8.6)\r\n",
+      "Requirement already satisfied: pansql>=0.0.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pansql[pansql]>=0.0.1->sssom<0.5.0,>=0.4.4->oaklib) (0.0.1)\r\n",
+      "Requirement already satisfied: scipy[scipy] in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (1.15.1)\r\n",
+      "Requirement already satisfied: sssom-schema<2.0.0,>=1.0.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (1.0.0)\r\n",
+      "Requirement already satisfied: validators>=0.20.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom<0.5.0,>=0.4.4->oaklib) (0.34.0)\r\n",
+      "Requirement already satisfied: exceptiongroup>=1.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from cattrs>=22.2->requests-cache<2.0.0,>=1.0.1->oaklib) (1.2.2)\r\n",
+      "Requirement already satisfied: packaging in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from deprecation<3.0.0,>=2.1.0->sssom<0.5.0,>=0.4.4->oaklib) (24.2)\r\n",
+      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema>=3.2.0->linkml-runtime>=1.5.3->oaklib) (2024.10.1)\r\n",
+      "Requirement already satisfied: referencing>=0.28.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema>=3.2.0->linkml-runtime>=1.5.3->oaklib) (0.36.2)\r\n",
+      "Requirement already satisfied: rpds-py>=0.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema>=3.2.0->linkml-runtime>=1.5.3->oaklib) (0.23.1)\r\n",
+      "Requirement already satisfied: antlr4-python3-runtime<4.10,>=4.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (4.9.3)\r\n",
+      "Requirement already satisfied: graphviz>=0.10.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.20.3)\r\n",
+      "Requirement already satisfied: isodate>=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.7.2)\r\n",
+      "Requirement already satisfied: jinja2>=3.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (3.1.5)\r\n",
+      "Requirement already satisfied: linkml-dataops in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.1.0)\r\n",
+      "Requirement already satisfied: openpyxl in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (3.1.5)\r\n",
+      "Requirement already satisfied: parse in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.20.2)\r\n",
+      "Requirement already satisfied: pyshex>=0.7.20 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.8.1)\r\n",
+      "Requirement already satisfied: pyshexc>=0.8.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.9.1)\r\n",
+      "Requirement already satisfied: watchdog>=0.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (6.0.0)\r\n",
+      "\u001B[33mWARNING: networkx 3.4.2 does not provide the extra 'networkx'\u001B[0m\u001B[33m\r\n",
+      "\u001B[0mRequirement already satisfied: tzdata>=2022.7 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pandas->ndex2>=3.5.0->oaklib) (2025.1)\r\n",
+      "\u001B[33mWARNING: pansql 0.0.1 does not provide the extra 'pansql'\u001B[0m\u001B[33m\r\n",
+      "\u001B[0mRequirement already satisfied: pytest-logging<2016.0.0,>=2015.11.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from prefixcommons>=0.1.12->linkml-runtime>=1.5.3->oaklib) (2015.11.4)\r\n",
+      "Requirement already satisfied: pyparsing<4,>=2.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from rdflib<8,>=6.2.0->funowl>=0.2.0->oaklib) (3.2.1)\r\n",
+      "Requirement already satisfied: charset-normalizer<4,>=2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests->eutils>=0.6.0->oaklib) (3.4.1)\r\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests->eutils>=0.6.0->oaklib) (3.10)\r\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests->eutils>=0.6.0->oaklib) (2025.1.31)\r\n",
+      "Requirement already satisfied: wrapt<2,>=1.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from deprecated->linkml-runtime>=1.5.3->oaklib) (1.17.2)\r\n",
+      "Requirement already satisfied: sortedcontainers in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytrie->curies>=0.6.6->oaklib) (2.4.0)\r\n",
+      "Requirement already satisfied: rdflib-jsonld==0.6.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from rdflib-shim->funowl>=0.2.0->oaklib) (0.6.1)\r\n",
+      "\u001B[33mWARNING: scipy 1.15.1 does not provide the extra 'scipy'\u001B[0m\u001B[33m\r\n",
+      "\u001B[0mRequirement already satisfied: MarkupSafe>=2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jinja2>=3.1.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (3.0.2)\r\n",
+      "Requirement already satisfied: fqdn in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.5.1)\r\n",
+      "Requirement already satisfied: isoduration in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (20.11.0)\r\n",
+      "Requirement already satisfied: jsonpointer>1.13 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (3.0.0)\r\n",
+      "Requirement already satisfied: rfc3339-validator in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.1.4)\r\n",
+      "Requirement already satisfied: uri-template in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.3.0)\r\n",
+      "Requirement already satisfied: webcolors>=1.11 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (24.11.1)\r\n",
+      "Requirement already satisfied: cfgraph>=0.2.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex>=0.7.20->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.2.1)\r\n",
+      "Requirement already satisfied: shexjsg>=0.8.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex>=0.7.20->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.8.2)\r\n",
+      "Requirement already satisfied: sparqlslurper>=0.5.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex>=0.7.20->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.5.1)\r\n",
+      "Requirement already satisfied: pytest>=2.8.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest-logging<2016.0.0,>=2015.11.4->prefixcommons>=0.1.12->linkml-runtime>=1.5.3->oaklib) (7.4.4)\r\n",
+      "Requirement already satisfied: jsonpatch in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.33)\r\n",
+      "Requirement already satisfied: jsonpath-ng in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.7.0)\r\n",
+      "Requirement already satisfied: ruamel.yaml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.18.10)\r\n",
+      "Requirement already satisfied: et-xmlfile in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from openpyxl->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (2.0.0)\r\n",
+      "Requirement already satisfied: iniconfig in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest>=2.8.1->pytest-logging<2016.0.0,>=2015.11.4->prefixcommons>=0.1.12->linkml-runtime>=1.5.3->oaklib) (2.0.0)\r\n",
+      "Requirement already satisfied: pluggy<2.0,>=0.12 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest>=2.8.1->pytest-logging<2016.0.0,>=2015.11.4->prefixcommons>=0.1.12->linkml-runtime>=1.5.3->oaklib) (1.5.0)\r\n",
+      "Requirement already satisfied: tomli>=1.0.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest>=2.8.1->pytest-logging<2016.0.0,>=2015.11.4->prefixcommons>=0.1.12->linkml-runtime>=1.5.3->oaklib) (2.2.1)\r\n",
+      "Requirement already satisfied: arrow>=0.15.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from isoduration->jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (1.3.0)\r\n",
+      "Requirement already satisfied: ply in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonpath-ng->linkml-dataops->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (3.11)\r\n",
+      "Requirement already satisfied: ruamel.yaml.clib>=0.2.7 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ruamel.yaml->linkml-dataops->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (0.2.12)\r\n",
+      "Requirement already satisfied: types-python-dateutil>=2.8.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from arrow>=0.15.0->isoduration->jsonschema[format]>=4.0.0->linkml>1.7.10->sssom<0.5.0,>=0.4.4->oaklib) (2.9.0.20241206)\r\n"
+     ]
+    }
+   ],
+   "execution_count": 13
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:00:44.166411Z",
+     "start_time": "2025-02-23T02:00:44.160407Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "from oaklib import get_adapter\n",
+    "chebi_adapter = get_adapter(\"sqlite:obo:chebi\")"
+   ],
+   "id": "f8e37557edb32a1c",
+   "outputs": [],
+   "execution_count": 14
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:00:59.881839Z",
+     "start_time": "2025-02-23T02:00:59.864635Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "from linkml_store import Client\n",
+    "\n",
+    "client = Client()\n",
+    "db = client.attach_database(DB)\n",
+    "collection = db.get_collection(CN)\n",
+    "study_collection = db.get_collection(\"study\")"
+   ],
+   "id": "de1f95ed72293127",
+   "outputs": [],
+   "execution_count": 15
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:15:30.003333Z",
+     "start_time": "2025-02-23T02:15:30.000793Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "def get_info(study: dict):\n",
+    "    inv = study.get(\"isaInvestigation\", {})\n",
+    "    studies = inv.get(\"studies\", [])\n",
+    "    s0 = studies[0] if studies else {}\n",
+    "    title = s0.get(\"title\")\n",
+    "    desc = s0.get(\"description\")\n",
+    "    if title and title != \"Investigation\":\n",
+    "        return title, desc\n",
+    "    title = inv.get(\"title\")\n",
+    "    desc = inv.get(\"description\")\n",
+    "    return title, desc\n",
+    "    \n",
+    "    "
+   ],
+   "id": "f3ce8ff87352ed66",
+   "outputs": [],
+   "execution_count": 40
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:15:36.396444Z",
+     "start_time": "2025-02-23T02:15:36.390912Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "study = study_collection.find(limit=1).rows[0]\n",
+    "print(get_info(study))"
+   ],
+   "id": "395764fb9e607489",
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "('A metabolomic study of urinary changes in type 2 diabetes in human compared to the control group', 'Type 2 diabetes mellitus is the result of a combination of impaired insulin secretion with reduced insulin sensitivity of target tissues. There are an estimated 150 million affected individuals worldwide, of whom a large proportion remains undiagnosed because of a lack of specific symptoms early in this disorder and inadequate diagnostics. In this study, NMR-based metabolomic analysis in conjunction with uni- and multivariate statistics was applied to examine the urinary metabolic changes in Human type 2 diabetes mellitus patients compared to the control group. The human population were un medicated diabetic patients who have good daily dietary control over their blood glucose concentrations by following the guidelines on diet issued by the American Diabetes Association. Note: This is part of a larger study, please refer to the original paper below.')\n"
+     ]
+    }
+   ],
+   "execution_count": 41
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:52:15.587975Z",
+     "start_time": "2025-02-23T02:52:15.532285Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "def study_id_from_path(path: str):\n",
+    "    if \"/\" in path:\n",
+    "        # e.g. foo/bar/MTBLS1/FILE.json\n",
+    "        return path.split(\"/\")[-2]\n",
+    "    return path\n",
+    "    \n",
+    "\n",
+    "def study_by_id(study_id: str):\n",
+    "    if \"/\" in study_id:\n",
+    "        study_id = study_id_from_path(study_id)\n",
+    "    # isaInvestigation.identifier\n",
+    "    rows = study_collection.find({\"isaInvestigation.identifier\": study_id}).rows\n",
+    "    if rows:\n",
+    "        return rows[0]\n",
+    "    return None\n",
+    "\n",
+    "get_info(study_by_id(\"MTBLS1\"))"
+   ],
+   "id": "ad284211d23f3171",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "('A metabolomic study of urinary changes in type 2 diabetes in human compared to the control group',\n",
+       " 'Type 2 diabetes mellitus is the result of a combination of impaired insulin secretion with reduced insulin sensitivity of target tissues. There are an estimated 150 million affected individuals worldwide, of whom a large proportion remains undiagnosed because of a lack of specific symptoms early in this disorder and inadequate diagnostics. In this study, NMR-based metabolomic analysis in conjunction with uni- and multivariate statistics was applied to examine the urinary metabolic changes in Human type 2 diabetes mellitus patients compared to the control group. The human population were un medicated diabetic patients who have good daily dietary control over their blood glucose concentrations by following the guidelines on diet issued by the American Diabetes Association. Note: This is part of a larger study, please refer to the original paper below.')"
+      ]
+     },
+     "execution_count": 57,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 57
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:53:19.574804Z",
+     "start_time": "2025-02-23T02:53:19.572126Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "def info_by_id(study_id: str):\n",
+    "    study = study_by_id(study_id)\n",
+    "    if not study:\n",
+    "        return None, None\n",
+    "    else:\n",
+    "        return get_info(study)"
+   ],
+   "id": "1de1b3895970f0d1",
+   "outputs": [],
+   "execution_count": 62
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:53:20.052408Z",
+     "start_time": "2025-02-23T02:53:20.041379Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "info_by_id(\"MTBLS138\")",
+   "id": "118b3cf4fde38701",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "('Multi-omics phenotyping of the gut-liver axis reveals metabolic perturbations from a low-dose pesticide mixture in rats',\n",
+       " 'Health effects of pesticides are not always accurately detected using the current battery of regulatory toxicity tests. We compared standard histopathology and serum biochemistry measures and multi-omics analyses in a subchronic toxicity test of a mixture of six pesticides frequently detected in foodstuffs (azoxystrobin, boscalid, chlorpyrifos, glyphosate, imidacloprid and thiabendazole) in Sprague-Dawley rats. Analysis of water and feed consumption, body weight, histopathology and serum biochemistry showed little effect. Contrastingly, serum and caecum metabolomics revealed that nicotinamide and tryptophan metabolism were affected, which suggested activation of an oxidative stress response. This was not reflected by gut microbial community composition changes evaluated by shotgun metagenomics. Transcriptomics of the liver showed that 257 genes had their expression changed. Gene functions affected included the regulation of response to steroid hormones and the activation of stress response pathways. Genome-wide DNA methylation analysis of the same liver samples showed that 4,255 CpG sites were differentially methylated. Overall, we demonstrated that in-depth molecular profiling in laboratory animals exposed to low concentrations of pesticides allows the detection of metabolic perturbations that would remain undetected by standard regulatory biochemical measures and which could thus improve the predictability of health risks from exposure to chemical pollutants.')"
+      ]
+     },
+     "execution_count": 63,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 63
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:01:25.952493Z",
+     "start_time": "2025-02-23T02:01:02.633393Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "ea = EnrichmentAnalyzer.from_collection(collection, sample_key=\"src\", \n",
+    "                                        classification_key=\"c3p_classifications\")"
+   ],
+   "id": "e6d19497ba01b35f",
+   "outputs": [],
+   "execution_count": 16
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:01:26.343621Z",
+     "start_time": "2025-02-23T02:01:25.957715Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "sample_ids = ea.sample_ids",
+   "id": "4329b195c2ce9feb",
+   "outputs": [],
+   "execution_count": 17
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T03:22:31.304990Z",
+     "start_time": "2025-02-23T03:22:20.211179Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "results = [] # for df\n",
+    "cases = [] # for llm-matrix\n",
+    "for sample in sample_ids:\n",
+    "    study_id = study_id_from_path(sample)\n",
+    "    study_title, desc = info_by_id(sample)\n",
+    "    if not study_title:\n",
+    "        continue\n",
+    "    file_name = sample.split(\"/\")[-1].split(\".\")[0]\n",
+    "    # print(f\"## {study_title}\")\n",
+    "    ideals = []\n",
+    "    ers = []\n",
+    "    for r in ea.find_enriched_categories(sample, p_value_threshold=0.05):\n",
+    "        #print(f\"## {study_title} -- {sample}\")\n",
+    "        #print(f\"      DESC: {desc}\")\n",
+    "        #print(f\" *  {chebi_adapter.label(r.category)} :: {r}\")\n",
+    "        category_label = chebi_adapter.label(r.category)\n",
+    "        results.append({\n",
+    "            \"study_id\": study_id,\n",
+    "            \"study\": study_title,\n",
+    "            \"description\": desc,\n",
+    "            \"sample_file\": file_name,\n",
+    "            \"category_label\": category_label,\n",
+    "            **r.model_dump(),\n",
+    "        })\n",
+    "        ers.append(r.model_dump())\n",
+    "        ideals.append((r.adjusted_p_value, category_label))\n",
+    "    # sort by p-value\n",
+    "    ideals.sort()\n",
+    "    if ideals:\n",
+    "        enrichment_summary = \"; \".join([f\"{i+1}. {label}\" for i, (_, label) in enumerate(ideals)])\n",
+    "        cases.append({\n",
+    "            \"input\": f\"Title: {study_title}\\nDescription: {desc}\\nEnriched: {enrichment_summary}\",\n",
+    "            \"original_input\": {\n",
+    "                \"study_id\": study_id,\n",
+    "                \"study\": study_title,\n",
+    "                \"description\": desc,\n",
+    "                \"sample_file\": file_name,\n",
+    "                \"enrichment\": ers,\n",
+    "            },\n",
+    "            \"ideal\": \"YES\",\n",
+    "        })"
+   ],
+   "id": "87d69ebeb4791f53",
+   "outputs": [],
+   "execution_count": 91
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T03:22:01.500492Z",
+     "start_time": "2025-02-23T03:22:01.497424Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "suite = {\n",
+    "    \"name\": \"metabolights_c3po_enrichment\",\n",
+    "    \"template\": \"enrichment\",\n",
+    "    \"templates\": {\n",
+    "        \"enrichment\": {\n",
+    "            \"system\": \"\"\"I will give you a metabolomics study title and description,\n",
+    "            and also the ordered list of chemical classes that are enriched for that study.\n",
+    "            Tell me if the enrichment results make sense.\n",
+    "            Return YES, NO, or OTHER, followed by an explanation.\n",
+    "            The explanation can be of any form and length but your response must start with YES, NO, or OTHER.\n",
+    "            \"\"\",\n",
+    "            \"prompt\": '{input}',\n",
+    "            \"metrics\": [\"qa_with_explanation\"],\n",
+    "        },\n",
+    "    },\n",
+    "    \"matrix\": {\n",
+    "        \"hyperparameters\": {\n",
+    "            \"model\": [\"claude-sonnet\"]\n",
+    "        },\n",
+    "    },\n",
+    "    \"cases\": cases,\n",
+    "}"
+   ],
+   "id": "fd0ace080ed28858",
+   "outputs": [],
+   "execution_count": 87
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T03:22:02.315460Z",
+     "start_time": "2025-02-23T03:22:02.001483Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    "import yaml\n",
+    "with open(\"output/metabolights_enrichment_suite.yaml\", \"w\") as f:\n",
+    "    f.write(yaml.dump(suite, sort_keys=False))"
+   ],
+   "id": "44fc6e1eba7379ce",
+   "outputs": [],
+   "execution_count": 88
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T03:22:04.548940Z",
+     "start_time": "2025-02-23T03:22:04.544609Z"
+    }
+   },
+   "cell_type": "code",
+   "source": [
+    " import pandas as pd\n",
+    "\n",
+    "df = pd.DataFrame(results)"
+   ],
+   "id": "f055aa99902b34e6",
+   "outputs": [],
+   "execution_count": 89
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T03:22:06.836855Z",
+     "start_time": "2025-02-23T03:22:06.828931Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "df",
+   "id": "34df42782fe5e5ad",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "        study_id                                              study  \\\n",
+       "0     MTBLS10416  A metabolic switch orchestrated by IL-18 and t...   \n",
+       "1     MTBLS10416  A metabolic switch orchestrated by IL-18 and t...   \n",
+       "2     MTBLS10416  A metabolic switch orchestrated by IL-18 and t...   \n",
+       "3     MTBLS10416  A metabolic switch orchestrated by IL-18 and t...   \n",
+       "4     MTBLS10416  A metabolic switch orchestrated by IL-18 and t...   \n",
+       "...          ...                                                ...   \n",
+       "1336    MTBLS959  Subcellular antibiotic visualization reveals a...   \n",
+       "1337    MTBLS968  The accumulation profiles of terpene metabolit...   \n",
+       "1338    MTBLS968  The accumulation profiles of terpene metabolit...   \n",
+       "1339    MTBLS968  The accumulation profiles of terpene metabolit...   \n",
+       "1340    MTBLS968  The accumulation profiles of terpene metabolit...   \n",
+       "\n",
+       "                                            description  \\\n",
+       "0     Tissues are exposed to diverse inflammatory ch...   \n",
+       "1     Tissues are exposed to diverse inflammatory ch...   \n",
+       "2     Tissues are exposed to diverse inflammatory ch...   \n",
+       "3     Tissues are exposed to diverse inflammatory ch...   \n",
+       "4     Tissues are exposed to diverse inflammatory ch...   \n",
+       "...                                                 ...   \n",
+       "1336  Tuberculosis, caused by the intracellular path...   \n",
+       "1337  Aroma is an important parameter for table grap...   \n",
+       "1338  Aroma is an important parameter for table grap...   \n",
+       "1339  Aroma is an important parameter for table grap...   \n",
+       "1340  Aroma is an important parameter for table grap...   \n",
+       "\n",
+       "                                            sample_file  \\\n",
+       "0     m_MTBLS10416_LC-MS_alternating_hilic_metabolit...   \n",
+       "1     m_MTBLS10416_LC-MS_alternating_hilic_metabolit...   \n",
+       "2     m_MTBLS10416_LC-MS_alternating_hilic_metabolit...   \n",
+       "3     m_MTBLS10416_LC-MS_alternating_hilic_metabolit...   \n",
+       "4     m_MTBLS10416_LC-MS_alternating_hilic_metabolit...   \n",
+       "...                                                 ...   \n",
+       "1336  m_MTBLS959_LC-MS_alternating_reverse-phase_met...   \n",
+       "1337  m_MTBLS968_GC-MS_positive__metabolite_profilin...   \n",
+       "1338  m_MTBLS968_GC-MS_positive__metabolite_profilin...   \n",
+       "1339  m_MTBLS968_GC-MS_positive__metabolite_profilin...   \n",
+       "1340  m_MTBLS968_GC-MS_positive__metabolite_profilin...   \n",
+       "\n",
+       "                 category_label     category   fold_change  original_p_value  \\\n",
+       "0              fatty acid anion  CHEBI:28868  46481.178571      2.724382e-14   \n",
+       "1     monocarboxylic acid anion  CHEBI:35757  22832.859649      3.331356e-09   \n",
+       "2            tricarboxylic acid  CHEBI:27093   1191.825092      8.387285e-04   \n",
+       "3                 fatty alcohol  CHEBI:24026    584.668913      1.709033e-03   \n",
+       "4                        cation  CHEBI:36916    539.582504      1.851715e-03   \n",
+       "...                         ...          ...           ...               ...   \n",
+       "1336                diterpenoid  CHEBI:23849      9.885406      1.783922e-02   \n",
+       "1337              fatty alcohol  CHEBI:24026   4823.518531      1.853589e-39   \n",
+       "1338                    prenols  CHEBI:26244  32536.825000      1.593974e-09   \n",
+       "1339             fatty aldehyde  CHEBI:35746   7935.810976      2.904251e-08   \n",
+       "1340                 fatty acid  CHEBI:35366    102.188521      9.741102e-03   \n",
+       "\n",
+       "      adjusted_p_value  \n",
+       "0         2.179505e-13  \n",
+       "1         1.332542e-08  \n",
+       "2         2.236609e-03  \n",
+       "3         2.962744e-03  \n",
+       "4         2.962744e-03  \n",
+       "...                ...  \n",
+       "1336      1.783922e-02  \n",
+       "1337      7.414355e-39  \n",
+       "1338      3.187947e-09  \n",
+       "1339      3.872335e-08  \n",
+       "1340      9.741102e-03  \n",
+       "\n",
+       "[1341 rows x 9 columns]"
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>study_id</th>\n",
+       "      <th>study</th>\n",
+       "      <th>description</th>\n",
+       "      <th>sample_file</th>\n",
+       "      <th>category_label</th>\n",
+       "      <th>category</th>\n",
+       "      <th>fold_change</th>\n",
+       "      <th>original_p_value</th>\n",
+       "      <th>adjusted_p_value</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>MTBLS10416</td>\n",
+       "      <td>A metabolic switch orchestrated by IL-18 and t...</td>\n",
+       "      <td>Tissues are exposed to diverse inflammatory ch...</td>\n",
+       "      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>\n",
+       "      <td>fatty acid anion</td>\n",
+       "      <td>CHEBI:28868</td>\n",
+       "      <td>46481.178571</td>\n",
+       "      <td>2.724382e-14</td>\n",
+       "      <td>2.179505e-13</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>MTBLS10416</td>\n",
+       "      <td>A metabolic switch orchestrated by IL-18 and t...</td>\n",
+       "      <td>Tissues are exposed to diverse inflammatory ch...</td>\n",
+       "      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>\n",
+       "      <td>monocarboxylic acid anion</td>\n",
+       "      <td>CHEBI:35757</td>\n",
+       "      <td>22832.859649</td>\n",
+       "      <td>3.331356e-09</td>\n",
+       "      <td>1.332542e-08</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>MTBLS10416</td>\n",
+       "      <td>A metabolic switch orchestrated by IL-18 and t...</td>\n",
+       "      <td>Tissues are exposed to diverse inflammatory ch...</td>\n",
+       "      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>\n",
+       "      <td>tricarboxylic acid</td>\n",
+       "      <td>CHEBI:27093</td>\n",
+       "      <td>1191.825092</td>\n",
+       "      <td>8.387285e-04</td>\n",
+       "      <td>2.236609e-03</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>MTBLS10416</td>\n",
+       "      <td>A metabolic switch orchestrated by IL-18 and t...</td>\n",
+       "      <td>Tissues are exposed to diverse inflammatory ch...</td>\n",
+       "      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>\n",
+       "      <td>fatty alcohol</td>\n",
+       "      <td>CHEBI:24026</td>\n",
+       "      <td>584.668913</td>\n",
+       "      <td>1.709033e-03</td>\n",
+       "      <td>2.962744e-03</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>MTBLS10416</td>\n",
+       "      <td>A metabolic switch orchestrated by IL-18 and t...</td>\n",
+       "      <td>Tissues are exposed to diverse inflammatory ch...</td>\n",
+       "      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>\n",
+       "      <td>cation</td>\n",
+       "      <td>CHEBI:36916</td>\n",
+       "      <td>539.582504</td>\n",
+       "      <td>1.851715e-03</td>\n",
+       "      <td>2.962744e-03</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1336</th>\n",
+       "      <td>MTBLS959</td>\n",
+       "      <td>Subcellular antibiotic visualization reveals a...</td>\n",
+       "      <td>Tuberculosis, caused by the intracellular path...</td>\n",
+       "      <td>m_MTBLS959_LC-MS_alternating_reverse-phase_met...</td>\n",
+       "      <td>diterpenoid</td>\n",
+       "      <td>CHEBI:23849</td>\n",
+       "      <td>9.885406</td>\n",
+       "      <td>1.783922e-02</td>\n",
+       "      <td>1.783922e-02</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1337</th>\n",
+       "      <td>MTBLS968</td>\n",
+       "      <td>The accumulation profiles of terpene metabolit...</td>\n",
+       "      <td>Aroma is an important parameter for table grap...</td>\n",
+       "      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>\n",
+       "      <td>fatty alcohol</td>\n",
+       "      <td>CHEBI:24026</td>\n",
+       "      <td>4823.518531</td>\n",
+       "      <td>1.853589e-39</td>\n",
+       "      <td>7.414355e-39</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1338</th>\n",
+       "      <td>MTBLS968</td>\n",
+       "      <td>The accumulation profiles of terpene metabolit...</td>\n",
+       "      <td>Aroma is an important parameter for table grap...</td>\n",
+       "      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>\n",
+       "      <td>prenols</td>\n",
+       "      <td>CHEBI:26244</td>\n",
+       "      <td>32536.825000</td>\n",
+       "      <td>1.593974e-09</td>\n",
+       "      <td>3.187947e-09</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1339</th>\n",
+       "      <td>MTBLS968</td>\n",
+       "      <td>The accumulation profiles of terpene metabolit...</td>\n",
+       "      <td>Aroma is an important parameter for table grap...</td>\n",
+       "      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>\n",
+       "      <td>fatty aldehyde</td>\n",
+       "      <td>CHEBI:35746</td>\n",
+       "      <td>7935.810976</td>\n",
+       "      <td>2.904251e-08</td>\n",
+       "      <td>3.872335e-08</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1340</th>\n",
+       "      <td>MTBLS968</td>\n",
+       "      <td>The accumulation profiles of terpene metabolit...</td>\n",
+       "      <td>Aroma is an important parameter for table grap...</td>\n",
+       "      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>\n",
+       "      <td>fatty acid</td>\n",
+       "      <td>CHEBI:35366</td>\n",
+       "      <td>102.188521</td>\n",
+       "      <td>9.741102e-03</td>\n",
+       "      <td>9.741102e-03</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>1341 rows × 9 columns</p>\n",
+       "</div>"
+      ]
+     },
+     "execution_count": 90,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 90
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:52:32.610917Z",
+     "start_time": "2025-02-23T02:52:32.478584Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "!mkdir -p output",
+   "id": "3571d834f7e7d67d",
+   "outputs": [],
+   "execution_count": 60
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2025-02-23T02:52:32.945245Z",
+     "start_time": "2025-02-23T02:52:32.911987Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "df.to_csv(\"output/enrichment_results.csv\", index=False)",
+   "id": "9b4d4f068d7bf44f",
+   "outputs": [],
+   "execution_count": 61
+  },
+  {
+   "metadata": {},
+   "cell_type": "code",
+   "outputs": [],
+   "execution_count": null,
+   "source": "",
+   "id": "6db9fc8d08f42c53"
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

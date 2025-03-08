@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="about.html" /><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 --><title>Index - linkml-store documentation</title>
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 --><title>Index - linkml-store documentation</title>
 <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -220,6 +220,7 @@
 <li class="toctree-l2"><a class="reference internal" href="how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/Perform-LLM-Inference.html">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -300,7 +301,7 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#X"><strong>X</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#X"><strong>X</strong></a></div>
 </section>
 <section id="_" class="genindex-section">
   <h2>_</h2>
@@ -590,6 +591,8 @@
 </li>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.get_one">get_one() (Collection method)</a>
 </li>
+        <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.group_by">group_by() (Collection method)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -634,6 +637,12 @@
           <li><a href="reference/linkml_store.api.stores.mongodb.html#linkml_store.api.stores.mongodb.MongoDBDatabase.import_database">(MongoDBDatabase method)</a>, <a href="reference/linkml_store.api.stores.mongodb.mongodb_database.html#linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase.import_database">[1]</a>
 </li>
         </ul></li>
+        <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.index">index() (Collection method)</a>
+
+        <ul>
+          <li><a href="reference/linkml_store.api.stores.mongodb.html#linkml_store.api.stores.mongodb.MongoDBCollection.index">(MongoDBCollection method)</a>, <a href="reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.index">[1]</a>
+</li>
+        </ul></li>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.index_objects">index_objects() (Collection method)</a>
 </li>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.indexers">indexers (Collection property)</a>
@@ -648,6 +657,8 @@
           <li><a href="reference/linkml_store.api.stores.hdf5.hdf5_database.html#linkml_store.api.stores.hdf5.hdf5_database.HDF5Database.induce_schema_view">(HDF5Database method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.database.Database.init_collections">init_collections() (Database method)</a>
 
         <ul>
@@ -662,8 +673,6 @@
           <li><a href="reference/linkml_store.api.stores.solr.solr_database.html#linkml_store.api.stores.solr.solr_database.SolrDatabase.init_collections">(SolrDatabase method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.insert">insert() (Collection method)</a>
 
         <ul>
@@ -1086,11 +1095,27 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="reference/linkml_store.api.stores.mongodb.html#linkml_store.api.stores.mongodb.MongoDBCollection.Union">Union (MongoDBCollection attribute)</a>, <a href="reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.Union">[1]</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.update">update() (Collection method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/linkml_store.api.html#linkml_store.api.collection.Collection.upsert">upsert() (Collection method)</a>
+
+        <ul>
+          <li><a href="reference/linkml_store.api.stores.mongodb.html#linkml_store.api.stores.mongodb.MongoDBCollection.upsert">(MongoDBCollection method)</a>, <a href="reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.upsert">[1]</a>
+</li>
+        </ul></li>
         <li><a href="reference/linkml_store.api.stores.solr.solr_database.html#linkml_store.api.stores.solr.solr_database.SolrDatabase.use_cores">use_cores (SolrDatabase attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/linkml_store.api.html#linkml_store.api.database.Database.validate_database">validate_database() (Database method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1141,7 +1166,7 @@
 </div><script src="_static/jquery.js?v=5d32c60e"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="../../../../../about.html" /><link rel="index" title="Index" href="../../../../../genindex.html" /><link rel="search" title="Search" href="../../../../../search.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>linkml_store.api.stores.duckdb.duckdb_database - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -221,6 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../how-to/Perform-LLM-Inference.html">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -302,7 +303,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy</span>
@@ -315,7 +316,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.duckdb.duckdb_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DuckDBCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.format_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Format</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.sql_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">introspect_schema</span><span class="p">,</span> <span class="n">query_to_sql</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.sql_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">introspect_schema</span><span class="p">,</span> <span class="n">query_to_sql</span><span class="p">,</span> <span class="n">where_clause_to_sql</span>
 
 <span class="n">TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;VARCHAR&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -368,7 +369,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">engine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Engine</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="p">:</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;duckdb://&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;duckdb://&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;://&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
                 <span class="n">handle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;duckdb:///</span><span class="si">{</span><span class="n">handle</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="s2">&quot;:memory:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
                 <span class="c1"># TODO: investigate this; duckdb appears to be prematurely caching</span>
@@ -376,6 +377,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_sqlite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sqlite:&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DuckDBDatabase.commit">
 <a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.commit">[docs]</a>
@@ -404,36 +409,62 @@
                 <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DuckDBDatabase.query">
-<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.query">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_table_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sqlite</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">table</span> <span class="o">==</span> <span class="s2">&quot;sqlite_master&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">meta_query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+                <span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;sqlite_master&quot;</span><span class="p">,</span>
+                <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span>
+                    <span class="c1"># &quot;type&quot;: &quot;table&quot;,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">table</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;information_schema&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">meta_query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+                <span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;information_schema.tables&quot;</span><span class="p">,</span>
+                <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;table_type&quot;</span><span class="p">:</span> <span class="s2">&quot;BASE TABLE&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;table_name&quot;</span><span class="p">:</span> <span class="n">table</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="n">qr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">meta_query</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Table </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2"> not created yet&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_json_encoded_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="n">json_encoded_cols</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;information_schema&quot;</span><span class="p">):</span>
-                <span class="n">meta_query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
-                    <span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;information_schema.tables&quot;</span><span class="p">,</span> <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;table_name&quot;</span><span class="p">:</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">}</span>
-                <span class="p">)</span>
-                <span class="n">qr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">meta_query</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Table </span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="si">}</span><span class="s2"> not created yet&quot;</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">QueryResult</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="p">[])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;information_schema&quot;</span><span class="p">):</span>
-                <span class="n">sv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_view</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">sv</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">table_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">table_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;information_schema&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">table_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sqlite&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="n">sv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_view</span>
             <span class="k">if</span> <span class="n">sv</span><span class="p">:</span>
                 <span class="n">cd</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="c1"># if c.name == query.from_table or c.metadata.alias == query.from_table:</span>
-                    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">alias</span> <span class="o">==</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span> <span class="ow">or</span> <span class="n">c</span><span class="o">.</span><span class="n">target_class_name</span> <span class="o">==</span> <span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">alias</span> <span class="o">==</span> <span class="n">table_name</span> <span class="ow">or</span> <span class="n">c</span><span class="o">.</span><span class="n">target_class_name</span> <span class="o">==</span> <span class="n">table_name</span><span class="p">:</span>
                         <span class="n">cd</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span>
                         <span class="k">break</span>
                 <span class="k">if</span> <span class="n">cd</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">sv</span><span class="o">.</span><span class="n">class_induced_slots</span><span class="p">(</span><span class="n">cd</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">att</span><span class="o">.</span><span class="n">inlined</span> <span class="ow">or</span> <span class="n">att</span><span class="o">.</span><span class="n">inlined_as_list</span><span class="p">:</span>
                             <span class="n">json_encoded_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">att</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json_encoded_cols</span>
+
+<div class="viewcode-block" id="DuckDBDatabase.query">
+<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_database.html#linkml_store.api.stores.duckdb.DuckDBDatabase.query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_exists</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">QueryResult</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="p">[])</span>
+        <span class="n">json_encoded_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_encoded_cols</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">from_table</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
             <span class="n">count_query_str</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">query_to_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;count_query_str: </span><span class="si">{</span><span class="n">count_query_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">count_query_str</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_rows: </span><span class="si">{</span><span class="n">num_rows</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">query_str</span> <span class="o">=</span> <span class="n">query_to_sql</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># include offset, limit</span>
@@ -490,6 +521,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inducing schema view for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">handle</span><span class="si">}</span><span class="s2"> // </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">sb</span> <span class="o">=</span> <span class="n">SchemaBuilder</span><span class="p">()</span>
         <span class="n">schema</span> <span class="o">=</span> <span class="n">sb</span><span class="o">.</span><span class="n">schema</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking if </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">handle</span><span class="si">}</span><span class="s2"> is sqlite: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_sqlite</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sqlite</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SchemaView</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
         <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">from_table</span><span class="o">=</span><span class="s2">&quot;information_schema.tables&quot;</span><span class="p">,</span> <span class="n">where_clause</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;table_type&quot;</span><span class="p">:</span> <span class="s2">&quot;BASE TABLE&quot;</span><span class="p">})</span>
         <span class="n">qr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span><span class="si">}</span><span class="s2"> information_schema.tables // </span><span class="si">{</span><span class="n">qr</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -596,7 +630,7 @@
 </div><script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/scripts/furo.js?v=5fa4622c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

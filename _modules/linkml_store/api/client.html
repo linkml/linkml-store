@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="author" title="About these documents" href="../../../about.html" /><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>linkml_store.api.client - linkml-store documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
     
     
@@ -221,6 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Predict-Missing-Data.html">How to predict missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../how-to/Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../how-to/Perform-LLM-Inference.html">Perform LLM Inference</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -313,14 +314,20 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-
 <span class="n">HANDLE_MAP</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;duckdb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;solr&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.solr.solr_database.SolrDatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;mongodb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;chromadb&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;neo4j&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase&quot;</span><span class="p">,</span>
     <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">SUFFIX_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ddb&quot;</span><span class="p">:</span> <span class="s2">&quot;duckdb:///</span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;duckdb&quot;</span><span class="p">:</span> <span class="s2">&quot;duckdb:///</span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;db&quot;</span><span class="p">:</span> <span class="s2">&quot;duckdb:///</span><span class="si">{path}</span><span class="s2">&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -509,6 +516,13 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">alias</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">alias</span> <span class="o">=</span> <span class="n">handle</span>
+            <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">SUFFIX_MAP</span><span class="p">:</span>
+                    <span class="n">handle</span> <span class="o">=</span> <span class="n">SUFFIX_MAP</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
             <span class="n">scheme</span> <span class="o">=</span> <span class="n">handle</span>
             <span class="n">handle</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">alias</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -517,21 +531,23 @@
             <span class="n">scheme</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">HANDLE_MAP</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown scheme: </span><span class="si">{</span><span class="n">scheme</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">module_path</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">HANDLE_MAP</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">module_path</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">HANDLE_MAP</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
             <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to import </span><span class="si">{</span><span class="n">scheme</span><span class="si">}</span><span class="s2"> database. Make sure the correct extras are installed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="c1">#cls = HANDLE_MAP[scheme]</span>
+        <span class="c1"># cls = HANDLE_MAP[scheme]</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="n">handle</span><span class="p">,</span> <span class="n">recreate_if_exists</span><span class="o">=</span><span class="n">recreate_if_exists</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">schema_view</span><span class="p">:</span>
             <span class="n">db</span><span class="o">.</span><span class="n">set_schema_view</span><span class="p">(</span><span class="n">schema_view</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">alias</span><span class="p">:</span>
             <span class="n">alias</span> <span class="o">=</span> <span class="n">handle</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initializing databases&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attaching </span><span class="si">{</span><span class="n">alias</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span>
         <span class="n">db</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="n">db</span><span class="o">.</span><span class="n">alias</span><span class="p">:</span>
@@ -577,8 +593,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">create_if_not_exists</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating database: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating/attaching database: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">alias</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
         <span class="n">db</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_databases</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -738,7 +755,7 @@
 </div><script src="../../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>

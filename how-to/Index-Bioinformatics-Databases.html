@@ -1,0 +1,633 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>Indexing Bioinformatics Databases - linkml-store documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">linkml-store  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="https://linkml.io/uploads/linkml-logo_color.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">linkml-store  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Command-Line-Tutorial.html">Tutorial: Using the Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Python-Tutorial.html">Tutorial: Using the Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">How-To Guides</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of How-To Guides</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="Use-MongoDB.html">How to use MongoDB with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Semantic-Search.html">How to use Semantic Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-the-Monarch-KG.html">How to query the Monarch-KG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-Solr-using-CLI.html">How to query Solr using the Command Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Neo4j.html">How to use Neo4J with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Check-Referential-Integrity.html">How to Check Referential Integrity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Store-an-Ontology.html">Example: Storing an ontology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-LLM-Inference.html">Perform LLM Inference</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/linkml_store.api.html">API</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.html">Adapters</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Adapters</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.html">linkml_store.api.stores.duckdb package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.duckdb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.duckdb_collection.html">linkml_store.api.stores.duckdb.duckdb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.duckdb_database.html">linkml_store.api.stores.duckdb.duckdb_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.mappings.html">linkml_store.api.stores.duckdb.mappings module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.html">linkml_store.api.stores.mongodb package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.mongodb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.mongodb_collection.html">linkml_store.api.stores.mongodb.mongodb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.mongodb_database.html">linkml_store.api.stores.mongodb.mongodb_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.html">linkml_store.api.stores.filesystem package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.filesystem package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.filesystem_collection.html">linkml_store.api.stores.filesystem.filesystem_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.filesystem_database.html">linkml_store.api.stores.filesystem.filesystem_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.html">linkml_store.api.stores.solr package</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.solr package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_collection.html">linkml_store.api.stores.solr.solr_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_database.html">linkml_store.api.stores.solr.solr_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_utils.html">linkml_store.api.stores.solr.solr_utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.html">linkml_store.api.stores.hdf5 package</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.hdf5 package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.hdf5_collection.html">linkml_store.api.stores.hdf5.hdf5_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.hdf5_database.html">linkml_store.api.stores.hdf5.hdf5_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.html">linkml_store.api.stores.chromadb package</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.chromadb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.chromadb_collection.html">linkml_store.api.stores.chromadb.chromadb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.chromadb_database.html">linkml_store.api.stores.chromadb.chromadb_database module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/how-to/Index-Bioinformatics-Databases.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="Indexing-Bioinformatics-Databases">
+<h1>Indexing Bioinformatics Databases<a class="headerlink" href="#Indexing-Bioinformatics-Databases" title="Link to this heading"></a></h1>
+<section id="SIB-Expasy-Enzyme-Database">
+<h2>SIB Expasy Enzyme Database<a class="headerlink" href="#SIB-Expasy-Enzyme-Database" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017/bioinf<span class="w"> </span>-c<span class="w"> </span>enzyme<span class="w"> </span>insert<span class="w"> </span>ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Inserted 8371 objects from ftp://ftp.expasy.org/databases/enzyme/enzyme.dat into collection &#39;enzyme&#39;.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-bash notranslate"><div class="highlight"><pre><span></span>%%bash
+linkml-store<span class="w"> </span>-vv<span class="w"> </span>--stacktrace<span class="w"> </span>-d<span class="w"> </span>mongodb://localhost:27017/bioinf::enzyme<span class="w"> </span>search<span class="w"> </span>-t<span class="w"> </span>llm<span class="w"> </span><span class="s2">&quot;degradation pathways&quot;</span><span class="w"> </span>-l<span class="w"> </span><span class="m">10</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: phenopackets, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: gaf_mgi, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: gaf_pombase, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: gaf_gcrp, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: nmdc, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: amigo, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: gocams, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: cadsr, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: npatlas, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: obo, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: metabolights, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: mibig, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: mixs, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: mondo, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: hpoa, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: hpoa_mongo, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: hpoa_kg, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: maxoa, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: refmet, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: neo4j, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: gold, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Initializing database: nmdc_duckdb, base_dir: /Users/cjm
+2025-03-06 09:50:11,450 - linkml_store.api.client - INFO - Creating/attaching database: mongodb://localhost:27017/bioinf
+2025-03-06 09:50:11,490 - linkml_store.api.client - INFO - Initializing databases
+2025-03-06 09:50:11,490 - linkml_store.api.client - INFO - Attaching mongodb://localhost:27017/bioinf
+2025-03-06 09:50:11,490 - linkml_store.api.database - DEBUG - Initializing collections
+2025-03-06 09:50:11,494 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Starting topology monitoring&#34;}
+2025-03-06 09:50:11,494 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;previousDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Unknown, servers: []&gt;&#34;, &#34;newDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Unknown, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Unknown, rtt: None&gt;]&gt;&#34;, &#34;message&#34;: &#34;Topology description changed&#34;}
+2025-03-06 09:50:11,494 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;message&#34;: &#34;Starting server monitoring&#34;}
+2025-03-06 09:50:11,494 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection pool created&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,494 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;listCollections&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Unknown, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Unknown, rtt: None&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,495 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Waiting for suitable server to become available&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;listCollections&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Unknown, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Unknown, rtt: None&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;remainingTimeMS&#34;: 29}
+2025-03-06 09:50:11,497 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;driverConnectionId&#34;: 1, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;awaited&#34;: false, &#34;message&#34;: &#34;Server heartbeat started&#34;}
+2025-03-06 09:50:11,500 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1165, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;awaited&#34;: false, &#34;durationMS&#34;: 2.4912499357014894, &#34;reply&#34;: &#34;{\&#34;helloOk\&#34;: true, \&#34;ismaster\&#34;: true, \&#34;topologyVersion\&#34;: {\&#34;processId\&#34;: {\&#34;$oid\&#34;: \&#34;67bd405a9a90e0cc87eb813e\&#34;}}, \&#34;maxBsonObjectSize\&#34;: 16777216, \&#34;maxMessageSizeBytes\&#34;: 48000000, \&#34;maxWriteBatchSize\&#34;: 100000, \&#34;localTime\&#34;: {\&#34;$date\&#34;: \&#34;2025-03-06T17:50:11.499Z\&#34;}, \&#34;logicalSessionTimeoutMinutes\&#34;: 30, \&#34;connectionId\&#34;: 1165, \&#34;maxWireVersion\&#34;: 21, \&#34;ok\&#34;: 1.0}&#34;, &#34;message&#34;: &#34;Server heartbeat succeeded&#34;}
+2025-03-06 09:50:11,500 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection pool ready&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,500 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;previousDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Unknown, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Unknown, rtt: None&gt;]&gt;&#34;, &#34;newDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;message&#34;: &#34;Topology description changed&#34;}
+2025-03-06 09:50:11,500 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;listCollections&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,500 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,500 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection created&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,500 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1165, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;awaited&#34;: true, &#34;message&#34;: &#34;Server heartbeat started&#34;}
+2025-03-06 09:50:11,503 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection ready&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 0.0017190839862450957}
+2025-03-06 09:50:11,503 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 0.0026320830220356584}
+2025-03-06 09:50:11,503 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;listCollections\&#34;: 1, \&#34;nameOnly\&#34;: true, \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;listCollections&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1144108930, &#34;operationId&#34;: 1144108930, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,507 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 4.3759999999999994, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;ns\&#34;: \&#34;bioinf.$cmd.listCollections\&#34;, \&#34;firstBatch\&#34;: [{\&#34;name\&#34;: \&#34;enzyme\&#34;, \&#34;type\&#34;: \&#34;collection\&#34;}]}, \&#34;ok\&#34;: 1.0}&#34;, &#34;commandName&#34;: &#34;listCollections&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1144108930, &#34;operationId&#34;: 1144108930, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,507 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,507 - linkml_store.cli - INFO - Attaching index to collection enzyme: {&#39;name&#39;: &#39;llm&#39;, &#39;index_type&#39;: &#39;llm&#39;, &#39;index_function&#39;: None, &#39;distance_function&#39;: None, &#39;index_attributes&#39;: None, &#39;text_template&#39;: None, &#39;text_template_syntax&#39;: None, &#39;filter_nulls&#39;: True, &#39;vector_default_length&#39;: 1000, &#39;index_field&#39;: &#39;__index__&#39;, &#39;embedding_model_name&#39;: &#39;ada-002&#39;, &#39;cached_embeddings_database&#39;: None, &#39;cached_embeddings_collection&#39;: None, &#39;cache_queries&#39;: False, &#39;truncation_method&#39;: None}
+2025-03-06 09:50:11,507 - linkml_store.api.collection - DEBUG - Pre-query hook (state: None; Q= None
+2025-03-06 09:50:11,507 - linkml_store.api.collection - INFO - No metadata for enzyme; no derivations
+2025-03-06 09:50:11,507 - linkml_store.api.database - DEBUG - Creating new collection: internal__index__enzyme__llm kwargs: {}
+2025-03-06 09:50:11,507 - linkml_store.api.collection - DEBUG - Using indexer &lt;class &#39;linkml_store.index.implementations.llm_indexer.LLMIndexer&#39;&gt; with name llm
+2025-03-06 09:50:11,507 - linkml_store.api.collection - DEBUG - Pre-query hook (state: None; Q= from_table=&#39;internal__index__enzyme__llm&#39; select_cols=None where_clause={} sort_by=None limit=None offset=None include_facet_counts=False facet_slots=None
+2025-03-06 09:50:11,508 - linkml_store.api.collection - INFO - No metadata for internal__index__enzyme__llm; no derivations
+2025-03-06 09:50:11,508 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;find&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,508 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;find&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,508 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,508 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 3.2374984584748745e-05}
+2025-03-06 09:50:11,508 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;find\&#34;: \&#34;internal__index__enzyme__llm\&#34;, \&#34;limit\&#34;: 1, \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;find&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 470211272, &#34;operationId&#34;: 470211272, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,509 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 0.9810000000000001, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;ns\&#34;: \&#34;bioinf.internal__index__enzyme__llm\&#34;}, \&#34;ok\&#34;: 1.0}&#34;, &#34;commandName&#34;: &#34;find&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 470211272, &#34;operationId&#34;: 470211272, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,509 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,509 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;count&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,509 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;count&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,509 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,509 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 2.9582995921373367e-05}
+2025-03-06 09:50:11,509 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;aggregate\&#34;: \&#34;internal__index__enzyme__llm\&#34;, \&#34;pipeline\&#34;: [{\&#34;$group\&#34;: {\&#34;_id\&#34;: 1, \&#34;n\&#34;: {\&#34;$sum\&#34;: 1}}}], \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;aggregate&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 101027544, &#34;operationId&#34;: 101027544, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,510 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 0.8019999999999999, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;ns\&#34;: \&#34;bioinf.internal__index__enzyme__llm\&#34;}, \&#34;ok\&#34;: 1.0}&#34;, &#34;commandName&#34;: &#34;aggregate&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 101027544, &#34;operationId&#34;: 101027544, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,510 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,510 - linkml_store.api.collection - INFO - Index llm is empty; indexing all objects
+2025-03-06 09:50:11,510 - linkml_store.api.collection - DEBUG - Pre-query hook (state: True; Q= from_table=&#39;enzyme&#39; select_cols=None where_clause=None sort_by=None limit=None offset=None include_facet_counts=False facet_slots=None
+2025-03-06 09:50:11,510 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;find&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,510 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;find&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,510 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,510 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 0.0001430839765816927}
+2025-03-06 09:50:11,510 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;find\&#34;: \&#34;enzyme\&#34;, \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;find&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1457850878, &#34;operationId&#34;: 1457850878, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,512 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 1.246, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;firstBatch\&#34;: [{\&#34;_id\&#34;: {\&#34;$oid\&#34;: \&#34;67c910cdad347dd8ce68a02d\&#34;}, \&#34;ID\&#34;: \&#34;1.1.1.1\&#34;, \&#34;DE\&#34;: \&#34;alcohol dehydrogenase\&#34;, \&#34;AN\&#34;: [\&#34;aldehyde reductase\&#34;], \&#34;CA\&#34;: [\&#34;(1) a primary alcohol + NAD(+) = an aldehyde + NADH + H(+)\&#34;, \&#34;(2) a secondary alcohol + NAD(+) = a ketone + NADH + H(+)\&#34;], \&#34;CC\&#34;: [\&#34;-!- Acts on primary or secondary alcohols or hemi-acetals with very broad specificity; however the enzyme oxidizes methanol much more poorly than ethanol.\&#34;, \&#34;-!- The animal, but not the yeast, enzyme acts also on cyclic secondary alcohols.\&#34;, \&#34;-!- Formerly EC 1.1.1.32.\&#34;], \&#34;DR\&#34;: \&#34;P07327, ADH1A_HUMAN;  P28469, ADH1A_MACMU;  Q5RBP7, ADH1A_PONAB;P25405, ADH1A_SAAHA;  P25406, ADH1B_SAAHA;  P00327, ADH1E_HORSE;P00326, ADH1G_HUMAN;  O97959, ADH1G_PAPHA;  P00328, ADH1S_HORSE;P80222, ADH1_ALLMI ;  P30350, ADH1_ANAPL ;  P49645, ADH1_APTAU ;P06525, ADH1_ARATH ;  P41747, ADH1_ASPFN ;  Q17334, ADH1_CAEEL ;P43067, ADH1_CANAX ;  P85440, ADH1_CATRO ;  P14219, ADH1_CENAM ;P48814, ADH1_CERCA ;  Q70UN9, ADH1_CERCO ;  P23...&#34;, &#34;commandName&#34;: &#34;find&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1457850878, &#34;operationId&#34;: 1457850878, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,513 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,513 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;&lt;function any_server_selector at 0x29ca04670&gt;&#34;, &#34;operation&#34;: &#34;getMore&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,513 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;&lt;function any_server_selector at 0x29ca04670&gt;&#34;, &#34;operation&#34;: &#34;getMore&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,513 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,513 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 3.4708064049482346e-05}
+2025-03-06 09:50:11,513 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;getMore\&#34;: 3344471647564691207, \&#34;collection\&#34;: \&#34;enzyme\&#34;, \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;getMore&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1458777923, &#34;operationId&#34;: 1458777923, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,561 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 47.666, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;nextBatch\&#34;: [{\&#34;_id\&#34;: {\&#34;$oid\&#34;: \&#34;67c910cdad347dd8ce68a092\&#34;}, \&#34;ID\&#34;: \&#34;1.1.1.102\&#34;, \&#34;DE\&#34;: \&#34;3-dehydrosphinganine reductase\&#34;, \&#34;AN\&#34;: [\&#34;3-ketosphinganine reductase\&#34;, \&#34;3-oxosphinganine:NADPH oxidoreductase\&#34;, \&#34;3-oxosphinganine reductase\&#34;, \&#34;D-3-dehydrosphinganine reductase\&#34;, \&#34;D-3-oxosphinganine:B-NADPH oxidoreductase\&#34;, \&#34;D-3-oxosphinganine reductase\&#34;, \&#34;DSR\&#34;, \&#34;KTS reductase\&#34;], \&#34;CA\&#34;: [\&#34;sphinganine + NADP(+) = 3-oxosphinganine + NADPH + H(+)\&#34;], \&#34;DR\&#34;: \&#34;Q9Y7P2, GPI11_SCHPO;  Q0WRJ2, KDSRA_ARATH;  F4JZN6, KDSRB_ARATH;Q4WSZ0, KDSR_ASPFU ;  Q8A945, KDSR_BACTN ;  Q2KIJ5, KDSR_BOVIN ;Q59RQ2, KDSR_CANAL ;  Q6FQ42, KDSR_CANGA ;  P0CR37, KDSR_CRYNB ;P0CR36, KDSR_CRYNJ ;  F1QWW8, KDSR_DANRE ;  Q6BQK1, KDSR_DEBHA ;Q556J2, KDSR_DICDI ;  Q5BE65, KDSR_EMENI ;  Q758B6, KDSR_EREGS ;Q06136, KDSR_HUMAN ;  Q6CLN0, KDSR_KLULA ;  Q6GV12, KDSR_MOUSE ;Q7RZR2, KDSR_NEUCR ;  Q6CE86, KDSR_YARLI ;  P38342, KDSR_YEAST ;\&#34;}, {\&#34;_id\&#34;: {\&#34;$oid\&#34;: \&#34;67c910cdad347dd8ce68a093\&#34;}, \&#34;ID\&#34;: \&#34;1.1.1.103\&#34;, \&#34;DE\&#34;: \&#34;L-threonine 3-dehydrogen...&#34;, &#34;commandName&#34;: &#34;getMore&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 1458777923, &#34;operationId&#34;: 1458777923, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,561 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,566 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection started&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;count&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}}
+2025-03-06 09:50:11,567 - pymongo.serverSelection - DEBUG - {&#34;message&#34;: &#34;Server selection succeeded&#34;, &#34;selector&#34;: &#34;Primary()&#34;, &#34;operation&#34;: &#34;count&#34;, &#34;topologyDescription&#34;: &#34;&lt;TopologyDescription id: 67c9e0533f1b6043a9a9dd16, topology_type: Single, servers: [&lt;ServerDescription (&#39;localhost&#39;, 27017) server_type: Standalone, rtt: 0.0024912499357014894&gt;]&gt;&#34;, &#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,567 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checkout started&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,567 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked out&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1, &#34;durationMS&#34;: 4.2749918065965176e-05}
+2025-03-06 09:50:11,567 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command started&#34;, &#34;command&#34;: &#34;{\&#34;aggregate\&#34;: \&#34;enzyme\&#34;, \&#34;pipeline\&#34;: [{\&#34;$group\&#34;: {\&#34;_id\&#34;: 1, \&#34;n\&#34;: {\&#34;$sum\&#34;: 1}}}], \&#34;lsid\&#34;: {\&#34;id\&#34;: {\&#34;$binary\&#34;: {\&#34;base64\&#34;: \&#34;7XlM7LkFRb+PVBWeJpTtRw==\&#34;, \&#34;subType\&#34;: \&#34;04\&#34;}}}, \&#34;$db\&#34;: \&#34;bioinf\&#34;}&#34;, &#34;commandName&#34;: &#34;aggregate&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 2007237709, &#34;operationId&#34;: 2007237709, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,573 - pymongo.command - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Command succeeded&#34;, &#34;durationMS&#34;: 5.842, &#34;reply&#34;: &#34;{\&#34;cursor\&#34;: {\&#34;firstBatch\&#34;: [{\&#34;_id\&#34;: 1, \&#34;n\&#34;: 8371}], \&#34;ns\&#34;: \&#34;bioinf.enzyme\&#34;}, \&#34;ok\&#34;: 1.0}&#34;, &#34;commandName&#34;: &#34;aggregate&#34;, &#34;databaseName&#34;: &#34;bioinf&#34;, &#34;requestId&#34;: 2007237709, &#34;operationId&#34;: 2007237709, &#34;driverConnectionId&#34;: 1, &#34;serverConnectionId&#34;: 1167, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017}
+2025-03-06 09:50:11,573 - pymongo.connection - DEBUG - {&#34;clientId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;message&#34;: &#34;Connection checked in&#34;, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;driverConnectionId&#34;: 1}
+2025-03-06 09:50:11,618 - root - INFO - Converting 8371 texts to vectors
+2025-03-06 09:50:11,635 - root - INFO - Token limit for text-embedding-ada-002: 7892
+2025-03-06 09:50:11,639 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): openaipublic.blob.core.windows.net:443
+Traceback (most recent call last):
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connection.py&#34;, line 198, in _new_conn
+    sock = connection.create_connection(
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/util/connection.py&#34;, line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+  File &#34;/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/socket.py&#34;, line 955, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+socket.gaierror: [Errno 8] nodename nor servname provided, or not known
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connectionpool.py&#34;, line 787, in urlopen
+    response = self._make_request(
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connectionpool.py&#34;, line 488, in _make_request
+    raise new_e
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connectionpool.py&#34;, line 464, in _make_request
+    self._validate_conn(conn)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connectionpool.py&#34;, line 1093, in _validate_conn
+    conn.connect()
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connection.py&#34;, line 704, in connect
+    self.sock = sock = self._new_conn()
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connection.py&#34;, line 205, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: &lt;urllib3.connection.HTTPSConnection object at 0x29ce69bd0&gt;: Failed to resolve &#39;openaipublic.blob.core.windows.net&#39; ([Errno 8] nodename nor servname provided, or not known)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/adapters.py&#34;, line 667, in send
+    resp = conn.urlopen(
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/connectionpool.py&#34;, line 841, in urlopen
+    retries = retries.increment(
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/urllib3/util/retry.py&#34;, line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host=&#39;openaipublic.blob.core.windows.net&#39;, port=443): Max retries exceeded with url: /encodings/o200k_base.tiktoken (Caused by NameResolutionError(&#34;&lt;urllib3.connection.HTTPSConnection object at 0x29ce69bd0&gt;: Failed to resolve &#39;openaipublic.blob.core.windows.net&#39; ([Errno 8] nodename nor servname provided, or not known)&#34;))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/bin/linkml-store&#34;, line 6, in &lt;module&gt;
+    sys.exit(cli())
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/core.py&#34;, line 1161, in __call__
+    return self.main(*args, **kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/core.py&#34;, line 1082, in main
+    rv = self.invoke(ctx)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/core.py&#34;, line 1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/core.py&#34;, line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/core.py&#34;, line 788, in invoke
+    return __callback(*args, **kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/click/decorators.py&#34;, line 33, in new_func
+    return f(get_current_context(), *args, **kwargs)
+  File &#34;/Users/cjm/repos/linkml-store/src/linkml_store/cli.py&#34;, line 882, in search
+    result = collection.search(search_term, where=where, select_cols=select_cols, limit=limit)
+  File &#34;/Users/cjm/repos/linkml-store/src/linkml_store/api/collection.py&#34;, line 595, in search
+    self.index_objects(all_objs, index_name, replace=True, **kwargs)
+  File &#34;/Users/cjm/repos/linkml-store/src/linkml_store/api/collection.py&#34;, line 905, in index_objects
+    vectors = [list(float(e) for e in v) for v in ix.objects_to_vectors(objs)]
+  File &#34;/Users/cjm/repos/linkml-store/src/linkml_store/index/indexer.py&#34;, line 103, in objects_to_vectors
+    return self.texts_to_vectors([self.object_to_text(obj) for obj in objs])
+  File &#34;/Users/cjm/repos/linkml-store/src/linkml_store/index/implementations/llm_indexer.py&#34;, line 73, in texts_to_vectors
+    encoding = encoding_for_model(&#34;gpt-4o&#34;)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken/model.py&#34;, line 110, in encoding_for_model
+    return get_encoding(encoding_name_for_model(model_name))
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken/registry.py&#34;, line 86, in get_encoding
+    enc = Encoding(**constructor())
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken_ext/openai_public.py&#34;, line 96, in o200k_base
+    mergeable_ranks = load_tiktoken_bpe(
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken/load.py&#34;, line 148, in load_tiktoken_bpe
+    contents = read_file_cached(tiktoken_bpe_file, expected_hash)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken/load.py&#34;, line 63, in read_file_cached
+    contents = read_file(blobpath)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/tiktoken/load.py&#34;, line 22, in read_file
+    resp = requests.get(blobpath)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/api.py&#34;, line 73, in get
+    return request(&#34;get&#34;, url, params=params, **kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/api.py&#34;, line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/sessions.py&#34;, line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/sessions.py&#34;, line 703, in send
+    r = adapter.send(request, **kwargs)
+  File &#34;/Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/requests/adapters.py&#34;, line 700, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host=&#39;openaipublic.blob.core.windows.net&#39;, port=443): Max retries exceeded with url: /encodings/o200k_base.tiktoken (Caused by NameResolutionError(&#34;&lt;urllib3.connection.HTTPSConnection object at 0x29ce69bd0&gt;: Failed to resolve &#39;openaipublic.blob.core.windows.net&#39; ([Errno 8] nodename nor servname provided, or not known)&#34;))
+2025-03-06 09:50:12,001 - pymongo.topology - DEBUG - {&#34;topologyId&#34;: {&#34;$oid&#34;: &#34;67c9e0533f1b6043a9a9dd16&#34;}, &#34;serverHost&#34;: &#34;localhost&#34;, &#34;serverPort&#34;: 27017, &#34;awaited&#34;: true, &#34;durationMS&#34;: 501.27241597510874, &#34;failure&#34;: &#34;\&#34;_OperationCancelled(&#39;operation cancelled&#39;)\&#34;&#34;, &#34;driverConnectionId&#34;: 1, &#34;message&#34;: &#34;Server heartbeat failed&#34;}
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">CalledProcessError</span>                        Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[1], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">get_ipython</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">run_cell_magic</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">bash</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">linkml-store -vv --stacktrace -d mongodb://localhost:27017/bioinf::enzyme search -t llm </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">degradation pathways</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)"> -l 10 </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,95,0)">\n</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/IPython/core/interactiveshell.py:2543</span>, in <span class="ansi-cyan-fg">InteractiveShell.run_cell_magic</span><span class="ansi-blue-fg">(self, magic_name, line, cell)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2541</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>builtin_trap:
+<span class="ansi-green-intense-fg ansi-bold">   2542</span>     args <span style="color: rgb(98,98,98)">=</span> (magic_arg_s, cell)
+<span class="ansi-green-fg">-&gt; 2543</span>     result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   2545</span> <span style="color: rgb(95,135,135)"># The code below prevents the output from being displayed</span>
+<span class="ansi-green-intense-fg ansi-bold">   2546</span> <span style="color: rgb(95,135,135)"># when using magics with decorator @output_can_be_silenced</span>
+<span class="ansi-green-intense-fg ansi-bold">   2547</span> <span style="color: rgb(95,135,135)"># when the last Python token in the expression is a &#39;;&#39;.</span>
+<span class="ansi-green-intense-fg ansi-bold">   2548</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">getattr</span>(fn, magic<span style="color: rgb(98,98,98)">.</span>MAGIC_OUTPUT_CAN_BE_SILENCED, <span class="ansi-bold" style="color: rgb(0,135,0)">False</span>):
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/IPython/core/magics/script.py:159</span>, in <span class="ansi-cyan-fg">ScriptMagics._make_script_magic.&lt;locals&gt;.named_script_magic</span><span class="ansi-blue-fg">(line, cell)</span>
+<span class="ansi-green-intense-fg ansi-bold">    157</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">    158</span>     line <span style="color: rgb(98,98,98)">=</span> script
+<span class="ansi-green-fg">--&gt; 159</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">shebang</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">line</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">cell</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages/IPython/core/magics/script.py:336</span>, in <span class="ansi-cyan-fg">ScriptMagics.shebang</span><span class="ansi-blue-fg">(self, line, cell)</span>
+<span class="ansi-green-intense-fg ansi-bold">    331</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> args<span style="color: rgb(98,98,98)">.</span>raise_error <span class="ansi-bold" style="color: rgb(175,0,255)">and</span> p<span style="color: rgb(98,98,98)">.</span>returncode <span style="color: rgb(98,98,98)">!=</span> <span style="color: rgb(98,98,98)">0</span>:
+<span class="ansi-green-intense-fg ansi-bold">    332</span>     <span style="color: rgb(95,135,135)"># If we get here and p.returncode is still None, we must have</span>
+<span class="ansi-green-intense-fg ansi-bold">    333</span>     <span style="color: rgb(95,135,135)"># killed it but not yet seen its return code. We don&#39;t wait for it,</span>
+<span class="ansi-green-intense-fg ansi-bold">    334</span>     <span style="color: rgb(95,135,135)"># in case it&#39;s stuck in uninterruptible sleep. -9 = SIGKILL</span>
+<span class="ansi-green-intense-fg ansi-bold">    335</span>     rc <span style="color: rgb(98,98,98)">=</span> p<span style="color: rgb(98,98,98)">.</span>returncode <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> <span style="color: rgb(98,98,98)">-</span><span style="color: rgb(98,98,98)">9</span>
+<span class="ansi-green-fg">--&gt; 336</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> CalledProcessError(rc, cell)
+
+<span class="ansi-red-fg">CalledProcessError</span>: Command &#39;b&#39;linkml-store -vv --stacktrace -d mongodb://localhost:27017/bioinf::enzyme search -t llm &#34;degradation pathways&#34; -l 10 \n&#39;&#39; returned non-zero exit status 1.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Author 1 &lt;author@org.org&gt;
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Indexing Bioinformatics Databases</a><ul>
+<li><a class="reference internal" href="#SIB-Expasy-Enzyme-Database">SIB Expasy Enzyme Database</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

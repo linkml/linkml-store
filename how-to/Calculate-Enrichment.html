@@ -1,0 +1,946 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="author" title="About these documents" href="../about.html" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>&lt;no title&gt; - linkml-store documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">linkml-store  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="https://linkml.io/uploads/linkml-logo_color.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">linkml-store  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorials</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Command-Line-Tutorial.html">Tutorial: Using the Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Python-Tutorial.html">Tutorial: Using the Python API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">How-To Guides</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of How-To Guides</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="Use-MongoDB.html">How to use MongoDB with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Semantic-Search.html">How to use Semantic Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-the-Monarch-KG.html">How to query the Monarch-KG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Query-Solr-using-CLI.html">How to query Solr using the Command Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Use-Neo4j.html">How to use Neo4J with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Check-Referential-Integrity.html">How to Check Referential Integrity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Store-an-Ontology.html">Example: Storing an ontology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-Phenopackets.html">How to index Phenopackets with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Index-GO-CAMs.html">How to index GO-CAMs with LinkML-Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Predict-Missing-Data.html">How to predict missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-RAG-Inference.html">Perform RAG Inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Perform-LLM-Inference.html">Perform LLM Inference</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/linkml_store.api.html">API</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.html">Adapters</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Adapters</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.html">linkml_store.api.stores.duckdb package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.duckdb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.duckdb_collection.html">linkml_store.api.stores.duckdb.duckdb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.duckdb_database.html">linkml_store.api.stores.duckdb.duckdb_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.duckdb.mappings.html">linkml_store.api.stores.duckdb.mappings module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.html">linkml_store.api.stores.mongodb package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.mongodb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.mongodb_collection.html">linkml_store.api.stores.mongodb.mongodb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.mongodb.mongodb_database.html">linkml_store.api.stores.mongodb.mongodb_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.html">linkml_store.api.stores.filesystem package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.filesystem package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.filesystem_collection.html">linkml_store.api.stores.filesystem.filesystem_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.filesystem.filesystem_database.html">linkml_store.api.stores.filesystem.filesystem_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.html">linkml_store.api.stores.solr package</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.solr package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_collection.html">linkml_store.api.stores.solr.solr_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_database.html">linkml_store.api.stores.solr.solr_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.solr.solr_utils.html">linkml_store.api.stores.solr.solr_utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.html">linkml_store.api.stores.hdf5 package</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.hdf5 package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.hdf5_collection.html">linkml_store.api.stores.hdf5.hdf5_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.hdf5.hdf5_database.html">linkml_store.api.stores.hdf5.hdf5_database module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.html">linkml_store.api.stores.chromadb package</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of linkml_store.api.stores.chromadb package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.chromadb_collection.html">linkml_store.api.stores.chromadb.chromadb_collection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/linkml_store.api.stores.chromadb.chromadb_database.html">linkml_store.api.stores.chromadb.chromadb_database module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/how-to/Calculate-Enrichment.ipynb.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">unicodedata</span><span class="w"> </span><span class="kn">import</span> <span class="n">category</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.enrichment_analyzer</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnrichmentAnalyzer</span>
+
+<span class="n">DB</span> <span class="o">=</span> <span class="s2">&quot;mongodb://localhost:27017/metabolights&quot;</span>
+<span class="n">CN</span> <span class="o">=</span> <span class="s2">&quot;maf&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>oaklib
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requirement already satisfied: oaklib in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (0.6.21)
+Requirement already satisfied: SPARQLWrapper in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.0.0)
+Requirement already satisfied: SQLAlchemy&gt;=1.4.32 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.0.38)
+Requirement already satisfied: airium&gt;=0.2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.6)
+Requirement already satisfied: appdirs&gt;=1.4.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.4.4)
+Requirement already satisfied: class-resolver&gt;=0.4.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.4)
+Requirement already satisfied: click in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (8.1.8)
+Requirement already satisfied: curies&gt;=0.6.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.10.4)
+Requirement already satisfied: defusedxml&gt;=0.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.7.1)
+Requirement already satisfied: eutils&gt;=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.6.0)
+Requirement already satisfied: funowl&gt;=0.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.3)
+Requirement already satisfied: jsonlines in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (4.0.0)
+Requirement already satisfied: kgcl-rdflib==0.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.0)
+Requirement already satisfied: kgcl-schema&lt;0.7.0,&gt;=0.6.9 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.6.9)
+Requirement already satisfied: linkml-renderer&gt;=0.3.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.3.1)
+Requirement already satisfied: linkml-runtime&gt;=1.5.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.8.3)
+Requirement already satisfied: ndex2&gt;=3.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.10.0)
+Requirement already satisfied: networkx&gt;=2.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.4.2)
+Requirement already satisfied: ols-client&gt;=0.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.1.4)
+Requirement already satisfied: ontoportal-client&gt;=0.0.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.0.4)
+Requirement already satisfied: prefixmaps&gt;=0.1.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.2.6)
+Requirement already satisfied: pronto&gt;=2.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.6.0)
+Requirement already satisfied: pydantic in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.10.6)
+Requirement already satisfied: pysolr&lt;4.0.0,&gt;=3.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (3.10.0)
+Requirement already satisfied: pystow&gt;=0.5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.5.6)
+Requirement already satisfied: ratelimit&gt;=2.2.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (2.2.1)
+Requirement already satisfied: requests-cache&lt;2.0.0,&gt;=1.0.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (1.2.1)
+Requirement already satisfied: semsql&gt;=0.3.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.4.0)
+Requirement already satisfied: sssom&lt;0.5.0,&gt;=0.4.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (0.4.15)
+Requirement already satisfied: tenacity&gt;=8.2.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from oaklib) (9.0.0)
+Requirement already satisfied: pytrie in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from curies&gt;=0.6.6-&gt;oaklib) (0.4.0)
+Requirement already satisfied: typing-extensions in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from curies&gt;=0.6.6-&gt;oaklib) (4.12.2)
+Requirement already satisfied: lxml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils&gt;=0.6.0-&gt;oaklib) (5.3.1)
+Requirement already satisfied: pytz in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils&gt;=0.6.0-&gt;oaklib) (2025.1)
+Requirement already satisfied: requests in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from eutils&gt;=0.6.0-&gt;oaklib) (2.32.3)
+Requirement already satisfied: bcp47 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (0.1.0)
+Requirement already satisfied: jsonasobj in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (1.3.1)
+Requirement already satisfied: pyjsg&gt;=0.11.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (0.11.10)
+Requirement already satisfied: rdflib-shim in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (1.0.3)
+Requirement already satisfied: rdflib&lt;8,&gt;=6.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (7.1.3)
+Requirement already satisfied: rfc3987 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from funowl&gt;=0.2.0-&gt;oaklib) (1.3.8)
+Requirement already satisfied: lark&gt;=1.1.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from kgcl-schema&lt;0.7.0,&gt;=0.6.9-&gt;oaklib) (1.2.2)
+Requirement already satisfied: deprecated in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (1.2.18)
+Requirement already satisfied: hbreader in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (0.9.1)
+Requirement already satisfied: json-flattener&gt;=0.1.9 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (0.1.9)
+Requirement already satisfied: jsonasobj2&lt;2.dev0,&gt;=1.0.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (1.0.4)
+Requirement already satisfied: jsonschema&gt;=3.2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (4.23.0)
+Requirement already satisfied: prefixcommons&gt;=0.1.12 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (0.1.12)
+Requirement already satisfied: pyyaml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-runtime&gt;=1.5.3-&gt;oaklib) (6.0.2)
+Requirement already satisfied: six in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (1.17.0)
+Requirement already satisfied: ijson in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (3.3.0)
+Requirement already satisfied: requests-toolbelt in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (1.0.0)
+Requirement already satisfied: urllib3&gt;=1.16 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (2.3.0)
+Requirement already satisfied: pandas in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (2.2.3)
+Requirement already satisfied: numpy in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ndex2&gt;=3.5.0-&gt;oaklib) (2.2.3)
+Requirement already satisfied: more-click in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ols-client&gt;=0.1.1-&gt;oaklib) (0.1.2)
+Requirement already satisfied: chardet~=5.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto&gt;=2.5.0-&gt;oaklib) (5.2.0)
+Requirement already satisfied: fastobo~=0.13.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto&gt;=2.5.0-&gt;oaklib) (0.13.0)
+Requirement already satisfied: python-dateutil~=2.8 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pronto&gt;=2.5.0-&gt;oaklib) (2.9.0.post0)
+Requirement already satisfied: annotated-types&gt;=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pydantic-&gt;oaklib) (0.7.0)
+Requirement already satisfied: pydantic-core==2.27.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pydantic-&gt;oaklib) (2.27.2)
+Requirement already satisfied: setuptools in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pysolr&lt;4.0.0,&gt;=3.9.0-&gt;oaklib) (75.8.0)
+Requirement already satisfied: tqdm in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pystow&gt;=0.5.0-&gt;oaklib) (4.67.1)
+Requirement already satisfied: attrs&gt;=21.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache&lt;2.0.0,&gt;=1.0.1-&gt;oaklib) (25.1.0)
+Requirement already satisfied: cattrs&gt;=22.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache&lt;2.0.0,&gt;=1.0.1-&gt;oaklib) (24.1.2)
+Requirement already satisfied: platformdirs&gt;=2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache&lt;2.0.0,&gt;=1.0.1-&gt;oaklib) (4.3.6)
+Requirement already satisfied: url-normalize&gt;=1.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-cache&lt;2.0.0,&gt;=1.0.1-&gt;oaklib) (1.4.3)
+Requirement already satisfied: SQLAlchemy-Utils&lt;0.39.0,&gt;=0.38.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from semsql&gt;=0.3.1-&gt;oaklib) (0.38.3)
+Requirement already satisfied: deprecation&lt;3.0.0,&gt;=2.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (2.1.0)
+Requirement already satisfied: importlib-resources&lt;7.0.0,&gt;=6.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (6.5.2)
+Requirement already satisfied: linkml&gt;1.7.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.8.6)
+Requirement already satisfied: pansql&gt;=0.0.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pansql[pansql]&gt;=0.0.1-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.0.1)
+Requirement already satisfied: scipy[scipy] in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.15.1)
+Requirement already satisfied: sssom-schema&lt;2.0.0,&gt;=1.0.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.0.0)
+Requirement already satisfied: validators&gt;=0.20.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.34.0)
+Requirement already satisfied: exceptiongroup&gt;=1.1.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from cattrs&gt;=22.2-&gt;requests-cache&lt;2.0.0,&gt;=1.0.1-&gt;oaklib) (1.2.2)
+Requirement already satisfied: packaging in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from deprecation&lt;3.0.0,&gt;=2.1.0-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (24.2)
+Requirement already satisfied: jsonschema-specifications&gt;=2023.03.6 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema&gt;=3.2.0-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (2024.10.1)
+Requirement already satisfied: referencing&gt;=0.28.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema&gt;=3.2.0-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (0.36.2)
+Requirement already satisfied: rpds-py&gt;=0.7.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema&gt;=3.2.0-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (0.23.1)
+Requirement already satisfied: antlr4-python3-runtime&lt;4.10,&gt;=4.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (4.9.3)
+Requirement already satisfied: graphviz&gt;=0.10.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.20.3)
+Requirement already satisfied: isodate&gt;=0.6.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.7.2)
+Requirement already satisfied: jinja2&gt;=3.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (3.1.5)
+Requirement already satisfied: linkml-dataops in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.1.0)
+Requirement already satisfied: openpyxl in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (3.1.5)
+Requirement already satisfied: parse in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.20.2)
+Requirement already satisfied: pyshex&gt;=0.7.20 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.8.1)
+Requirement already satisfied: pyshexc&gt;=0.8.3 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.9.1)
+Requirement already satisfied: watchdog&gt;=0.9.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (6.0.0)
+<span class="ansi-yellow-fg">WARNING: networkx 3.4.2 does not provide the extra &#39;networkx&#39;</span><span class="ansi-yellow-fg">
+</span>Requirement already satisfied: tzdata&gt;=2022.7 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pandas-&gt;ndex2&gt;=3.5.0-&gt;oaklib) (2025.1)
+<span class="ansi-yellow-fg">WARNING: pansql 0.0.1 does not provide the extra &#39;pansql&#39;</span><span class="ansi-yellow-fg">
+</span>Requirement already satisfied: pytest-logging&lt;2016.0.0,&gt;=2015.11.4 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from prefixcommons&gt;=0.1.12-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (2015.11.4)
+Requirement already satisfied: pyparsing&lt;4,&gt;=2.1.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from rdflib&lt;8,&gt;=6.2.0-&gt;funowl&gt;=0.2.0-&gt;oaklib) (3.2.1)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-&gt;eutils&gt;=0.6.0-&gt;oaklib) (3.4.1)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-&gt;eutils&gt;=0.6.0-&gt;oaklib) (3.10)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from requests-&gt;eutils&gt;=0.6.0-&gt;oaklib) (2025.1.31)
+Requirement already satisfied: wrapt&lt;2,&gt;=1.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from deprecated-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (1.17.2)
+Requirement already satisfied: sortedcontainers in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytrie-&gt;curies&gt;=0.6.6-&gt;oaklib) (2.4.0)
+Requirement already satisfied: rdflib-jsonld==0.6.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from rdflib-shim-&gt;funowl&gt;=0.2.0-&gt;oaklib) (0.6.1)
+<span class="ansi-yellow-fg">WARNING: scipy 1.15.1 does not provide the extra &#39;scipy&#39;</span><span class="ansi-yellow-fg">
+</span>Requirement already satisfied: MarkupSafe&gt;=2.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jinja2&gt;=3.1.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (3.0.2)
+Requirement already satisfied: fqdn in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.5.1)
+Requirement already satisfied: isoduration in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (20.11.0)
+Requirement already satisfied: jsonpointer&gt;1.13 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (3.0.0)
+Requirement already satisfied: rfc3339-validator in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.1.4)
+Requirement already satisfied: uri-template in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.3.0)
+Requirement already satisfied: webcolors&gt;=1.11 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (24.11.1)
+Requirement already satisfied: cfgraph&gt;=0.2.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex&gt;=0.7.20-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.2.1)
+Requirement already satisfied: shexjsg&gt;=0.8.2 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex&gt;=0.7.20-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.8.2)
+Requirement already satisfied: sparqlslurper&gt;=0.5.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pyshex&gt;=0.7.20-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.5.1)
+Requirement already satisfied: pytest&gt;=2.8.1 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest-logging&lt;2016.0.0,&gt;=2015.11.4-&gt;prefixcommons&gt;=0.1.12-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (7.4.4)
+Requirement already satisfied: jsonpatch in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.33)
+Requirement already satisfied: jsonpath-ng in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.7.0)
+Requirement already satisfied: ruamel.yaml in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from linkml-dataops-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.18.10)
+Requirement already satisfied: et-xmlfile in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from openpyxl-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (2.0.0)
+Requirement already satisfied: iniconfig in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest&gt;=2.8.1-&gt;pytest-logging&lt;2016.0.0,&gt;=2015.11.4-&gt;prefixcommons&gt;=0.1.12-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (2.0.0)
+Requirement already satisfied: pluggy&lt;2.0,&gt;=0.12 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest&gt;=2.8.1-&gt;pytest-logging&lt;2016.0.0,&gt;=2015.11.4-&gt;prefixcommons&gt;=0.1.12-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (1.5.0)
+Requirement already satisfied: tomli&gt;=1.0.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from pytest&gt;=2.8.1-&gt;pytest-logging&lt;2016.0.0,&gt;=2015.11.4-&gt;prefixcommons&gt;=0.1.12-&gt;linkml-runtime&gt;=1.5.3-&gt;oaklib) (2.2.1)
+Requirement already satisfied: arrow&gt;=0.15.0 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from isoduration-&gt;jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (1.3.0)
+Requirement already satisfied: ply in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from jsonpath-ng-&gt;linkml-dataops-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (3.11)
+Requirement already satisfied: ruamel.yaml.clib&gt;=0.2.7 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from ruamel.yaml-&gt;linkml-dataops-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (0.2.12)
+Requirement already satisfied: types-python-dateutil&gt;=2.8.10 in /Users/cjm/Library/Caches/pypoetry/virtualenvs/linkml-store-8ZYO4kTy-py3.10/lib/python3.10/site-packages (from arrow&gt;=0.15.0-&gt;isoduration-&gt;jsonschema[format]&gt;=4.0.0-&gt;linkml&gt;1.7.10-&gt;sssom&lt;0.5.0,&gt;=0.4.4-&gt;oaklib) (2.9.0.20241206)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">oaklib</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_adapter</span>
+<span class="n">chebi_adapter</span> <span class="o">=</span> <span class="n">get_adapter</span><span class="p">(</span><span class="s2">&quot;sqlite:obo:chebi&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">attach_database</span><span class="p">(</span><span class="n">DB</span><span class="p">)</span>
+<span class="n">collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">CN</span><span class="p">)</span>
+<span class="n">study_collection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">&quot;study&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_info</span><span class="p">(</span><span class="n">study</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">study</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isaInvestigation&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">studies</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;studies&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">s0</span> <span class="o">=</span> <span class="n">studies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">studies</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">s0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">s0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">and</span> <span class="n">title</span> <span class="o">!=</span> <span class="s2">&quot;Investigation&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">desc</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">desc</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">study</span> <span class="o">=</span> <span class="n">study_collection</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">get_info</span><span class="p">(</span><span class="n">study</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;A metabolomic study of urinary changes in type 2 diabetes in human compared to the control group&#39;, &#39;Type 2 diabetes mellitus is the result of a combination of impaired insulin secretion with reduced insulin sensitivity of target tissues. There are an estimated 150 million affected individuals worldwide, of whom a large proportion remains undiagnosed because of a lack of specific symptoms early in this disorder and inadequate diagnostics. In this study, NMR-based metabolomic analysis in conjunction with uni- and multivariate statistics was applied to examine the urinary metabolic changes in Human type 2 diabetes mellitus patients compared to the control group. The human population were un medicated diabetic patients who have good daily dietary control over their blood glucose concentrations by following the guidelines on diet issued by the American Diabetes Association. Note: This is part of a larger study, please refer to the original paper below.&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">study_id_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="c1"># e.g. foo/bar/MTBLS1/FILE.json</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">study_by_id</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;/&quot;</span> <span class="ow">in</span> <span class="n">study_id</span><span class="p">:</span>
+        <span class="n">study_id</span> <span class="o">=</span> <span class="n">study_id_from_path</span><span class="p">(</span><span class="n">study_id</span><span class="p">)</span>
+    <span class="c1"># isaInvestigation.identifier</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">study_collection</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;isaInvestigation.identifier&quot;</span><span class="p">:</span> <span class="n">study_id</span><span class="p">})</span><span class="o">.</span><span class="n">rows</span>
+    <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="n">get_info</span><span class="p">(</span><span class="n">study_by_id</span><span class="p">(</span><span class="s2">&quot;MTBLS1&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;A metabolomic study of urinary changes in type 2 diabetes in human compared to the control group&#39;,
+ &#39;Type 2 diabetes mellitus is the result of a combination of impaired insulin secretion with reduced insulin sensitivity of target tissues. There are an estimated 150 million affected individuals worldwide, of whom a large proportion remains undiagnosed because of a lack of specific symptoms early in this disorder and inadequate diagnostics. In this study, NMR-based metabolomic analysis in conjunction with uni- and multivariate statistics was applied to examine the urinary metabolic changes in Human type 2 diabetes mellitus patients compared to the control group. The human population were un medicated diabetic patients who have good daily dietary control over their blood glucose concentrations by following the guidelines on diet issued by the American Diabetes Association. Note: This is part of a larger study, please refer to the original paper below.&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">info_by_id</span><span class="p">(</span><span class="n">study_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">study</span> <span class="o">=</span> <span class="n">study_by_id</span><span class="p">(</span><span class="n">study_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">study</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_info</span><span class="p">(</span><span class="n">study</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">info_by_id</span><span class="p">(</span><span class="s2">&quot;MTBLS138&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;Multi-omics phenotyping of the gut-liver axis reveals metabolic perturbations from a low-dose pesticide mixture in rats&#39;,
+ &#39;Health effects of pesticides are not always accurately detected using the current battery of regulatory toxicity tests. We compared standard histopathology and serum biochemistry measures and multi-omics analyses in a subchronic toxicity test of a mixture of six pesticides frequently detected in foodstuffs (azoxystrobin, boscalid, chlorpyrifos, glyphosate, imidacloprid and thiabendazole) in Sprague-Dawley rats. Analysis of water and feed consumption, body weight, histopathology and serum biochemistry showed little effect. Contrastingly, serum and caecum metabolomics revealed that nicotinamide and tryptophan metabolism were affected, which suggested activation of an oxidative stress response. This was not reflected by gut microbial community composition changes evaluated by shotgun metagenomics. Transcriptomics of the liver showed that 257 genes had their expression changed. Gene functions affected included the regulation of response to steroid hormones and the activation of stress response pathways. Genome-wide DNA methylation analysis of the same liver samples showed that 4,255 CpG sites were differentially methylated. Overall, we demonstrated that in-depth molecular profiling in laboratory animals exposed to low concentrations of pesticides allows the detection of metabolic perturbations that would remain undetected by standard regulatory biochemical measures and which could thus improve the predictability of health risks from exposure to chemical pollutants.&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">ea</span> <span class="o">=</span> <span class="n">EnrichmentAnalyzer</span><span class="o">.</span><span class="n">from_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">sample_key</span><span class="o">=</span><span class="s2">&quot;src&quot;</span><span class="p">,</span>
+                                        <span class="n">classification_key</span><span class="o">=</span><span class="s2">&quot;c3p_classifications&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">sample_ids</span> <span class="o">=</span> <span class="n">ea</span><span class="o">.</span><span class="n">sample_ids</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[91]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># for df</span>
+<span class="n">cases</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># for llm-matrix</span>
+<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_ids</span><span class="p">:</span>
+    <span class="n">study_id</span> <span class="o">=</span> <span class="n">study_id_from_path</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">study_title</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">info_by_id</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">study_title</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># print(f&quot;## {study_title}&quot;)</span>
+    <span class="n">ideals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ea</span><span class="o">.</span><span class="n">find_enriched_categories</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">p_value_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="c1">#print(f&quot;## {study_title} -- {sample}&quot;)</span>
+        <span class="c1">#print(f&quot;      DESC: {desc}&quot;)</span>
+        <span class="c1">#print(f&quot; *  {chebi_adapter.label(r.category)} :: {r}&quot;)</span>
+        <span class="n">category_label</span> <span class="o">=</span> <span class="n">chebi_adapter</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;study_id&quot;</span><span class="p">:</span> <span class="n">study_id</span><span class="p">,</span>
+            <span class="s2">&quot;study&quot;</span><span class="p">:</span> <span class="n">study_title</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">desc</span><span class="p">,</span>
+            <span class="s2">&quot;sample_file&quot;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+            <span class="s2">&quot;category_label&quot;</span><span class="p">:</span> <span class="n">category_label</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">r</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+        <span class="p">})</span>
+        <span class="n">ers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+        <span class="n">ideals</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">r</span><span class="o">.</span><span class="n">adjusted_p_value</span><span class="p">,</span> <span class="n">category_label</span><span class="p">))</span>
+    <span class="c1"># sort by p-value</span>
+    <span class="n">ideals</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ideals</span><span class="p">:</span>
+        <span class="n">enrichment_summary</span> <span class="o">=</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ideals</span><span class="p">)])</span>
+        <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Title: </span><span class="si">{</span><span class="n">study_title</span><span class="si">}</span><span class="se">\n</span><span class="s2">Description: </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\n</span><span class="s2">Enriched: </span><span class="si">{</span><span class="n">enrichment_summary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;original_input&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;study_id&quot;</span><span class="p">:</span> <span class="n">study_id</span><span class="p">,</span>
+                <span class="s2">&quot;study&quot;</span><span class="p">:</span> <span class="n">study_title</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">desc</span><span class="p">,</span>
+                <span class="s2">&quot;sample_file&quot;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+                <span class="s2">&quot;enrichment&quot;</span><span class="p">:</span> <span class="n">ers</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;ideal&quot;</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">suite</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;metabolights_c3po_enrichment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="s2">&quot;enrichment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;templates&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;enrichment&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;I will give you a metabolomics study title and description,</span>
+<span class="s2">            and also the ordered list of chemical classes that are enriched for that study.</span>
+<span class="s2">            Tell me if the enrichment results make sense.</span>
+<span class="s2">            Return YES, NO, or OTHER, followed by an explanation.</span>
+<span class="s2">            The explanation can be of any form and length but your response must start with YES, NO, or OTHER.</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{input}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;qa_with_explanation&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;matrix&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;hyperparameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;claude-sonnet&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;cases&quot;</span><span class="p">:</span> <span class="n">cases</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[88]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output/metabolights_enrichment_suite.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">suite</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[89]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[90]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[90]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>study_id</th>
+      <th>study</th>
+      <th>description</th>
+      <th>sample_file</th>
+      <th>category_label</th>
+      <th>category</th>
+      <th>fold_change</th>
+      <th>original_p_value</th>
+      <th>adjusted_p_value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>MTBLS10416</td>
+      <td>A metabolic switch orchestrated by IL-18 and t...</td>
+      <td>Tissues are exposed to diverse inflammatory ch...</td>
+      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>
+      <td>fatty acid anion</td>
+      <td>CHEBI:28868</td>
+      <td>46481.178571</td>
+      <td>2.724382e-14</td>
+      <td>2.179505e-13</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MTBLS10416</td>
+      <td>A metabolic switch orchestrated by IL-18 and t...</td>
+      <td>Tissues are exposed to diverse inflammatory ch...</td>
+      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>
+      <td>monocarboxylic acid anion</td>
+      <td>CHEBI:35757</td>
+      <td>22832.859649</td>
+      <td>3.331356e-09</td>
+      <td>1.332542e-08</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>MTBLS10416</td>
+      <td>A metabolic switch orchestrated by IL-18 and t...</td>
+      <td>Tissues are exposed to diverse inflammatory ch...</td>
+      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>
+      <td>tricarboxylic acid</td>
+      <td>CHEBI:27093</td>
+      <td>1191.825092</td>
+      <td>8.387285e-04</td>
+      <td>2.236609e-03</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>MTBLS10416</td>
+      <td>A metabolic switch orchestrated by IL-18 and t...</td>
+      <td>Tissues are exposed to diverse inflammatory ch...</td>
+      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>
+      <td>fatty alcohol</td>
+      <td>CHEBI:24026</td>
+      <td>584.668913</td>
+      <td>1.709033e-03</td>
+      <td>2.962744e-03</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>MTBLS10416</td>
+      <td>A metabolic switch orchestrated by IL-18 and t...</td>
+      <td>Tissues are exposed to diverse inflammatory ch...</td>
+      <td>m_MTBLS10416_LC-MS_alternating_hilic_metabolit...</td>
+      <td>cation</td>
+      <td>CHEBI:36916</td>
+      <td>539.582504</td>
+      <td>1.851715e-03</td>
+      <td>2.962744e-03</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1336</th>
+      <td>MTBLS959</td>
+      <td>Subcellular antibiotic visualization reveals a...</td>
+      <td>Tuberculosis, caused by the intracellular path...</td>
+      <td>m_MTBLS959_LC-MS_alternating_reverse-phase_met...</td>
+      <td>diterpenoid</td>
+      <td>CHEBI:23849</td>
+      <td>9.885406</td>
+      <td>1.783922e-02</td>
+      <td>1.783922e-02</td>
+    </tr>
+    <tr>
+      <th>1337</th>
+      <td>MTBLS968</td>
+      <td>The accumulation profiles of terpene metabolit...</td>
+      <td>Aroma is an important parameter for table grap...</td>
+      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>
+      <td>fatty alcohol</td>
+      <td>CHEBI:24026</td>
+      <td>4823.518531</td>
+      <td>1.853589e-39</td>
+      <td>7.414355e-39</td>
+    </tr>
+    <tr>
+      <th>1338</th>
+      <td>MTBLS968</td>
+      <td>The accumulation profiles of terpene metabolit...</td>
+      <td>Aroma is an important parameter for table grap...</td>
+      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>
+      <td>prenols</td>
+      <td>CHEBI:26244</td>
+      <td>32536.825000</td>
+      <td>1.593974e-09</td>
+      <td>3.187947e-09</td>
+    </tr>
+    <tr>
+      <th>1339</th>
+      <td>MTBLS968</td>
+      <td>The accumulation profiles of terpene metabolit...</td>
+      <td>Aroma is an important parameter for table grap...</td>
+      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>
+      <td>fatty aldehyde</td>
+      <td>CHEBI:35746</td>
+      <td>7935.810976</td>
+      <td>2.904251e-08</td>
+      <td>3.872335e-08</td>
+    </tr>
+    <tr>
+      <th>1340</th>
+      <td>MTBLS968</td>
+      <td>The accumulation profiles of terpene metabolit...</td>
+      <td>Aroma is an important parameter for table grap...</td>
+      <td>m_MTBLS968_GC-MS_positive__metabolite_profilin...</td>
+      <td>fatty acid</td>
+      <td>CHEBI:35366</td>
+      <td>102.188521</td>
+      <td>9.741102e-03</td>
+      <td>9.741102e-03</td>
+    </tr>
+  </tbody>
+</table>
+<p>1341 rows × 9 columns</p>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>mkdir<span class="w"> </span>-p<span class="w"> </span>output
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;output/enrichment_results.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython2 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Author 1 &lt;author@org.org&gt;
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
