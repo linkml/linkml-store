@@ -72,7 +72,8 @@ def test_inference_basic():
     config = InferenceConfig(target_attributes=["species"], feature_attributes=features)
     ie = get_inference_engine("sklearn", config=config)
     assert isinstance(ie.config, InferenceConfig)
-    ie.load_and_split_data(collection)
+    # don't randomize split as this makes test non-deterministic
+    ie.load_and_split_data(collection, randomize=False)
     ie.initialize_model()
     assert isinstance(ie, SklearnInferenceEngine)
     assert set(ie.encoders.keys()) == {"species"}
