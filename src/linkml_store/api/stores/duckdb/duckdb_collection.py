@@ -8,7 +8,7 @@ from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
-from linkml_store.api.queries import Query
+from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.mappings import TMAP
 from linkml_store.utils.sql_utils import facet_count_sql
 
