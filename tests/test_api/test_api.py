@@ -335,6 +335,88 @@ def test_group_by(handle):
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
+def test_group_by_advanced(handle):
+    """
+    Test more advanced group_by features for specific store implementations.
+    
+    Tests various features:
+    1. Multi-field grouping
+    2. Filtering with where clause
+    3. Aggregation of specific fields
+    4. Different inlined field name
+    """
+    client = create_client(handle)
+    database = client.get_database()
+    
+    # Create a more complex dataset with multiple grouping possibilities
+    rows = [
+        {"id": 1, "category": "A", "name": "Item1", "price": 10.0, "qty": 5, "tags": ["red", "small"]},
+        {"id": 2, "category": "A", "name": "Item2", "price": 20.0, "qty": 3, "tags": ["blue", "medium"]},
+        {"id": 3, "category": "B", "name": "Item3", "price": 15.0, "qty": 7, "tags": ["red", "large"]},
+        {"id": 4, "category": "B", "name": "Item4", "price": 25.0, "qty": 2, "tags": ["green", "small"]},
+        {"id": 5, "category": "A", "name": "Item5", "price": 30.0, "qty": 1, "tags": ["blue", "large"]},
+    ]
+    
+    collection = database.create_collection("Products", recreate_if_exists=True)
+    collection.insert(rows)
+    
+    # Test 1: Group by a single field
+    result = collection.group_by(["category"])
+    assert result.num_rows == 2
+    
+    # Verify correct grouping
+    for group in result.rows:
+        if group["category"] == "A":
+            assert len(group["objects"]) == 3
+        elif group["category"] == "B":
+            assert len(group["objects"]) == 2
+        else:
+            assert False, f"Unexpected category: {group['category']}"
+    
+    # Test 2: Group by multiple fields
+    result = collection.group_by(["category", "tags"])
+    
+    # Test 3: Group with a where clause - use exact match for compatibility
+    # Filter for category "A" items only
+    result = collection.group_by(["category"], where={"category": "A"})
+    assert result.num_rows == 1
+    assert result.rows[0]["category"] == "A"
+    assert len(result.rows[0]["objects"]) == 3
+    
+    # For MongoDB specific test, if this is MongoDB handle
+    if "mongodb" in handle:
+        # Uses MongoDB's query operators
+        result = collection.group_by(["category"], where={"price": {"$gt": 15.0}})
+        
+        # Find the group with category "A"
+        a_group = next((g for g in result.rows if g["category"] == "A"), None)
+        if a_group is not None:
+            # Should only include items with price > 15.0
+            for item in a_group["objects"]:
+                assert item["price"] > 15.0
+    
+    # Test 4: Custom inlined field name
+    result = collection.group_by(["category"], inlined_field="items")
+    for group in result.rows:
+        assert "items" in group
+        assert "objects" not in group
+    
+    # Test 5: Test with agg_map for field selection
+    result = collection.group_by(
+        ["category"], 
+        agg_map={"first": ["category"], "list": ["name", "price"]}
+    )
+    
+    # Verify that only specified fields are included
+    for group in result.rows:
+        for item in group["objects"]:
+            assert "name" in item
+            assert "price" in item
+            assert "qty" not in item  # This field should be excluded
+            assert "tags" not in item  # This field should be excluded
+
+
+@pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_collections_of_same_type(handle):
     """
     Tests storing of objects in collections of the same type
