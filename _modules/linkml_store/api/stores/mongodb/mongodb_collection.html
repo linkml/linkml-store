@@ -589,6 +589,107 @@
         <span class="k">if</span> <span class="n">deleted_rows_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">missing_ok</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No rows found for </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">deleted_rows_count</span></div>
+
+        
+<div class="viewcode-block" id="MongoDBCollection.group_by">
+<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.MongoDBCollection.group_by">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_by</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">group_by_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">inlined_field</span><span class="o">=</span><span class="s2">&quot;objects&quot;</span><span class="p">,</span>
+        <span class="n">agg_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Group objects in the collection by specified fields using MongoDB&#39;s aggregation pipeline.</span>
+<span class="sd">        </span>
+<span class="sd">        This implementation leverages MongoDB&#39;s native aggregation capabilities for efficient grouping.</span>
+<span class="sd">        </span>
+<span class="sd">        :param group_by_fields: List of fields to group by</span>
+<span class="sd">        :param inlined_field: Field name to store aggregated objects</span>
+<span class="sd">        :param agg_map: Dictionary mapping aggregation types to fields</span>
+<span class="sd">        :param where: Filter conditions</span>
+<span class="sd">        :param kwargs: Additional arguments</span>
+<span class="sd">        :return: Query result containing grouped data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">group_by_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_by_fields</span><span class="p">]</span>
+        
+        <span class="c1"># Build the group key for MongoDB</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Single field grouping</span>
+            <span class="n">group_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">group_by_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Multi-field grouping</span>
+            <span class="n">group_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">group_by_fields</span><span class="p">}</span>
+        
+        <span class="c1"># Start building the pipeline</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># Add match stage if where clause is provided</span>
+        <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+            <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;$match&quot;</span><span class="p">:</span> <span class="n">where</span><span class="p">})</span>
+        
+        <span class="c1"># Add the group stage</span>
+        <span class="n">group_stage</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;$group&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="n">group_id</span><span class="p">,</span>
+                <span class="s2">&quot;objects&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$push&quot;</span><span class="p">:</span> <span class="s2">&quot;$$ROOT&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_stage</span><span class="p">)</span>
+        
+        <span class="c1"># Execute the aggregation</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MongoDB group_by pipeline: </span><span class="si">{</span><span class="n">pipeline</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">aggregation_results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_collection</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">pipeline</span><span class="p">))</span>
+        
+        <span class="c1"># Transform the results to match the expected format</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">aggregation_results</span><span class="p">:</span>
+            <span class="c1"># Skip null groups if needed</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skip_nulls&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">continue</span>
+                
+            <span class="c1"># Create the group object</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="c1"># Multi-field grouping</span>
+                <span class="n">group_obj</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Single field grouping</span>
+                <span class="n">group_obj</span> <span class="o">=</span> <span class="p">{</span><span class="n">group_by_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]}</span>
+                
+            <span class="c1"># Add the grouped objects</span>
+            <span class="n">objects</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span>
+            
+            <span class="c1"># Remove MongoDB _id field from each object</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;_id&quot;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">obj</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span>
+            
+            <span class="c1"># Apply any field selection or transformations based on agg_map</span>
+            <span class="k">if</span> <span class="n">agg_map</span><span class="p">:</span>
+                <span class="c1"># Get first fields (fields to keep as single values)</span>
+                <span class="n">first_fields</span> <span class="o">=</span> <span class="n">agg_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="n">first_fields</span><span class="p">:</span>
+                    <span class="c1"># These are already in the group_obj from the _id</span>
+                    <span class="k">pass</span>
+                
+                <span class="c1"># Get list fields (fields to aggregate as lists)</span>
+                <span class="n">list_fields</span> <span class="o">=</span> <span class="n">agg_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="n">list_fields</span><span class="p">:</span>
+                    <span class="c1"># Filter objects to only include specified fields</span>
+                    <span class="n">objects</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">}</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">list_fields</span> <span class="ow">and</span> <span class="n">first_fields</span><span class="p">:</span>
+                    <span class="c1"># If list_fields is empty but first_fields is specified,</span>
+                    <span class="c1"># filter out first_fields from objects to avoid duplication</span>
+                    <span class="n">objects</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">first_fields</span><span class="p">}</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
+            
+            <span class="c1"># Add the objects to the group</span>
+            <span class="n">group_obj</span><span class="p">[</span><span class="n">inlined_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">objects</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_obj</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">QueryResult</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">),</span> <span class="n">rows</span><span class="o">=</span><span class="n">results</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

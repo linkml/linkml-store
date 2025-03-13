@@ -310,7 +310,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_FACET_LIMIT</span><span class="p">,</span> <span class="n">OBJECT</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">Query</span><span class="p">,</span> <span class="n">QueryResult</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.api.stores.duckdb.mappings</span><span class="w"> </span><span class="kn">import</span> <span class="n">TMAP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linkml_store.utils.sql_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">facet_count_sql</span>
 
@@ -463,6 +463,169 @@
         <span class="k">if</span> <span class="n">qr</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DuckDBCollection.group_by">
+<a class="viewcode-back" href="../../../../../reference/linkml_store.api.stores.duckdb.duckdb_collection.html#linkml_store.api.stores.duckdb.DuckDBCollection.group_by">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_by</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">group_by_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">inlined_field</span><span class="o">=</span><span class="s2">&quot;objects&quot;</span><span class="p">,</span>
+        <span class="n">agg_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">where</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Group objects in the collection by specified fields using SQLAlchemy.</span>
+<span class="sd">        </span>
+<span class="sd">        This implementation leverages DuckDB&#39;s SQL capabilities for more efficient grouping.</span>
+<span class="sd">        </span>
+<span class="sd">        :param group_by_fields: List of fields to group by</span>
+<span class="sd">        :param inlined_field: Field name to store aggregated objects</span>
+<span class="sd">        :param agg_map: Dictionary mapping aggregation types to fields</span>
+<span class="sd">        :param where: Filter conditions</span>
+<span class="sd">        :param kwargs: Additional arguments</span>
+<span class="sd">        :return: Query result containing grouped data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">group_by_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_by_fields</span><span class="p">]</span>
+            
+        <span class="n">cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_definition</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cd</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No class definition defined for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target_class_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="n">inlined_field</span><span class="p">,</span> <span class="n">agg_map</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            
+        <span class="c1"># Check if the table exists</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_table_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Table </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="si">}</span><span class="s2"> doesn&#39;t exist, falling back to parent implementation&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="n">inlined_field</span><span class="p">,</span> <span class="n">agg_map</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            
+        <span class="c1"># Get table definition</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqla_table</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">engine</span>
+        
+        <span class="c1"># Create a SQLAlchemy select statement for groups</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">select</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">or_</span>
+        <span class="n">group_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">group_by_fields</span> <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">group_cols</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;None of the group_by fields </span><span class="si">{</span><span class="n">group_by_fields</span><span class="si">}</span><span class="s2"> found in table columns&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="n">inlined_field</span><span class="p">,</span> <span class="n">agg_map</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">group_cols</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+        
+        <span class="c1"># Add where conditions if specified</span>
+        <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">where</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="c1"># Handle different operator types (dict values for operators)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$gt&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">val</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$gte&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$lt&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">val</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$lte&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$ne&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">val</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$in&quot;</span><span class="p">:</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># Default to equality for unknown operators</span>
+                                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown operator </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">, using equality&quot;</span><span class="p">)</span>
+                                <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Direct equality comparison</span>
+                        <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">conditions</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">conditions</span><span class="p">:</span>
+                    <span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+        
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                <span class="c1"># Get all distinct groups</span>
+                <span class="n">group_result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+                <span class="n">group_rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group_result</span><span class="p">)</span>
+                
+                <span class="c1"># For each group, get all objects</span>
+                <span class="k">for</span> <span class="n">group_row</span> <span class="ow">in</span> <span class="n">group_rows</span><span class="p">:</span>
+                    <span class="c1"># Build conditions for this group</span>
+                    <span class="n">group_conditions</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">group_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">group_row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">group_dict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">group_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">is_</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">group_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">==</span> <span class="n">value</span><span class="p">)</span>
+                    
+                    <span class="c1"># Get all rows for this group</span>
+                    <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">group_conditions</span><span class="p">:</span>
+                        <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+                    
+                    <span class="c1"># Add original where conditions</span>
+                    <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">where</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="c1"># Handle different operator types for the row query as well</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                                    <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$gt&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">val</span><span class="p">)</span>
+                                        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$gte&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span>
+                                        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$lt&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">val</span><span class="p">)</span>
+                                        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$lte&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">)</span>
+                                        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$ne&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">val</span><span class="p">)</span>
+                                        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;$in&quot;</span><span class="p">:</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                                        <span class="k">else</span><span class="p">:</span>
+                                            <span class="c1"># Default to equality for unknown operators</span>
+                                            <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="c1"># Direct equality comparison</span>
+                                    <span class="n">row_stmt</span> <span class="o">=</span> <span class="n">row_stmt</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span>
+                    
+                    <span class="n">row_result</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">row_stmt</span><span class="p">)</span>
+                    <span class="n">rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_result</span><span class="p">)</span>
+                    
+                    <span class="c1"># Convert rows to dictionaries</span>
+                    <span class="n">objects</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                        <span class="n">obj</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">_fields</span><span class="p">):</span>
+                            <span class="n">obj</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    
+                    <span class="c1"># Apply agg_map to filter fields if specified</span>
+                    <span class="k">if</span> <span class="n">agg_map</span> <span class="ow">and</span> <span class="s2">&quot;list&quot;</span> <span class="ow">in</span> <span class="n">agg_map</span><span class="p">:</span>
+                        <span class="n">list_fields</span> <span class="o">=</span> <span class="n">agg_map</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">list_fields</span><span class="p">:</span>
+                            <span class="n">objects</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">}</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
+                    
+                    <span class="c1"># Create the result object</span>
+                    <span class="n">result_obj</span> <span class="o">=</span> <span class="n">group_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">result_obj</span><span class="p">[</span><span class="n">inlined_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">objects</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
+                
+                <span class="k">return</span> <span class="n">QueryResult</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">),</span> <span class="n">rows</span><span class="o">=</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in DuckDB group_by: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Fall back to parent implementation</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">group_by_fields</span><span class="p">,</span> <span class="n">inlined_field</span><span class="p">,</span> <span class="n">agg_map</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cd</span><span class="p">:</span> <span class="n">ClassDefinition</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_created</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">is_prepopulated</span><span class="p">:</span>

@@ -559,6 +559,30 @@ containing the facet counts for each unique value in the respective column.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml_store.api.stores.mongodb.MongoDBCollection.group_by">
+<span class="sig-name descname"><span class="pre">group_by</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlined_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'objects'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml_store/api/stores/mongodb/mongodb_collection.html#MongoDBCollection.group_by"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml_store.api.stores.mongodb.MongoDBCollection.group_by" title="Link to this definition"></a></dt>
+<dd><p>Group objects in the collection by specified fields using MongoDB’s aggregation pipeline.</p>
+<p>This implementation leverages MongoDB’s native aggregation capabilities for efficient grouping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_by_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – List of fields to group by</p></li>
+<li><p><strong>inlined_field</strong> – Field name to store aggregated objects</p></li>
+<li><p><strong>agg_map</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – Dictionary mapping aggregation types to fields</p></li>
+<li><p><strong>where</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]</span>) – Filter conditions</p></li>
+<li><p><strong>kwargs</strong> – Additional arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryResult</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Query result containing grouped data</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -747,6 +771,7 @@ containing the facet counts for each unique value in the respective column.</p>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query_facets()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete_where()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="linkml_store.api.stores.mongodb.mongodb_collection.html#linkml_store.api.stores.mongodb.mongodb_collection.MongoDBCollection.group_by"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.group_by()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -842,6 +867,7 @@ containing the facet counts for each unique value in the respective column.</p>
 <li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.query_facets"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.query_facets()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete()</span></code></a></li>
 <li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.delete_where"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.delete_where()</span></code></a></li>
+<li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBCollection.group_by"><code class="docutils literal notranslate"><span class="pre">MongoDBCollection.group_by()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#linkml_store.api.stores.mongodb.MongoDBDatabase"><code class="docutils literal notranslate"><span class="pre">MongoDBDatabase</span></code></a><ul>
