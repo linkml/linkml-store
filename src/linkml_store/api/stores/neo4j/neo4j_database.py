@@ -27,7 +27,7 @@ class Neo4jDatabase(Database):
         if handle is None:
             handle = "bolt://localhost:7687/neo4j"
         if handle.startswith("neo4j:"):
-            handle = handle.replace("neo4j:", "bolt:")
+            handle = handle.replace("neo4j:", "bolt:", 1)
         super().__init__(handle=handle, **kwargs)
 
     @property
