@@ -1,4 +1,5 @@
 import pytest
+
 from linkml_store.utils.object_utils import object_path_update
 
 

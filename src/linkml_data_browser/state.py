@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from linkml_store.api import Database
-
 from linkml_data_browser.cart import Cart
+from linkml_store.api import Database
 
 
 @dataclass

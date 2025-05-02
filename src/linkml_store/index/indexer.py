@@ -3,8 +3,9 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
-from linkml_store.utils.vector_utils import pairwise_cosine_similarity, mmr_diversified_search
 from pydantic import BaseModel
+
+from linkml_store.utils.vector_utils import mmr_diversified_search, pairwise_cosine_similarity
 
 INDEX_ITEM = np.ndarray
 

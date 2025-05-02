@@ -18,6 +18,7 @@ Example:
 import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.utils.schema_builder import SchemaBuilder
+
 from linkml_store.api.client import Client
 from linkml_store.api.stores.neo4j.neo4j_collection import DeletePolicy
 from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection

@@ -1,4 +1,4 @@
-from linkml_store.utils.format_utils import process_file, Format
+from linkml_store.utils.format_utils import Format, process_file
 from tests import INPUT_DIR
 
 DAT_FILE = INPUT_DIR / "expasy-subset.dat"

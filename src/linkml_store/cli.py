@@ -3,8 +3,7 @@ import sys
 import warnings
 from collections import defaultdict
 from pathlib import Path
-from tokenize import group
-from typing import Optional, Tuple, Any
+from typing import Any, Optional, Tuple
 
 import click
 import yaml

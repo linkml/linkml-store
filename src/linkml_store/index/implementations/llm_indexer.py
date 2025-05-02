@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
-import openai
 
 from linkml_store.api.config import CollectionConfig
 from linkml_store.index.indexer import INDEX_ITEM, Indexer

@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import pandas as pd
 import sqlalchemy
@@ -14,7 +14,7 @@ from linkml_store.api import Database
 from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.duckdb.duckdb_collection import DuckDBCollection
 from linkml_store.utils.format_utils import Format
-from linkml_store.utils.sql_utils import introspect_schema, query_to_sql, where_clause_to_sql
+from linkml_store.utils.sql_utils import introspect_schema, query_to_sql
 
 TYPE_MAP = {
     "VARCHAR": "string",

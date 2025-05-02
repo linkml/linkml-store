@@ -10,6 +10,7 @@ from linkml_runtime import SchemaView
 from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.linkml_model import SlotDefinition
 from linkml_runtime.utils.schema_builder import SchemaBuilder
+
 from linkml_store.api.client import Client
 from linkml_store.api.config import ClientConfig, CollectionConfig, DerivationConfiguration
 from linkml_store.api.queries import Query
@@ -21,7 +22,6 @@ from linkml_store.index import get_indexer
 from linkml_store.index.implementations.simple_indexer import SimpleIndexer
 from linkml_store.utils.format_utils import load_objects
 from linkml_store.utils.sql_utils import introspect_schema
-
 from tests import COUNTRIES_DATA_JSONL, COUNTRIES_SCHEMA, INPUT_DIR, OUTPUT_DIR, PERSONINFO_SCHEMA
 
 logger = logging.getLogger(__name__)

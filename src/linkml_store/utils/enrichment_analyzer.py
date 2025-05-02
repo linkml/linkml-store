@@ -1,9 +1,12 @@
-import pandas as pd
-import numpy as np
-from linkml_store.api import Collection
-from scipy import stats
+from collections import Counter
 from typing import Dict, List
+
+import numpy as np
+import pandas as pd
 from pydantic import BaseModel
+from scipy import stats
+
+from linkml_store.api import Collection
 
 
 class EnrichedCategory(BaseModel):
@@ -15,9 +18,6 @@ class EnrichedCategory(BaseModel):
     fold_change: float
     original_p_value: float
     adjusted_p_value: float
-
-
-from collections import Counter, defaultdict
 
 
 class EnrichmentAnalyzer:

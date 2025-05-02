@@ -606,16 +606,6 @@ class Database(ABC, Generic[CollectionType]):
         """
         return list(self.iter_validate_database(**kwargs))
 
-    def validate_database(self, **kwargs) -> List["ValidationResult"]:
-        """
-        Validate the contents of the database.
-
-        As `iter_validate_database`, but returns a list of validation results.
-
-        :param kwargs:
-        :return:
-        """
-        return list(self.iter_validate_database(**kwargs))
 
     def iter_validate_database(
         self, ensure_referential_integrity: bool = None, **kwargs
@@ -623,7 +613,7 @@ class Database(ABC, Generic[CollectionType]):
         """
         Validate the contents of the database.
 
-        An an example, let's create a database with a predefined schema
+        An example, let's create a database with a predefined schema
         from the countries.linkml.yaml file:
 
         >>> from linkml_store.api.client import Client

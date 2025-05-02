@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
@@ -138,7 +138,8 @@ class DuckDBCollection(Collection):
         # if self._initialized:
         #    return True
         query = Query(
-            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
+            from_table="information_schema.tables",
+            where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
         )
         qr = self.parent.query(query)
         if qr.num_rows > 0:
@@ -183,7 +184,7 @@ class DuckDBCollection(Collection):
         engine = self.parent.engine
         
         # Create a SQLAlchemy select statement for groups
-        from sqlalchemy import select, func, and_, or_
+        from sqlalchemy import select
         group_cols = [table.c[field] for field in group_by_fields if field in table.columns.keys()]
         
         if not group_cols:
@@ -316,7 +317,8 @@ class DuckDBCollection(Collection):
             self.metadata.is_prepopulated = True
             return
         # query = Query(
-        #     from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
+        #     from_table="information_schema.tables",
+        #     where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
         # )
         # qr = self.parent.query(query)
         # if qr.num_rows > 0:

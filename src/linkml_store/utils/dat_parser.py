@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional, Tuple
 
 ENTRY = Dict[str, Any]
 

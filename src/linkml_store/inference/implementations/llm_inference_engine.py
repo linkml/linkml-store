@@ -1,18 +1,16 @@
-import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar, List, Optional, TextIO, Union
 
 import yaml
-from linkml_store.utils.llm_utils import parse_yaml_payload
 from llm import get_key
 from pydantic import BaseModel
 
-from linkml_store.api.collection import OBJECT, Collection
+from linkml_store.api.collection import OBJECT
 from linkml_store.inference.inference_config import Inference, InferenceConfig, LLMConfig
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
-from linkml_store.utils.object_utils import select_nested
+from linkml_store.utils.llm_utils import parse_yaml_payload
 
 logger = logging.getLogger(__name__)
 

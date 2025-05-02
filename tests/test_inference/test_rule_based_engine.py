@@ -1,7 +1,7 @@
 import pytest
+
 from linkml_store.inference import get_inference_engine
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
-
 from tests import OUTPUT_DIR
 
 MODEL_PATH = OUTPUT_DIR / "model.rulebased.yaml"

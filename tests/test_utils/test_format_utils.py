@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Union
 
 import pytest
 import yaml
-from linkml_store.utils.format_utils import Format, load_objects, render_output
 
+from linkml_store.utils.format_utils import Format, load_objects, render_output
 from tests.conftest import CSV_FILE, JSON_FILE, TEST_DATA, TSV_FILE, YAML_FILE
 
 

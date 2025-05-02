@@ -1,6 +1,6 @@
 import pytest
-from google.cloud import bigquery
 from google.auth import default
+from google.cloud import bigquery
 
 
 @pytest.mark.skip("BigQuery tests require credentials")
