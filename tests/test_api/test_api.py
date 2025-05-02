@@ -338,7 +338,7 @@ def test_group_by(handle):
 def test_group_by_advanced(handle):
     """
     Test more advanced group_by features for specific store implementations.
-    
+
     Tests various features:
     1. Multi-field grouping
     2. Filtering with where clause
@@ -347,7 +347,7 @@ def test_group_by_advanced(handle):
     """
     client = create_client(handle)
     database = client.get_database()
-    
+
     # Create a more complex dataset with multiple grouping possibilities
     rows = [
         {"id": 1, "category": "A", "name": "Item1", "price": 10.0, "qty": 5, "tags": ["red", "small"]},
@@ -356,14 +356,14 @@ def test_group_by_advanced(handle):
         {"id": 4, "category": "B", "name": "Item4", "price": 25.0, "qty": 2, "tags": ["green", "small"]},
         {"id": 5, "category": "A", "name": "Item5", "price": 30.0, "qty": 1, "tags": ["blue", "large"]},
     ]
-    
+
     collection = database.create_collection("Products", recreate_if_exists=True)
     collection.insert(rows)
-    
+
     # Test 1: Group by a single field
     result = collection.group_by(["category"])
     assert result.num_rows == 2
-    
+
     # Verify correct grouping
     for group in result.rows:
         if group["category"] == "A":
@@ -372,43 +372,40 @@ def test_group_by_advanced(handle):
             assert len(group["objects"]) == 2
         else:
             assert False, f"Unexpected category: {group['category']}"
-    
+
     # Test 2: Group by multiple scalar fields (avoid using array fields in multi-field grouping)
     result = collection.group_by(["category", "name"])
     # Just check that it doesn't error - the exact results will depend on implementation
-    
+
     # Test 3: Group with a where clause - use exact match for compatibility
     # Filter for category "A" items only
     result = collection.group_by(["category"], where={"category": "A"})
     assert result.num_rows == 1
     assert result.rows[0]["category"] == "A"
     assert len(result.rows[0]["objects"]) == 3
-    
+
     # For MongoDB specific test, if this is MongoDB handle
     if "mongodb" in handle:
         # Uses MongoDB's query operators
         result = collection.group_by(["category"], where={"price": {"$gt": 15.0}})
-        
+
         # Find the group with category "A"
         a_group = next((g for g in result.rows if g["category"] == "A"), None)
         if a_group is not None:
             # Should only include items with price > 15.0
             for item in a_group["objects"]:
                 assert item["price"] > 15.0
-    
+
     # Test 4: Custom inlined field name
     result = collection.group_by(["category"], inlined_field="items")
     for group in result.rows:
         assert "items" in group
         assert "objects" not in group
-    
+
     # Test 5: Test with agg_map for field selection (skip for file adapter which doesn't fully support agg_map)
     if "file:" not in handle:
-        result = collection.group_by(
-            ["category"], 
-            agg_map={"first": ["category"], "list": ["name", "price"]}
-        )
-        
+        result = collection.group_by(["category"], agg_map={"first": ["category"], "list": ["name", "price"]})
+
         # Verify that only specified fields are included
         for group in result.rows:
             for item in group["objects"]:

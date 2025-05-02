@@ -641,11 +641,11 @@ class Collection(Generic[DatabaseType]):
         if isinstance(group_by_fields, str):
             group_by_fields = [group_by_fields]
         df = self.find(where=where, limit=-1).rows_dataframe
-        
+
         # Handle the case where agg_map is None
         if agg_map is None:
             agg_map = {}
-            
+
         pk_fields = agg_map.get("first", []) + group_by_fields
         list_fields = agg_map.get("list", [])
         if not list_fields:

@@ -138,8 +138,7 @@ class DuckDBCollection(Collection):
         # if self._initialized:
         #    return True
         query = Query(
-            from_table="information_schema.tables",
-            where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
+            from_table="information_schema.tables", where_clause={"table_type": "BASE TABLE", "table_name": self.alias}
         )
         qr = self.parent.query(query)
         if qr.num_rows > 0:
@@ -156,9 +155,9 @@ class DuckDBCollection(Collection):
     ) -> QueryResult:
         """
         Group objects in the collection by specified fields using SQLAlchemy.
-        
+
         This implementation leverages DuckDB's SQL capabilities for more efficient grouping.
-        
+
         :param group_by_fields: List of fields to group by
         :param inlined_field: Field name to store aggregated objects
         :param agg_map: Dictionary mapping aggregation types to fields
@@ -168,31 +167,32 @@ class DuckDBCollection(Collection):
         """
         if isinstance(group_by_fields, str):
             group_by_fields = [group_by_fields]
-            
+
         cd = self.class_definition()
         if not cd:
             logger.debug(f"No class definition defined for {self.alias} {self.target_class_name}")
             return super().group_by(group_by_fields, inlined_field, agg_map, where, **kwargs)
-            
+
         # Check if the table exists
         if not self.parent._table_exists(self.alias):
             logger.debug(f"Table {self.alias} doesn't exist, falling back to parent implementation")
             return super().group_by(group_by_fields, inlined_field, agg_map, where, **kwargs)
-            
+
         # Get table definition
         table = self._sqla_table(cd)
         engine = self.parent.engine
-        
+
         # Create a SQLAlchemy select statement for groups
         from sqlalchemy import select
+
         group_cols = [table.c[field] for field in group_by_fields if field in table.columns.keys()]
-        
+
         if not group_cols:
             logger.warning(f"None of the group_by fields {group_by_fields} found in table columns")
             return super().group_by(group_by_fields, inlined_field, agg_map, where, **kwargs)
-        
+
         stmt = select(*group_cols).distinct()
-        
+
         # Add where conditions if specified
         if where:
             conditions = []
@@ -220,24 +220,24 @@ class DuckDBCollection(Collection):
                     else:
                         # Direct equality comparison
                         conditions.append(table.c[k] == v)
-            
+
             if conditions:
                 for condition in conditions:
                     stmt = stmt.where(condition)
-        
+
         results = []
         try:
             with engine.connect() as conn:
                 # Get all distinct groups
                 group_result = conn.execute(stmt)
                 group_rows = list(group_result)
-                
+
                 # For each group, get all objects
                 for group_row in group_rows:
                     # Build conditions for this group
                     group_conditions = []
                     group_dict = {}
-                    
+
                     for i, field in enumerate(group_by_fields):
                         if field in table.columns.keys():
                             value = group_row[i]
@@ -246,12 +246,12 @@ class DuckDBCollection(Collection):
                                 group_conditions.append(table.c[field].is_(None))
                             else:
                                 group_conditions.append(table.c[field] == value)
-                    
+
                     # Get all rows for this group
                     row_stmt = select(*table.columns)
                     for condition in group_conditions:
                         row_stmt = row_stmt.where(condition)
-                    
+
                     # Add original where conditions
                     if where:
                         for k, v in where.items():
@@ -277,10 +277,10 @@ class DuckDBCollection(Collection):
                                 else:
                                     # Direct equality comparison
                                     row_stmt = row_stmt.where(table.c[k] == v)
-                    
+
                     row_result = conn.execute(row_stmt)
                     rows = list(row_result)
-                    
+
                     # Convert rows to dictionaries
                     objects = []
                     for row in rows:
@@ -288,18 +288,18 @@ class DuckDBCollection(Collection):
                         for i, col in enumerate(row._fields):
                             obj[col] = row[i]
                         objects.append(obj)
-                    
+
                     # Apply agg_map to filter fields if specified
                     if agg_map and "list" in agg_map:
                         list_fields = agg_map["list"]
                         if list_fields:
                             objects = [{k: obj.get(k) for k in list_fields if k in obj} for obj in objects]
-                    
+
                     # Create the result object
                     result_obj = group_dict.copy()
                     result_obj[inlined_field] = objects
                     results.append(result_obj)
-                
+
                 return QueryResult(num_rows=len(results), rows=results)
         except Exception as e:
             logger.warning(f"Error in DuckDB group_by: {e}")

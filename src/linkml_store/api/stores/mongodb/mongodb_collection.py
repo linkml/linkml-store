@@ -265,7 +265,7 @@ class MongoDBCollection(Collection):
         if deleted_rows_count == 0 and not missing_ok:
             raise ValueError(f"No rows found for {where}")
         return deleted_rows_count
-        
+
     def group_by(
         self,
         group_by_fields: List[str],
@@ -276,9 +276,9 @@ class MongoDBCollection(Collection):
     ) -> QueryResult:
         """
         Group objects in the collection by specified fields using MongoDB's aggregation pipeline.
-        
+
         This implementation leverages MongoDB's native aggregation capabilities for efficient grouping.
-        
+
         :param group_by_fields: List of fields to group by
         :param inlined_field: Field name to store aggregated objects
         :param agg_map: Dictionary mapping aggregation types to fields
@@ -288,7 +288,7 @@ class MongoDBCollection(Collection):
         """
         if isinstance(group_by_fields, str):
             group_by_fields = [group_by_fields]
-        
+
         # Build the group key for MongoDB
         if len(group_by_fields) == 1:
             # Single field grouping
@@ -296,34 +296,29 @@ class MongoDBCollection(Collection):
         else:
             # Multi-field grouping
             group_id = {field: f"${field}" for field in group_by_fields}
-        
+
         # Start building the pipeline
         pipeline = []
-        
+
         # Add match stage if where clause is provided
         if where:
             pipeline.append({"$match": where})
-        
+
         # Add the group stage
-        group_stage = {
-            "$group": {
-                "_id": group_id,
-                "objects": {"$push": "$$ROOT"}
-            }
-        }
+        group_stage = {"$group": {"_id": group_id, "objects": {"$push": "$$ROOT"}}}
         pipeline.append(group_stage)
-        
+
         # Execute the aggregation
         logger.debug(f"MongoDB group_by pipeline: {pipeline}")
         aggregation_results = list(self.mongo_collection.aggregate(pipeline))
-        
+
         # Transform the results to match the expected format
         results = []
         for result in aggregation_results:
             # Skip null groups if needed
             if result["_id"] is None and kwargs.get("skip_nulls", False):
                 continue
-                
+
             # Create the group object
             if isinstance(result["_id"], dict):
                 # Multi-field grouping
@@ -331,15 +326,15 @@ class MongoDBCollection(Collection):
             else:
                 # Single field grouping
                 group_obj = {group_by_fields[0]: result["_id"]}
-                
+
             # Add the grouped objects
             objects = result["objects"]
-            
+
             # Remove MongoDB _id field from each object
             for obj in objects:
                 if "_id" in obj:
                     del obj["_id"]
-            
+
             # Apply any field selection or transformations based on agg_map
             if agg_map:
                 # Get first fields (fields to keep as single values)
@@ -347,7 +342,7 @@ class MongoDBCollection(Collection):
                 if first_fields:
                     # These are already in the group_obj from the _id
                     pass
-                
+
                 # Get list fields (fields to aggregate as lists)
                 list_fields = agg_map.get("list", [])
                 if list_fields:
@@ -357,9 +352,9 @@ class MongoDBCollection(Collection):
                     # If list_fields is empty but first_fields is specified,
                     # filter out first_fields from objects to avoid duplication
                     objects = [{k: v for k, v in obj.items() if k not in first_fields} for obj in objects]
-            
+
             # Add the objects to the group
             group_obj[inlined_field] = objects
             results.append(group_obj)
-            
+
         return QueryResult(num_rows=len(results), rows=results)
