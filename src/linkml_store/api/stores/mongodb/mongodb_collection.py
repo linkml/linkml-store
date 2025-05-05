@@ -7,6 +7,7 @@ from pymongo.collection import Collection as MongoCollection
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
 from linkml_store.api.queries import Query, QueryResult
+from linkml_store.utils.object_utils import object_path_get
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +131,15 @@ class MongoDBCollection(Collection):
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
         limit = limit or query.limit
-        cursor = self.mongo_collection.find(mongo_filter)
+        
+        # Build projection if select_cols are provided
+        projection = None
+        if query.select_cols:
+            projection = {"_id": 0}
+            for col in query.select_cols:
+                projection[col] = 1
+        
+        cursor = self.mongo_collection.find(mongo_filter, projection)
         if limit and limit >= 0:
             cursor = cursor.limit(limit)
         offset = offset or query.offset
@@ -141,9 +150,19 @@ class MongoDBCollection(Collection):
 
         def _as_row(row: dict):
             row = copy(row)
-            del row["_id"]
+            if "_id" in row:
+                del row["_id"]
+                
             if select_cols:
-                row = {k: row[k] for k in select_cols if k in row}
+                # For nested fields, ensure we handle them properly
+                result = {}
+                for col in select_cols:
+                    # If it's a nested field (contains dots)
+                    if "." in col or "[" in col:
+                        result[col]  = object_path_get(row, col)
+                    elif col in row:
+                        result[col] = row[col]
+                return result
             return row
 
         rows = [_as_row(row) for row in cursor]
