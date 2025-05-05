@@ -2,9 +2,9 @@ import logging
 import shutil
 
 import pytest
+
 from linkml_store.api.stores.filesystem.filesystem_database import FileSystemDatabase
 from linkml_store.index import get_indexer
-
 from tests import OUTPUT_DIR
 
 logger = logging.getLogger(__name__)

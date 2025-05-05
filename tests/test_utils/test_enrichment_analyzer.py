@@ -1,7 +1,8 @@
-import pytest
-import pandas as pd
-import numpy as np
 from collections import Counter
+
+import pandas as pd
+import pytest
+
 from linkml_store.utils.enrichment_analyzer import (
     EnrichmentAnalyzer,
 )  # Assuming the previous code is in enrichment_analysis.py

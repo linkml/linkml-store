@@ -4,7 +4,7 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, TextIO, Tuple, Union, Any
+from typing import Any, Optional, TextIO, Tuple, Union
 
 import pandas as pd
 from pydantic import BaseModel, ConfigDict

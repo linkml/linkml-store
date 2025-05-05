@@ -2,6 +2,7 @@ import logging
 from typing import List, Optional, Union
 
 import pandas as pd
+
 from linkml_store.inference import InferenceEngine
 from linkml_store.inference.evaluation import Outcome, evaluate_predictor, score_match
 from linkml_store.utils.object_utils import select_nested

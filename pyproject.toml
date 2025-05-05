@@ -67,6 +67,10 @@ jupyter = "*"
 jupysql = "*"
 papermill = "*"
 nbdime = "*"
+codespell = {version = ">=2.3.0"}
+tomli = {version = ">=2.0.1"}
+black = {version = ">=24.0.0"}
+ruff = {version = ">=0.6.2"}
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^7.4.0"

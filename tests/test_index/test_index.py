@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
 import pytest
+
 from linkml_store.index import get_indexer
 from tests import INPUT_DIR
 

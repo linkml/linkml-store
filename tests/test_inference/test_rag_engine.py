@@ -4,12 +4,12 @@ import pytest
 from linkml_runtime import SchemaView
 from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.utils.schema_builder import SchemaBuilder
+
 from linkml_store.inference import InferenceConfig, get_inference_engine
 from linkml_store.inference.implementations.rag_inference_engine import RAGInferenceEngine
 from linkml_store.inference.implementations.rule_based_inference_engine import RuleBasedInferenceEngine
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 from linkml_store.utils.format_utils import Format
-
 from tests import INPUT_DIR, OUTPUT_DIR
 from tests.test_api.test_api import SCHEMES, create_client
 from tests.test_inference import check_accuracy2

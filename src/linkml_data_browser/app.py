@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 import yaml
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
+
 from linkml_store import Client
 from linkml_store.api import Collection
 from linkml_store.api.queries import QueryResult
