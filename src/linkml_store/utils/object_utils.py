@@ -83,15 +83,21 @@ def object_path_get(obj: Union[BaseModel, Dict[str, Any]], path: str, default_va
     'NA'
     """
     if isinstance(obj, BaseModel):
-        obj = obj.dict()
+        obj = obj.model_dump()
     parts = path.split(".")
     for part in parts:
         if "[" in part:
             key, index = part[:-1].split("[")
             index = int(index)
-            obj = obj[key][index]
+            if key in obj and obj[key] is not None:
+                obj = obj[key][index]
+            else:
+                return default_value
         else:
-            obj = obj.get(part, default_value)
+            if isinstance(obj, list):
+                obj = [v1.get(part, default_value) for v1 in obj]
+            else:
+                obj = obj.get(part, default_value)
     return obj
 
 
