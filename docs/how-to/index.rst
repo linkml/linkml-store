@@ -20,4 +20,5 @@ How-To Guides
    Predict-Missing-Data
    Perform-RAG-Inference
    Perform-LLM-Inference
+   Plot-Aggregate-Data
 
