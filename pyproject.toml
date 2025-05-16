@@ -50,6 +50,7 @@ fastapi = { version="*", optional = true }
 uvicorn = { version="*", optional = true }
 xmltodict = ">=0.13.0"
 jsonpatch = ">=1.33"
+jsonpath-ng = "*"
 python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
