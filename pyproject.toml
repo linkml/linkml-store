@@ -31,6 +31,7 @@ py2neo = { version="*", optional = true }
 networkx = { version="*", optional = true }
 #chromadb = { version="*", optional = true }
 pyarrow = { version="*", optional = true }
+pyreadr = { version="*", optional = true }
 h5py = { version="*", optional = true }
 scipy = { version="*", optional = true }
 scikit-learn = { version="*", optional = true }
@@ -90,6 +91,7 @@ neo4j = ["neo4j", "py2neo", "networkx"]
 #chromadb = ["chromadb"]
 h5py = ["h5py"]
 pyarrow = ["pyarrow"]
+pyreadr = ["pyreadr"]
 validation = ["linkml"]
 map = ["linkml_map"]
 renderer = ["linkml_renderer"]
