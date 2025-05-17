@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Union
 
 import pytest
 import yaml
+from linkml_store.utils.format_utils import Format, load_objects, render_output, transform_objects
 
 from linkml_store.utils.format_utils import Format, load_objects, render_output
 from tests.conftest import CSV_FILE, JSON_FILE, TEST_DATA, TSV_FILE, YAML_FILE
@@ -133,3 +134,34 @@ def test_load_objects_from_tgz():
             for loaded_obj in matching_objects:
                 assert loaded_obj["name"] == original_obj["name"]
                 assert int(loaded_obj["age"]) == int(original_obj["age"])  # Convert to int for comparison
+
+OBJS = [
+    {
+        "id": "P1",
+         "address": {
+             "street": "1 oak st",
+             "city": "Oakland",
+         },
+     },
+     {
+        "id": "P2",
+         "address": {
+             "street": "2 spruce st",
+             "city": "Spruceland",
+         },
+     },
+]
+
+@pytest.mark.parametrize(
+    "objects, select_expr, expected",
+    [
+        ([], None, []),
+        ([], "x", []),
+        (OBJS, None, OBJS),
+        (OBJS, "id", ["P1", "P2"]),
+        (OBJS, "address.city", ["Oakland", "Spruceland"]),
+]
+)
+def test_transform_objects(objects, select_expr, expected):
+    tr_objects = transform_objects(objects, select_expr)
+    assert tr_objects == expected

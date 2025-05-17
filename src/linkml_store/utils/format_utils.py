@@ -44,6 +44,7 @@ class Format(Enum):
     DAT = "dat"
     MARKDOWN = "markdown"
     PKL = "pkl"
+    RDS = "rds"
     PYTHON = "python"
     PARQUET = "parquet"
     HDF5 = "hdf5"
@@ -195,6 +196,9 @@ def process_file(
         objs = xmltodict.parse(f.read())
     elif format == Format.PKL:
         objs = pd.read_pickle(f).to_dict(orient="records")
+    elif format == Format.RDS:
+        import pyreadr
+        objs = pyreadr.read_r(f)
     elif format == Format.XLSX:
         xls = pd.ExcelFile(f)
         objs = {sheet: clean_nested_structure(xls.parse(sheet).to_dict(orient="records")) for sheet in xls.sheet_names}
@@ -349,21 +353,25 @@ def load_objects(
             all_objects = process_file(f, format, expected_type, header_comment_token)
 
     logger.debug(f"Loaded {len(all_objects)} objects from {file_path}")
-    if select_query:
-        import jsonpath_ng as jp
-
-        path_expr = jp.parse(select_query)
-        new_objs = []
-        for obj in all_objects:
-            for match in path_expr.find(obj):
-                logging.debug(f"Match: {match.value}")
-                if isinstance(match.value, list):
-                    new_objs.extend(match.value)
-                else:
-                    new_objs.append(match.value)
-        all_objects = new_objs
+    all_objects = transform_objects(all_objects, select_query)
     return all_objects
 
+def transform_objects(all_objects: List[Dict[str, Any]], select_query: Optional[str]) -> List[Dict[str, Any]]:
+    if not select_query:
+        return all_objects
+    import jsonpath_ng as jp
+
+    path_expr = jp.parse(select_query)
+    new_objs = []
+    for obj in all_objects:
+        for match in path_expr.find(obj):
+            logging.debug(f"Match: {match.value}")
+            if isinstance(match.value, list):
+                new_objs.extend(match.value)
+            else:
+                new_objs.append(match.value)
+    all_objects = new_objs
+    return all_objects
 
 def write_output(
     data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame],

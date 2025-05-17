@@ -25,6 +25,7 @@ from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
+from linkml_store.plotting.cli import plot_cli
 
 DEFAULT_LOCAL_CONF_PATH = Path("linkml.yaml")
 # global path is ~/.linkml.yaml in the user's home directory
@@ -205,9 +206,10 @@ def drop(ctx):
 @click.option("--format", "-f", type=format_choice, help="Input format")
 @click.option("--object", "-i", multiple=True, help="Input object as YAML")
 @click.option("--source-field", help="If provided, inject file path source as this field")
+@click.option("--glob-files/--no-glob-files", default=False, show_default=True, help="If true, use glob to find files")
 @json_select_query_option
 @click.pass_context
-def insert(ctx, files, replace, object, format, source_field, json_select_query):
+def insert(ctx, files, glob_files, replace, object, format, source_field, json_select_query):
     """Insert objects from files (JSON, YAML, TSV) into the specified collection.
 
     Using a configuration:
@@ -216,6 +218,11 @@ def insert(ctx, files, replace, object, format, source_field, json_select_query)
 
     Note: if you don't provide a schema this will be inferred, but it is
     usually better to provide an explicit schema
+
+    You can use --glob-files if the list of files is too long
+
+        linkml-store -C config.yaml -c genes insert "data/genes/*.json" --glob-files
+
     """
     settings = ctx.obj["settings"]
     collection = settings.collection
@@ -226,7 +233,15 @@ def insert(ctx, files, replace, object, format, source_field, json_select_query)
     load_objects_args = {}
     if json_select_query:
         load_objects_args["select_query"] = json_select_query
+    if glob_files:
+        import glob
+        new_files = []
+        for file_path in files:
+            new_files.extend(glob.glob(file_path))
+        logger.info(f"Found {len(new_files)} files matching glob pattern {files}")
+        files = new_files
     for file_path in files:
+        
         if format:
             objects = load_objects(file_path, format=format, **load_objects_args)
         else:
@@ -486,11 +501,13 @@ def fq(ctx, where, limit, columns, output_type, wide, output, **kwargs):
 
     Nested columns:
 
-        linkml-store -d phenopackets fq subject.timeAtLastEncounter.age
+        linkml-store -d phenopackets fq -S subject.timeAtLastEncounter.age
 
     Compound keys:
 
         linkml-store -d phenopackets fq subject.sex+subject.timeAtLastEncounter.age
+
+    (TODO: compound keys do not work on solr)
 
     """
     collection = ctx.obj["settings"].collection
@@ -947,6 +964,8 @@ def validate(ctx, output_type, output, collection_only, **kwargs):
     else:
         click.echo(output_data)
 
+
+cli.add_command(plot_cli, name="plot")
 
 if __name__ == "__main__":
     cli()
