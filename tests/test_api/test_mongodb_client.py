@@ -22,9 +22,7 @@ def test_attach_mongodb_client(mongodb_client):
     """
     Test attaching an existing MongoClient instance directly.
     """
-    # Skip if no MongoDB available
-    if mongodb_client is None:
-        pytest.skip("Skipping test: MongoDB client is not available.")
+    # Setup
         
     # Setup
     db_name = "test_direct_client_db"
