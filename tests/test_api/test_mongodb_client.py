@@ -25,15 +25,37 @@ def test_attach_mongodb_client(mongodb_client):
     # Skip if no MongoDB available
     if mongodb_client is None:
         pytest.skip("Skipping test: MongoDB client is not available.")
-        
+
     # Setup
     db_name = "test_direct_client_db"
     test_collection = "test_collection"
-    
+
     # Create a Client
     client = Client()
-    
-    # Attach MongoDB client directly
+
+    # Test that db_name is optional
+    db_no_name = client.attach_mongodb_client(
+        mongo_client=mongodb_client,
+        db_name=None,
+        alias="mongo_without_db_name"
+    )
+    assert db_no_name.alias == "mongo_without_db_name"
+    assert db_no_name._db_name == "mongo_without_db_name"  # Should use alias as db_name
+
+    # Test that we can create collections without specifying a db_name
+    no_name_collection = db_no_name.create_collection("test_auto_db_collection", recreate_if_exists=True)
+    test_data = [{"id": "auto1", "name": "Auto DB Test"}]
+    no_name_collection.insert(test_data)
+
+    # Verify data was inserted
+    result = no_name_collection.find()
+    assert result.num_rows == 1
+    assert result.rows[0]["name"] == "Auto DB Test"
+
+    # Clean up
+    mongodb_client.drop_database("mongo_without_db_name")
+
+    # Attach MongoDB client directly with valid parameters
     db = client.attach_mongodb_client(
         mongo_client=mongodb_client,
         db_name=db_name,
@@ -71,15 +93,25 @@ def test_attach_native_connection_with_mongodb(mongodb_client):
     # Skip if no MongoDB available
     if mongodb_client is None:
         pytest.skip("Skipping test: MongoDB client is not available.")
-        
+
     # Setup
     db_name = "test_native_connection_db"
     test_collection = "test_collection"
-    
+
     # Create a Client
     client = Client()
-    
-    # Attach MongoDB client via the generic method
+
+    # Test that db_name is optional
+    db_no_name = client.attach_native_connection(
+        connection_type="mongodb",
+        connection_object=mongodb_client,
+        db_name=None,
+        alias="mongo_native_without_db_name"
+    )
+    assert db_no_name.alias == "mongo_native_without_db_name"
+    assert db_no_name._db_name == "mongo_native_without_db_name"  # Should use alias as db_name
+
+    # Attach MongoDB client via the generic method with valid parameters
     db = client.attach_native_connection(
         connection_type="mongodb",
         connection_object=mongodb_client,

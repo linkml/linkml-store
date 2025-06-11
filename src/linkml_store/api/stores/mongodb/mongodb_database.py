@@ -39,7 +39,7 @@ class MongoDBDatabase(Database):
         Args:
             handle: A MongoDB connection URI string
             mongo_client: An existing MongoClient instance (takes precedence over handle if both provided)
-            db_name: Database name to use (required when using mongo_client)
+            db_name: Database name to use with the MongoClient (optional - will use alias if not provided)
             **kwargs: Additional arguments passed to the parent constructor
         """
         if mongo_client is not None:
@@ -47,7 +47,8 @@ class MongoDBDatabase(Database):
             self._db_name_override = db_name
             # Use a placeholder handle for MongoDB databases connected via client
             if handle is None:
-                handle = f"mongodb://direct-client-connection/{db_name or 'unknown'}"
+                db_name_part = db_name if db_name else "direct-connection"
+                handle = f"mongodb://{db_name_part}"
         elif handle is None:
             handle = "mongodb://localhost:27017/test"
         elif handle == "mongodb":
@@ -60,6 +61,11 @@ class MongoDBDatabase(Database):
         # If a db_name was explicitly provided with a MongoClient, use that
         if self._db_name_override is not None:
             return self._db_name_override
+
+        # If we have a MongoClient but no db_name specified,
+        # we'll use the database name from the alias
+        if self._native_client is not None and self.alias:
+            return self.alias
 
         # Otherwise extract from handle
         if self.handle:
