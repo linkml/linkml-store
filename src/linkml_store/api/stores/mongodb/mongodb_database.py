@@ -23,21 +23,45 @@ class MongoDBDatabase(Database):
     An adapter for MongoDB databases.
 
     The LinkML-Store Database abstraction combines mongodb Client and Database.
+
+    This can be initialized either with a connection string handle or with an existing MongoClient instance.
     """
 
     _native_client: MongoClient = None
     _native_db = None
+    _db_name_override: Optional[str] = None
     collection_class = MongoDBCollection
 
-    def __init__(self, handle: Optional[str] = None, **kwargs):
-        if handle is None:
+    def __init__(self, handle: Optional[str] = None, mongo_client: Optional[MongoClient] = None, db_name: Optional[str] = None, **kwargs):
+        """
+        Initialize a MongoDB database adapter.
+
+        Args:
+            handle: A MongoDB connection URI string
+            mongo_client: An existing MongoClient instance (takes precedence over handle if both provided)
+            db_name: Database name to use (required when using mongo_client)
+            **kwargs: Additional arguments passed to the parent constructor
+        """
+        if mongo_client is not None:
+            self._native_client = mongo_client
+            self._db_name_override = db_name
+            # Use a placeholder handle for MongoDB databases connected via client
+            if handle is None:
+                handle = f"mongodb://direct-client-connection/{db_name or 'unknown'}"
+        elif handle is None:
             handle = "mongodb://localhost:27017/test"
-        if handle == "mongodb":
+        elif handle == "mongodb":
             handle = "mongodb://localhost:27017/temporary"
+
         super().__init__(handle=handle, **kwargs)
 
     @property
     def _db_name(self) -> str:
+        # If a db_name was explicitly provided with a MongoClient, use that
+        if self._db_name_override is not None:
+            return self._db_name_override
+
+        # Otherwise extract from handle
         if self.handle:
             parsed_url = urlparse(self.handle)
             path_parts = parsed_url.path.lstrip("/").split("?")[0].split("/")
