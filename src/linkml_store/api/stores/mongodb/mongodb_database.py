@@ -51,7 +51,7 @@ class MongoDBDatabase(Database):
         elif handle is None:
             handle = "mongodb://localhost:27017/test"
         elif handle == "mongodb":
-            handle = "mongodb://localhost:27017/temporary"
+            handle = "mongodb://localhost:27017/test"
 
         super().__init__(handle=handle, **kwargs)
 
