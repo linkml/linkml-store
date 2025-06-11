@@ -246,6 +246,73 @@ class Client:
         self._set_database_config(db)
         return db
 
+    def attach_native_connection(
+        self,
+        connection_type: str,
+        connection_object: object,
+        alias: Optional[str] = None,
+        **kwargs
+    ) -> Database:
+        """
+        Associate a database with a native connection object instead of a handle.
+        
+        This method allows passing already instantiated connection objects
+        directly to the appropriate database adapter.
+        
+        Examples
+        --------
+        >>> from pymongo import MongoClient
+        >>> client = Client()
+        >>> mongo_client = MongoClient("mongodb://localhost:27017/")
+        >>> db = client.attach_native_connection("mongodb", mongo_client, db_name="my_database", alias="mongodb_direct")
+        >>> "mongodb_direct" in client.databases
+        True
+        
+        :param connection_type: The type of connection ('mongodb', 'duckdb', etc.)
+        :param connection_object: The native connection object (e.g., MongoClient instance)
+        :param alias: Alias for the database
+        :param kwargs: Additional parameters to pass to the database constructor
+        :return: Database instance
+        """
+        if connection_type not in HANDLE_MAP:
+            raise ValueError(f"Unknown connection type: {connection_type}")
+            
+        module_path, class_name = HANDLE_MAP[connection_type].rsplit(".", 1)
+        try:
+            module = importlib.import_module(module_path)
+            cls = getattr(module, class_name)
+        except ImportError as e:
+            raise ImportError(f"Failed to import {connection_type} database. Make sure the correct extras are installed: {e}")
+        
+        # Pass the connection object to the database constructor
+        if connection_type == "mongodb":
+            # For MongoDB, we need special handling
+            db = cls(mongo_client=connection_object, **kwargs)
+        else:
+            # For other databases, we might need different parameters
+            # This can be expanded as needed for other database types
+            db = cls(native_connection=connection_object, **kwargs)
+            
+        if not alias:
+            alias = f"{connection_type}_direct"
+            
+        if not self._databases:
+            logger.info("Initializing databases")
+            self._databases = {}
+            
+        logger.info(f"Attaching {alias}")
+        self._databases[alias] = db
+        db.parent = self
+        
+        if db.alias:
+            if db.alias != alias:
+                raise AssertionError(f"Inconsistent alias: {db.alias} != {alias}")
+        else:
+            db.metadata.alias = alias
+            
+        self._set_database_config(db)
+        return db
+        
     def attach_mongodb_client(
         self,
         mongo_client: object,  # Type hint as object to avoid direct import
@@ -256,11 +323,11 @@ class Client:
     ) -> Database:
         """
         Associate a MongoDB database using an existing MongoClient instance.
-
+        
         This is a convenience method for attaching a MongoDB database when you already
         have a MongoClient instance. It avoids having to parse the connection string
         and recreate a connection.
-
+        
         Examples
         --------
         >>> from pymongo import MongoClient
@@ -269,7 +336,7 @@ class Client:
         >>> db = client.attach_mongodb_client(mongo_client, "my_database", alias="mongodb_direct")
         >>> "mongodb_direct" in client.databases
         True
-
+        
         :param mongo_client: An existing MongoClient instance
         :param db_name: The name of the MongoDB database to use
         :param alias: Alias for the database in the client
@@ -278,16 +345,16 @@ class Client:
         :return: MongoDBDatabase instance
         """
         db = self.attach_native_connection(
-            "mongodb",
-            mongo_client,
-            alias=alias,
-            db_name=db_name,
+            "mongodb", 
+            mongo_client, 
+            alias=alias, 
+            db_name=db_name, 
             **kwargs
         )
-
+        
         if schema_view:
             db.set_schema_view(schema_view)
-
+            
         return db
 
     def get_database(self, name: Optional[str] = None, create_if_not_exists=True, **kwargs) -> Database:
@@ -329,50 +396,6 @@ class Client:
                 raise ValueError(f"Database {name} does not exist")
         db = self._databases[name]
         self._set_database_config(db)
-        return db
-
-    def attach_mongodb_client(
-        self,
-        mongo_client: object,  # Type hint as object to avoid direct import
-        db_name: str,
-        alias: Optional[str] = None,
-        schema_view: Optional[SchemaView] = None,
-        **kwargs
-    ) -> Database:
-        """
-        Associate a MongoDB database using an existing MongoClient instance.
-
-        This is a convenience method for attaching a MongoDB database when you already
-        have a MongoClient instance. It avoids having to parse the connection string
-        and recreate a connection.
-
-        Examples
-        --------
-        >>> from pymongo import MongoClient
-        >>> client = Client()
-        >>> mongo_client = MongoClient("mongodb://localhost:27017/")
-        >>> db = client.attach_mongodb_client(mongo_client, "my_database", alias="mongodb_direct")
-        >>> "mongodb_direct" in client.databases
-        True
-
-        :param mongo_client: An existing MongoClient instance
-        :param db_name: The name of the MongoDB database to use
-        :param alias: Alias for the database in the client
-        :param schema_view: Optional schema view to associate with the database
-        :param kwargs: Additional parameters to pass to the MongoDBDatabase constructor
-        :return: MongoDBDatabase instance
-        """
-        db = self.attach_native_connection(
-            "mongodb",
-            mongo_client,
-            alias=alias,
-            db_name=db_name,
-            **kwargs
-        )
-
-        if schema_view:
-            db.set_schema_view(schema_view)
-
         return db
 
     @property
@@ -485,114 +508,3 @@ class Client:
         for name in list(self._databases.keys()):
             self.drop_database(name, missing_ok=False, **kwargs)
         self._databases = {}
-
-    def attach_native_connection(
-        self,
-        connection_type: str,
-        connection_object: object,
-        alias: Optional[str] = None,
-        **kwargs
-    ) -> Database:
-        """
-        Associate a database with a native connection object instead of a handle.
-
-        This method allows passing already instantiated connection objects
-        directly to the appropriate database adapter.
-
-        Examples
-        --------
-        >>> from pymongo import MongoClient
-        >>> client = Client()
-        >>> mongo_client = MongoClient("mongodb://localhost:27017/")
-        >>> db = client.attach_native_connection("mongodb", mongo_client, db_name="my_database", alias="mongodb_direct")
-        >>> "mongodb_direct" in client.databases
-        True
-
-        :param connection_type: The type of connection ('mongodb', 'duckdb', etc.)
-        :param connection_object: The native connection object (e.g., MongoClient instance)
-        :param alias: Alias for the database
-        :param kwargs: Additional parameters to pass to the database constructor
-        :return: Database instance
-        """
-        if connection_type not in HANDLE_MAP:
-            raise ValueError(f"Unknown connection type: {connection_type}")
-
-        module_path, class_name = HANDLE_MAP[connection_type].rsplit(".", 1)
-        try:
-            module = importlib.import_module(module_path)
-            cls = getattr(module, class_name)
-        except ImportError as e:
-            raise ImportError(f"Failed to import {connection_type} database. Make sure the correct extras are installed: {e}")
-
-        # Pass the connection object to the database constructor
-        if connection_type == "mongodb":
-            # For MongoDB, we need special handling
-            db = cls(mongo_client=connection_object, **kwargs)
-        else:
-            # For other databases, we might need different parameters
-            # This can be expanded as needed for other database types
-            db = cls(native_connection=connection_object, **kwargs)
-
-        if not alias:
-            alias = f"{connection_type}_direct"
-
-        if not self._databases:
-            logger.info("Initializing databases")
-            self._databases = {}
-
-        logger.info(f"Attaching {alias}")
-        self._databases[alias] = db
-        db.parent = self
-
-        if db.alias:
-            if db.alias != alias:
-                raise AssertionError(f"Inconsistent alias: {db.alias} != {alias}")
-        else:
-            db.metadata.alias = alias
-
-        self._set_database_config(db)
-        return db
-
-    def attach_mongodb_client(
-        self,
-        mongo_client: object,  # Type hint as object to avoid direct import
-        db_name: str,
-        alias: Optional[str] = None,
-        schema_view: Optional[SchemaView] = None,
-        **kwargs
-    ) -> Database:
-        """
-        Associate a MongoDB database using an existing MongoClient instance.
-
-        This is a convenience method for attaching a MongoDB database when you already
-        have a MongoClient instance. It avoids having to parse the connection string
-        and recreate a connection.
-
-        Examples
-        --------
-        >>> from pymongo import MongoClient
-        >>> client = Client()
-        >>> mongo_client = MongoClient("mongodb://localhost:27017/")
-        >>> db = client.attach_mongodb_client(mongo_client, "my_database", alias="mongodb_direct")
-        >>> "mongodb_direct" in client.databases
-        True
-
-        :param mongo_client: An existing MongoClient instance
-        :param db_name: The name of the MongoDB database to use
-        :param alias: Alias for the database in the client
-        :param schema_view: Optional schema view to associate with the database
-        :param kwargs: Additional parameters to pass to the MongoDBDatabase constructor
-        :return: MongoDBDatabase instance
-        """
-        db = self.attach_native_connection(
-            "mongodb",
-            mongo_client,
-            alias=alias,
-            db_name=db_name,
-            **kwargs
-        )
-
-        if schema_view:
-            db.set_schema_view(schema_view)
-
-        return db
