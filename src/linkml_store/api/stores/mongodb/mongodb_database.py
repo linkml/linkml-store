@@ -41,6 +41,7 @@ class MongoDBDatabase(Database):
         if self.handle:
             parsed_url = urlparse(self.handle)
             path_parts = parsed_url.path.lstrip("/").split("?")[0].split("/")
+            logger.info(f"Parsed URL: {parsed_url}, Path parts: {path_parts}")
             db_name = path_parts[0] if path_parts else "default"
             if not db_name:
                 db_name = self.alias
@@ -60,6 +61,7 @@ class MongoDBDatabase(Database):
             alias = self.metadata.alias
             if not alias:
                 alias = "default"
+            logger.info(f"Using database {alias} for {self.__class__.__name__} named {self._db_name}")
             self._native_db = self.native_client[self._db_name]
         return self._native_db
 

@@ -156,7 +156,7 @@ class DuckDBDatabase(Database):
             if json_encoded_cols:
                 for row in qr.rows:
                     for col in json_encoded_cols:
-                        if row[col]:
+                        if row.get(col):
                             if isinstance(row[col], list):
                                 for i in range(len(row[col])):
                                     try:
