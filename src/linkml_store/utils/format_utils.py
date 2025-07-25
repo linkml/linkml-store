@@ -52,6 +52,7 @@ class Format(Enum):
     FORMATTED = "formatted"
     TABLE = "table"
     XLSX = "xlsx"
+    PNG = "png"
     SQLDUMP_DUCKDB = "duckdb"
     SQLDUMP_POSTGRES = "postgres"
     DUMP_MONGODB = "mongodb"
@@ -373,6 +374,12 @@ def transform_objects(all_objects: List[Dict[str, Any]], select_query: Optional[
     all_objects = new_objs
     return all_objects
 
+def remove_control_chars_from_df(df: pd.DataFrame) -> pd.DataFrame:
+    df_clean = df.copy()
+    for col in df_clean.select_dtypes(include=['object']).columns:
+        df_clean[col] = df_clean[col].astype(str).str.replace(r'[\x00-\x1f\x7f-\x9f]', '', regex=True)
+    return df_clean
+
 def write_output(
     data: Union[List[Dict[str, Any]], Dict[str, Any], pd.DataFrame],
     format: Union[Format, str] = Format.YAML,
@@ -393,6 +400,16 @@ def write_output(
         }
     ]
     """
+    if isinstance(format, str):
+        format = Format(format)
+    if format == Format.XLSX:
+        if not target:
+            raise ValueError("XLSX output requires a target file")
+        if not isinstance(data, pd.DataFrame):
+            data = pd.DataFrame(data)
+        data = remove_control_chars_from_df(data)
+        data.to_excel(target, index=False)
+        return
     output_str = render_output(data, format)
     if target:
         if isinstance(target, str):
@@ -431,7 +448,7 @@ def render_output(
     if isinstance(format, str):
         format = Format(format)
 
-    if format == Format.FORMATTED:
+    if format in (Format.FORMATTED, ):
         if not isinstance(data, pd.DataFrame):
             data = pd.DataFrame(data)
         return data.to_string(max_rows=None)
