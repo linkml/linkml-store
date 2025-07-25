@@ -27,6 +27,7 @@ def create_heatmap(
     x_column: str,
     y_column: str,
     value_column: Optional[str] = None,
+    minimum_value: Optional[float] = None,
     title: Optional[str] = None,
     figsize: Tuple[int, int] = (10, 8),
     cmap: Union[str, LinearSegmentedColormap] = "YlGnBu",
@@ -41,7 +42,7 @@ def create_heatmap(
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     robust: bool = False,
-    remove_duplicates: bool = True,
+    remove_duplicates: bool = False,
     font_size: int = 10,
     cluster: Union[bool, Literal["both", "x", "y"]] = False,
     cluster_method: str = "complete",  # linkage method: complete, average, single, etc.
@@ -56,6 +57,7 @@ def create_heatmap(
         x_column: Column to use for x-axis categories
         y_column: Column to use for y-axis categories
         value_column: Column containing values for the heatmap. If None, frequency counts will be used.
+        minimum_value: Minimum value to include in the heatmap
         title: Title for the heatmap
         figsize: Figure size as (width, height) in inches
         cmap: Colormap for the heatmap
@@ -92,14 +94,40 @@ def create_heatmap(
         raise ValueError(f"y_column '{y_column}' not found in DataFrame columns: {list(data.columns)}")
     if value_column and value_column not in data.columns:
         raise ValueError(f"value_column '{value_column}' not found in DataFrame columns: {list(data.columns)}")
+    
+
+    cols = [x_column, y_column]
+    if value_column:
+        cols.append(value_column)
+
+    # select cols from data
+    data = data[cols]  
+    print("DATA", data)
+
+    if any(isinstance(val, (list, set, tuple)) for val in data[x_column].dropna().head(100)):
+        logger.info(f"Exploding list values in x_column '{x_column}'")
+        data = data.explode(x_column).dropna(subset=[x_column])
+
+    if any(isinstance(val, (list, set, tuple)) for val in data[y_column].dropna().head(100)):
+        logger.info(f"Exploding list values in y_column '{y_column}'")
+        data = data.explode(y_column).dropna(subset=[y_column])
+
+    if value_column:
+        if any(isinstance(val, (list, set, tuple)) for val in data[value_column].dropna().head(100)):
+            logger.info(f"Exploding list values in value_column '{value_column}'")
+            data = data.explode(value_column).dropna(subset=[value_column])
 
     # Remove duplicates by default (assume they're accidents unless user overrides)
     if remove_duplicates:
         data = data.drop_duplicates()
+
+    if value_column and minimum_value is not None:
+        data = data[data[value_column] >= minimum_value]
     
     # Prepare the data
     if value_column:
         # Use the provided value column
+        # print(data.head())
         pivot_data = data.pivot_table(
             index=y_column, 
             columns=x_column, 
