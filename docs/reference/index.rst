@@ -5,7 +5,7 @@ Reference
 =========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    linkml_store.api
    linkml_store.api.stores

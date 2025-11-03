@@ -20,7 +20,7 @@ class Query(BaseModel):
     - In SQL this would be a SQL query string
     """
 
-    from_table: Optional[str]
+    from_table: Optional[str] = None
     select_cols: Optional[List[str]] = None
     where_clause: Optional[Union[str, List[str], Dict[str, Any]]] = None
     sort_by: Optional[List[str]] = None

@@ -695,5 +695,132 @@ def facet_chart(
     create_faceted_horizontal_barchart(objs[0], output)
     click.echo(f"Facet chart saved to {output}")
 
+
+@plot_cli.command()
+@click.pass_context
+@click.option("--collections", "-c", help="Comma-separated list of collection names", required=True)
+@click.option("--method", "-m", type=click.Choice(["umap", "tsne", "pca"]), default="tsne", help="Reduction method")
+@click.option("--index-name", "-i", help="Name of index to use (defaults to first available)")
+@click.option("--color-field", help="Field to use for coloring points")
+@click.option("--shape-field", default="collection", help="Field to use for point shapes")
+@click.option("--size-field", help="Field to use for point sizes")
+@click.option("--hover-fields", help="Comma-separated list of fields to show on hover")
+@click.option("--limit-per-collection", "-l", type=int, help="Max embeddings per collection")
+@click.option("--n-neighbors", type=int, default=15, help="UMAP n_neighbors parameter")
+@click.option("--min-dist", type=float, default=0.1, help="UMAP min_dist parameter")
+@click.option("--perplexity", type=float, default=30.0, help="t-SNE perplexity parameter")
+@click.option("--random-state", type=int, default=42, help="Random seed for reproducibility")
+@click.option("--width", type=int, default=800, help="Plot width in pixels")
+@click.option("--height", type=int, default=600, help="Plot height in pixels")
+@click.option("--dark-mode/--no-dark-mode", default=False, help="Use dark mode theme")
+@click.option("--output", "-o", type=click.Path(), help="Output HTML file path")
+def multi_collection_embeddings(ctx, collections, method, index_name, color_field, shape_field,
+                   size_field, hover_fields, limit_per_collection, n_neighbors,
+                   min_dist, perplexity, random_state, width, height, dark_mode, output):
+    """
+    Create an interactive plot of embeddings from indexed collections.
+
+    Example:
+        linkml-store -d mydb.ddb plot multi-collection-embeddings --c coll1,coll2 --method umap -o plot.html
+    """
+    from linkml_store.utils.embedding_utils import extract_embeddings_from_multiple_collections
+    from linkml_store.plotting.dimensionality_reduction import reduce_dimensions
+    from linkml_store.plotting.embedding_plot import plot_embeddings as create_plot, EmbeddingPlotConfig
+
+    # Parse collections
+    collection_names = [c.strip() for c in collections.split(",")]
+
+    # Parse hover fields
+    hover_field_list = []
+    if hover_fields:
+        hover_field_list = [f.strip() for f in hover_fields.split(",")]
+
+    # Extract embeddings
+    db = ctx.obj["settings"].database
+    click.echo(f"Extracting embeddings from collections: {collection_names}")
+
+    embedding_data = extract_embeddings_from_multiple_collections(
+        database=db,
+        collection_names=collection_names,
+        index_name=index_name,
+        limit_per_collection=limit_per_collection,
+        include_metadata=True,
+        normalize=True
+    )
+
+    click.echo(f"Extracted {embedding_data.n_samples} embeddings with {embedding_data.n_dimensions} dimensions")
+
+    # Validate embeddings before reduction
+    from linkml_store.plotting.dimensionality_reduction import validate_embeddings
+    validation_results = validate_embeddings(embedding_data.vectors)
+
+    if validation_results["warnings"]:
+        click.echo("Embedding validation warnings:", err=True)
+        for warning in validation_results["warnings"]:
+            click.echo(f"  - {warning}", err=True)
+
+    # Log detailed stats for debugging
+    logger.info(f"Embedding validation results: {validation_results}")
+
+    # Perform dimensionality reduction
+    click.echo(f"Performing {method.upper()} dimensionality reduction...")
+
+    # Set method-specific parameters
+    reduction_params = {
+        "n_components": 2,
+        "random_state": random_state
+    }
+
+    if method == "umap":
+        reduction_params.update({
+            "n_neighbors": min(n_neighbors, embedding_data.n_samples - 1),
+            "min_dist": min_dist
+        })
+    elif method == "tsne":
+        reduction_params["perplexity"] = min(perplexity, embedding_data.n_samples / 4)
+
+    try:
+        reduction_result = reduce_dimensions(
+            embedding_data.vectors,
+            method=method,
+            **reduction_params
+        )
+    except ImportError as e:
+        click.echo(f"Missing dependency: {e}", err=True)
+        click.echo("Install with: pip install umap-learn scikit-learn", err=True)
+        return
+    except Exception as e:
+        click.echo(f"Error during dimensionality reduction: {e}", err=True)
+        return
+
+    logger.info(f"Reduction result: {reduction_result}")
+    # Create plot configuration
+    plot_config = EmbeddingPlotConfig(
+        color_field=color_field,
+        shape_field=shape_field,
+        size_field=size_field,
+        hover_fields=hover_field_list,
+        title=f"Embedding Visualization ({', '.join(collection_names)})",
+        width=width,
+        height=height,
+        dark_mode=dark_mode
+    )
+
+    # Create plot
+    click.echo("Creating interactive plot...")
+    fig = create_plot(
+        embedding_data=embedding_data,
+        reduction_result=reduction_result,
+        config=plot_config,
+        output_file=output
+    )
+
+    if output:
+        click.echo(f"Plot saved to {output}")
+    else:
+        # If no output file, try to show in browser
+        fig.show()
+        click.echo("Plot opened in browser")
+
 if __name__ == "__main__":
     plot_cli()

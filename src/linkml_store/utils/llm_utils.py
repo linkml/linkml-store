@@ -51,6 +51,9 @@ def render_formatted_text(
     """
     Render a formatted text string with a given object, encoding, and token limit.
 
+    This function safely handles text that may contain special tokens (e.g., <|fim_suffix|>,
+    <|endoftext|>) by treating them as normal text rather than raising errors.
+
     >>> from tiktoken import encoding_for_model
     >>> encoding = encoding_for_model("gpt-4o-mini")
     >>> names = ["Alice", "Bob", "DoctorHippopotamusMcHippopotamusFace"]
@@ -69,8 +72,8 @@ def render_formatted_text(
     """
     text = render_func(values)
     if additional_text:
-        token_limit -= len(encoding.encode(additional_text))
-    text_length = len(encoding.encode(text))
+        token_limit -= len(encoding.encode(additional_text, disallowed_special=()))
+    text_length = len(encoding.encode(text, disallowed_special=()))
     logger.debug(f"Encoding length: {text_length} (original: {len(text)})")
     if text_length <= token_limit:
         return text

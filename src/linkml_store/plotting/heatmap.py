@@ -102,7 +102,6 @@ def create_heatmap(
 
     # select cols from data
     data = data[cols]  
-    print("DATA", data)
 
     if any(isinstance(val, (list, set, tuple)) for val in data[x_column].dropna().head(100)):
         logger.info(f"Exploding list values in x_column '{x_column}'")

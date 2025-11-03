@@ -84,6 +84,7 @@ class Indexer(BaseModel):
     filter_nulls: Optional[bool] = True
     vector_default_length: Optional[int] = 1000
     index_field: Optional[str] = "__index__"
+    index_value_field: Optional[str] = "__index_value__"
 
     def object_to_vector(self, obj: Dict[str, Any]) -> INDEX_ITEM:
         """

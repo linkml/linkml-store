@@ -34,8 +34,10 @@ class SolrCollection(Collection):
         if index_name is None:
             index_name = "edismax"
         qfs = self.parent.metadata.searchable_slots
+        #if not qfs:
+        #    raise ValueError("No searchable slots configured for Solr collection")
         if not qfs:
-            raise ValueError("No searchable slots configured for Solr collection")
+            qfs = list(self.class_definition().attributes.keys())
         solr_query = self._build_solr_query(where, search_term=query, extra={"defType": index_name, "qf": qfs})
         logger.info(f"Querying Solr collection {self.alias} with query: {solr_query}")
 
