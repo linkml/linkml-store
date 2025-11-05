@@ -460,13 +460,9 @@ def query(ctx, where, select, limit, output_type, output):
             raise ValueError(f"SELECT clause must be a list. Got: {select_clause}")
     query = Query(from_table=collection.alias, select_cols=select_clause, where_clause=where_clause, limit=limit)
     result = collection.query(query)
-    output_data = render_output(result.rows, output_type)
+    write_output(result.rows, output_type, target=output)
     if output:
-        with open(output, "w") as f:
-            f.write(output_data)
         click.echo(f"Query results saved to {output}")
-    else:
-        click.echo(output_data)
 
 
 @cli.command()
@@ -540,6 +536,13 @@ def fq(ctx, where, limit, columns, output_type, wide, output, **kwargs):
             for key, value in results.items():
                 value_as_dict = {_untuple(v[0:-1]): v[-1] for v in value}
                 results_obj[_untuple(key)] = value_as_dict
+    if output_type == Format.PNG.value:
+        if not output:
+            raise ValueError("Output file path is required for PNG output")
+        from linkml_store.plotting.facet_chart import create_faceted_horizontal_barchart
+        create_faceted_horizontal_barchart(results_obj, output)
+        click.echo(f"Facet chart saved to {output}")
+        return
     output_data = render_output(results_obj, output_type)
     if output:
         with open(output, "w") as f:
@@ -856,12 +859,23 @@ def infer(
 @index_type_option
 @click.option("--cached-embeddings-database", "-E", help="Path to the database where embeddings are cached")
 @click.option("--text-template", "-T", help="Template for text embeddings")
+@click.option("--name", "-N", help="Index name")
+# TODO: Add --model option to specify embedding model (e.g., text-embedding-3-large)
+# TODO: Add --batch-size option to control batch processing size
+# TODO: Add --index-attributes option to specify which fields to index
+# TODO: Add --progress flag to show indexing progress
 @click.pass_context
 def index(ctx, index_type, **kwargs):
     """
     Create an index over a collection.
 
     By default a simple trigram index is used.
+
+    TODO: Support additional options for LLM indexer:
+    - Model selection (--model text-embedding-3-large)
+    - Batch size configuration (--batch-size 100)
+    - Index attributes (--index-attributes title,content,author)
+    - Progress reporting (--progress)
     """
     collection = ctx.obj["settings"].collection
     ix = get_indexer(index_type, **kwargs)
@@ -902,14 +916,17 @@ def schema(ctx, output_type, output):
     "--auto-index/--no-auto-index", default=False, show_default=True, help="Automatically index the collection"
 )
 @index_type_option
+@click.option("--index-name", "-N", help="Index name")
 @click.pass_context
-def search(ctx, search_term, where, select, limit, index_type, output_type, output, auto_index):
+def search(ctx, search_term, where, select, limit, index_type, output_type, output, auto_index, index_name):
     """Search objects in the specified collection."""
     collection = ctx.obj["settings"].collection
     ix = get_indexer(index_type)
     logger.info(f"Attaching index to collection {collection.alias}: {ix.model_dump()}")
-    collection.attach_indexer(ix, auto_index=auto_index)
+    collection.attach_indexer(ix, auto_index=auto_index, name=index_name)
     select_cols = yaml.safe_load(select) if select else None
+    if where:
+        where = yaml.safe_load(where)
     result = collection.search(search_term, where=where, select_cols=select_cols, limit=limit)
     output_data = render_output([{"score": row[0], **row[1]} for row in result.ranked_rows], output_type)
     if output:
@@ -929,6 +946,126 @@ def indexes(ctx):
     collection = ctx.obj["settings"].collection
     for name, ix in collection.indexers.items():
         click.echo(f"{name}: {type(ix)}\n{ix.model_json()}")
+
+
+
+
+
+@cli.command()
+@click.pass_context
+@click.option("--source-collection", "-s", required=True, help="Source collection name")
+@click.option("--target-collection", "-t", help="Target collection name (defaults to source for intra-collection)")
+@click.option("--index-name", "-i", help="Name of index to use (defaults to first available)")
+@click.option("--metric", "-m", type=click.Choice(["cosine", "euclidean", "l2", "dot", "manhattan"]), default="cosine", help="Distance metric")
+@click.option("--max-matches", "-n", type=int, default=5, help="Maximum matches per item")
+@click.option("--similarity-threshold", type=float, help="Minimum similarity threshold")
+@click.option("--distance-threshold", type=float, help="Maximum distance threshold")
+@click.option("--source-fields", help="Comma-separated list of source fields to include")
+@click.option("--target-fields", help="Comma-separated list of target fields to include")
+@click.option("--limit", "-l", type=int, help="Limit number of items to process")
+@click.option("--output-format", "-f", type=click.Choice(["report", "json", "csv"]), default="report", help="Output format")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+def find_matches(ctx, source_collection, target_collection, index_name, metric, max_matches,
+                similarity_threshold, distance_threshold, source_fields, target_fields,
+                limit, output_format, output):
+    """
+    Find best matches between embeddings in collections.
+
+    Examples:
+        # Find matches between two collections
+        linkml-store -d mydb.ddb find-matches -s collection1 -t collection2
+
+        # Find similar items within a single collection
+        linkml-store -d mydb.ddb find-matches -s collection1
+
+        # With specific fields and threshold
+        linkml-store -d mydb.ddb find-matches -s coll1 -t coll2 \\
+            --similarity-threshold 0.8 \\
+            --source-fields id,name \\
+            --target-fields id,description
+    """
+    from linkml_store.utils.embedding_matcher import (
+        match_embeddings_between_collections,
+        match_embeddings_within_collection,
+        MatchingConfig,
+        DistanceMetric,
+        format_matches_report
+    )
+
+    db = ctx.obj["settings"].database
+
+    # Parse field lists
+    source_field_list = None
+    if source_fields:
+        source_field_list = [f.strip() for f in source_fields.split(",")]
+
+    target_field_list = None
+    if target_fields:
+        target_field_list = [f.strip() for f in target_fields.split(",")]
+
+    # Create config
+    config = MatchingConfig(
+        metric=DistanceMetric(metric),
+        max_matches_per_item=max_matches,
+        similarity_threshold=similarity_threshold,
+        distance_threshold=distance_threshold,
+        source_fields=source_field_list,
+        target_fields=target_field_list
+    )
+
+    # Perform matching
+    try:
+        if target_collection and target_collection != source_collection:
+            # Between collections
+            click.echo(f"Finding matches between {source_collection} and {target_collection}...")
+            results = match_embeddings_between_collections(
+                database=db,
+                source_collection=source_collection,
+                target_collection=target_collection,
+                index_name=index_name,
+                config=config,
+                limit=limit
+            )
+        else:
+            # Within collection
+            click.echo(f"Finding matches within {source_collection}...")
+            results = match_embeddings_within_collection(
+                database=db,
+                collection_name=source_collection,
+                index_name=index_name,
+                config=config,
+                limit=limit
+            )
+
+        # Format output
+        if output_format == "report":
+            output_text = format_matches_report(results)
+        elif output_format == "json":
+            import json
+            output_text = json.dumps([m.to_dict() for m in results.matches], indent=2)
+        elif output_format == "csv":
+            df = results.to_dataframe()
+            if df is not None:
+                output_text = df.to_csv(index=False)
+            else:
+                click.echo("pandas required for CSV output", err=True)
+                return
+
+        # Output results
+        if output:
+            with open(output, "w") as f:
+                f.write(output_text)
+            click.echo(f"Results saved to {output}")
+        else:
+            click.echo(output_text)
+
+        # Summary
+        click.echo(f"\nFound {len(results.matches)} total matches")
+
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        import traceback
+        traceback.print_exc()
 
 
 @cli.command()

@@ -896,6 +896,11 @@ class Collection(Generic[DatabaseType]):
         By default, the indexed objects will be stored in a shadow
         collection in the same database, with additional fields for the index vector
 
+        TODO: Support batch_size parameter for processing large collections
+        TODO: Implement parallel indexing for multiple objects
+        TODO: Add progress reporting for long-running index operations
+        TODO: Support incremental indexing (only index new/changed items)
+
         :param objs:
         :param index_name: e.g. simple, llm
         :param replace:
@@ -907,9 +912,21 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"No index named {index_name}")
         ix_coll_name = self._index_collection_name(index_name)
         ix_coll = self.parent.get_collection(ix_coll_name, create_if_not_exists=True)
+        if not ix_coll.metadata:
+            ix_coll.metadata = CollectionConfig()
+        if not ix_coll.metadata.additional_properties:
+            ix_coll.metadata.additional_properties = {}
+        #for k in ["name", "index_type", "index_field", "index_value_field"]:
+        #    ix_coll.metadata.additional_properties[k] = getattr(ix, k)
+        for k, v in ix.model_dump().items():
+            ix_coll.metadata.additional_properties[k] = v
+        ix_coll.store_metadata()
+        # TODO: Process vectors in batches rather than all at once
         vectors = [list(float(e) for e in v) for v in ix.objects_to_vectors(objs)]
         objects_with_ix = []
         index_col = ix.index_field
+        # TODO: implement this
+        index_value_col = ix.index_value_field
         for obj, vector in zip(objs, vectors):
             # TODO: id field
             objects_with_ix.append({**obj, **{index_col: vector}})
@@ -919,6 +936,8 @@ class Collection(Generic[DatabaseType]):
             if ix_coll_name in schema.classes:
                 ix_coll.delete_where()
 
+        # TODO: Use bulk insert operations for better performance
+        logger.info(f"Inserting {len(objects_with_ix)} objects into {ix_coll_name}")
         ix_coll.insert(objects_with_ix, **kwargs)
         ix_coll.commit()
 
@@ -1244,3 +1263,18 @@ class Collection(Generic[DatabaseType]):
 
     def _broadcast(self, *args, **kwargs):
         self.parent.broadcast(self, *args, **kwargs)
+
+    def store_metadata(self, replace=True):
+        """
+        Store the metadata for the collection.
+        """
+        if not self.metadata:
+            return
+        this_collection_name = self.alias
+        metadata_collection_name = f"{this_collection_name}__metadata"
+        metadata_collection = self.parent.get_collection(metadata_collection_name, create_if_not_exists=True)
+        metadata_dict = self.metadata.model_dump()
+        if replace:
+            metadata_collection.replace(metadata_dict)
+        else:
+            metadata_collection.insert(metadata_dict)

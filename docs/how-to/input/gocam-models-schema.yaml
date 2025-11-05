@@ -1,0 +1,352 @@
+id: https://w3id.org/gocam
+name: gocam
+description: |-
+  GO CAM LinkML schema (experimental)
+
+  The central class in this datamodel is a [Model](Model.md). A model consists of a set of
+  [MolecularActivity](MolecularActivity.md) objects, from which hangs various elements connected by different kinds of [Association](Association.md)
+
+imports:
+ - linkml:types
+
+prefixes:
+  pav: http://purl.org/pav/
+  dce: http://purl.org/dc/elements/1.1/
+  lego: http://geneontology.org/lego/
+  linkml: https://w3id.org/linkml/
+  biolink: https://w3id.org/biolink/vocab/
+  gocam: https://w3id.org/gocam/
+  OBAN: http://purl.org/oban/
+  goshapes: http://purl.obolibrary.org/obo/go/shapes/
+  RO: http://purl.obolibrary.org/obo/RO_
+  NCBITaxon: http://purl.obolibrary.org/obo/NCBITaxon_
+  BFO: http://purl.obolibrary.org/obo/BFO_
+  GO: http://purl.obolibrary.org/obo/GO_
+  ECO: http://purl.obolibrary.org/obo/ECO_
+  gomodel: http://model.geneontology.org/
+  oio: http://www.geneontology.org/formats/oboInOwl#
+  orcid: https://orcid.org/
+  UniProtKB: http://identifiers.org/uniprot/
+  PMID: http://identifiers.org/pmid/
+  dcterms: http://purl.org/dc/terms/
+
+default_prefix: gocam
+default_range: string
+see_also:
+  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/
+  - https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8
+
+classes:
+
+  Model:
+    description: A model of a biological program consisting of a set of causally connected activities
+    attributes:
+      id:
+        identifier: true
+        range: uriorcurie
+      title:
+        slot_uri: dct:title
+      taxon:
+        range: TaxonTermObject
+      status:
+        range: ModelStateEnum
+        slot_uri: pav:status
+      comments:
+        slot_uri: rdfs:comment
+        multivalued: true
+      activities:
+        range: Activity
+        inlined_as_list: true
+        multivalued: true
+      objects:
+        range: Object
+        inlined_as_list: true
+        multivalued: true
+      provenances:
+        range: ProvenanceInfo
+        inlined_as_list: true
+        multivalued: true
+
+  Activity:
+    description: An individual activity in a causal model, representing the individual molecular 
+      activity of a single gene product or complex
+    aliases:
+      - annoton
+    attributes:
+      id:
+        identifier: true
+        range: uriorcurie
+      enabled_by:
+        description: The gene product or complex that carries out the activity
+        range: InformationBiomacromoleculeTermObject
+        inlined: false
+      molecular_function:
+        description: The molecular function that is carried out by the gene product or complex
+        range: MolecularFunctionAssociation
+        inlined: true
+      occurs_in:
+        description: The cellular location in which the activity occurs
+        range: CellularAnatomicalEntityAssociation
+        inlined: true
+      part_of:
+        description: The larger biological process in which the activity is a part
+        range: BiologicalProcessAssociation
+        inlined: true
+      has_direct_input:
+        description: The input molecules that are directly consumed by the activity
+        range: MoleculeAssociation
+        inlined: true
+      causal_associations:
+        description: The causal associations that connect this activity to other activities
+        range: CausalAssociation
+        inlined_as_list: true
+        multivalued: true
+      provenances:
+        description: Provenance information for the activity
+        range: ProvenanceInfo
+        inlined_as_list: true
+        multivalued: true
+
+  EvidenceItem:
+    attributes:
+      term:
+        range: EvidenceTermObject
+      reference:
+        range: PublicationObject
+      with_objects:
+        range: Object
+        multivalued: true
+      provenances:
+        range: ProvenanceInfo
+        inlined_as_list: true
+        multivalued: true
+
+  Association:
+    description: An abstract grouping for different kinds of evidence-associated provenance
+    abstract: true
+    attributes:
+      type:
+        designates_type: true
+      evidence:
+        range: EvidenceItem
+        inlined: true
+        multivalued: true
+      provenances:
+        range: ProvenanceInfo
+        inlined_as_list: true
+        multivalued: true
+
+  CausalAssociation:
+    description: A causal association between two activities
+    is_a: Association
+    attributes:
+      predicate:
+        range: PredicateTermObject
+      downstream_activity:
+        range: Activity
+
+  TermAssociation:
+    description: An association between an activity and a term, potentially with extensions
+    is_a: Association
+    abstract: true
+    attributes:
+      term:
+        range: TermObject
+
+  MolecularFunctionAssociation:
+    description: An association between an activity and a molecular function term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: MolecularFunctionTermObject
+
+  BiologicalProcessAssociation:
+    description: An association between an activity and a biological process term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: BiologicalProcessTermObject
+      happens_during:
+        range: PhaseTermObject
+      part_of:
+        range: BiologicalProcessTermObject
+
+  CellularAnatomicalEntityAssociation:
+    description: An association between an activity and a cellular anatomical entity term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: CellularAnatomicalEntityTermObject
+
+  MoleculeAssociation:
+    description: An association between an activity and a molecule term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: MoleculeTermObject
+
+  Object:
+    description: An abstract class for all identified objects in a model
+    attributes:
+      id:
+        identifier: true
+        range: uriorcurie
+      label:
+        slot_uri: rdfs:label
+      type:
+        designates_type: true
+        range: uriorcurie
+      obsolete:
+        range: boolean
+
+  TermObject:
+    description: An abstract class for all ontology term objects
+    abstract: true
+    is_a: Object
+
+  PublicationObject:
+    description: An object that represents a publication or other kind of reference
+    is_a: Object
+    attributes:
+      abstract_text:
+      full_text:
+    id_prefixes:
+      - PMID
+      - GOREF
+      - DOI
+
+  EvidenceTermObject:
+    description: A term object that represents an evidence term from ECO
+    is_a: TermObject
+    id_prefixes:
+      - ECO
+
+  MolecularFunctionTermObject:
+    description: A term object that represents a molecular function term from GO
+    is_a: TermObject
+    id_prefixes:
+      - GO
+
+  BiologicalProcessTermObject:
+    description: A termm object that represents a biological process term from GO
+    is_a: TermObject
+    id_prefixes:
+      - GO
+
+  CellularAnatomicalEntityTermObject:
+    description: A term object that represents a cellular anatomical entity term from GO
+    is_a: TermObject
+    id_prefixes:
+      - GO
+
+  MoleculeTermObject:
+    description: A term object that represents a molecule term from CHEBI or UniProtKB
+    is_a: TermObject
+    id_prefixes:
+      - CHEBI
+      - UniProtKB
+
+  CellTypeTermObject:
+    description: A term object that represents a cell type term from CL
+    is_a: TermObject
+    id_prefixes:
+      - CL
+      - PO
+      - FAO
+      - DDANAT
+
+  GrossAnatomicalStructureTermObject:
+    description: A term object that represents a gross anatomical structure term from UBERON
+    is_a: TermObject
+    id_prefixes:
+      - UBERON
+      - PO
+      - FAO
+      - DDANAT
+
+  PhaseTermObject:
+    description: A term object that represents a phase term from GO or UBERON
+    is_a: TermObject
+    id_prefixes:
+      - GO
+      - UBERON
+      - PO
+
+  InformationBiomacromoleculeTermObject:
+    description: An abstract class for all information biomacromolecule term objects
+    abstract: true
+    is_a: TermObject
+
+  GeneProductTermObject:
+    description: A term object that represents a gene product term from GO or UniProtKB
+    is_a: InformationBiomacromoleculeTermObject
+
+  ProteinComplexTermObject:
+    description: A term object that represents a protein complex term from GO
+    is_a: InformationBiomacromoleculeTermObject
+
+  TaxonTermObject:
+    description: A term object that represents a taxon term from NCBITaxon
+    is_a: TermObject
+    id_prefixes:
+      - NCBITaxon
+
+  PredicateTermObject:
+    description: A term object that represents a taxon term from NCBITaxon
+    is_a: TermObject
+    id_prefixes:
+      - RO
+
+  ProvenanceInfo:
+    description: Provenance information for an object
+    attributes:
+      contributor:
+        slot_uri: dct:contributor
+      created:
+        slot_uri: dct:created
+      date:
+        slot_uri: dct:date
+      provided_by:
+        slot_uri: pav:providedBy
+
+enums:
+
+  ModelStateEnum:
+    description: >-
+      Status of a model
+    permissible_values:
+      production:
+      development:
+
+  InformationBiomacromoleculeCategory:
+    permissible_values:
+      GeneOrReferenceProtein:
+        meaning: biolink.GeneOrGeneProduct
+      ProteinIsoform:
+      MacromolecularComplex:
+      Unknown:
+
+  CausalPredicateEnum:
+    permissible_values:
+      causally upstream of, positive effect:
+        meaning: RO:0002304
+      causally upstream of, negative effect:
+        meaning: RO:0002305
+      causally upstream of:
+        meaning: RO:0002411
+      immediately causally upstream of:
+        meaning: RO:0002412
+      causally upstream of or within:
+        meaning: RO:0002418
+      causally upstream of or within, negative effect:
+        meaning: RO:0004046
+      causally upstream of or within, positive effect:
+        meaning: RO:0004047
+      regulates:
+        meaning: RO:0002211
+      negatively regulates:
+        meaning: RO:0002212
+      positively regulates:
+        meaning: RO:0002213
+
+

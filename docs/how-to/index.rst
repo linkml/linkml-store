@@ -10,6 +10,7 @@ How-To Guides
 
    Use-MongoDB
    Use-Semantic-Search
+   Use-LLM-Indexing
    Query-the-Monarch-KG
    Query-Solr-using-CLI
    Use-Neo4j

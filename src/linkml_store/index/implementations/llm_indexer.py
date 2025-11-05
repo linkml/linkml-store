@@ -24,6 +24,12 @@ class LLMIndexer(Indexer):
 
     >>> indexer = LLMIndexer(cached_embeddings_database="tests/input/llm_cache.db")
     >>> vector = indexer.text_to_vector("hello")
+
+    TODO: Implement true batching for embedding API calls
+    TODO: Add batch_size parameter to control batch processing
+    TODO: Support batch embedding APIs (e.g., OpenAI batch endpoint)
+    TODO: Add progress reporting for large batch operations
+    TODO: Implement smart batching with accumulation and flushing
     """
 
     embedding_model_name: str = "text-embedding-ada-002"
@@ -32,6 +38,9 @@ class LLMIndexer(Indexer):
     cached_embeddings_collection: str = None
     cache_queries: bool = False
     truncation_method: Optional[str] = None
+    # TODO: Add batch_size: int = 100 parameter for batch processing
+    # TODO: Add supported_models class variable with model metadata (dims, costs, limits)
+    # TODO: Add model_validation to check if model exists before use
 
     @property
     def embedding_model(self):
@@ -54,7 +63,7 @@ class LLMIndexer(Indexer):
         return self.texts_to_vectors([text], cache=cache, **kwargs)[0]
 
     def texts_to_vectors(
-        self, texts: List[str], cache: bool = None, token_limit_penalty=0, **kwargs
+        self, texts: List[str], cache: bool = None, token_limit_penalty=0, batch_size: int=None, **kwargs
     ) -> List[INDEX_ITEM]:
         """
         Use LLM to embed.
@@ -89,6 +98,15 @@ class LLMIndexer(Indexer):
             return truncated
 
         texts = [truncate_text(text) for text in texts]
+        # Calculate average number of tokens per text for accurate batch sizing
+        text_token_counts = [len(encoding.encode(t)) for t in texts]
+        avg_text_tokens = sum(text_token_counts) / len(text_token_counts)
+        logger.info(f"Average text token count: {avg_text_tokens}")
+        if batch_size is None:
+            # TODO: empirically determine best batch size
+            batch_size = max(int(token_limit / avg_text_tokens), 5)
+            logger.info(f"Setting batch size to {batch_size}")
+        
 
         if self.cached_embeddings_database and (cache is None or cache or self.cache_queries):
             model_id = model.model_id
@@ -120,10 +138,13 @@ class LLMIndexer(Indexer):
             embeddings = list([None] * len(texts))
             uncached_texts = []
             n = 0
+            # TODO: Implement batch lookup for cache checking (single query for all texts)
+            # TODO: Use IN clause or batch query to check multiple texts at once
+            logger.info(f"Checking cache for {len(texts)} texts")
             for i in range(len(texts)):
-                # TODO: optimize this
+                # TODO: optimize this - currently makes N database queries for N texts
                 text = texts[i]
-                logger.info(f"Looking for cached embedding for {text}")
+                logger.debug(f"Looking for cached embedding for {text}")
                 r = embeddings_collection.find({"text": text, "model_id": model_id})
                 if r.num_rows:
                     embeddings[i] = r.rows[0]["embedding"]
@@ -136,8 +157,9 @@ class LLMIndexer(Indexer):
             if uncached_texts:
                 logger.info(f"Embedding {len(uncached_texts)} uncached texts")
                 uncached_texts, uncached_indices = zip(*uncached_texts)
-                uncached_embeddings = list(model.embed_multi(uncached_texts))
-                # TODO: combine into a single insert with multiple rows
+                uncached_embeddings = list(model.embed_multi(uncached_texts, batch_size=batch_size))
+                # TODO: Combine into a single insert with multiple rows for better performance
+                # TODO: Use insert_many or bulk insert instead of individual inserts
                 for i, index in enumerate(uncached_indices):
                     logger.debug(f"Indexing text at {i}")
                     embeddings[index] = uncached_embeddings[i]
@@ -147,5 +169,6 @@ class LLMIndexer(Indexer):
                 embeddings_collection.commit()
         else:
             logger.info(f"Embedding {len(texts)} texts")
-            embeddings = list(model.embed_multi(texts, batch_size=1))
+            # TODO: Add progress callback for large batches without cache
+            embeddings = list(model.embed_multi(texts, batch_size=batch_size))
         return [np.array(v, dtype=float) for v in embeddings]
