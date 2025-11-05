@@ -98,12 +98,13 @@ class LLMIndexer(Indexer):
             return truncated
 
         texts = [truncate_text(text) for text in texts]
-        text_lengths = [len(t) for t in texts]
-        avg_text_length = sum(text_lengths) / len(text_lengths)
-        logger.info(f"Average text length: {avg_text_length}")
+        # Calculate average number of tokens per text for accurate batch sizing
+        text_token_counts = [len(encoding.encode(t)) for t in texts]
+        avg_text_tokens = sum(text_token_counts) / len(text_token_counts)
+        logger.info(f"Average text token count: {avg_text_tokens}")
         if batch_size is None:
             # TODO: empirically determine best batch size
-            batch_size = max(int(token_limit / avg_text_length), 5)
+            batch_size = max(int(token_limit / avg_text_tokens), 5)
             logger.info(f"Setting batch size to {batch_size}")
         
 
