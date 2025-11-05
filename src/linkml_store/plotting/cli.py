@@ -721,7 +721,7 @@ def multi_collection_embeddings(ctx, collections, method, index_name, color_fiel
     Create an interactive plot of embeddings from indexed collections.
 
     Example:
-        linkml-store -d mydb.ddb plot multi-collection-embeddings --c coll1,coll2 --method umap -o plot.html
+        linkml-store -d mydb.ddb plot multi-collection-embeddings --collections coll1,coll2 --method umap -o plot.html
     """
     from linkml_store.utils.embedding_utils import extract_embeddings_from_multiple_collections
     from linkml_store.plotting.dimensionality_reduction import reduce_dimensions
