@@ -39,7 +39,7 @@ linkml = { version=">=1.8.0", optional = true }
 linkml_map = { version="*", optional = true }
 linkml_renderer = { version="*", optional = true }
 frictionless = { version="*", optional = true }
-#ibis-framework = { version=">=9.3.0", extras = ["duckdb", "examples"], optional = true }
+ibis-framework = { version=">=9.3.0", extras = ["duckdb", "examples"], optional = true }
 gcsfs = { version="*", optional = true }
 multipledispatch = { version="*" }
 tabulate = "*"
@@ -100,7 +100,7 @@ fastapi = ["fastapi", "uvicorn"]
 frictionless = ["frictionless"]
 scipy = ["scipy", "scikit-learn"]
 rdf = ["lightrdf"]
-#ibis = ["ibis-framework", "multipledispatch", "gcsfs"]
+ibis = ["ibis-framework", "multipledispatch", "gcsfs"]
 bigquery = ["google-cloud-bigquery"]
 all = ["llm", "mongodb", "neo4j", "validation", "map", "renderer", "bigquery"]
 

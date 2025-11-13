@@ -20,6 +20,7 @@ HANDLE_MAP = {
     "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
     "neo4j": "linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase",
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
+    "ibis": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
 }
 
 SUFFIX_MAP = {
