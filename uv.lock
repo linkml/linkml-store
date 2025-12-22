@@ -986,14 +986,14 @@ wheels = [
 
 [[package]]
 name = "deepdiff"
-version = "6.7.1"
+version = "8.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ordered-set" },
+    { name = "orderly-set" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/52/11/d265eb046685fe97538e39f71d16d58a1197ddbd59873e06167bcfba8a89/deepdiff-6.7.1.tar.gz", hash = "sha256:b367e6fa6caac1c9f500adc79ada1b5b1242c50d5f716a1a4362030197847d30", size = 409107 }
+sdist = { url = "https://files.pythonhosted.org/packages/19/76/36c9aab3d5c19a94091f7c6c6e784efca50d87b124bf026c36e94719f33c/deepdiff-8.6.1.tar.gz", hash = "sha256:ec56d7a769ca80891b5200ec7bd41eec300ced91ebcc7797b41eb2b3f3ff643a", size = 634054 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/8f/a9d39ec15f40e8169cb134317824ee4618b864b2e4b91a9b310d3ef94729/deepdiff-6.7.1-py3-none-any.whl", hash = "sha256:58396bb7a863cbb4ed5193f548c56f18218060362311aa1dc36397b2f25108bd", size = 76554 },
+    { url = "https://files.pythonhosted.org/packages/f7/e6/efe534ef0952b531b630780e19cabd416e2032697019d5295defc6ef9bd9/deepdiff-8.6.1-py3-none-any.whl", hash = "sha256:ee8708a7f7d37fb273a541fa24ad010ed484192cd0c4ffc0fa0ed5e2d4b9e78b", size = 91378 },
 ]
 
 [[package]]
@@ -1169,6 +1169,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a7/23/ce7a1126827cedeb958fc043d61745754464eb56c5937c35bbf2b8e26f34/filelock-3.20.1.tar.gz", hash = "sha256:b8360948b351b80f420878d8516519a2204b07aefcdcfd24912a5d33127f188c", size = 19476 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e3/7f/a1a97644e39e7316d850784c642093c99df1290a460df4ede27659056834/filelock-3.20.1-py3-none-any.whl", hash = "sha256:15d9e9a67306188a44baa72f569d2bfd803076269365fdea0934385da4dc361a", size = 16666 },
+]
+
+[[package]]
+name = "flatten-dict"
+version = "0.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/89/c6/5fe21639369f2ea609c964e20870b5c6c98a134ef12af848a7776ddbabe3/flatten-dict-0.4.2.tar.gz", hash = "sha256:506a96b6e6f805b81ae46a0f9f31290beb5fa79ded9d80dbe1b7fa236ab43076", size = 10362 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/f5/ee39c6e92acc742c052f137b47c210cd0a1b72dcd3f98495528bb4d27761/flatten_dict-0.4.2-py2.py3-none-any.whl", hash = "sha256:7e245b20c4c718981212210eec4284a330c9f713e632e98765560e05421e48ad", size = 9656 },
 ]
 
 [[package]]
@@ -2912,18 +2924,30 @@ wheels = [
 
 [[package]]
 name = "linkml-map"
-version = "0.3.8"
+version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asteval" },
+    { name = "click" },
+    { name = "curies" },
     { name = "deepdiff" },
+    { name = "duckdb" },
+    { name = "flatten-dict" },
+    { name = "graphviz" },
+    { name = "jinja2" },
+    { name = "lark" },
     { name = "linkml-runtime" },
+    { name = "more-itertools" },
+    { name = "pint", version = "0.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pint", version = "0.25.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pydantic" },
-    { name = "ucumvert" },
+    { name = "pyyaml" },
+    { name = "ucumvert", version = "0.2.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "ucumvert", version = "0.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/a3/a11f7560c009b1c3549fb6ba8ca06a02f1cf51f70d80f414a6f4531f990c/linkml_map-0.3.8.tar.gz", hash = "sha256:64fb27768384cf02dd865ab146e29e096dc33b08416947cb37e2213957396e0d", size = 35235 }
+sdist = { url = "https://files.pythonhosted.org/packages/98/9c/b2eb742721dc1d6fe07174e19e08db7618aa622193545417e5c1a8dab228/linkml_map-0.3.9.tar.gz", hash = "sha256:b23136d71d9b58afbfea6d69b5aa2b3e0abc8bf3285b6e5db07a416760eee9da", size = 395502 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/f2/7775e80aed5ef9b96e5e8531fb12297cbff52c60ea8caa68b1af8dc8f113/linkml_map-0.3.8-py3-none-any.whl", hash = "sha256:2779602e4d298070308d2f369213bd52ae06e8e1f29def1761275cb1aa338a5c", size = 48200 },
+    { url = "https://files.pythonhosted.org/packages/ad/dc/9da9f17011e3227413d38589d5d935d3877227ef9c8417cb2dea50ede238/linkml_map-0.3.9-py3-none-any.whl", hash = "sha256:bafe4fd683923eed699630c3da6c84de3bfeb9dcd1d756e5a9f494b69e22bc9c", size = 67924 },
 ]
 
 [[package]]
@@ -3036,6 +3060,8 @@ llm = [
 ]
 map = [
     { name = "linkml-map" },
+    { name = "ucumvert", version = "0.2.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "ucumvert", version = "0.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
 mongodb = [
     { name = "pymongo" },
@@ -3126,7 +3152,7 @@ requires-dist = [
     { name = "linkml", marker = "extra == 'all'", specifier = ">=1.8.0" },
     { name = "linkml", marker = "extra == 'validation'", specifier = ">=1.8.0" },
     { name = "linkml-map", marker = "extra == 'all'" },
-    { name = "linkml-map", marker = "extra == 'map'" },
+    { name = "linkml-map", marker = "extra == 'map'", specifier = ">=0.3.9" },
     { name = "linkml-renderer", marker = "extra == 'all'" },
     { name = "linkml-renderer", marker = "extra == 'renderer'" },
     { name = "linkml-runtime", specifier = ">=1.8.0" },
@@ -3160,6 +3186,7 @@ requires-dist = [
     { name = "tabulate" },
     { name = "tiktoken", marker = "extra == 'all'" },
     { name = "tiktoken", marker = "extra == 'llm'" },
+    { name = "ucumvert", marker = "extra == 'map'", specifier = ">=0.2.0" },
     { name = "uvicorn", marker = "extra == 'fastapi'" },
     { name = "xmltodict", specifier = ">=0.13.0" },
 ]
@@ -3454,6 +3481,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ea/ca/8e91948b782ddfbd194f323e7e7d9ba12e5877addf04fb2bf8fca38e86ac/monotonic-1.6.tar.gz", hash = "sha256:3a55207bcfed53ddd5c5bae174524062935efed17792e9de2ad0205ce9ad63f7", size = 7615 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9a/67/7e8406a29b6c45be7af7740456f7f37025f0506ae2e05fb9009a53946860/monotonic-1.6-py2.py3-none-any.whl", hash = "sha256:68687e19a14f11f26d140dd5c86f3dba4bf5df58003000ed467e0e2a69bca96c", size = 8154 },
+]
+
+[[package]]
+name = "more-itertools"
+version = "10.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/5d/38b681d3fce7a266dd9ab73c66959406d565b3e85f21d5e66e1181d93721/more_itertools-10.8.0.tar.gz", hash = "sha256:f638ddf8a1a0d134181275fb5d58b086ead7c6a72429ad725c67503f13ba30bd", size = 137431 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/8e/469e5a4a2f5855992e425f3cb33804cc07bf18d48f2db061aec61ce50270/more_itertools-10.8.0-py3-none-any.whl", hash = "sha256:52d4362373dcf7c52546bc4af9a86ee7c4579df9a8dc268be0a2f949d376cc9b", size = 69667 },
 ]
 
 [[package]]
@@ -4054,12 +4090,12 @@ wheels = [
 ]
 
 [[package]]
-name = "ordered-set"
-version = "4.1.0"
+name = "orderly-set"
+version = "5.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4c/ca/bfac8bc689799bcca4157e0e0ced07e70ce125193fc2e166d2e685b7e2fe/ordered-set-4.1.0.tar.gz", hash = "sha256:694a8e44c87657c59292ede72891eb91d34131f6531463aab3009191c77364a8", size = 12826 }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/88/39c83c35d5e97cc203e9e77a4f93bf87ec89cf6a22ac4818fdcc65d66584/orderly_set-5.5.0.tar.gz", hash = "sha256:e87185c8e4d8afa64e7f8160ee2c542a475b738bc891dc3f58102e654125e6ce", size = 27414 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/55/af02708f230eb77084a299d7b08175cff006dea4f2721074b92cdb0296c0/ordered_set-4.1.0-py3-none-any.whl", hash = "sha256:046e1132c71fcf3330438a539928932caf51ddbc582496833e23de611de14562", size = 7634 },
+    { url = "https://files.pythonhosted.org/packages/12/27/fb8d7338b4d551900fa3e580acbe7a0cf655d940e164cb5c00ec31961094/orderly_set-5.5.0-py3-none-any.whl", hash = "sha256:46f0b801948e98f427b412fcabb831677194c05c3b699b80de260374baa0b1e7", size = 13068 },
 ]
 
 [[package]]
@@ -6953,16 +6989,37 @@ wheels = [
 
 [[package]]
 name = "ucumvert"
-version = "0.1.2"
+version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.11'",
+]
 dependencies = [
-    { name = "lark" },
+    { name = "lark", marker = "python_full_version < '3.11'" },
     { name = "pint", version = "0.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d1/27/cfeeea46e92d30edd1f8938e7630798e92c2cc8dbb0493a26373d850b3c4/ucumvert-0.2.2.tar.gz", hash = "sha256:f6218839a36b0e74e671f16d1f9f4aa1a2b530527a3c126031515c13273b1343", size = 52281 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6b/b5/be9107654e04f7bcc16138598f2bccfde20952dfe1115f5289b5a7c5717e/ucumvert-0.2.2-py3-none-any.whl", hash = "sha256:cd5b9e93f9dfc52d4dbe3f4e790d0b426934185823a611fd6898bb4e3d6f4c86", size = 53201 },
+]
+
+[[package]]
+name = "ucumvert"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14'",
+    "python_full_version == '3.13.*'",
+    "python_full_version == '3.12.*'",
+    "python_full_version == '3.11.*'",
+]
+dependencies = [
+    { name = "lark", marker = "python_full_version >= '3.11'" },
     { name = "pint", version = "0.25.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/34/4a/f78273ed592b9587a4501b1c708805fdf4c47585b8f4bdce0842e034eeba/ucumvert-0.1.2.tar.gz", hash = "sha256:a7c0dab878571ed5e03abab988c46e40e40092b253d6da5041d2305e1ddecd02", size = 51934 }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/4c/b0e949900f3b5c1e84bc8aa63d0c6687726985a58abda1a68146a4997dd1/ucumvert-0.3.1.tar.gz", hash = "sha256:8c287a71e453f79c822213239cf6873407b7363c6bca42f7418a1d56282c90c6", size = 52256 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/70/06/3349c311a58fb4233b842323e0f8bbdd6b3127e4914077367dc7edb2c87b/ucumvert-0.1.2-py3-none-any.whl", hash = "sha256:480f0cd9315ebc5c6da3117de42296a4f8e35deb84a7f0b8719a909129afb72b", size = 52796 },
+    { url = "https://files.pythonhosted.org/packages/44/f7/44633e6317c569fa448aeed3a64c20482d7c802e2d4f18a1adf3826374b8/ucumvert-0.3.1-py3-none-any.whl", hash = "sha256:503b3cc3dfba7ec0c1b53a9692e74163e6d9dc5119422f8ff57f5a044fed0231", size = 53180 },
 ]
 
 [[package]]
