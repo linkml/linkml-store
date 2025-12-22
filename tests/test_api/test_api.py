@@ -260,6 +260,7 @@ def test_derivations(handle):
     :param handle:
     :return:
     """
+    pytest.importorskip("linkml_map")
     client = create_client(handle)
     database = client.get_database()
     coll = database.create_collection("Person", recreate_if_exists=True)
