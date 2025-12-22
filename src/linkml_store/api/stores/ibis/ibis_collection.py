@@ -1,5 +1,6 @@
 """Ibis collection adapter for linkml-store."""
 
+import json
 import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -13,6 +14,52 @@ from linkml_store.api.queries import Query, QueryResult
 logger = logging.getLogger(__name__)
 
 
+def _is_complex_value(v):
+    """Check if a value is complex (list/dict) and needs JSON serialization."""
+    if isinstance(v, (list, dict)):
+        return True
+    return False
+
+
+def _serialize_complex_values(obj: dict) -> dict:
+    """Serialize complex values (lists, dicts) to JSON strings."""
+    result = {}
+    for k, v in obj.items():
+        if _is_complex_value(v):
+            result[k] = json.dumps(v)
+        else:
+            result[k] = v
+    return result
+
+
+def _deserialize_complex_values(obj: dict, json_columns: set = None) -> dict:
+    """Deserialize JSON strings back to Python objects.
+
+    If json_columns is None, attempt to auto-detect by trying to parse
+    string values that look like JSON arrays or objects.
+    """
+    result = {}
+    for k, v in obj.items():
+        if isinstance(v, str):
+            # Check if this is a known JSON column or looks like JSON
+            if json_columns and k in json_columns:
+                try:
+                    result[k] = json.loads(v)
+                except (json.JSONDecodeError, TypeError):
+                    result[k] = v
+            elif v.startswith('[') or v.startswith('{'):
+                # Auto-detect JSON arrays and objects
+                try:
+                    result[k] = json.loads(v)
+                except (json.JSONDecodeError, TypeError):
+                    result[k] = v
+            else:
+                result[k] = v
+        else:
+            result[k] = v
+    return result
+
+
 class IbisCollection(Collection):
     """
     Collection implementation using Ibis tables.
@@ -22,9 +69,17 @@ class IbisCollection(Collection):
     """
 
     _table_created: bool = None
+    _json_columns: set = None  # Columns that contain JSON-serialized data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._json_columns = set()
+
+    def _check_if_initialized(self) -> bool:
+        """Check if the table exists in the database."""
+        conn = self.parent.connection
+        table_name = self.alias or self.target_class_name
+        return table_name in conn.list_tables()
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
         """Insert objects into the collection."""
@@ -41,8 +96,20 @@ class IbisCollection(Collection):
 
         self._create_table(cd)
 
+        # Identify and serialize complex values (lists, dicts)
+        serialized_objs = []
+        for obj in objs:
+            serialized_obj = {}
+            for k, v in obj.items():
+                if _is_complex_value(v):
+                    serialized_obj[k] = json.dumps(v)
+                    self._json_columns.add(k)
+                else:
+                    serialized_obj[k] = v
+            serialized_objs.append(serialized_obj)
+
         # Convert objects to DataFrame for efficient insertion
-        df = pd.DataFrame(objs)
+        df = pd.DataFrame(serialized_objs)
 
         # Get the Ibis connection and table
         conn = self.parent.connection
@@ -111,8 +178,17 @@ class IbisCollection(Collection):
             conditions = []
             for k, v in obj.items():
                 if k in cd.attributes:
-                    if isinstance(v, str):
-                        conditions.append(f"{k} = '{v}'")
+                    if v is None:
+                        conditions.append(f"{k} IS NULL")
+                    elif _is_complex_value(v):
+                        # Complex values are stored as JSON strings
+                        json_str = json.dumps(v).replace("'", "''")  # Escape quotes
+                        conditions.append(f"{k} = '{json_str}'")
+                    elif isinstance(v, str):
+                        escaped_v = v.replace("'", "''")  # Escape quotes
+                        conditions.append(f"{k} = '{escaped_v}'")
+                    elif isinstance(v, bool):
+                        conditions.append(f"{k} = {str(v).lower()}")
                     else:
                         conditions.append(f"{k} = {v}")
 
@@ -209,10 +285,14 @@ class IbisCollection(Collection):
                     sort_exprs.append(table[sort_spec].asc())
             table = table.order_by(sort_exprs)
 
+        # Get total count BEFORE applying limit/offset (for pagination)
+        total_count = table.count().execute()
+
         # Apply limit and offset
-        if query.offset:
+        # Note: limit=-1 is used as a magic value for "no limit" in linkml-store
+        if query.offset and query.offset > 0:
             table = table.limit(None, offset=query.offset)
-        if query.limit:
+        if query.limit and query.limit > 0:
             table = table.limit(query.limit)
 
         # Execute query and convert to pandas
@@ -220,9 +300,12 @@ class IbisCollection(Collection):
             df = table.to_pandas()
             rows = df.to_dict("records")
 
+            # Deserialize JSON columns (auto-detect if not explicitly tracked)
+            rows = [_deserialize_complex_values(row, self._json_columns) for row in rows]
+
             result = QueryResult(
                 query=query,
-                num_rows=len(rows),
+                num_rows=total_count,
                 offset=query.offset,
                 rows=rows,
                 rows_dataframe=df,
@@ -238,17 +321,41 @@ class IbisCollection(Collection):
             raise
 
     def _apply_where(self, table, where_clause):
-        """Apply where clause filters to an Ibis table."""
+        """Apply where clause filters to an Ibis table.
+
+        Supports MongoDB-style operators: $in, $gt, $gte, $lt, $lte, $ne
+        """
         if isinstance(where_clause, dict):
-            # Simple equality filters
             for k, v in where_clause.items():
-                table = table.filter(table[k] == v)
+                if isinstance(v, dict):
+                    # Handle MongoDB-style operators
+                    for op, op_val in v.items():
+                        if op == "$in":
+                            # IN operator
+                            if isinstance(op_val, (list, tuple)):
+                                table = table.filter(table[k].isin(list(op_val)))
+                            else:
+                                table = table.filter(table[k] == op_val)
+                        elif op == "$gt":
+                            table = table.filter(table[k] > op_val)
+                        elif op == "$gte":
+                            table = table.filter(table[k] >= op_val)
+                        elif op == "$lt":
+                            table = table.filter(table[k] < op_val)
+                        elif op == "$lte":
+                            table = table.filter(table[k] <= op_val)
+                        elif op == "$ne":
+                            table = table.filter(table[k] != op_val)
+                        else:
+                            logger.warning(f"Unsupported operator {op}")
+                else:
+                    # Simple equality
+                    table = table.filter(table[k] == v)
         elif isinstance(where_clause, list):
             # Multiple conditions (AND)
             for condition in where_clause:
                 if isinstance(condition, dict):
-                    for k, v in condition.items():
-                        table = table.filter(table[k] == v)
+                    table = self._apply_where(table, condition)
                 else:
                     # String condition - use SQL
                     logger.warning(f"String where clauses not fully supported in Ibis: {condition}")
@@ -259,7 +366,7 @@ class IbisCollection(Collection):
         return table
 
     def _compute_facets(
-        self, table_name: str, where_clause, facet_columns: List[str]
+        self, table_name: str, where_clause, facet_columns: List[str], facet_limit: int = DEFAULT_FACET_LIMIT
     ) -> Dict[str, List[Tuple[Any, int]]]:
         """Compute facet counts for specified columns."""
         conn = self.parent.connection
@@ -273,6 +380,10 @@ class IbisCollection(Collection):
             try:
                 # Group by and count
                 grouped = table.group_by(col).aggregate(count=table.count())
+                # Order by count descending and limit
+                grouped = grouped.order_by(grouped["count"].desc())
+                if facet_limit:
+                    grouped = grouped.limit(facet_limit)
                 df = grouped.to_pandas()
                 # Convert to list of tuples
                 facets[col] = list(zip(df[col], df["count"]))
@@ -297,21 +408,28 @@ class IbisCollection(Collection):
         # Create an empty table with the schema
         # Build a sample DataFrame with correct types
         columns = {}
-        for attr_name, slot in cd.attributes.items():
-            # Map LinkML types to Python types for DataFrame
-            slot_range = slot.range or "string"
-            if slot_range == "integer":
-                columns[attr_name] = pd.Series([], dtype="Int64")
-            elif slot_range == "float":
-                columns[attr_name] = pd.Series([], dtype="float64")
-            elif slot_range == "boolean":
-                columns[attr_name] = pd.Series([], dtype="boolean")
-            elif slot_range == "date":
-                columns[attr_name] = pd.Series([], dtype="object")
-            elif slot_range == "datetime":
-                columns[attr_name] = pd.Series([], dtype="datetime64[ns]")
-            else:
-                columns[attr_name] = pd.Series([], dtype="string")
+        if cd.attributes:
+            for attr_name, slot in cd.attributes.items():
+                # Map LinkML types to Python types for DataFrame
+                slot_range = slot.range or "string"
+                if slot_range == "integer":
+                    columns[attr_name] = pd.Series([], dtype="Int64")
+                elif slot_range == "float":
+                    columns[attr_name] = pd.Series([], dtype="float64")
+                elif slot_range == "boolean":
+                    columns[attr_name] = pd.Series([], dtype="boolean")
+                elif slot_range == "date":
+                    columns[attr_name] = pd.Series([], dtype="object")
+                elif slot_range == "datetime":
+                    columns[attr_name] = pd.Series([], dtype="datetime64[ns]")
+                else:
+                    columns[attr_name] = pd.Series([], dtype="string")
+
+        if not columns:
+            # No columns defined - table will be created on first insert with actual data
+            logger.debug(f"No columns defined for {table_name}, will create on first insert")
+            self._table_created = False
+            return
 
         # Create empty DataFrame with schema
         df = pd.DataFrame(columns)
@@ -325,14 +443,46 @@ class IbisCollection(Collection):
             logger.error(f"Error creating table {table_name}: {e}")
             raise
 
-    def find(self, where: Optional[Dict[str, Any]] = None, **kwargs) -> List[OBJECT]:
+    def find(self, where: Optional[Dict[str, Any]] = None, **kwargs) -> QueryResult:
         """Find objects matching the where clause."""
         query = Query(where_clause=where, limit=kwargs.get("limit"), offset=kwargs.get("offset"))
-        result = self.query(query)
-        return result.rows or []
+        self._pre_query_hook(query)
+        return self.query(query)
 
-    def peek(self, limit=5) -> List[OBJECT]:
+    def peek(self, limit=5) -> QueryResult:
         """Get a few sample objects from the collection."""
         query = Query(limit=limit)
-        result = self.query(query)
-        return result.rows or []
+        return self.query(query)
+
+    def query_facets(
+        self,
+        where: Optional[Dict[str, Any]] = None,
+        facet_columns: List[str] = None,
+        facet_limit: int = DEFAULT_FACET_LIMIT,
+        **kwargs,
+    ) -> Dict[str, List[Tuple[Any, int]]]:
+        """Get facet counts for specified columns.
+
+        :param where: Optional filter conditions
+        :param facet_columns: Columns to facet on (defaults to all columns)
+        :param facet_limit: Maximum number of facet values per column
+        :return: Dictionary mapping column names to lists of (value, count) tuples
+        """
+        conn = self.parent.connection
+        table_name = self.alias or self.target_class_name
+
+        if table_name not in conn.list_tables():
+            logger.warning(f"Table {table_name} does not exist")
+            return {}
+
+        # Get facet columns from class definition if not specified
+        if not facet_columns:
+            cd = self.class_definition()
+            if cd and cd.attributes:
+                facet_columns = list(cd.attributes.keys())
+            else:
+                # Fallback: get columns from table schema
+                table = conn.table(table_name)
+                facet_columns = list(table.columns)
+
+        return self._compute_facets(table_name, where, facet_columns, facet_limit)

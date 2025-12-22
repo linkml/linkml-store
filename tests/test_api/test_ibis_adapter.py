@@ -6,7 +6,6 @@ and integrates properly with the LinkML Store API.
 """
 
 import logging
-import unittest
 from pathlib import Path
 
 import pytest
@@ -32,17 +31,16 @@ PERSONS = [
 ]
 
 
-class TestIbisAdapter(unittest.TestCase):
-    """Test suite for Ibis backend adapter."""
+@pytest.fixture(autouse=True)
+def cleanup_temp_db():
+    """Cleanup temp files after each test."""
+    yield
+    if TEMP_DB_PATH.exists():
+        TEMP_DB_PATH.unlink()
 
-    @pytest.fixture(autouse=True)
-    def setup_teardown(self):
-        """Setup and teardown for each test."""
-        # Setup
-        yield
-        # Teardown - clean up temp files
-        if TEMP_DB_PATH.exists():
-            TEMP_DB_PATH.unlink()
+
+class TestIbisAdapter:
+    """Test suite for Ibis backend adapter."""
 
     @pytest.mark.parametrize("handle", IBIS_SCHEMES)
     def test_basic_insert_and_find(self, handle):
@@ -54,7 +52,7 @@ class TestIbisAdapter(unittest.TestCase):
             pytest.skip("ibis-framework not installed")
 
         client = Client()
-        db = client.attach_database(handle, alias="test")
+        db = client.attach_database(handle, alias="test", recreate_if_exists=True)
 
         # Create a collection
         collection = db.create_collection("Person")
@@ -63,18 +61,18 @@ class TestIbisAdapter(unittest.TestCase):
         collection.insert(PERSONS)
 
         # Find all
-        results = collection.find()
-        assert len(results) == 3, f"Expected 3 persons, got {len(results)}"
+        result = collection.find()
+        assert result.num_rows == 3, f"Expected 3 persons, got {result.num_rows}"
 
         # Find by ID
-        results = collection.find({"id": "P1"})
-        assert len(results) == 1
-        assert results[0]["name"] == "Alice"
+        result = collection.find({"id": "P1"})
+        assert result.num_rows == 1
+        assert result.rows[0]["name"] == "Alice"
 
         # Find by name
-        results = collection.find({"name": "Bob"})
-        assert len(results) == 1
-        assert results[0]["age"] == 25
+        result = collection.find({"name": "Bob"})
+        assert result.num_rows == 1
+        assert result.rows[0]["age"] == 25
 
         # Clean up
         db.drop(missing_ok=True)
@@ -88,14 +86,14 @@ class TestIbisAdapter(unittest.TestCase):
             pytest.skip("ibis-framework not installed")
 
         client = Client()
-        db = client.attach_database(handle, alias="test")
+        db = client.attach_database(handle, alias="test", recreate_if_exists=True)
         collection = db.create_collection("Person")
         collection.insert(PERSONS)
 
-        # Query with limit
+        # Query with limit - num_rows returns total count for pagination
         query = Query(limit=2)
         result = collection.query(query)
-        assert result.num_rows == 2
+        assert len(result.rows) == 2
 
         # Query with where clause
         query = Query(where_clause={"name": "Alice"})
@@ -121,7 +119,7 @@ class TestIbisAdapter(unittest.TestCase):
             pytest.skip("ibis-framework not installed")
 
         client = Client()
-        db = client.attach_database(handle, alias="test")
+        db = client.attach_database(handle, alias="test", recreate_if_exists=True)
         collection = db.create_collection("Person")
         collection.insert(PERSONS)
 
@@ -129,9 +127,9 @@ class TestIbisAdapter(unittest.TestCase):
         collection.delete_where({"id": "P1"})
 
         # Verify deletion
-        results = collection.find()
-        assert len(results) == 2
-        assert all(r["id"] != "P1" for r in results)
+        result = collection.find()
+        assert len(result.rows) == 2
+        assert all(r["id"] != "P1" for r in result.rows)
 
         # Clean up
         db.drop(missing_ok=True)
@@ -145,13 +143,13 @@ class TestIbisAdapter(unittest.TestCase):
             pytest.skip("ibis-framework not installed")
 
         client = Client()
-        db = client.attach_database(handle, alias="test")
+        db = client.attach_database(handle, alias="test", recreate_if_exists=True)
         collection = db.create_collection("Person")
         collection.insert(PERSONS)
 
-        # Peek at data
+        # Peek at data - returns QueryResult
         results = collection.peek(limit=2)
-        assert len(results) == 2
+        assert len(results.rows) == 2
 
         # Clean up
         db.drop(missing_ok=True)
@@ -165,16 +163,20 @@ class TestIbisAdapter(unittest.TestCase):
             pytest.skip("ibis-framework not installed")
 
         client = Client()
-        db = client.attach_database(handle, alias="test")
+        db = client.attach_database(handle, alias="test", recreate_if_exists=True)
 
-        # Create multiple collections
-        db.create_collection("Person")
-        db.create_collection("Organization")
+        # Create collections and insert data (tables are created on insert)
+        person_coll = db.create_collection("Person")
+        person_coll.insert([{"id": "P1", "name": "Test"}])
+
+        org_coll = db.create_collection("Organization")
+        org_coll.insert([{"id": "O1", "name": "TestOrg"}])
 
         # List collections
         collections = db.list_collections()
-        assert "Person" in collections
-        assert "Organization" in collections
+        collection_names = [c.alias for c in collections]
+        assert "Person" in collection_names
+        assert "Organization" in collection_names
 
         # Clean up
         db.drop(missing_ok=True)
@@ -216,11 +218,11 @@ class TestIbisAdapter(unittest.TestCase):
 
         collection = db.create_collection("TestCollection")
         collection.insert([{"id": "1", "name": "test"}])
-        results = collection.find()
-        assert len(results) == 1
+        result = collection.find()
+        assert result.num_rows == 1
 
         db.drop(missing_ok=True)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__, "-v"])

@@ -55,18 +55,26 @@ class IbisDatabase(Database):
     - ibis:///path.duckdb uses DuckDB
     """
 
-    _connection = None
     collection_class = IbisCollection
 
     def __init__(self, handle: Optional[str] = None, recreate_if_exists: bool = False, **kwargs):
+        self._connection = None  # Instance-level connection
         if handle is None:
             handle = MEMORY_HANDLE
         if recreate_if_exists and handle != MEMORY_HANDLE:
             # For file-based databases, delete the file if it exists
             parsed = self._parse_handle(handle)
-            if parsed.get("path") and Path(parsed["path"]).exists():
-                Path(parsed["path"]).unlink()
+            path = parsed.get("path")
+            if path:
+                path_obj = Path(path)
+                if path_obj.exists():
+                    path_obj.unlink()
+                # Also clean up potential WAL files
+                wal_path = Path(str(path) + ".wal")
+                if wal_path.exists():
+                    wal_path.unlink()
         super().__init__(handle=handle, **kwargs)
+        self._recreate_if_exists = recreate_if_exists
 
     def _parse_handle(self, handle: str) -> dict:
         """
@@ -101,11 +109,14 @@ class IbisDatabase(Database):
                     connection_string = ":memory:"
                     path = None
                 else:
-                    path = parsed.path.lstrip("/") if parsed.path else None
+                    # For file:// style URLs, path includes the leading /
+                    # e.g., ibis+duckdb:///abs/path -> parsed.path = "/abs/path"
+                    # We keep absolute paths as-is, only strip for relative paths
+                    path = parsed.path if parsed.path else None
                     connection_string = path or ":memory:"
             elif backend == "sqlite":
-                path = parsed.path.lstrip("/") if parsed.path else None
-                connection_string = f"{backend}:///{path}"
+                path = parsed.path if parsed.path else None
+                connection_string = path
             elif backend in ["postgres", "postgresql"]:
                 # postgres://user:pass@host:port/dbname
                 connection_string = f"{backend}://{parsed.netloc}{parsed.path}"
@@ -164,7 +175,22 @@ class IbisDatabase(Database):
             except Exception as e:
                 raise ConnectionError(f"Failed to connect to Ibis backend {backend}: {e}")
 
+            # If recreate_if_exists was set, drop all existing tables
+            if getattr(self, "_recreate_if_exists", False):
+                self._drop_all_tables()
+
         return self._connection
+
+    def _drop_all_tables(self):
+        """Drop all tables in the database."""
+        if self._connection:
+            tables = self._connection.list_tables()
+            for table_name in tables:
+                try:
+                    self._connection.drop_table(table_name)
+                    logger.debug(f"Dropped table {table_name}")
+                except Exception as e:
+                    logger.warning(f"Failed to drop table {table_name}: {e}")
 
     def commit(self, **kwargs):
         """Commit changes (no-op for most Ibis backends)."""
@@ -201,13 +227,23 @@ class IbisDatabase(Database):
             logger.warning(f"Error checking if table {table} exists: {e}")
             return False
 
-    def list_collections(self) -> List[str]:
-        """List all collections (tables) in the database."""
+    def _list_table_names(self) -> List[str]:
+        """List all table names in the database."""
         try:
             return self.connection.list_tables()
         except Exception as e:
             logger.error(f"Error listing tables: {e}")
             return []
+
+    def init_collections(self):
+        """Initialize collections from existing tables in the database."""
+        if self._collections is None:
+            self._collections = {}
+
+        for table_name in self._list_table_names():
+            if table_name not in self._collections:
+                collection = IbisCollection(name=table_name, parent=self)
+                self._collections[table_name] = collection
 
     def query(self, query: Union[str, Query], **kwargs) -> QueryResult:
         """
@@ -245,9 +281,9 @@ class IbisDatabase(Database):
         For Ibis, we introspect the database schema and convert it to LinkML.
         """
         sb = SchemaBuilder()
-        tables = self.list_collections()
+        table_names = self._list_table_names()
 
-        for table_name in tables:
+        for table_name in table_names:
             try:
                 table = self.connection.table(table_name)
                 schema = table.schema()
