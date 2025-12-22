@@ -28,14 +28,26 @@ logger = logging.getLogger(__name__)
 
 TEST_DB = INPUT_DIR / "integration" / "mgi.db"
 TEMP_DB_PATH = OUTPUT_DIR / "temp.db"
+TEMP_IBIS_PATH = OUTPUT_DIR / "temp_ibis.duckdb"
 
 SCHEMES = [
     "duckdb",
     f"duckdb:///{TEMP_DB_PATH}",
     # "mongodb://localhost:27017/test_db",
 ]
+
+# Ibis schemes - only included if ibis is installed
+try:
+    import ibis
+    IBIS_SCHEMES = [
+        "ibis+duckdb:///:memory:",
+        f"ibis+duckdb:///{TEMP_IBIS_PATH}",
+    ]
+except ImportError:
+    IBIS_SCHEMES = []
+
 # SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db"]
-SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db", f"file:{OUTPUT_DIR}/api_test_fs"]
+SCHEMES_PLUS = SCHEMES + ["mongodb://localhost:27017/test_db", f"file:{OUTPUT_DIR}/api_test_fs"] + IBIS_SCHEMES
 
 DEFAULT_DB = "default"
 
@@ -68,7 +80,9 @@ def is_persistent(handle: str) -> bool:
     # if "duckdb" in handle:
     #    # NOTE: in previous versions of duckdb, in-memory databases were not persistent
     #    return True
-    return ".db" in handle or "mongodb" in handle or "file:" in handle
+    if ":memory:" in handle:
+        return False
+    return ".db" in handle or "mongodb" in handle or "file:" in handle or ".duckdb" in handle
 
 
 def remove_none(d: dict, additional_keys=None):
@@ -79,9 +93,19 @@ def remove_none(d: dict, additional_keys=None):
     :param additional_keys:
     :return:
     """
+    import math
     if additional_keys is None:
         additional_keys = []
-    return {k: v for k, v in d.items() if v is not None and k not in additional_keys}
+
+    def is_null(v):
+        if v is None:
+            return True
+        # Handle NaN values (returned by Ibis/DuckDB for missing columns)
+        if isinstance(v, float) and math.isnan(v):
+            return True
+        return False
+
+    return {k: v for k, v in d.items() if not is_null(v) and k not in additional_keys}
 
 
 @pytest.fixture()
@@ -139,13 +163,30 @@ def create_client(handle: str, recreate_if_exists=True) -> Client:
             print(f"UNLINKING: {path}")
             Path(path).unlink(missing_ok=True)
             assert not Path(path).exists()
+    if handle.endswith(".duckdb") and "ibis" in handle:
+        # Handle Ibis DuckDB file paths
+        if "ibis+duckdb:///" in handle:
+            path = handle.replace("ibis+duckdb:///", "")
+        elif "ibis:///" in handle:
+            path = handle.replace("ibis:///", "")
+        else:
+            path = None
+        if path and recreate_if_exists:
+            print(f"UNLINKING IBIS DB: {path}")
+            path_obj = Path(path)
+            # Also clean up WAL files that DuckDB may create
+            wal_path = Path(str(path) + ".wal")
+            if wal_path.exists():
+                wal_path.unlink()
+            path_obj.unlink(missing_ok=True)
+            assert not path_obj.exists(), f"Failed to delete Ibis DB file: {path}"
     if handle.startswith("mongodb:"):
         # because the mongo instance is shared, we want to avoid destroying
         # existing databases
         pass
     print(f"DB2s={client.databases}")
     # client.attach_database(handle, alias=DEFAULT_DB)
-    client.attach_database(handle)
+    client.attach_database(handle, recreate_if_exists=recreate_if_exists)
     print(f"ATTACHED: {handle} // num={len(client.databases)} // {client.databases}")
     return client
 
@@ -219,6 +260,7 @@ def test_derivations(handle):
     :param handle:
     :return:
     """
+    pytest.importorskip("linkml_map")
     client = create_client(handle)
     database = client.get_database()
     coll = database.create_collection("Person", recreate_if_exists=True)

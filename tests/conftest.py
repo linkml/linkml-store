@@ -4,7 +4,10 @@ import os
 
 import yaml
 
-from tests import INPUT_DIR
+from tests import INPUT_DIR, OUTPUT_DIR
+
+# Ensure output directory exists for tests that write temp files
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 TEST_DATA = [
     {"id": 1, "name": "John", "age": 30},
