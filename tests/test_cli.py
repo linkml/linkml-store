@@ -13,7 +13,7 @@ from tests.conftest import JSON_FILE
 
 @pytest.fixture
 def cli_runner():
-    return CliRunner(mix_stderr=False)
+    return CliRunner()
 
 
 @pytest.fixture
