@@ -1,117 +1,117 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[project]
 name = "linkml-store"
-version = "0.0.0"
 description = "linkml-store"
-authors = ["Author 1 <author@org.org>"]
+authors = [
+  {name = "Author 1", email = "author@org.org"},
+]
 license = "MIT"
+license-files = ["LICENSE"]
 readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dynamic = ["version"]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-click = "*"
-pydantic = "^2.0.0"
-linkml-runtime = ">=1.8.0"
-streamlit = { version = "^1.32.2", optional = true }
-sqlalchemy = "*"
-google-cloud-bigquery = "*"
-duckdb = ">=0.10.1"
-duckdb-engine = ">=0.11.2"
-matplotlib = { version = "*", optional = true }
-seaborn = { version = "*", optional = true }
-plotly = { version = "*", optional = true }
-pystow = "^0.5.4"
-black = { version=">=24.0.0", optional = true }
-ruff = { version=">=0.6.2", optional = true }
-llm = { version="*", optional = true }
-lightrdf = { version="*", optional = true }
-tiktoken = { version="*", optional = true }
-pymongo = "^4.11"
-neo4j = { version="*", optional = true }
-py2neo = { version="*", optional = true }
-networkx = { version="*", optional = true }
-#chromadb = { version="*", optional = true }
-pyarrow = { version="*", optional = true }
-pyreadr = { version="*", optional = true }
-h5py = { version="*", optional = true }
-scipy = { version="*", optional = true }
-scikit-learn = { version="*", optional = true }
-linkml = { version=">=1.8.0", optional = true }
-linkml_map = { version="*", optional = true }
-linkml_renderer = { version="*", optional = true }
-frictionless = { version="*", optional = true }
-ibis-framework = { version=">=9.3.0", extras = ["duckdb", "examples"], optional = true }
-gcsfs = { version="*", optional = true }
-multipledispatch = { version="*" }
-tabulate = "*"
-pandas = ">=2.2.1"
-jinja2 = "^3.1.4"
-jsonlines = "^4.0.0"
-fastapi = { version="*", optional = true }
-uvicorn = { version="*", optional = true }
-xmltodict = ">=0.13.0"
-jsonpatch = ">=1.33"
-jsonpath-ng = "*"
-python-dotenv = "^1.0.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = {version = ">=7.1.2"}
-tox = {version = ">=3.25.1"}
-pre-commit = {version = ">=3.3.3"}
-sphinx = {version = ">=6.1.3"}
-sphinx-rtd-theme = {version = ">=1.0.0"}
-sphinx-autodoc-typehints = {version = "<2.0.0"}
-sphinx-click = {version = ">=4.3.0"}
-sphinx-automodapi = "*"
-myst-parser = {version = ">=0.18.1"}
-furo = {version = "*"}
-nbsphinx = "*"
-jupyter = "*"
-jupysql = "*"
-papermill = "*"
-nbdime = "*"
-codespell = {version = ">=2.3.0"}
-tomli = {version = ">=2.0.1"}
-black = {version = ">=24.0.0"}
-ruff = {version = ">=0.6.2"}
-
-[tool.poetry.group.tests.dependencies]
-pytest = "^7.4.0"
-pytest-subtests = "^0.11.0"
-numpy = [
-  { "version" = ">=1.24.3", "python" = "<3.12" },
-  { "version" = ">=1.25.2", "python" = ">=3.12" }
+dependencies = [
+  "click",
+  "pydantic>=2.0.0",
+  "linkml-runtime>=1.8.0",
+  "sqlalchemy",
+  "google-cloud-bigquery",
+  "duckdb>=0.10.1",
+  "duckdb-engine>=0.11.2",
+  "pystow>=0.5.4",
+  "pymongo>=4.11",
+  "multipledispatch",
+  "tabulate",
+  "pandas>=2.2.1",
+  "jinja2>=3.1.4",
+  "jsonlines>=4.0.0",
+  "xmltodict>=0.13.0",
+  "jsonpatch>=1.33",
+  "jsonpath-ng",
+  "python-dotenv>=1.0.1",
 ]
 
-[tool.poetry.extras]
+[project.optional-dependencies]
 analytics = ["pandas", "matplotlib", "seaborn", "plotly"]
-app = ["streamlit"]
-tests = ["black", "ruff"]
+app = ["streamlit>=1.32.2"]
+tests = ["black>=24.0.0", "ruff>=0.6.2"]
 llm = ["llm", "tiktoken"]
 mongodb = ["pymongo"]
 neo4j = ["neo4j", "py2neo", "networkx"]
-#chromadb = ["chromadb"]
 h5py = ["h5py"]
 pyarrow = ["pyarrow"]
 pyreadr = ["pyreadr"]
-validation = ["linkml"]
+validation = ["linkml>=1.8.0"]
 map = ["linkml_map"]
 renderer = ["linkml_renderer"]
 fastapi = ["fastapi", "uvicorn"]
 frictionless = ["frictionless"]
 scipy = ["scipy", "scikit-learn"]
 rdf = ["lightrdf"]
-ibis = ["ibis-framework", "multipledispatch", "gcsfs"]
+ibis = ["ibis-framework[duckdb,examples]>=9.3.0", "multipledispatch", "gcsfs"]
 bigquery = ["google-cloud-bigquery"]
-all = ["llm", "mongodb", "neo4j", "validation", "map", "renderer", "bigquery"]
+all = [
+  "llm",
+  "tiktoken",
+  "neo4j",
+  "py2neo",
+  "networkx",
+  "linkml>=1.8.0",
+  "linkml_map",
+  "linkml_renderer",
+  "google-cloud-bigquery",
+]
 
-[tool.poetry.scripts]
+[dependency-groups]
+dev = [
+  "pytest>=7.1.2",
+  "pytest-subtests>=0.11.0",
+  "tox>=3.25.1",
+  "pre-commit>=3.3.3",
+  "sphinx>=6.1.3",
+  "sphinx-rtd-theme>=1.0.0",
+  "sphinx-autodoc-typehints<2.0.0",
+  "sphinx-click>=4.3.0",
+  "sphinx-automodapi",
+  "myst-parser>=0.18.1",
+  "furo",
+  "nbsphinx",
+  "jupyter",
+  "jupysql",
+  "papermill",
+  "nbdime",
+  "codespell>=2.3.0",
+  "tomli>=2.0.1",
+  "black>=24.0.0",
+  "ruff>=0.6.2",
+  "mypy>=1.0.0",
+]
+
+tests = [
+  "pytest>=7.4.0",
+  "pytest-subtests>=0.11.0",
+  "numpy>=1.24.3; python_version < '3.12'",
+  "numpy>=1.25.2; python_version >= '3.12'",
+]
+
+[project.scripts]
 linkml-store = "linkml_store.cli:cli"
 linkml-store-api = "linkml_store.webapi.main:start"
 
-[tool.poetry-dynamic-versioning]
-enable = true
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
 vcs = "git"
 style = "pep440"
+fallback-version = "0.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.black]
 line-length = 120
@@ -140,25 +140,18 @@ extend-exclude = [
 ]
 force-exclude = true
 line-length = 120
-lint.extend-ignore = ["E203"]
-lint.select = [
+
+[tool.ruff.lint]
+extend-ignore = ["E203"]
+select = [
   "E",  # pycodestyle errors
   "F",  # Pyflakes
   "I",  # isort
 ]
 
-
-
 [tool.codespell]
-# TODO: bring in tests in too
-skip = '.git,*.pdf,*.svg,./tests,pyproject.toml,*.dill,poetry.lock,*.ipynb,./docs/how-to/input,./docs/how-to/output,./docs/_build,./tmp,eccode.json'
-# Ignore table where words could be split across rows
-# Ignore shortcut specifications like [Ff]alse
+skip = '.git,*.pdf,*.svg,./tests,pyproject.toml,*.dill,uv.lock,*.ipynb,./docs/how-to/input,./docs/how-to/output,./docs/_build,./tmp,eccode.json'
 ignore-regex = '(\|.*\|.*\|.*\||\[[A-Z][a-z]\][a-z][a-z])'
 ignore-words-list = 'mater,connexion,infarction,nin,STING,importin'
 count = ""
 quiet-level = 3
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
