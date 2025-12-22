@@ -42,7 +42,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install project
-        # Note: not using --all-extras because linkml_map has pint/ucumvert conflict
+        # Note: not using --all-extras because linkml_map 0.3.8 pins ucumvert<0.2 which has pint conflict
+        # TODO: restore --all-extras once linkml-map is released with relaxed ucumvert constraint
         run: uv sync --group dev --extra analytics --extra validation --extra ibis --extra scipy --extra fastapi --extra mongodb
 
       - name: Check common spelling errors
@@ -54,4 +55,5 @@ jobs:
           mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Test with pytest
+        # TODO: restore test_inference and test_cli once linkml_map/ucumvert conflict is resolved
         run: uv run pytest -m "not integration and not neo4j" --ignore=tests/test_api/test_neo4j_adapter.py --ignore=tests/test_inference --ignore=tests/test_cli.py tests
