@@ -8,6 +8,7 @@ How-To Guides
    :maxdepth: 3
    :caption: Contents:
 
+   Use-Ibis
    Use-MongoDB
    Use-Semantic-Search
    Use-LLM-Indexing

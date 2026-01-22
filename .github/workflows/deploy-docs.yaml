@@ -1,49 +1,59 @@
+---
 name: Sphinx Documentation
+
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
-    steps:
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-          pipx inject poetry poetry-dynamic-versioning
+    permissions:
+      contents: write
 
+    steps:
       - name: Check out repository
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
-      - name: install
-        run: poetry install --with docs --all-extras
+      - name: Configure git for the bot
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
 
-      - name: Set up Python 3.10
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
         uses: actions/setup-python@v5.6.0
         with:
-          python-version: "3.10"
-          cache: 'poetry'
+          python-version: "3.12"
+
+      - name: Install project
+        run: uv sync --group dev --all-extras
 
       - name: Install dependencies for nbsphinx
         run: |
           sudo apt update
           sudo apt install -y pandoc
 
-      - name: Run Pandoc
-        run: |
-          pandoc --version
-
-      - name: Build documentation.
+      - name: Build documentation
         run: |
           mkdir gh-pages
           touch gh-pages/.nojekyll
           cd docs/
-          poetry run sphinx-build -b html . _build
+          uv run sphinx-build -b html . _build
           cp -r _build/* ../gh-pages/
 
-      - name: Deploy documentation.
+      - name: Deploy documentation
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4.3.0
         with:

@@ -69,10 +69,11 @@ LinkML-Store is designed to work with multiple backends, giving a common abstrac
 * [DuckDB](https://linkml.io/linkml-store/tutorials/Python-Tutorial.html)
 * [Solr](https://linkml.io/linkml-store/how-to/Query-Solr-using-CLI.html)
 * [Neo4j](https://linkml.io/linkml-store/how-to/Use-Neo4j.html)
+* **Ibis** - Universal database adapter supporting DuckDB, PostgreSQL, SQLite, BigQuery, Snowflake, and many more
 
 * Filesystem
 
-Coming soon: any RDBMS, any triplestore, Neo4J, HDF5-based stores, ChromaDB/Vector dbs ...
+Coming soon: any RDBMS, any triplestore, HDF5-based stores, ChromaDB/Vector dbs ...
 
 The intent is to give a union of all features of each backend. For
 example, analytic faceted queries are provided for *all* backends, not

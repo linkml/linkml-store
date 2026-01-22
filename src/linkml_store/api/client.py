@@ -22,6 +22,16 @@ HANDLE_MAP = {
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
     "dremio": "linkml_store.api.stores.dremio.dremio_database.DremioDatabase",
     "dremio-rest": "linkml_store.api.stores.dremio_rest.dremio_rest_database.DremioRestDatabase",
+    "ibis": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    # Ibis backend-specific schemes
+    "ibis+duckdb": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+sqlite": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+postgres": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+postgresql": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+bigquery": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+mysql": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+snowflake": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
+    "ibis+clickhouse": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
 }
 
 SUFFIX_MAP = {
@@ -374,6 +384,9 @@ class Client:
         else:
             db = self.get_database(name, create_if_not_exists=True)
             db.drop(**kwargs)
+            # Remove from _databases after dropping
+            if self._databases and db.alias in self._databases:
+                del self._databases[db.alias]
 
     def drop_all_databases(self, **kwargs):
         """
