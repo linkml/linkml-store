@@ -20,6 +20,8 @@ HANDLE_MAP = {
     "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
     "neo4j": "linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase",
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
+    "dremio": "linkml_store.api.stores.dremio.dremio_database.DremioDatabase",
+    "dremio-rest": "linkml_store.api.stores.dremio_rest.dremio_rest_database.DremioRestDatabase",
     "ibis": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
     # Ibis backend-specific schemes
     "ibis+duckdb": "linkml_store.api.stores.ibis.ibis_database.IbisDatabase",
