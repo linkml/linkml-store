@@ -177,6 +177,24 @@ class DuckDBDatabase(Database):
                 raise NotImplementedError
             return qr
 
+    @property
+    def supports_sql(self) -> bool:
+        """Return True - DuckDB supports raw SQL queries."""
+        return True
+
+    def execute_sql(self, sql: str, **kwargs) -> QueryResult:
+        """
+        Execute a raw SQL query against the DuckDB database.
+
+        :param sql: SQL query string
+        :param kwargs: Additional arguments
+        :return: QueryResult containing the results
+        """
+        with self.engine.connect() as conn:
+            result = conn.execute(text(sql))
+            rows = [dict(row._mapping) for row in result]
+            return QueryResult(num_rows=len(rows), rows=rows)
+
     def init_collections(self):
         # TODO: unify schema introspection
         if not self.schema_view:

@@ -422,12 +422,13 @@ def apply(ctx, patch_files, identifier_attribute):
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query, as YAML")
 @click.option("--select", "-s", type=click.STRING, help="SELECT clause for the query, as YAML")
+@click.option("--sql", type=click.STRING, help="Raw SQL query (database-level, collection not required)")
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.pass_context
-def query(ctx, where, select, limit, output_type, output):
-    """Query objects from the specified collection.
+def query(ctx, where, select, sql, limit, output_type, output):
+    """Query objects from the specified collection or execute raw SQL.
 
 
     Leave the query field blank to return all objects in the collection.
@@ -449,8 +450,46 @@ def query(ctx, where, select, limit, output_type, output):
         linkml-store -d file:. -c persons query  -w 'occupation: {$ne: Architect}'
 
     Finds all people who are not architects.
+
+    Raw SQL queries can be executed against SQL-capable backends (DuckDB, Dremio):
+
+    Examples:
+
+        linkml-store -d duckdb:///countries.db query --sql 'SELECT * FROM countries WHERE code = "NZ"'
+
+        linkml-store -d dremio://lakehouse:32010 query --sql 'SELECT COUNT(*) FROM "gold"."samples"'
+
+    Note: --sql cannot be combined with --where or --select.
     """
-    collection = ctx.obj["settings"].collection
+    settings = ctx.obj["settings"]
+
+    # Handle raw SQL mode
+    if sql:
+        if where or select:
+            raise click.UsageError("--sql cannot be combined with --where or --select.")
+
+        database = settings.database
+        if not database:
+            raise click.UsageError("Database must be specified when using --sql.")
+
+        if not database.supports_sql:
+            raise click.UsageError(
+                f"Database type '{database.__class__.__name__}' does not support raw SQL queries."
+            )
+
+        result = database.execute_sql(sql)
+        write_output(result.rows, output_type, target=output)
+        if output:
+            click.echo(f"Query results saved to {output}")
+        return
+
+    # Original collection-based query logic
+    collection = settings.collection
+    if not collection:
+        raise click.UsageError(
+            "Collection must be specified for non-SQL queries. "
+            "Use -c/--collection option or --sql for raw SQL queries."
+        )
     where_clause = yaml.safe_load(where) if where else None
     select_clause = yaml.safe_load(select) if select else None
     if select_clause:
@@ -458,8 +497,8 @@ def query(ctx, where, select, limit, output_type, output):
             select_clause = [select_clause]
         if not isinstance(select_clause, list):
             raise ValueError(f"SELECT clause must be a list. Got: {select_clause}")
-    query = Query(from_table=collection.alias, select_cols=select_clause, where_clause=where_clause, limit=limit)
-    result = collection.query(query)
+    query_obj = Query(from_table=collection.alias, select_cols=select_clause, where_clause=where_clause, limit=limit)
+    result = collection.query(query_obj)
     write_output(result.rows, output_type, target=output)
     if output:
         click.echo(f"Query results saved to {output}")

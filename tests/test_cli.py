@@ -237,3 +237,73 @@ def test_infer_using_rag(cli_runner, output_dir):
     result = yaml.safe_load(open(output_path))
     obj = result["predicted_object"]
     assert obj["capital"] == "Montevideo"
+
+
+def test_query_with_sql_flag(cli_runner, output_dir):
+    """Test raw SQL query execution via CLI."""
+    db_path = f"{output_dir}/sql_test.db"
+    Path(db_path).unlink(missing_ok=True)
+    db_name = f"duckdb:///{db_path}"
+
+    # First insert some data
+    result = cli_runner.invoke(
+        cli,
+        ["-d", db_name, "-c", "persons", "insert", JSON_FILE],
+    )
+    assert result.exit_code == 0
+
+    # Query using raw SQL
+    output_file = f"{output_dir}/sql_results.json"
+    result = cli_runner.invoke(
+        cli,
+        ["-d", db_name, "query", "--sql", "SELECT * FROM persons WHERE name = 'John'", "-o", output_file],
+    )
+    if result.exit_code != 0:
+        print(f"Error: {result.output}")
+    assert result.exit_code == 0
+    assert os.path.exists(output_file)
+
+    # Verify results
+    import json
+    with open(output_file) as f:
+        results = json.load(f)
+    assert len(results) == 1
+    assert results[0]["name"] == "John"
+
+
+def test_sql_flag_mutual_exclusivity(cli_runner, output_dir):
+    """Test that --sql cannot be combined with --where."""
+    db_path = f"{output_dir}/sql_mutex_test.db"
+    Path(db_path).unlink(missing_ok=True)
+    db_name = f"duckdb:///{db_path}"
+
+    result = cli_runner.invoke(
+        cli,
+        ["-d", db_name, "query", "--sql", "SELECT 1", "--where", "x: 1"],
+    )
+    assert result.exit_code != 0
+    assert "--sql cannot be combined" in result.output
+
+
+def test_sql_requires_database(cli_runner):
+    """Test that --sql requires a database to be specified."""
+    result = cli_runner.invoke(
+        cli,
+        ["query", "--sql", "SELECT 1"],
+    )
+    assert result.exit_code != 0
+    assert "Database must be specified" in result.output
+
+
+def test_query_without_collection_requires_sql(cli_runner, output_dir):
+    """Test that query without collection requires --sql."""
+    db_path = f"{output_dir}/sql_nocoll_test.db"
+    Path(db_path).unlink(missing_ok=True)
+    db_name = f"duckdb:///{db_path}"
+
+    result = cli_runner.invoke(
+        cli,
+        ["-d", db_name, "query", "--where", "x: 1"],
+    )
+    assert result.exit_code != 0
+    assert "Collection must be specified" in result.output

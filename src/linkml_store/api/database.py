@@ -442,6 +442,48 @@ class Database(ABC, Generic[CollectionType]):
             raise NotImplementedError(f"Querying without a table is not supported in {self.__class__.__name__}")
 
     @property
+    def supports_sql(self) -> bool:
+        """
+        Return whether this database supports raw SQL queries.
+
+        Backends like DuckDB, PostgreSQL, Dremio support SQL.
+        Backends like MongoDB, filesystem do not.
+
+        :return: True if raw SQL is supported
+        """
+        return False
+
+    def execute_sql(self, sql: str, **kwargs) -> QueryResult:
+        """
+        Execute a raw SQL query against the database.
+
+        This method allows direct SQL execution on SQL-capable backends,
+        bypassing the linkml-store query abstraction layer.
+
+        :param sql: SQL query string
+        :param kwargs: Additional arguments
+        :return: QueryResult containing the results
+        :raises NotImplementedError: If this backend does not support SQL
+
+        Examples
+        --------
+        >>> from linkml_store.api.client import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test", recreate_if_exists=True)
+        >>> collection = db.create_collection("Person")
+        >>> collection.insert([{"id": "P1", "name": "John"}, {"id": "P2", "name": "Alice"}])
+        >>> result = db.execute_sql("SELECT * FROM Person WHERE name = 'John'")
+        >>> len(result.rows)
+        1
+        >>> result.rows[0]["name"]
+        'John'
+        """
+        raise NotImplementedError(
+            f"Raw SQL queries are not supported by {self.__class__.__name__}. "
+            f"Use collection.find() or collection.query() instead."
+        )
+
+    @property
     def schema_view(self) -> SchemaView:
         """
         Return a schema view for the named collection.
