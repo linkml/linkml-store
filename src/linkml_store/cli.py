@@ -25,7 +25,12 @@ from linkml_store.inference.inference_engine import ModelSerialization
 from linkml_store.utils.format_utils import Format, guess_format, load_objects, render_output, write_output
 from linkml_store.utils.object_utils import object_path_update
 from linkml_store.utils.pandas_utils import facet_summary_to_dataframe_unmelted
-from linkml_store.plotting.cli import plot_cli
+
+# Optional plotting support (requires matplotlib)
+try:
+    from linkml_store.plotting.cli import plot_cli
+except ImportError:
+    plot_cli = None
 
 DEFAULT_LOCAL_CONF_PATH = Path("linkml.yaml")
 # global path is ~/.linkml.yaml in the user's home directory
@@ -1141,7 +1146,8 @@ def validate(ctx, output_type, output, collection_only, **kwargs):
         click.echo(output_data)
 
 
-cli.add_command(plot_cli, name="plot")
+if plot_cli is not None:
+    cli.add_command(plot_cli, name="plot")
 
 if __name__ == "__main__":
     cli()
