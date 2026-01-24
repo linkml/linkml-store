@@ -71,6 +71,7 @@ all = [
   "adbc-driver-flightsql",
   "matplotlib",
   "seaborn",
+  "plotly",
   "scipy",
   "scikit-learn",
 ]
