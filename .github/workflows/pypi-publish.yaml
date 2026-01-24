@@ -29,6 +29,19 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Pre-flight tests (full extras)
+        run: |
+          uv run pytest tests/test_cli.py::test_help_option -v
+          uv run linkml-store --help
+
+      - name: Test minimal install viability
+        run: |
+          # Create fresh venv with minimal deps
+          uv venv --python 3.12 /tmp/minimal-test
+          VIRTUAL_ENV=/tmp/minimal-test uv pip install .
+          /tmp/minimal-test/bin/python -c "from linkml_store import Client; print('Minimal install OK')"
+          /tmp/minimal-test/bin/linkml-store --help
+
       - name: Build source and wheel archives
         run: uv build
 

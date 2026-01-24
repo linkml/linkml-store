@@ -2,9 +2,39 @@ import csv
 import json
 import os
 
+import pytest
 import yaml
 
 from tests import INPUT_DIR, OUTPUT_DIR
+
+
+def pytest_configure(config):
+    """Register custom markers."""
+    config.addinivalue_line(
+        "markers", "core: tests that work with minimal (no extras) install"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Auto-skip tests requiring optional dependencies when not installed."""
+    # Check which optional deps are available
+    optional_deps = {
+        "mongodb": "pymongo",
+        "neo4j": "neo4j",
+        "ibis": "ibis",
+        "llm": "llm",
+        "sklearn": "sklearn",
+        "matplotlib": "matplotlib",
+    }
+
+    missing_deps = {}
+    for name, module in optional_deps.items():
+        try:
+            __import__(module)
+        except ImportError:
+            missing_deps[name] = pytest.mark.skip(
+                reason=f"requires {module} (install with: pip install linkml-store[{name}])"
+            )
 
 # Ensure output directory exists for tests that write temp files
 os.makedirs(OUTPUT_DIR, exist_ok=True)
