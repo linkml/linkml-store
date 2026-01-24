@@ -40,8 +40,11 @@ jobs:
         run: |
           # Run CLI tests (exclude integration tests that need llm/rag)
           uv run pytest tests/test_cli.py -v -k "not infer_using_rag"
-          # Run core API tests with DuckDB only (skip mongodb, neo4j, ibis, dremio tests)
-          uv run pytest tests/test_api/test_api.py tests/test_api/test_filesystem_adapter.py -v -k "duckdb" \
+          # Run core API tests with DuckDB only
+          # Exclude: mongodb, neo4j, ibis, dremio adapters
+          # Exclude: validation tests (need linkml extra)
+          uv run pytest tests/test_api/test_api.py tests/test_api/test_filesystem_adapter.py -v \
+            -k "duckdb and not validation and not validate" \
             --ignore=tests/test_api/test_mongodb_adapter.py \
             --ignore=tests/test_api/test_neo4j_adapter.py \
             --ignore=tests/test_api/test_ibis_adapter.py \
