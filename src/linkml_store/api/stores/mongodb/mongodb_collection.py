@@ -130,7 +130,8 @@ class MongoDBCollection(Collection):
 
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, include_count: bool = True, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
-        limit = limit or query.limit
+        if limit is None:
+            limit = query.limit
         
         # Build projection if select_cols are provided
         projection = None
@@ -194,6 +195,7 @@ class MongoDBCollection(Collection):
         """
         if page_size < 1:
             raise ValueError(f"Invalid page size: {page_size}")
+        self._pre_query_hook()
         mongo_filter = self._build_mongo_filter(where or {})
         select_cols = kwargs.get("select_cols")
         projection: Optional[Dict[str, Any]] = None
