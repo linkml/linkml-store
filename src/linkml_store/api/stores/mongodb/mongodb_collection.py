@@ -199,6 +199,14 @@ class MongoDBCollection(Collection):
                 row = copy(doc)
                 if "_id" in row:
                     del row["_id"]
+                if select_cols:
+                    shaped: Dict[str, Any] = {}
+                    for col in select_cols:
+                        if "." in col or "[" in col:
+                            shaped[col] = object_path_get(row, col)
+                        elif col in row:
+                            shaped[col] = row[col]
+                    row = shaped
                 yield row
         finally:
             cursor.close()
