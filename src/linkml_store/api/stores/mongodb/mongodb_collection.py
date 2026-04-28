@@ -1,6 +1,6 @@
 import logging
 from copy import copy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from pymongo.collection import Collection as MongoCollection
 
@@ -128,7 +128,7 @@ class MongoDBCollection(Collection):
                 self.mongo_collection.insert_one(obj)
                 logging.debug(f"Inserted new document: {obj}")
 
-    def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
+    def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, include_count: bool = True, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
         limit = limit or query.limit
         
@@ -166,9 +166,43 @@ class MongoDBCollection(Collection):
             return row
 
         rows = [_as_row(row) for row in cursor]
-        count = self.mongo_collection.count_documents(mongo_filter)
+        if include_count:
+            if not mongo_filter:
+                count = self.mongo_collection.estimated_document_count()
+            else:
+                count = self.mongo_collection.count_documents(mongo_filter)
+        else:
+            count = None
 
         return QueryResult(query=query, num_rows=count, rows=rows)
+
+    def find_iter(self, where=None, page_size: int = 100, **kwargs) -> Iterator[OBJECT]:
+        """Iterate over all matching documents without counting on every page.
+
+        The base-class implementation calls ``self.find()`` (and therefore
+        ``count_documents``) on every page.  For MongoDB that is an O(N) full
+        collection scan, costing ~25 s per page on a 54 M-row collection over a
+        GCP tunnel — making large collections unusably slow (issue #69).
+
+        This override fetches the total count exactly once: via
+        ``estimated_document_count()`` when there is no filter (metadata read,
+        ~1 s), or via ``count_documents(filter)`` when a filter is present.
+        Subsequent pages are fetched without re-counting.
+        """
+        mongo_filter = self._build_mongo_filter(where or {})
+        if not mongo_filter:
+            total_rows = self.mongo_collection.estimated_document_count()
+        else:
+            total_rows = self.mongo_collection.count_documents(mongo_filter)
+
+        offset = 0
+        while offset < total_rows:
+            qr = self.find(where=where, offset=offset, limit=page_size, include_count=False, **kwargs)
+            if not qr.rows:
+                return
+            for row in qr.rows:
+                yield row
+            offset += page_size
 
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}

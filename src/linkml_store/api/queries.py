@@ -47,7 +47,7 @@ class QueryResult(BaseModel):
 
     query: Optional[Query] = None
     search_term: Optional[str] = None
-    num_rows: int
+    num_rows: Optional[int] = None
     offset: Optional[int] = 0
     rows: Optional[List[Dict[str, Any]]] = None
     ranked_rows: Optional[List[Tuple[float, Dict[str, Any]]]] = None

@@ -524,7 +524,7 @@ class Collection(Generic[DatabaseType]):
             for row in qr.rows:
                 yield row
             offset += page_size
-            if offset >= total_rows:
+            if total_rows is not None and offset >= total_rows:
                 break
         return
 
