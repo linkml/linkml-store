@@ -168,6 +168,8 @@ class MongoDBCollection(Collection):
         rows = [_as_row(row) for row in cursor]
         if include_count:
             if not mongo_filter:
+                # estimated_document_count is a fast metadata read but may be
+                # slightly stale; num_rows should not be used for exact pagination.
                 count = self.mongo_collection.estimated_document_count()
             else:
                 count = self.mongo_collection.count_documents(mongo_filter)
@@ -184,19 +186,15 @@ class MongoDBCollection(Collection):
         collection scan, costing ~25 s per page on a 54 M-row collection over a
         GCP tunnel — making large collections unusably slow (issue #69).
 
-        This override fetches the total count exactly once: via
-        ``estimated_document_count()`` when there is no filter (metadata read,
-        ~1 s), or via ``count_documents(filter)`` when a filter is present.
-        Subsequent pages are fetched without re-counting.
+        This override terminates when a fetched page is empty.  No count call
+        is made during iteration, so ``estimated_document_count()`` is never
+        used as a hard bound (which could silently truncate results if the
+        estimate is stale).
         """
-        mongo_filter = self._build_mongo_filter(where or {})
-        if not mongo_filter:
-            total_rows = self.mongo_collection.estimated_document_count()
-        else:
-            total_rows = self.mongo_collection.count_documents(mongo_filter)
-
+        if page_size < 1:
+            raise ValueError(f"Invalid page size: {page_size}")
         offset = 0
-        while offset < total_rows:
+        while True:
             qr = self.find(where=where, offset=offset, limit=page_size, include_count=False, **kwargs)
             if not qr.rows:
                 return

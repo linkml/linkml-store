@@ -272,10 +272,12 @@ def test_find_iter_counts_once(mongodb_client):
         rows = list(collection.find_iter(page_size=3))
 
     assert len(rows) == 10
-    # No-filter case uses estimated_document_count (fast metadata read).
-    # count_documents must NOT be called, and estimated_document_count at most once.
-    total_count_calls = mock_count.call_count + mock_est.call_count
-    assert total_count_calls <= 1, (
-        f"count called {total_count_calls} times across {10 // 3 + 1} pages; expected ≤1"
+    # No-filter find_iter must never call count_documents (O(N) scan).
+    # estimated_document_count is also no longer called — iteration stops on empty page.
+    assert mock_count.call_count == 0, (
+        f"count_documents called {mock_count.call_count} times; expected 0"
+    )
+    assert mock_est.call_count == 0, (
+        f"estimated_document_count called {mock_est.call_count} times; expected 0"
     )
     db.drop()
