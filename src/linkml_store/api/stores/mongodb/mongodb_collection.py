@@ -179,28 +179,34 @@ class MongoDBCollection(Collection):
         return QueryResult(query=query, num_rows=count, rows=rows)
 
     def find_iter(self, where=None, page_size: int = 100, **kwargs) -> Iterator[OBJECT]:
-        """Iterate over all matching documents without counting on every page.
+        """Iterate over all matching documents, streaming directly from the cursor.
 
         The base-class implementation calls ``self.find()`` (and therefore
         ``count_documents``) on every page.  For MongoDB that is an O(N) full
         collection scan, costing ~25 s per page on a 54 M-row collection over a
         GCP tunnel — making large collections unusably slow (issue #69).
 
-        This override terminates when a fetched page is empty.  No count call
-        is made during iteration, so ``estimated_document_count()`` is never
-        used as a hard bound (which could silently truncate results if the
-        estimate is stale).
+        This override streams directly from the pymongo cursor using
+        ``batch_size`` so records are yielded as they arrive from the server
+        rather than waiting for a full page to materialise in memory first.
+        No count call is made.  ``select_cols`` from ``kwargs`` is honoured
+        as a projection; other kwargs are ignored.
         """
         if page_size < 1:
             raise ValueError(f"Invalid page size: {page_size}")
-        offset = 0
-        while True:
-            qr = self.find(where=where, offset=offset, limit=page_size, include_count=False, **kwargs)
-            if not qr.rows:
-                return
-            for row in qr.rows:
-                yield row
-            offset += page_size
+        mongo_filter = self._build_mongo_filter(where or {})
+        select_cols = kwargs.get("select_cols")
+        projection: Optional[Dict[str, Any]] = None
+        if select_cols:
+            projection = {"_id": 0}
+            for col in select_cols:
+                projection[col] = 1
+        cursor = self.mongo_collection.find(mongo_filter, projection).batch_size(page_size)
+        for doc in cursor:
+            row = copy(doc)
+            if "_id" in row:
+                del row["_id"]
+            yield row
 
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}
