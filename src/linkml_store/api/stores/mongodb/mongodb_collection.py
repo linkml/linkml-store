@@ -194,11 +194,14 @@ class MongoDBCollection(Collection):
             for col in select_cols:
                 projection[col] = 1
         cursor = self.mongo_collection.find(mongo_filter, projection).batch_size(page_size)
-        for doc in cursor:
-            row = copy(doc)
-            if "_id" in row:
-                del row["_id"]
-            yield row
+        try:
+            for doc in cursor:
+                row = copy(doc)
+                if "_id" in row:
+                    del row["_id"]
+                yield row
+        finally:
+            cursor.close()
 
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}

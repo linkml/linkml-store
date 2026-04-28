@@ -1,5 +1,7 @@
 # test_mongodb_adapter.py
 
+from unittest.mock import patch
+
 import pytest
 import yaml
 from pymongo import MongoClient
