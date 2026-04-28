@@ -241,3 +241,41 @@ def test_index_creation(mongodb_collection, unique_flag):
         assert (
             "unique" not in created_indexes[index_name] or not created_indexes[index_name]["unique"]
         ), f"Index {index_name} should not be unique"
+
+
+@pytest.mark.integration
+def test_find_iter_no_count_calls(mongodb_client):
+    """find_iter must never call count_documents or estimated_document_count.
+
+    Regression test for https://github.com/linkml/linkml-store/issues/69.
+    Without the fix, a 54M-row collection at page_size=1000 paid ~25s per page
+    (~15 days total) in count_documents calls.
+    """
+    from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
+
+    db = MongoDBDatabase(handle="mongodb://localhost:27017/test_find_iter_db")
+    try:
+        collection = db.create_collection("count_test", recreate_if_exists=True)
+        docs = [{"id": i, "val": f"v{i}"} for i in range(10)]
+        collection.insert(docs)
+
+        with patch.object(
+            collection.mongo_collection,
+            "count_documents",
+            wraps=collection.mongo_collection.count_documents,
+        ) as mock_count, patch.object(
+            collection.mongo_collection,
+            "estimated_document_count",
+            wraps=collection.mongo_collection.estimated_document_count,
+        ) as mock_est:
+            rows = list(collection.find_iter(page_size=3))
+
+        assert len(rows) == 10
+        assert mock_count.call_count == 0, (
+            f"count_documents called {mock_count.call_count} times; expected 0"
+        )
+        assert mock_est.call_count == 0, (
+            f"estimated_document_count called {mock_est.call_count} times; expected 0"
+        )
+    finally:
+        db.drop()

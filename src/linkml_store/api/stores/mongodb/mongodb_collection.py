@@ -1,6 +1,6 @@
 import logging
 from copy import copy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from pymongo.collection import Collection as MongoCollection
 
@@ -169,6 +169,36 @@ class MongoDBCollection(Collection):
         count = self.mongo_collection.count_documents(mongo_filter)
 
         return QueryResult(query=query, num_rows=count, rows=rows)
+
+    def find_iter(self, where=None, page_size: int = 100, **kwargs) -> Iterator[OBJECT]:
+        """Iterate over all matching documents, streaming directly from the cursor.
+
+        The base-class implementation calls ``self.find()`` (and therefore
+        ``count_documents``) on every page.  For MongoDB that is an O(N) full
+        collection scan, costing ~25 s per page on a 54 M-row collection over a
+        remote tunnel — making large collections unusably slow (issue #69).
+
+        This override opens a single pymongo cursor with ``batch_size`` and
+        yields documents as they arrive from the server.  No count call is made
+        at any point during iteration.  ``select_cols`` from ``kwargs`` is
+        honoured as a MongoDB projection; other kwargs are ignored.
+        """
+        if page_size < 1:
+            raise ValueError(f"Invalid page size: {page_size}")
+        self._pre_query_hook()
+        mongo_filter = self._build_mongo_filter(where or {})
+        select_cols = kwargs.get("select_cols")
+        projection: Optional[Dict[str, Any]] = None
+        if select_cols:
+            projection = {"_id": 0}
+            for col in select_cols:
+                projection[col] = 1
+        cursor = self.mongo_collection.find(mongo_filter, projection).batch_size(page_size)
+        for doc in cursor:
+            row = copy(doc)
+            if "_id" in row:
+                del row["_id"]
+            yield row
 
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}
