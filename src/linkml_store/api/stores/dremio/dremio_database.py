@@ -9,7 +9,7 @@ import logging
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import parse_qs, urlparse
 
 import pandas as pd
@@ -22,6 +22,12 @@ from linkml_store.api.queries import Query, QueryResult
 from linkml_store.api.stores.dremio.dremio_collection import DremioCollection
 from linkml_store.api.stores.dremio.mappings import get_linkml_type_from_arrow
 from linkml_store.utils.format_utils import Format
+
+if TYPE_CHECKING:
+    # pyarrow is an optional dependency, imported lazily inside the methods that need it.
+    # This import exists only so the "pyarrow.Table" return annotations below resolve for
+    # type checkers; it is not evaluated at runtime and adds no import cost.
+    import pyarrow
 
 logger = logging.getLogger(__name__)
 
