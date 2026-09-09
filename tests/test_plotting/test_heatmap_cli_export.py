@@ -15,7 +15,9 @@ import matplotlib
 import pytest
 from click.testing import CliRunner
 
-matplotlib.use("Agg")  # no display in CI
+# Prefer a headless backend. force=False so that if another test module has already
+# loaded a backend, this leaves it alone rather than switching it session-wide.
+matplotlib.use("Agg", force=False)
 
 from linkml_store.plotting.cli import plot_cli  # noqa: E402
 
