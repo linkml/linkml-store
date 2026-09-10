@@ -53,6 +53,8 @@ class MongoDBCollection(Collection):
         """
         if not isinstance(objs, list):
             objs = [objs]
+        # PyMongo adds _id client-side, even when insert_many raises.
+        objs_without_id = [obj for obj in objs if "_id" not in obj]
         inserted_objs = objs
         skipped = 0
         try:
@@ -75,9 +77,10 @@ class MongoDBCollection(Collection):
                 inserted_objs = objs[:min(failed_indices)]
             else:
                 inserted_objs = [obj for i, obj in enumerate(objs) if i not in failed_indices]
-        # TODO: allow mapping of _id to id for efficiency
-        for obj in objs:
-            obj.pop("_id", None)
+        finally:
+            # Preserve caller-supplied IDs and clean up before invoking the hook.
+            for obj in objs_without_id:
+                obj.pop("_id", None)
         if inserted_objs:
             self._post_insert_hook(inserted_objs)
         if ignore_duplicates:
