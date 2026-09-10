@@ -1,10 +1,13 @@
 # test_mongodb_adapter.py
 
-from unittest.mock import patch
+from copy import deepcopy
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
 import yaml
+from bson import ObjectId
 from pymongo import MongoClient
+from pymongo.errors import BulkWriteError, ConnectionFailure, OperationFailure
 
 from linkml_store.api.stores.mongodb.mongodb_collection import MongoDBCollection
 from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
@@ -12,13 +15,16 @@ from linkml_store.api.stores.mongodb.mongodb_database import MongoDBDatabase
 
 @pytest.fixture(scope="module")
 def mongodb_client():
+    client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)
     try:
-        client = MongoClient("mongodb://localhost:27017", serverSelectionTimeoutMS=2000)  # 2s timeout
         client.admin.command("ping")  # Check MongoDB connectivity
-        yield client
+    except ConnectionFailure:
         client.close()
-    except Exception:
         pytest.skip("Skipping tests: MongoDB is not available.")
+    try:
+        yield client
+    finally:
+        client.close()
 
 
 @pytest.fixture(scope="function")
@@ -51,7 +57,9 @@ def mongodb_collection(mongodb_client):
     if collection_name not in db.list_collection_names():
         db.create_collection(collection_name)
 
-    collection = MongoDBCollection(name=collection_name, parent=db)
+    parent = MongoDBDatabase(handle=f"mongodb://localhost:27017/{db_name}")
+    parent._native_db = db
+    collection = MongoDBCollection(name=collection_name, parent=parent)
 
     yield collection
 
@@ -96,7 +104,7 @@ def test_upsert_update(mongodb_collection):
 
 @pytest.mark.parametrize("handle", ["mongodb://localhost:27017/test_db", None, "mongodb"])
 @pytest.mark.integration
-def test_insert_and_query(handle):
+def test_insert_and_query(handle, mongodb_client):
     """
     Test inserting and querying documents in MongoDB.
     """
@@ -281,3 +289,191 @@ def test_find_iter_no_count_calls(mongodb_client):
         )
     finally:
         db.drop()
+
+
+@pytest.fixture
+def duplicate_batch(mongodb_collection):
+    native = mongodb_collection.mongo_collection
+    native.delete_many({})
+    native.create_index("id", unique=True)
+    native.insert_one({"id": "existing"})
+    batch = [{"id": "before"}, {"id": "existing"}, {"id": "after"}]
+    assert native.index_information()["id_1"]["unique"]
+    assert [native.count_documents(obj) for obj in batch] == [0, 1, 0]
+    return mongodb_collection, batch
+
+
+@pytest.mark.parametrize("ordered", [True, False])
+def test_insert_duplicate_raises(duplicate_batch, ordered):
+    collection, batch = duplicate_batch
+    kwargs = {} if ordered else {"ordered": False}
+    with pytest.raises(BulkWriteError) as exc:
+        collection.insert(batch, **kwargs)
+    assert all("_id" not in obj for obj in batch)
+    assert [error["code"] for error in exc.value.details["writeErrors"]] == [11000]
+    assert exc.value.details["nInserted"] == (1 if ordered else 2)
+    assert collection.mongo_collection.count_documents({"id": "before"}) == 1
+    assert collection.mongo_collection.count_documents({"id": "after"}) == (0 if ordered else 1)
+
+
+@pytest.mark.parametrize("ordered", [True, False])
+def test_insert_ignore_duplicates(duplicate_batch, ordered):
+    collection, batch = duplicate_batch
+    result = collection.insert(batch, ordered=ordered, ignore_duplicates=True)
+    assert result == {"inserted": 1 if ordered else 2, "skipped": 1}
+    assert collection.mongo_collection.count_documents({}) == 1 + result["inserted"]
+    assert collection.mongo_collection.count_documents({"id": "after"}) == (0 if ordered else 1)
+    assert all("_id" not in obj for obj in batch)
+
+
+@pytest.fixture
+def mock_insert_collection():
+    collection = MongoDBCollection(name="test_collection")
+    native = Mock()
+    with patch.object(
+        MongoDBCollection, "mongo_collection", new_callable=PropertyMock, return_value=native
+    ), patch.object(MongoDBCollection, "_post_insert_hook") as hook:
+        yield collection, native, hook
+
+
+@pytest.mark.parametrize("ignore_duplicates", [False, True])
+def test_insert_success(mock_insert_collection, ignore_duplicates):
+    collection, native, hook = mock_insert_collection
+    obj = {"id": "new"}
+
+    def insert_many(objs, ordered):
+        assert objs == [obj]
+        objs[0]["_id"] = "generated"
+        return Mock(inserted_ids=["generated"])
+
+    native.insert_many.side_effect = insert_many
+    result = collection.insert(obj, ignore_duplicates=ignore_duplicates)
+    native.insert_many.assert_called_once_with([obj], ordered=True)
+    assert result == ({"inserted": 1, "skipped": 0} if ignore_duplicates else None)
+    assert obj == {"id": "new"}
+    hook.assert_called_once_with([obj])
+
+
+@pytest.mark.parametrize("ordered", [True, False])
+def test_insert_duplicate_counts_and_hook(mock_insert_collection, ordered):
+    collection, native, hook = mock_insert_collection
+    batch = [{"id": i} for i in range(4)]
+    errors = [{"code": 11000, "index": 1}]
+    inserted = 1 if ordered else 3
+    failure = BulkWriteError({"nInserted": inserted, "writeErrors": errors, "writeConcernErrors": []})
+    assert failure.details["writeErrors"][0]["code"] == 11000
+    if ordered:
+        assert inserted != len(batch) - len(errors)
+
+    def insert_many(objs, ordered):
+        for obj in objs:
+            obj["_id"] = ObjectId()
+        raise failure
+
+    native.insert_many.side_effect = insert_many
+    def check_hook(objs):
+        assert all("_id" not in obj for obj in objs)
+
+    hook.side_effect = check_hook
+    result = collection.insert(batch, ordered=ordered, ignore_duplicates=True)
+    native.insert_many.assert_called_once_with(batch, ordered=ordered)
+    assert result == {"inserted": inserted, "skipped": 1}
+    hook.assert_called_once_with(batch[:1] if ordered else [batch[0], batch[2], batch[3]])
+    assert all("_id" not in obj for obj in batch)
+
+
+@pytest.mark.parametrize(
+    "errors,concerns",
+    [
+        ([{"code": 121, "index": 0}], []),
+        ([{"code": 11000, "index": 0}, {"code": 121, "index": 1}], []),
+        ([], [{"code": 64, "errmsg": "waiting for replication timed out"}]),
+        ([{"code": 11000, "index": 0}], [{"code": 64, "errmsg": "write concern failed"}]),
+        ([], []),
+    ],
+)
+def test_insert_rejects_other_failures(mock_insert_collection, errors, concerns):
+    collection, native, hook = mock_insert_collection
+    failure = BulkWriteError({"nInserted": 0, "writeErrors": errors, "writeConcernErrors": concerns})
+    assert concerns or not errors or any(error["code"] != 11000 for error in errors)
+    native.insert_many.side_effect = failure
+    with pytest.raises(BulkWriteError) as exc:
+        collection.insert([{"id": 0}, {"id": 1}], ordered=False, ignore_duplicates=True)
+    assert exc.value is failure
+    native.insert_many.assert_called_once()
+    hook.assert_not_called()
+
+
+def test_insert_duplicates_raise_by_default(mock_insert_collection):
+    collection, native, hook = mock_insert_collection
+    failure = BulkWriteError({"nInserted": 0, "writeErrors": [{"code": 11000, "index": 0}]})
+    assert failure.details["writeErrors"][0]["code"] == 11000
+    native.insert_many.side_effect = failure
+    with pytest.raises(BulkWriteError) as exc:
+        collection.insert({"id": 0})
+    assert exc.value is failure
+    native.insert_many.assert_called_once_with([{"id": 0}], ordered=True)
+    hook.assert_not_called()
+
+
+def test_insert_all_duplicates(mock_insert_collection):
+    collection, native, hook = mock_insert_collection
+    batch = [{"id": 0}, {"id": 1}]
+    errors = [{"code": 11000, "index": i} for i in range(len(batch))]
+    assert len(errors) == len(batch)
+    assert all(error["code"] == 11000 for error in errors)
+    def insert_many(objs, ordered):
+        for obj in objs:
+            obj["_id"] = ObjectId()
+        raise BulkWriteError({"nInserted": 0, "writeErrors": errors, "writeConcernErrors": []})
+
+    native.insert_many.side_effect = insert_many
+    assert collection.insert(batch, ordered=False, ignore_duplicates=True) == {"inserted": 0, "skipped": 2}
+    native.insert_many.assert_called_once_with(batch, ordered=False)
+    hook.assert_not_called()
+    assert all("_id" not in obj for obj in batch)
+
+
+@pytest.mark.parametrize("ordered", [True, False])
+@pytest.mark.parametrize("error_kind", ["duplicate", "validation", "write_concern", "operation"])
+def test_insert_raising_restores_documents(mock_insert_collection, ordered, error_kind):
+    collection, native, hook = mock_insert_collection
+    batch = [{"id": "before"}, {"id": "existing"}, {"id": "after", "_id": "caller-id"}]
+    original = deepcopy(batch)
+    if error_kind == "operation":
+        failure = OperationFailure("not authorized", code=13)
+    else:
+        errors = [] if error_kind == "write_concern" else [
+            {"code": 11000 if error_kind == "duplicate" else 121, "index": 1}
+        ]
+        concerns = [{"code": 64, "errmsg": "write concern failed"}] if error_kind == "write_concern" else []
+        failure = BulkWriteError({"nInserted": 1, "writeErrors": errors, "writeConcernErrors": concerns})
+
+    def insert_many(objs, ordered):
+        for obj in objs:
+            obj.setdefault("_id", ObjectId())
+        raise failure
+
+    native.insert_many.side_effect = insert_many
+    kwargs = {} if ordered else {"ordered": False}
+    if error_kind != "duplicate":
+        kwargs["ignore_duplicates"] = True
+    with pytest.raises(type(failure)) as exc:
+        collection.insert(batch, **kwargs)
+    assert exc.value is failure
+    hook.assert_not_called()
+    assert all("_id" not in obj for obj in batch[:2])
+    assert batch == original
+    native.insert_many.assert_called_once_with(batch, ordered=ordered)
+
+
+@pytest.mark.parametrize("ignore_duplicates", [False, True])
+@pytest.mark.parametrize("original_id", [None, "caller-id"])
+def test_insert_preserves_existing_id(mock_insert_collection, ignore_duplicates, original_id):
+    collection, native, hook = mock_insert_collection
+    obj = {"id": "new", "_id": original_id}
+    original = deepcopy(obj)
+    native.insert_many.return_value = Mock(inserted_ids=[original_id])
+    collection.insert(obj, ignore_duplicates=ignore_duplicates)
+    assert obj == original
+    hook.assert_called_once_with([obj])

@@ -3,6 +3,7 @@ from copy import copy
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from pymongo.collection import Collection as MongoCollection
+from pymongo.errors import BulkWriteError
 
 from linkml_store.api import Collection
 from linkml_store.api.collection import DEFAULT_FACET_LIMIT, OBJECT
@@ -33,14 +34,57 @@ class MongoDBCollection(Collection):
     def _check_if_initialized(self) -> bool:
         return self.alias in self.parent.native_db.list_collection_names()
 
-    def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
+    def insert(
+        self,
+        objs: Union[OBJECT, List[OBJECT]],
+        ordered: bool = True,
+        ignore_duplicates: bool = False,
+        **kwargs,
+    ) -> Optional[Dict[str, int]]:
+        """Insert documents, optionally tolerating duplicate keys.
+
+        :param ordered: Stop at the first write error when True (the default).
+        :param ignore_duplicates: Tolerate only duplicate-key errors (code 11000).
+            Other write errors and write-concern errors still raise.
+        :return: None by default; with ignore_duplicates, a dictionary containing
+            ``inserted`` and ``skipped`` counts. Skipped counts only reported
+            duplicates, not documents left unattempted by an ordered write.
+            Use ordered=False to attempt the whole batch.
+        """
         if not isinstance(objs, list):
             objs = [objs]
-        self.mongo_collection.insert_many(objs)
-        # TODO: allow mapping of _id to id for efficiency
-        for obj in objs:
-            del obj["_id"]
-        self._post_insert_hook(objs)
+        # PyMongo adds _id client-side, even when insert_many raises.
+        objs_without_id = [obj for obj in objs if "_id" not in obj]
+        inserted_objs = objs
+        skipped = 0
+        try:
+            result = self.mongo_collection.insert_many(objs, ordered=ordered)
+            inserted = len(result.inserted_ids)
+        except BulkWriteError as bwe:
+            details = bwe.details
+            errors = details.get("writeErrors", [])
+            if (
+                not ignore_duplicates
+                or details.get("writeConcernErrors")
+                or not errors
+                or any(error["code"] != 11000 for error in errors)
+            ):
+                raise
+            inserted = details["nInserted"]
+            skipped = len(errors)
+            failed_indices = {error["index"] for error in errors}
+            if ordered:
+                inserted_objs = objs[:min(failed_indices)]
+            else:
+                inserted_objs = [obj for i, obj in enumerate(objs) if i not in failed_indices]
+        finally:
+            # Preserve caller-supplied IDs and clean up before invoking the hook.
+            for obj in objs_without_id:
+                obj.pop("_id", None)
+        if inserted_objs:
+            self._post_insert_hook(inserted_objs)
+        if ignore_duplicates:
+            return {"inserted": inserted, "skipped": skipped}
 
     def index(
         self,
