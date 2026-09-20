@@ -35,6 +35,26 @@ Validate it:
 linkml-store -d duckdb:///db/my.db -c persons validate
 ```
 
+## Agent skill
+
+Install the [linkml-store workflow skill](skills/linkml-store/SKILL.md) with the
+[skills CLI](https://skills.sh/) (requires Node.js). Preview available skills first:
+
+```bash
+npx skills add linkml/linkml-store --list
+npx skills add linkml/linkml-store --skill linkml-store
+```
+
+Installation defaults to the current project. Use `-a codex` or
+`-a claude-code` to select an agent; add `-g` for your user-wide skills directory:
+
+```bash
+npx skills add linkml/linkml-store --skill linkml-store -a codex -g
+```
+
+The skill provides agent instructions. Install the runtime separately as described
+above; it does not configure credentials, backend services, or data sources.
+
 ## Basic usage
 
 * [Command Line](https://linkml.io/linkml-store/tutorials/Command-Line-Tutorial.html)
@@ -135,4 +155,3 @@ make app
 ## Background
 
 See [these slides](https://docs.google.com/presentation/d/e/2PACX-1vSgtWUNUW0qNO_ZhMAGQ6fYhlXZJjBNMYT0OiZz8DDx8oj7iG9KofRs6SeaMXBBOICGknoyMG2zaHnm/embed?start=false&loop=false&delayms=3000) for more details
-
