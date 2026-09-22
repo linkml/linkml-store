@@ -122,8 +122,8 @@ def heatmap(
     if export_data:
         # For export, reuse the data already loaded for the heatmap instead of loading again
         # This avoids the "I/O operation on closed file" error when input_file is stdin
+        import matplotlib.pyplot as plt
         import pandas as pd
-        from matplotlib.axes import Axes
         
         # Extract the data directly from the plot
         if hasattr(ax, 'get_figure') and hasattr(ax, 'get_children'):
