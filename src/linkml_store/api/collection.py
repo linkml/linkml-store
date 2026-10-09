@@ -343,17 +343,19 @@ class Collection(Generic[DatabaseType]):
         Now let's delete an object:
 
         >>> collection.delete_where({"id": "P1"})
+        1
         >>> collection.find({}).num_rows
         1
 
         Match everything:
 
         >>> collection.delete_where({})
+        1
         >>> collection.find({}).num_rows
         0
 
         :param where: where conditions
-        :param missing_ok: if True, do not raise an error if the collection does not exist
+        :param missing_ok: if False, raise a ValueError when no objects match
         :param kwargs:
         :return: number of objects deleted (or -1 if unsupported)
         """

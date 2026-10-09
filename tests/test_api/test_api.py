@@ -734,6 +734,30 @@ def test_induced_schema(handle, type_alias):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
+def test_delete_where_returns_count(handle):
+    """
+    Test that delete_where returns the number of objects deleted, and that
+    missing_ok=False raises when nothing matches.
+    """
+    client = create_client(handle)
+    collection = client.get_database().get_collection("Person")
+    collection.insert(
+        [
+            {"id": "P1", "age_in_years": 30},
+            {"id": "P2", "age_in_years": 30},
+            {"id": "P3", "age_in_years": 25},
+        ]
+    )
+    assert collection.delete_where({"age_in_years": 30}) == 2
+    assert collection.delete_where({"age_in_years": 99}) == 0
+    with pytest.raises(ValueError):
+        collection.delete_where({"age_in_years": 99}, missing_ok=False)
+    assert collection.find().num_rows == 1
+    assert collection.delete_where({}) == 1
+    assert collection.find().num_rows == 0
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
 def test_induced_multivalued(handle):
     """
     Test induced schema and collection creation with multivalued slots
