@@ -432,7 +432,7 @@ class Collection(Generic[DatabaseType]):
         """
         id_field = self.identifier_attribute_name
         if not id_field:
-            raise ValueError(f"No identifier for {self.name}")
+            raise ValueError(f"No identifier for {self.alias}")
         if len(ids) == 1:
             return self.find({id_field: ids[0]})
         else:
@@ -450,7 +450,7 @@ class Collection(Generic[DatabaseType]):
             raise ValueError("Must pass an ID")
         id_field = self.identifier_attribute_name
         if not id_field:
-            raise ValueError(f"No identifier for {self.name}")
+            raise ValueError(f"No identifier for {self.alias}")
         w = {id_field: id}
         qr = self.find(w)
         if qr.num_rows == 1:
@@ -750,7 +750,7 @@ class Collection(Generic[DatabaseType]):
             source_obj_iter = coll.find_iter(derivation.where or {})
             mappings = derivation.mappings
             if not mappings:
-                raise ValueError(f"No mappings for {self.name}")
+                raise ValueError(f"No mappings for {self.alias}")
             target_class_name = self.target_class_name
             from linkml_map.session import Session
 

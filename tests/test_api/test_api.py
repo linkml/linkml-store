@@ -538,6 +538,20 @@ def test_patch(handle):
     case.assertCountEqual(collection_a.diff(collection_b), rev_patches)
 
 
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_get_without_identifier_raises_value_error(handle):
+    """
+    Getting by id from a collection with no identifier is a ValueError that names the collection.
+    """
+    client = create_client(handle)
+    collection = client.get_database().create_collection("Person", alias="unkeyed", recreate_if_exists=True)
+    collection.insert([{"name": "n1"}])
+    with pytest.raises(ValueError, match="No identifier for unkeyed"):
+        collection.get(["P1"])
+    with pytest.raises(ValueError, match="No identifier for unkeyed"):
+        collection.get_one("P1")
+
+
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_store_nested(handle):
     """
