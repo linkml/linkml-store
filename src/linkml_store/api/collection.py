@@ -677,14 +677,16 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"Collection has no alias: {self} // {self.metadata}")
         return self.alias.startswith("internal__")
 
-    def exists(self) -> Optional[bool]:
+    def exists(self) -> bool:
         """
         Check if the collection exists.
 
-        :return:
+        A collection exists when its class is known and has at least one slot,
+        whether declared inline, at the top level of the schema, or inherited.
+
+        :return: True if the collection has a class with slots
         """
-        cd = self.class_definition()
-        return cd is not None and cd.attributes
+        return bool(self.induced_slots())
 
     def load_from_source(self, load_if_exists=False):
         """

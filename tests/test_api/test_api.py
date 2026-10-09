@@ -949,6 +949,8 @@ def test_facets_on_top_level_and_inherited_slots(handle):
     r = collection.query_facets(facet_columns=["department"])
     assert r == {"department": [("Engineering", 2), ("Sales", 1)]}
     assert set(collection.query_facets()) == {"id", "name", "department", "nickname"}
+    # the same lookup decides whether the collection exists at all
+    assert collection.exists() is True
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
