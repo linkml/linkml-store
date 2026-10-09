@@ -2,6 +2,7 @@ import os
 import uuid
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
+from urllib.parse import urlencode
 
 import httpx
 import uvicorn
@@ -19,7 +20,6 @@ from starlette.responses import JSONResponse
 from linkml_store import Client
 from linkml_store.api import Collection, Database
 from linkml_store.api.queries import Query as StoreQuery
-from linkml_store.utils.format_utils import load_objects
 from linkml_store.webapi.html import HTML_TEMPLATES_DIR
 
 html_renderer = HTMLRenderer()
@@ -111,6 +111,44 @@ class ObjectInsert(BaseModel):
 
 
 # Helper functions
+
+
+def parse_where(where: Optional[str]) -> Optional[Dict[str, Any]]:
+    """
+    Parse the ``where`` query parameter into a where clause.
+
+    The parameter is a YAML or JSON mapping, as with the ``--where`` option of the command line.
+    A value that does not parse, or that is not a mapping, is a client error rather than a server error.
+
+    >>> parse_where('{"name": "a"}')
+    {'name': 'a'}
+    >>> parse_where("age: 30")
+    {'age': 30}
+    >>> parse_where(None) is None
+    True
+    """
+    if not where:
+        return None
+    try:
+        where_clause = yaml.safe_load(where)
+    except yaml.YAMLError as e:
+        raise HTTPException(status_code=400, detail=f"Cannot parse where parameter: {e}")
+    if not isinstance(where_clause, dict):
+        raise HTTPException(status_code=400, detail="The where parameter must be a mapping of field names to values")
+    return where_clause
+
+
+def page_href(base_url: str, limit: int, offset: int, where: Optional[str] = None) -> str:
+    """
+    Build the link to one page of a listing, carrying the where parameter so that every page has the same filter.
+
+    >>> page_href("/objects", 10, 20, '{"name": "a"}')
+    '/objects?limit=10&offset=20&where=%7B%22name%22%3A+%22a%22%7D'
+    """
+    params = {"limit": limit, "offset": offset}
+    if where:
+        params["where"] = where
+    return f"{base_url}?{urlencode(params)}"
 
 
 def get_client():
@@ -330,7 +368,7 @@ async def list_collection_objects(
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
-    where_clause = load_objects(where) if where else None
+    where_clause = parse_where(where)
     query = StoreQuery(from_table=collection.alias, where_clause=where_clause, limit=limit, offset=offset)
     result = collection.query(query)
     base_url = f"/databases/{database_name}/collections/{collection_name}/objects"
@@ -349,20 +387,21 @@ async def list_collection_objects(
         item = Item(name=name, data=row, links=[link])
         items.append(item)
 
-    total_count = collection.find({}).num_rows
+    # The query counts every match before applying the limit, so this is the size of the filtered set.
+    total_count = result.num_rows
     total_pages = (total_count + limit - 1) // limit
     current_page = offset // limit + 1
 
-    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
+    links = [Link(rel="self", href=page_href(base_url, limit, offset, where))]
     if current_page > 1:
-        links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
+        links.append(Link(rel="prev", href=page_href(base_url, limit, offset - limit, where)))
     if current_page < total_pages:
-        links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
+        links.append(Link(rel="next", href=page_href(base_url, limit, offset + limit, where)))
 
     links.extend(
         [
-            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="first", href=page_href(base_url, limit, 0, where)),
+            Link(rel="last", href=page_href(base_url, limit, max(total_pages - 1, 0) * limit, where)),
             Link(rel="parent", href=f"/databases/{database_name}/collections/{collection_name}"),
         ]
     )
@@ -496,7 +535,7 @@ async def list_collection_facets(
     # DEPRECATED?
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
-    where_clause = load_objects(where) if where else None
+    where_clause = parse_where(where)
     results = collection.query_facets(where_clause)
 
     total_count = collection.find({}).num_rows
@@ -549,7 +588,7 @@ async def list_collection_attributes(
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
-    where_clause = load_objects(where) if where else None
+    where_clause = parse_where(where)
     base_url = f"/databases/{database_name}/collections/{collection_name}/attributes"
     results = collection.query_facets(where_clause)
     items = [
@@ -598,7 +637,7 @@ async def get_attribute_details(
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
-    where_clause = load_objects(where) if where else None
+    where_clause = parse_where(where)
     base_url = f"/databases/{database_name}/collections/{collection_name}/attributes/{attribute_name}"
     count_tuples = collection.query_facets(where_clause, facet_columns=[attribute_name])[attribute_name]
     _count_objs = [{"value": v, "count": c} for v, c in count_tuples]
@@ -657,7 +696,7 @@ async def query_by_attribute(
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
-    where_clause = {attribute_name: value}
+    where_clause = {**(parse_where(where) or {}), attribute_name: value}
     query = StoreQuery(from_table=collection.alias, where_clause=where_clause, limit=limit, offset=offset)
     result = collection.query(query)
     items = []
@@ -665,21 +704,21 @@ async def query_by_attribute(
         item = Item(name=str(i), type="X", data=row, links=[])
         items.append(item)
 
-    total_count = collection.find({}).num_rows
+    total_count = result.num_rows
     total_pages = (total_count + limit - 1) // limit
     current_page = offset // limit + 1
 
     base_url = f"/databases/{database_name}/collections/{collection_name}/attributes/{attribute_name}/equals/{value}"
-    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
+    links = [Link(rel="self", href=page_href(base_url, limit, offset, where))]
     if current_page > 1:
-        links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
+        links.append(Link(rel="prev", href=page_href(base_url, limit, offset - limit, where)))
     if current_page < total_pages:
-        links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
+        links.append(Link(rel="next", href=page_href(base_url, limit, offset + limit, where)))
 
     links.extend(
         [
-            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="first", href=page_href(base_url, limit, 0, where)),
+            Link(rel="last", href=page_href(base_url, limit, max(total_pages - 1, 0) * limit, where)),
             Link(
                 rel="parent",
                 href=f"/databases/{database_name}/collections/{collection_name}/attributes/{attribute_name}",
