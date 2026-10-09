@@ -23,6 +23,7 @@ def api(tmp_path):
     db = client.attach_database(f"duckdb:///{tmp_path / 'test.ddb'}", alias="test")
     collection = db.create_collection("Person", alias="persons")
     collection.insert([{"id": f"P{i}", "name": "a" if i < 3 else "b", "age": 30 + i} for i in range(5)])
+    db.create_collection("Thing", alias="empty")
     app.dependency_overrides[get_client] = lambda: client
     yield TestClient(app)
     app.dependency_overrides.clear()
@@ -58,6 +59,12 @@ def test_objects_with_no_match_link_to_valid_pages(api):
 
 def test_blank_where_means_no_filter(api):
     assert api.get(f"{BASE}/objects", params={"where": " "}).json()["meta"]["item_count"] == 5
+
+
+def test_empty_collection_lists_no_objects(api):
+    body = api.get("/databases/test/collections/empty/objects").json()
+    assert body["items"] == []
+    assert body["meta"]["item_count"] == 0
 
 
 def test_facets_route_counts_the_filtered_set(api):

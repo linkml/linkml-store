@@ -428,10 +428,8 @@ async def list_collection_objects(
             page=current_page,
             page_size=limit,
         ),
-        item_type=ItemType(
-            name=cd.name,
-            description=cd.description,
-        ),
+        # An empty collection has no class definition until objects are added.
+        item_type=ItemType(name=cd.name, description=cd.description) if cd else None,
         items=items,
         data={},
         links=links,
