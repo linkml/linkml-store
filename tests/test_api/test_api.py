@@ -919,6 +919,40 @@ def test_facets(schema_view, handle, index_class):
     assert len(database.list_collection_names(include_internal=True)) > 1
 
 
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_facets_on_top_level_and_inherited_slots(handle):
+    """
+    Test faceting on slots a class does not declare as inline attributes.
+
+    ``Person`` takes ``id`` and ``name`` from its parent, ``department`` from the
+    schema's top-level ``slots:`` list, and has one inline attribute, ``nickname``.
+    See https://github.com/linkml/linkml-store/issues/90
+    """
+    sb = SchemaBuilder()
+    sb.add_slot(SlotDefinition("id", identifier=True))
+    sb.add_slot("name")
+    sb.add_slot("department")
+    sb.add_class("Agent", slots=["id", "name"])
+    sb.add_class("Person", is_a="Agent", slots=["department"])
+    sb.schema.classes["Person"].attributes["nickname"] = SlotDefinition("nickname")
+    client = create_client(handle)
+    database = client.get_database()
+    database.set_schema_view(SchemaView(sb.schema))
+    collection = database.create_collection("Person", recreate_if_exists=True)
+    collection.insert(
+        [
+            {"id": "P1", "name": "Alice", "department": "Engineering", "nickname": "Al"},
+            {"id": "P2", "name": "Bob", "department": "Sales"},
+            {"id": "P3", "name": "Carol", "department": "Engineering"},
+        ]
+    )
+    r = collection.query_facets(facet_columns=["department"])
+    assert r == {"department": [("Engineering", 2), ("Sales", 1)]}
+    assert set(collection.query_facets()) == {"id", "name", "department", "nickname"}
+    # the same lookup decides whether the collection exists at all
+    assert collection.exists() is True
+
+
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)
 def test_validation(countries_schema_view, handle):
     """
