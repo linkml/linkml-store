@@ -99,17 +99,18 @@ class DuckDBCollection(Collection):
             facet_limit = DEFAULT_FACET_LIMIT
         results = {}
         cd = self.class_definition()
+        slots = self.induced_slots()
         with self.parent.engine.connect() as conn:
             if not facet_columns:
                 if not cd:
                     raise ValueError(f"No class definition found for {self.target_class_name}")
-                facet_columns = list(cd.attributes.keys())
+                facet_columns = list(slots.keys())
             for col in facet_columns:
                 logger.debug(f"Faceting on {col}")
                 if isinstance(col, tuple):
                     sd = SlotDefinition(name="PLACEHOLDER")
                 else:
-                    sd = cd.attributes[col]
+                    sd = slots[col]
                 facet_query = self._create_query(where_clause=where)
                 facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued)
                 logger.debug(f"Facet query: {facet_query_str}")
