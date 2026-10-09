@@ -59,7 +59,6 @@ class DuckDBCollection(Collection):
             for obj in objs:
                 conditions = [table.c[k] == v for k, v in obj.items() if k in cd.attributes]
                 stmt = delete(table).where(*conditions)
-                stmt = stmt.compile(engine)
                 conn.execute(stmt)
                 conn.commit()
         self._post_delete_hook()
@@ -83,7 +82,6 @@ class DuckDBCollection(Collection):
         with engine.connect() as conn:
             conditions = [table.c[k] == v for k, v in where.items()]
             stmt = delete(table).where(*conditions)
-            stmt = stmt.compile(engine)
             result = conn.execute(stmt)
             deleted_rows_count = result.rowcount
             if deleted_rows_count == 0 and not missing_ok:
