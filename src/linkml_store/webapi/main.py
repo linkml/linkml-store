@@ -602,8 +602,7 @@ async def get_attribute_details(
     base_url = f"/databases/{database_name}/collections/{collection_name}/attributes/{attribute_name}"
     count_tuples = collection.query_facets(where_clause, facet_columns=[attribute_name])[attribute_name]
     _count_objs = [{"value": v, "count": c} for v, c in count_tuples]
-    cd = collection.class_definition()
-    att = cd.attributes[attribute_name]
+    att = collection.induced_slots()[attribute_name]
     att_dict = json_dumper.to_dict(att)
     items = [
         Item(

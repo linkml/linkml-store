@@ -734,6 +734,39 @@ def test_induced_schema(handle, type_alias):
 
 
 @pytest.mark.parametrize("handle", SCHEMES)
+def test_delete_matches_on_top_level_slots(handle):
+    """
+    Test that delete() matches on every slot of the class, not only inline attributes.
+
+    ``id`` and ``department`` are top-level slots and ``nickname`` is the only inline
+    attribute. Before the fix the object's keys were all filtered out, the DELETE ran
+    with no WHERE clause, and every row went.
+    """
+    sb = SchemaBuilder()
+    sb.add_slot(SlotDefinition("id", identifier=True))
+    sb.add_slot("department")
+    sb.add_class("Person", slots=["id", "department"])
+    sb.schema.classes["Person"].attributes["nickname"] = SlotDefinition("nickname")
+    client = create_client(handle)
+    database = client.get_database()
+    database.set_schema_view(SchemaView(sb.schema))
+    collection = database.create_collection("Person", recreate_if_exists=True)
+    collection.insert(
+        [
+            {"id": "P1", "department": "Engineering"},
+            {"id": "P2", "department": "Sales"},
+            {"id": "P3", "department": "Engineering"},
+        ]
+    )
+    collection.delete({"id": "P1", "department": "Engineering"})
+    assert collection.find().num_rows == 2
+    # an object with no slot keys at all must not become an unconditional DELETE
+    with pytest.raises(ValueError):
+        collection.delete({"not_a_slot": "x"})
+    assert collection.find().num_rows == 2
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
 def test_induced_multivalued(handle):
     """
     Test induced schema and collection creation with multivalued slots
@@ -917,6 +950,40 @@ def test_facets(schema_view, handle, index_class):
         assert expected_facets == {}
     assert database.list_collection_names() == ["Person"]
     assert len(database.list_collection_names(include_internal=True)) > 1
+
+
+@pytest.mark.parametrize("handle", SCHEMES)
+def test_facets_on_top_level_and_inherited_slots(handle):
+    """
+    Test faceting on slots a class does not declare as inline attributes.
+
+    ``Person`` takes ``id`` and ``name`` from its parent, ``department`` from the
+    schema's top-level ``slots:`` list, and has one inline attribute, ``nickname``.
+    See https://github.com/linkml/linkml-store/issues/90
+    """
+    sb = SchemaBuilder()
+    sb.add_slot(SlotDefinition("id", identifier=True))
+    sb.add_slot("name")
+    sb.add_slot("department")
+    sb.add_class("Agent", slots=["id", "name"])
+    sb.add_class("Person", is_a="Agent", slots=["department"])
+    sb.schema.classes["Person"].attributes["nickname"] = SlotDefinition("nickname")
+    client = create_client(handle)
+    database = client.get_database()
+    database.set_schema_view(SchemaView(sb.schema))
+    collection = database.create_collection("Person", recreate_if_exists=True)
+    collection.insert(
+        [
+            {"id": "P1", "name": "Alice", "department": "Engineering", "nickname": "Al"},
+            {"id": "P2", "name": "Bob", "department": "Sales"},
+            {"id": "P3", "name": "Carol", "department": "Engineering"},
+        ]
+    )
+    r = collection.query_facets(facet_columns=["department"])
+    assert r == {"department": [("Engineering", 2), ("Sales", 1)]}
+    assert set(collection.query_facets()) == {"id", "name", "department", "nickname"}
+    # the same lookup decides whether the collection exists at all
+    assert collection.exists() is True
 
 
 @pytest.mark.parametrize("handle", SCHEMES_PLUS)

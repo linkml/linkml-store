@@ -833,7 +833,7 @@ def infer(
         query_obj = None
     collection = ctx.obj["settings"].collection
     if collection:
-        atts = collection.class_definition().attributes.keys()
+        atts = collection.induced_slots().keys()
     else:
         atts = []
     if feature_attributes:

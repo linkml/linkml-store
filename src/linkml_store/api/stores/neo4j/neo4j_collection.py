@@ -286,7 +286,7 @@ class Neo4jCollection(Collection):
     ) -> Dict[Union[str, Tuple[str, ...]], List[Tuple[Any, int]]]:
         results = {}
         if not facet_columns:
-            facet_columns = list(self.class_definition().attributes.keys())
+            facet_columns = list(self.induced_slots())
 
         category_labels_attribute = self.category_labels_attribute
         with self.session() as session:

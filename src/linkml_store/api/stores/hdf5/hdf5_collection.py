@@ -75,7 +75,7 @@ class HDF5Collection(Collection):
     ) -> Dict[str, List[Tuple[Any, int]]]:
         results = {}
         if not facet_columns:
-            facet_columns = list(self.class_definition().attributes.keys())
+            facet_columns = list(self.induced_slots())
 
         for col in facet_columns:
             logger.debug(f"Faceting on {col}")

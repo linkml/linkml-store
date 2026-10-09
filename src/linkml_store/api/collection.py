@@ -677,14 +677,16 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"Collection has no alias: {self} // {self.metadata}")
         return self.alias.startswith("internal__")
 
-    def exists(self) -> Optional[bool]:
+    def exists(self) -> bool:
         """
         Check if the collection exists.
 
-        :return:
+        A collection exists when its class is known and has at least one slot,
+        whether declared inline, at the top level of the schema, or inherited.
+
+        :return: True if the collection has a class with slots
         """
-        cd = self.class_definition()
-        return cd is not None and cd.attributes
+        return bool(self.induced_slots())
 
     def load_from_source(self, load_if_exists=False):
         """
@@ -990,6 +992,34 @@ class Collection(Generic[DatabaseType]):
                     sv.set_modified()
             return cls
         return None
+
+    def induced_slots(self) -> Dict[str, SlotDefinition]:
+        """
+        Return every slot of the collection's class, keyed by name.
+
+        Unlike ``class_definition().attributes``, this includes slots the class takes
+        from the schema's top-level ``slots:`` list and from its ancestors and mixins.
+
+        >>> from linkml_runtime import SchemaView
+        >>> from linkml_runtime.utils.schema_builder import SchemaBuilder
+        >>> from linkml_store import Client
+        >>> sb = SchemaBuilder()
+        >>> _ = sb.add_slot("name").add_class("Person", slots=["name"])
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> db.set_schema_view(SchemaView(sb.schema))
+        >>> collection = db.create_collection("Person")
+        >>> list(collection.class_definition().attributes)
+        []
+        >>> list(collection.induced_slots())
+        ['name']
+
+        :return: slot definitions keyed by slot name, empty if there is no class definition
+        """
+        cd = self.class_definition()
+        if cd is None:
+            return {}
+        return {s.name: s for s in self.parent.schema_view.class_induced_slots(cd.name)}
 
     def _induce_attributes(self) -> List[SlotDefinition]:
         result = self.find({}, limit=-1)

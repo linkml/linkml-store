@@ -50,14 +50,23 @@ class DuckDBCollection(Collection):
         if not isinstance(objs, list):
             objs = [objs]
         cd = self.class_definition()
-        if not cd or not cd.attributes:
+        slot_names = set(self.induced_slots())
+        if not cd or not slot_names:
             cd = self.induce_class_definition_from_objects(objs)
-        assert cd.attributes
+            slot_names = set(cd.attributes)
+        assert slot_names
         table = self._sqla_table(cd)
         engine = self.parent.engine
         with engine.connect() as conn:
             for obj in objs:
-                conditions = [table.c[k] == v for k, v in obj.items() if k in cd.attributes]
+                # Only keys that are slots of the class can appear in the WHERE clause. An
+                # object with none of them would give a DELETE with no WHERE at all, which
+                # removes every row, so refuse rather than guess.
+                conditions = [table.c[k] == v for k, v in obj.items() if k in slot_names]
+                if not conditions:
+                    raise ValueError(
+                        f"Cannot delete from {self.target_class_name}: none of {sorted(obj)} are slots of the class"
+                    )
                 stmt = delete(table).where(*conditions)
                 stmt = stmt.compile(engine)
                 conn.execute(stmt)
@@ -99,17 +108,18 @@ class DuckDBCollection(Collection):
             facet_limit = DEFAULT_FACET_LIMIT
         results = {}
         cd = self.class_definition()
+        slots = self.induced_slots()
         with self.parent.engine.connect() as conn:
             if not facet_columns:
                 if not cd:
                     raise ValueError(f"No class definition found for {self.target_class_name}")
-                facet_columns = list(cd.attributes.keys())
+                facet_columns = list(slots.keys())
             for col in facet_columns:
                 logger.debug(f"Faceting on {col}")
                 if isinstance(col, tuple):
                     sd = SlotDefinition(name="PLACEHOLDER")
                 else:
-                    sd = cd.attributes[col]
+                    sd = slots[col]
                 facet_query = self._create_query(where_clause=where)
                 facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued)
                 logger.debug(f"Facet query: {facet_query_str}")

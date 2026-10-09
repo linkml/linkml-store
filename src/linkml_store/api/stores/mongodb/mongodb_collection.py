@@ -231,7 +231,7 @@ class MongoDBCollection(Collection):
             facet_limit = DEFAULT_FACET_LIMIT
         results = {}
         if not facet_columns:
-            facet_columns = list(self.class_definition().attributes.keys())
+            facet_columns = list(self.induced_slots())
 
         for col in facet_columns:
             logger.debug(f"Faceting on {col}")
