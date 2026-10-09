@@ -112,12 +112,15 @@ class ObjectInsert(BaseModel):
 
 # Helper functions
 
+WHERE_DESCRIPTION = 'A YAML or JSON mapping of field names to values, for example {"name": "a"} or name: a.'
+
 
 def parse_where(where: Optional[str]) -> Optional[Dict[str, Any]]:
     """
     Parse the ``where`` query parameter into a where clause.
 
     The parameter is a YAML or JSON mapping, as with the ``--where`` option of the command line.
+    A blank value means no filter, as it does there.
     A value that does not parse, or that is not a mapping, is a client error rather than a server error.
 
     >>> parse_where('{"name": "a"}')
@@ -126,6 +129,8 @@ def parse_where(where: Optional[str]) -> Optional[Dict[str, Any]]:
     {'age': 30}
     >>> parse_where(None) is None
     True
+    >>> parse_where(" ") is None
+    True
     """
     if not where:
         return None
@@ -133,6 +138,8 @@ def parse_where(where: Optional[str]) -> Optional[Dict[str, Any]]:
         where_clause = yaml.safe_load(where)
     except yaml.YAMLError as e:
         raise HTTPException(status_code=400, detail=f"Cannot parse where parameter: {e}")
+    if where_clause is None:
+        return None
     if not isinstance(where_clause, dict):
         raise HTTPException(status_code=400, detail="The where parameter must be a mapping of field names to values")
     return where_clause
@@ -361,7 +368,7 @@ async def list_collection_objects(
     request: Request,
     database_name: str,
     collection_name: str,
-    where: Optional[str] = None,
+    where: Optional[str] = Query(None, description=WHERE_DESCRIPTION),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     get_db: Callable[[str], Database] = Depends(get_database),
@@ -381,9 +388,11 @@ async def list_collection_objects(
             name = row[id_att_name]
             link = Link(rel="self", href=f"{base_url}/{name}")
         else:
+            # Without an identifier the object's position in this listing is its only address,
+            # so the link is a page of one object under the same filter.
             ix = offset + i
             name = str(ix)
-            link = Link(rel="self", href=f"{base_url}_index/{ix}")
+            link = Link(rel="self", href=page_href(base_url, 1, ix, where))
         item = Item(name=name, data=row, links=[link])
         items.append(item)
 
@@ -439,6 +448,11 @@ async def get_object_details(
 ):
     database = get_db(database_name)
     collection = database.get_collection(collection_name)
+    if not collection.identifier_attribute_name:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Collection '{collection_name}' has no identifier slot, so its objects cannot be fetched by id",
+        )
     ids = id.split("+")
     result = collection.get(ids)
 
@@ -527,7 +541,7 @@ async def list_collection_facets(
     request: Request,
     database_name: str,
     collection_name: str,
-    where: Optional[str] = None,
+    where: Optional[str] = Query(None, description=WHERE_DESCRIPTION),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     get_db: Callable[[str], Database] = Depends(get_database),
@@ -538,21 +552,22 @@ async def list_collection_facets(
     where_clause = parse_where(where)
     results = collection.query_facets(where_clause)
 
-    total_count = collection.find({}).num_rows
+    # Fetching one row is enough, because the count covers every match before the limit.
+    total_count = collection.find(where_clause or {}, limit=1).num_rows
     total_pages = (total_count + limit - 1) // limit
     current_page = offset // limit + 1
 
     base_url = f"/databases/{database_name}/collections/{collection_name}/facets"
-    links = [Link(rel="self", href=f"{base_url}?limit={limit}&offset={offset}")]
+    links = [Link(rel="self", href=page_href(base_url, limit, offset, where))]
     if current_page > 1:
-        links.append(Link(rel="prev", href=f"{base_url}?limit={limit}&offset={offset - limit}"))
+        links.append(Link(rel="prev", href=page_href(base_url, limit, offset - limit, where)))
     if current_page < total_pages:
-        links.append(Link(rel="next", href=f"{base_url}?limit={limit}&offset={offset + limit}"))
+        links.append(Link(rel="next", href=page_href(base_url, limit, offset + limit, where)))
 
     links.extend(
         [
-            Link(rel="first", href=f"{base_url}?limit={limit}&offset=0"),
-            Link(rel="last", href=f"{base_url}?limit={limit}&offset={(total_pages - 1) * limit}"),
+            Link(rel="first", href=page_href(base_url, limit, 0, where)),
+            Link(rel="last", href=page_href(base_url, limit, max(total_pages - 1, 0) * limit, where)),
             Link(rel="collection", href=f"/databases/{database_name}/collections/{collection_name}"),
             Link(rel="database", href=f"/databases/{database_name}"),
         ]
@@ -583,7 +598,7 @@ async def list_collection_attributes(
     request: Request,
     database_name: str,
     collection_name: str,
-    where: Optional[str] = None,
+    where: Optional[str] = Query(None, description=WHERE_DESCRIPTION),
     get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
@@ -632,7 +647,7 @@ async def get_attribute_details(
     database_name: str,
     collection_name: str,
     attribute_name: str,
-    where: Optional[str] = None,
+    where: Optional[str] = Query(None, description=WHERE_DESCRIPTION),
     get_db: Callable[[str], Database] = Depends(get_database),
 ):
     database = get_db(database_name)
@@ -689,7 +704,7 @@ async def query_by_attribute(
     collection_name: str,
     attribute_name: str,
     value: str,
-    where: Optional[str] = None,
+    where: Optional[str] = Query(None, description=WHERE_DESCRIPTION),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
     get_db: Callable[[str], Database] = Depends(get_database),
@@ -701,7 +716,7 @@ async def query_by_attribute(
     result = collection.query(query)
     items = []
     for i, row in enumerate(result.rows):
-        item = Item(name=str(i), type="X", data=row, links=[])
+        item = Item(name=str(offset + i), type="X", data=row, links=[])
         items.append(item)
 
     total_count = result.num_rows
