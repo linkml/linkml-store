@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sqla
 from linkml_runtime.linkml_model import ClassDefinition, SlotDefinition
-from sqlalchemy import Column, Table, delete, insert, inspect, text
+from sqlalchemy import Column, Table, delete, func, insert, inspect, select, text
 from sqlalchemy.sql.ddl import CreateTable
 
 from linkml_store.api import Collection
@@ -59,7 +59,6 @@ class DuckDBCollection(Collection):
             for obj in objs:
                 conditions = [table.c[k] == v for k, v in obj.items() if k in cd.attributes]
                 stmt = delete(table).where(*conditions)
-                stmt = stmt.compile(engine)
                 conn.execute(stmt)
                 conn.commit()
         self._post_delete_hook()
@@ -82,15 +81,17 @@ class DuckDBCollection(Collection):
             return 0
         with engine.connect() as conn:
             conditions = [table.c[k] == v for k, v in where.items()]
-            stmt = delete(table).where(*conditions)
-            stmt = stmt.compile(engine)
-            result = conn.execute(stmt)
-            deleted_rows_count = result.rowcount
+            # DuckDB does not report how many rows a DELETE removed (rowcount is -1), so
+            # count the matching rows first. The count and the delete run in the same
+            # transaction, so the number is exact.
+            matching = select(func.count()).select_from(table).where(*conditions)
+            deleted_rows_count = conn.execute(matching).scalar_one()
             if deleted_rows_count == 0 and not missing_ok:
                 raise ValueError(f"No rows found for {where}")
+            conn.execute(delete(table).where(*conditions))
             conn.commit()
             self._post_delete_hook()
-            return deleted_rows_count if deleted_rows_count > -1 else None
+            return deleted_rows_count
 
     def query_facets(
         self, where: Dict = None, facet_columns: List[str] = None, facet_limit=DEFAULT_FACET_LIMIT, **kwargs
