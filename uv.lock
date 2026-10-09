@@ -3115,6 +3115,8 @@ dremio = [
 ]
 fastapi = [
     { name = "fastapi" },
+    { name = "httpx" },
+    { name = "linkml-renderer" },
     { name = "uvicorn" },
 ]
 frictionless = [
@@ -3219,6 +3221,7 @@ requires-dist = [
     { name = "google-cloud-bigquery", marker = "extra == 'all'" },
     { name = "google-cloud-bigquery", marker = "extra == 'bigquery'" },
     { name = "h5py", marker = "extra == 'h5py'" },
+    { name = "httpx", marker = "extra == 'fastapi'" },
     { name = "ibis-framework", extras = ["duckdb", "examples"], marker = "extra == 'ibis'", specifier = ">=9.3.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "jsonlines", specifier = ">=4.0.0" },
@@ -3230,6 +3233,7 @@ requires-dist = [
     { name = "linkml-map", marker = "extra == 'all'" },
     { name = "linkml-map", marker = "extra == 'map'", specifier = ">=0.3.9" },
     { name = "linkml-renderer", marker = "extra == 'all'" },
+    { name = "linkml-renderer", marker = "extra == 'fastapi'" },
     { name = "linkml-renderer", marker = "extra == 'renderer'" },
     { name = "linkml-runtime", specifier = ">=1.8.0" },
     { name = "llm", marker = "extra == 'all'" },
