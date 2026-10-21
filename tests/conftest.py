@@ -10,9 +10,8 @@ from tests import INPUT_DIR, OUTPUT_DIR
 
 def pytest_configure(config):
     """Register custom markers."""
-    config.addinivalue_line(
-        "markers", "core: tests that work with minimal (no extras) install"
-    )
+    config.addinivalue_line("markers", "core: tests that work with minimal (no extras) install")
+    config.addinivalue_line("markers", "typedb: tests that need a reachable TypeDB server")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -21,6 +20,7 @@ def pytest_collection_modifyitems(config, items):
     optional_deps = {
         "mongodb": "pymongo",
         "neo4j": "neo4j",
+        "typedb": "typedb",
         "ibis": "ibis",
         "llm": "llm",
         "sklearn": "sklearn",
@@ -35,6 +35,7 @@ def pytest_collection_modifyitems(config, items):
             missing_deps[name] = pytest.mark.skip(
                 reason=f"requires {module} (install with: pip install linkml-store[{name}])"
             )
+
 
 # Ensure output directory exists for tests that write temp files
 os.makedirs(OUTPUT_DIR, exist_ok=True)
