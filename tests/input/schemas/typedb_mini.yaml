@@ -1,0 +1,54 @@
+id: https://example.org/mini
+name: mini
+prefixes:
+  linkml: https://w3id.org/linkml/
+  mini: https://example.org/mini/
+  prov: http://www.w3.org/ns/prov#
+default_prefix: mini
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+  NamedThing:
+    slots: [id, name, type, alias]
+  Study:
+    is_a: NamedThing
+    slots: [credit_associations, part_of]
+    slot_usage:
+      part_of:
+        range: Study
+  Person:
+    description: inlined, no identifier
+    slots: [orcid, name]
+  CreditAssociation:
+    class_uri: prov:Association
+    slots: [applies_to_person, applied_role]
+  Dataset:
+    is_a: NamedThing
+    slots: [part_of]
+  Dated:
+    description: exercises datetime coercion
+    slots: [id, name, created]
+
+slots:
+  id:
+    identifier: true
+  name: {}
+  alias:
+    multivalued: true
+  type:
+    description: collides with a TypeDB reserved keyword
+  orcid: {}
+  applied_role: {}
+  credit_associations:
+    range: CreditAssociation
+    multivalued: true
+    inlined_as_list: true
+  applies_to_person:
+    range: Person
+    inlined: true
+  part_of:
+    range: NamedThing
+  created:
+    range: datetime

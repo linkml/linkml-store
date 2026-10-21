@@ -44,6 +44,9 @@ tests = ["black>=24.0.0", "ruff>=0.6.2"]
 llm = ["llm", "tiktoken"]
 mongodb = ["pymongo"]
 neo4j = ["neo4j", "py2neo", "networkx"]
+# linkml is NOT required: the naming rules it owns are vendored in
+# src/linkml_store/api/stores/typedb/naming.py. See scripts/sync_typedb_naming.py.
+typedb = ["typedb-driver>=3.0.0"]
 h5py = ["h5py"]
 pyarrow = ["pyarrow"]
 dremio = ["pyarrow", "adbc-driver-flightsql"]
@@ -63,6 +66,7 @@ all = [
   "neo4j",
   "py2neo",
   "networkx",
+  "typedb-driver>=3.0.0",
   "linkml>=1.8.0",
   "linkml_map",
   "linkml_renderer",
@@ -146,7 +150,9 @@ extend-exclude = [
     "tests/**/__snapshots__",
     "examples/",
     "docs/",
-    "notebooks/"
+    "notebooks/",
+    # Vendored verbatim from linkml; reformatting would break the equality test.
+    "src/linkml_store/api/stores/typedb/naming.py"
 ]
 force-exclude = true
 line-length = 120

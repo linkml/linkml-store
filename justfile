@@ -60,6 +60,14 @@ doctest:
 lint:
     uv run ruff check .
 
+# Re-vendor linkml's TypeDB naming rules into the adapter (requires linkml installed)
+sync-typedb-naming:
+    uv run python scripts/sync_typedb_naming.py
+
+# Fail if the vendored TypeDB naming rules are stale
+check-typedb-naming:
+    uv run python scripts/sync_typedb_naming.py --check
+
 # Run ruff format check
 format-check:
     uv run ruff format --check .
