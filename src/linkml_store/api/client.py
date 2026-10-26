@@ -19,6 +19,7 @@ HANDLE_MAP = {
     "mongodb": "linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase",
     "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
     "neo4j": "linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase",
+    "typedb": "linkml_store.api.stores.typedb.typedb_database.TypeDBDatabase",
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",
     "dremio": "linkml_store.api.stores.dremio.dremio_database.DremioDatabase",
     "dremio-rest": "linkml_store.api.stores.dremio_rest.dremio_rest_database.DremioRestDatabase",
