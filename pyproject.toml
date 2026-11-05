@@ -49,7 +49,9 @@ pyarrow = ["pyarrow"]
 dremio = ["pyarrow", "adbc-driver-flightsql"]
 pyreadr = ["pyreadr"]
 validation = ["linkml>=1.8.0"]
-map = ["linkml_map>=0.3.9", "ucumvert>=0.2.0"]
+# pint<0.26.2: newer pint rejects an alias in ucumvert's unit definitions, which linkml_map
+# loads at import time (linkml-store #105, https://github.com/dalito/ucumvert/issues/82)
+map = ["linkml_map>=0.3.9", "ucumvert>=0.2.0", "pint<0.26.2"]
 renderer = ["linkml_renderer"]
 fastapi = ["fastapi", "uvicorn"]
 frictionless = ["frictionless"]
@@ -65,6 +67,7 @@ all = [
   "networkx",
   "linkml>=1.8.0",
   "linkml_map",
+  "pint<0.26.2",
   "linkml_renderer",
   "google-cloud-bigquery",
   "pyarrow",

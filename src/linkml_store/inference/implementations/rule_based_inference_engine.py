@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, Union
 
 import yaml
-from linkml_map.utils.eval_utils import eval_expr
 from linkml_runtime import SchemaView
 from linkml_runtime.linkml_model.meta import AnonymousClassExpression, ClassRule
 from linkml_runtime.utils.formatutils import underscore
@@ -17,6 +16,25 @@ from linkml_store.inference.inference_config import Inference, InferenceConfig
 from linkml_store.inference.inference_engine import InferenceEngine, ModelSerialization
 
 logger = logging.getLogger(__name__)
+
+
+def eval_expr(expr: str, **kwargs) -> Any:
+    """
+    Evaluate a LinkML expression (e.g. an ``equals_expression``) against an object.
+
+    The implementation lives in ``linkml_map``, which is an optional dependency and is
+    expensive to import: it builds a pint/ucumvert unit registry at import time, and a
+    broken combination of those libraries would otherwise take down every linkml-store
+    import (see https://github.com/linkml/linkml-store/issues/105). It is therefore
+    imported on first use rather than when this module is loaded.
+
+    :param expr: The expression to evaluate
+    :param kwargs: Variable bindings, typically the object's slot values
+    :return: The evaluated value
+    """
+    from linkml_map.utils.eval_utils import eval_expr as _eval_expr
+
+    return _eval_expr(expr, **kwargs)
 
 
 def expression_matches(ce: AnonymousClassExpression, object: OBJECT) -> bool:

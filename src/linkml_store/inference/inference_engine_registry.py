@@ -1,11 +1,14 @@
 import importlib
 import inspect
+import logging
 import os
 from typing import Dict, Type
 
 from linkml_store.inference.inference_config import InferenceConfig
 from linkml_store.inference.inference_engine import InferenceEngine
 from linkml_store.utils.object_utils import object_path_update
+
+logger = logging.getLogger(__name__)
 
 
 class InferenceEngineRegistry:
@@ -36,6 +39,17 @@ class InferenceEngineRegistry:
 
     @classmethod
     def load_engines(cls, package_path: str):
+        """
+        Discover and register every InferenceEngine subclass defined in a package.
+
+        Engines may depend on optional, heavyweight libraries. A module that cannot be
+        imported, for whatever reason, is skipped with a warning rather than aborting
+        the whole registry: a broken optional backend must not prevent unrelated
+        functionality (e.g. the CLI) from loading.
+
+        :param package_path: dotted path of the package to scan
+        :return: a registry populated with the engines that imported successfully
+        """
         registry = cls()
         package_dir = os.path.dirname(importlib.import_module(package_path).__file__)
         for filename in os.listdir(package_dir):
@@ -47,8 +61,8 @@ class InferenceEngineRegistry:
                         if inspect.isclass(obj) and issubclass(obj, InferenceEngine) and obj != InferenceEngine:
                             engine_name = name.lower().replace("inferenceengine", "")
                             registry.register(engine_name, obj)
-                except ImportError as e:
-                    print(f"Error importing {module_name}: {e}")
+                except Exception as e:  # noqa: BLE001 - any import-time failure must be tolerated
+                    logger.warning(f"Skipping inference engine module {module_name}; it could not be imported: {e}")
         return registry
 
 
