@@ -86,6 +86,7 @@ including:
 LinkML-Store is designed to work with multiple backends, giving a common abstraction layer
 
 * [MongoDB](https://linkml.io/linkml-store/how-to/Use-MongoDB.html)
+* [Bigtable](https://linkml.io/linkml-store/how-to/Use-Bigtable.html)
 * [DuckDB](https://linkml.io/linkml-store/tutorials/Python-Tutorial.html)
 * [Solr](https://linkml.io/linkml-store/how-to/Query-Solr-using-CLI.html)
 * [Neo4j](https://linkml.io/linkml-store/how-to/Use-Neo4j.html)

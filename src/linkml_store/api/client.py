@@ -17,6 +17,7 @@ HANDLE_MAP = {
     "sqlite": "linkml_store.api.stores.duckdb.duckdb_database.DuckDBDatabase",
     "solr": "linkml_store.api.stores.solr.solr_database.SolrDatabase",
     "mongodb": "linkml_store.api.stores.mongodb.mongodb_database.MongoDBDatabase",
+    "bigtable": "linkml_store.api.stores.bigtable.bigtable_database.BigtableDatabase",
     "chromadb": "linkml_store.api.stores.chromadb.chromadb_database.ChromaDBDatabase",
     "neo4j": "linkml_store.api.stores.neo4j.neo4j_database.Neo4jDatabase",
     "file": "linkml_store.api.stores.filesystem.filesystem_database.FileSystemDatabase",

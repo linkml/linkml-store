@@ -58,6 +58,7 @@ The current backends are:
 
 - :py:mod:`DuckDB<linkml_store.api.stores.duckdb>` (supports read and write)
 - :py:mod:`MongoDB<linkml_store.api.stores.mongodb>` (supports read and write)
+- :py:mod:`Bigtable<linkml_store.api.stores.bigtable>` (supports read and write)
 - :py:mod:`Solr<linkml_store.api.stores.solr>` (write not yet supported)
 - :py:mod:`ChromaDB<linkml_store.api.stores.chromadb>` (pre-alpha)
 - :py:mod:`HDF5<linkml_store.api.stores.mdf5>` (pre-alpha)
