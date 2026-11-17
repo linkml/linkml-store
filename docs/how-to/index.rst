@@ -10,6 +10,7 @@ How-To Guides
 
    Use-Ibis
    Use-MongoDB
+   Use-Bigtable
    Use-Semantic-Search
    Use-LLM-Indexing
    Query-the-Monarch-KG

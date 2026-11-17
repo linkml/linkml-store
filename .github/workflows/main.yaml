@@ -88,5 +88,25 @@ jobs:
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
 
+      - name: Set up Go (for the Bigtable emulator)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          cache: false
+
+      - name: Start Bigtable emulator
+        run: |
+          go install cloud.google.com/go/bigtable/cmd/emulator@v1.58.0
+          nohup "$(go env GOPATH)/bin/emulator" -host localhost -port 8086 > "$RUNNER_TEMP/bigtable-emulator.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if (echo > /dev/tcp/localhost/8086) 2>/dev/null; then echo "Bigtable emulator is up"; exit 0; fi
+            sleep 1
+          done
+          echo "Bigtable emulator did not start"
+          cat "$RUNNER_TEMP/bigtable-emulator.log"
+          exit 1
+
       - name: Test with pytest
+        env:
+          BIGTABLE_EMULATOR_HOST: localhost:8086
         run: uv run pytest -m "not integration and not neo4j" --ignore=tests/test_api/test_neo4j_adapter.py tests

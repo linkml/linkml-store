@@ -57,6 +57,7 @@ scipy = ["scipy", "scikit-learn"]
 rdf = ["lightrdf"]
 ibis = ["ibis-framework[duckdb,examples]>=9.3.0", "multipledispatch", "gcsfs"]
 bigquery = ["google-cloud-bigquery"]
+bigtable = ["google-cloud-bigtable>=2.20.0"]
 all = [
   "llm",
   "tiktoken",
@@ -67,6 +68,7 @@ all = [
   "linkml_map",
   "linkml_renderer",
   "google-cloud-bigquery",
+  "google-cloud-bigtable>=2.20.0",
   "pyarrow",
   "adbc-driver-flightsql",
   "matplotlib",
