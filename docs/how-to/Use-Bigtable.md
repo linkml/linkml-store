@@ -80,6 +80,7 @@ facets = persons.query_facets(facet_columns=["occupation"])
 - If the collection's class has an identifier attribute in the schema, its value is the row key.
   Inserting an object with an existing identifier replaces that row. Without an identifier, row keys are random,
   so inserting the same object twice creates two rows.
+- `upsert` cannot change an object's identifier, since that would mean moving the row; it raises an error instead.
 
 Declare the identifier in the schema **before** loading data. Row keys are fixed when rows are written,
 so rows loaded without an identifier cannot be looked up by it later.
@@ -89,6 +90,15 @@ so rows loaded without an identifier cannot be looked up by it later.
 Tables written by other tools can be read too. Cells in the configured column family become top-level fields.
 Cells in other column families are nested under the family name, e.g. `{"name": "x", "stats": {"views": 10}}`.
 Values that are not JSON are returned as strings, or as hex strings if they are not valid UTF-8.
+If the schema declares an identifier and a row has no cell for it, the row key is used as its value.
+
+Existing tables are found automatically, as collections whose class is named after the table.
+To use a class from your schema, pass it when getting the collection:
+
+```python
+db.set_schema_view("my_schema.yaml")
+people = db.get_collection("people", type="Person")
+```
 
 ## Query performance
 
@@ -104,4 +114,5 @@ Bigtable has no secondary indexes. Its only fast access path is by row key.
 ## Dropping data
 
 `db.drop()` deletes **every table in the instance**, not just the ones linkml-store created.
-The instance itself is not deleted. `collection.delete_where({})` truncates a single table.
+The instance itself is not deleted. Attaching with `recreate_if_exists=True` does the same when it first connects.
+`collection.delete_where({})` truncates a single table.

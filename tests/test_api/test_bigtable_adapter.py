@@ -24,10 +24,13 @@ from linkml_runtime.linkml_model import SlotDefinition  # noqa: E402
 from linkml_runtime.utils.schema_builder import SchemaBuilder  # noqa: E402
 
 from linkml_store import Client  # noqa: E402
+from linkml_store.api.config import CollectionConfig, DatabaseConfig  # noqa: E402
 from linkml_store.api.queries import Query  # noqa: E402
 from linkml_store.api.stores.bigtable import BigtableCollection, BigtableDatabase  # noqa: E402
+from tests import INPUT_DIR  # noqa: E402
 
 HANDLE = "bigtable://test-project/test-instance"
+COUNTRIES = INPUT_DIR / "countries" / "countries.jsonl"
 
 PEOPLE = [
     {
@@ -297,3 +300,172 @@ def test_existing_table_with_other_families(db):
     row.commit()
     collection = db.get_collection("legacy")
     assert collection.find({}).rows == [{"name": "plain text", "count": 3, "stats": {"views": 10}}]
+
+
+# -- regressions for review findings --
+
+
+@requires_emulator
+def test_sparse_rows(db):
+    """Rows missing a field must not break range filters, projections or descending sorts."""
+    collection = db.create_collection("Thing", alias="things")
+    collection.insert([dict(p) for p in PEOPLE] + [{"id": "P4", "name": "Dan"}])
+    assert {r["name"] for r in collection.find({"age": {"$gte": 30}}).rows} == {"Bob", "Carol"}
+    rows = collection.find({}, select_cols=["name", "meta.date"]).rows
+    assert {r["name"]: r["meta.date"] for r in rows} == {
+        "Alice": "2021-01-01",
+        "Bob": "2021-01-02",
+        "Carol": None,
+        "Dan": None,
+    }
+    qr = collection.query(Query(from_table="things", sort_by=["-age"], limit=1))
+    assert qr.rows[0]["name"] == "Carol"
+    qr = collection.query(Query(from_table="things", sort_by=["-age"]))
+    assert qr.rows[-1]["name"] == "Dan"
+
+
+@requires_emulator
+def test_array_and_nested_matching(db):
+    collection = db.create_collection("Thing", alias="things")
+    collection.insert(
+        [
+            {"name": "a", "foods": ["apple"], "rels": [{"type": "friend"}], "meta": {"x": 1}},
+            {"name": "b", "foods": ["kiwi"], "rels": [{"type": "sibling"}], "meta": {"x": 1, "y": 2}},
+        ]
+    )
+    assert [r["name"] for r in collection.find({"foods": "apple"}).rows] == ["a"]
+    assert [r["name"] for r in collection.find({"rels.type": "sibling"}).rows] == ["b"]
+    assert [r["name"] for r in collection.find({"meta": {"x": 1}}).rows] == ["a"]
+    facets = collection.query_facets(facet_columns=["rels.type", "meta"])
+    assert dict(facets["rels.type"]) == {"friend": 1, "sibling": 1}
+    assert sorted(facets["meta"], key=lambda f: len(f[0])) == [({"x": 1}, 1), ({"x": 1, "y": 2}, 1)]
+
+
+@requires_emulator
+def test_schemaless_insert_does_not_freeze_schema(db):
+    db.create_collection("A", alias="a").insert({"x": 1})
+    b = db.create_collection("B", alias="b")
+    b.insert({"y": "v"})
+    assert b.class_definition() is not None
+    assert b.query_facets() == {"y": [("v", 1)]}
+
+
+@requires_emulator
+def test_default_facets_use_slots(db):
+    sb = SchemaBuilder()
+    sb.add_slot("code", identifier=True)
+    sb.add_slot("continent")
+    sb.add_class("Country", slots=["code", "continent"])
+    db.set_schema_view(SchemaView(sb.schema))
+    collection = db.create_collection("Country", alias="countries")
+    collection.insert([{"code": "FR", "continent": "Europe"}, {"code": "DE", "continent": "Europe"}])
+    assert collection.query_facets()["continent"] == [("Europe", 2)]
+
+
+@requires_emulator
+def test_upsert_identifier_rules(people):
+    # an identifier cannot be changed, because it is the row key
+    with pytest.raises(ValueError):
+        people.upsert({"name": "Bob", "id": "P9"}, filter_fields=["name"])
+    assert people.get_one("P2")["name"] == "Bob"
+    # no match on name, but the identifier exists: the row is replaced, as with insert
+    people.upsert({"id": "P1", "name": "Alicia"}, filter_fields=["name"])
+    assert people.get_one("P1") == {"id": "P1", "name": "Alicia"}
+
+
+@requires_emulator
+def test_upsert_pydantic_explicit_none(people):
+    from typing import Optional
+
+    from pydantic import BaseModel
+
+    class Person(BaseModel):
+        id: str
+        name: Optional[str] = None
+        occupation: Optional[str] = None
+
+    people.upsert(Person(id="P2", occupation=None), filter_fields=["id"])
+    bob = people.get_one("P2")
+    assert "occupation" not in bob
+    assert bob["name"] == "Bob"
+
+
+@requires_emulator
+def test_upsert_validates(people):
+    pytest.importorskip("linkml.validator")
+    people.metadata.validate_modifications = True
+    # the person schema is closed, so an unknown field is invalid
+    with pytest.raises(ValueError):
+        people.upsert({"id": "P2", "bogus": 1}, filter_fields=["id"])
+    with pytest.raises(ValueError):
+        people.upsert({"id": "P9", "bogus": 1}, filter_fields=["id"])
+    assert "bogus" not in people.get_one("P2")
+    assert people.get_one("P9") is None
+    people.upsert({"id": "P2", "age": 31}, filter_fields=["id"])
+    assert people.get_one("P2")["age"] == 31
+
+
+@requires_emulator
+def test_pagination_reads_only_the_page(people, monkeypatch):
+    decoded = []
+    original = BigtableCollection._decode_row
+
+    def spy(self, row, id_slot=None):
+        decoded.append(row.row_key)
+        return original(self, row, id_slot)
+
+    monkeypatch.setattr(BigtableCollection, "_decode_row", spy)
+    qr = people.find({}, offset=1, limit=1)
+    assert qr.num_rows == 3
+    assert [r["id"] for r in qr.rows] == ["P2"]
+    assert decoded == [b"P2"]
+    assert people.find({}, offset=5, limit=1).rows == []
+
+
+@requires_emulator
+def test_rediscovered_table_keeps_identifier(people):
+    db2 = Client().attach_database(HANDLE, alias="bt2")
+    db2.set_schema_view(person_schema())
+    collection = db2.get_collection("people", type="Person")
+    assert collection.target_class_name == "Person"
+    assert collection.get_one("P2")["name"] == "Bob"
+
+
+@requires_emulator
+def test_discovery_after_create(people):
+    db2 = Client().attach_database(HANDLE, alias="bt2")
+    db2.create_collection("Other", alias="other")
+    assert set(db2.list_collection_names()) == {"people", "other"}
+    assert db2.get_collection("people", create_if_not_exists=False).find({}).num_rows == 3
+
+
+@requires_emulator
+def test_row_key_as_identifier_for_external_tables(db):
+    table = db.native_instance.table("legacy")
+    table.create(column_families={"d": column_family.MaxVersionsGCRule(1)})
+    row = table.direct_row(b"P1")
+    row.set_cell("d", b"name", b'"Alice"')
+    row.commit()
+    db.set_schema_view(person_schema())
+    collection = db.get_collection("legacy", type="Person")
+    assert collection.get_one("P1") == {"id": "P1", "name": "Alice"}
+
+
+@requires_emulator
+def test_attach_recreate_if_exists(people):
+    db2 = Client().attach_database(HANDLE, alias="bt2", recreate_if_exists=True)
+    assert db2.list_collection_names() == []
+
+
+@requires_emulator
+def test_config_with_collection_source():
+    config = DatabaseConfig(
+        handle=HANDLE,
+        collections={"countries": CollectionConfig(source={"local_path": str(COUNTRIES)})},
+    )
+    db = BigtableDatabase(metadata=config)
+    try:
+        assert db.handle == HANDLE
+        assert db.get_collection("countries").find({}).num_rows == 20
+    finally:
+        db.drop()
