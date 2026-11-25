@@ -91,7 +91,7 @@ class Format(Enum):
         return self in [Format.SQLDUMP_DUCKDB, Format.SQLDUMP_POSTGRES, Format.DUMP_MONGODB]
 
     def is_binary_format(self):
-        return self in [Format.PARQUET, Format.XLSX]
+        return self in [Format.PARQUET, Format.XLSX, Format.PKL]
 
     def is_xsv(self):
         return self in [Format.TSV, Format.CSV]
@@ -168,12 +168,11 @@ def process_file(
     elif format == Format.JSONL:
         objs = [json.loads(line) for line in f]
     elif format == Format.YAML:
-        if expected_type and expected_type == list:  # noqa E721
-            objs = list(yaml.safe_load_all(f))
-            # allow YAML with a `---` with no object before it
-            objs = [obj for obj in objs if obj is not None]
-        else:
-            objs = yaml.safe_load(f)
+        # allow YAML with a `---` with no object before it
+        objs = [obj for obj in yaml.safe_load_all(f) if obj is not None]
+        if not (expected_type and expected_type == list) and len(objs) == 1:  # noqa E721
+            # a single document, which may itself be a list of objects
+            objs = objs[0]
     elif format == Format.TOML:
         import toml
 
@@ -325,6 +324,9 @@ def load_objects(
                 file_path,
                 format=format,
                 expected_type=expected_type,
+                compression=compression,
+                header_comment_token=header_comment_token,
+                select_query=select_query,
             )
 
     if isinstance(format, str):
@@ -347,10 +349,13 @@ def load_objects(
             raise ValueError(f"{file_path} is a dir, which is invalid for {format}")
         open_func = gzip.open if compression == "gz" else open
         format = Format.guess_format(file_path) if not format else format
-        mode = "rb" if (format and format.is_binary_format()) or compression == "gz" else "r"
+        is_binary = bool(format and format.is_binary_format())
+        if compression == "gz":
+            # gzip.open defaults to binary; text formats need text mode
+            mode = "rb" if is_binary else "rt"
+        else:
+            mode = "rb" if is_binary else "r"
         with open_func(file_path, mode) if file_path != "-" else sys.stdin as f:
-            if compression == "gz" and mode == "r":
-                f = io.TextIOWrapper(f)
             all_objects = process_file(f, format, expected_type, header_comment_token)
 
     logger.debug(f"Loaded {len(all_objects)} objects from {file_path}")
@@ -412,9 +417,9 @@ def write_output(
         return
     output_str = render_output(data, format)
     if target:
-        if isinstance(target, str):
-            with open(target, "w") as target:
-                target.write(output_str)
+        if isinstance(target, (str, Path)):
+            with open(target, "w") as stream:
+                stream.write(output_str)
         else:
             target.write(output_str)
     else:
@@ -471,7 +476,7 @@ def render_output(
     if format == Format.JSON:
         return json.dumps(data, indent=2, default=str)
     elif format == Format.JSONL:
-        return "\n".join(json.dumps(obj) for obj in data)
+        return "\n".join(json.dumps(obj, default=str) for obj in data)
     elif format == Format.PYTHON:
         return str(data)
     elif format == Format.MARKDOWN:

@@ -44,6 +44,14 @@ def mongo_query_to_match_function(where: Dict[str, Any]) -> Callable[[Dict[str, 
     >>> complex_matcher({"name": "foo", "age": 35, "nested": {"salary": 40000}})
     False
 
+    A nested dict of conditions applies to the nested object:
+
+    >>> dict_matcher = mongo_query_to_match_function({"nested": {"job": "engineer", "salary": {"$gt": 50000}}})
+    >>> dict_matcher({"nested": {"job": "engineer", "salary": 60000}})
+    True
+    >>> dict_matcher({"job": "engineer", "salary": 60000, "nested": {"job": "designer", "salary": 1}})
+    False
+
     >>> invalid_query = {"age": {"$invalid": 25}}
     >>> invalid_matcher = mongo_query_to_match_function(invalid_query)
     >>> invalid_matcher({"age": 30})
@@ -64,15 +72,10 @@ def mongo_query_to_match_function(where: Dict[str, Any]) -> Callable[[Dict[str, 
                     else:
                         raise ValueError(f"Unsupported operator: {op}")
             elif isinstance(condition, dict):
-                return check_nested_condition(get_nested_value(obj, key), condition)
+                # conditions on the attributes of a nested object
+                return all(check_condition(f"{key}.{k}", v) for k, v in condition.items())
             else:
                 return get_nested_value(obj, key) == condition
-            return True
-
-        def check_nested_condition(nested_obj: Dict[str, Any], nested_condition: Dict[str, Any]) -> bool:
-            for k, v in nested_condition.items():
-                if not check_condition(k, v):
-                    return False
             return True
 
         def get_nested_value(obj: Dict[str, Any], key: str) -> Any:

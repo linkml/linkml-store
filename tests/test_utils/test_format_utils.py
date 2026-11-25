@@ -165,3 +165,49 @@ OBJS = [
 def test_transform_objects(objects, select_expr, expected):
     tr_objects = transform_objects(objects, select_expr)
     assert tr_objects == expected
+
+
+OBJECTS = [{"id": "1", "name": "Alice"}, {"id": "2", "name": "Bob"}]
+
+
+@pytest.mark.parametrize("fmt", [Format.JSON, Format.JSONL, Format.YAML, Format.CSV, Format.TSV])
+def test_write_then_load(tmp_path, fmt):
+    """A list of objects written in a format is read back as the same list."""
+    from linkml_store.utils.format_utils import write_output
+
+    path = tmp_path / f"objects.{fmt.value}"
+    write_output(OBJECTS, fmt, target=path)
+    assert load_objects(path) == OBJECTS
+    # the target can also be a string
+    write_output(OBJECTS[0:1], fmt, target=str(path))
+    assert load_objects(path) == OBJECTS[0:1]
+
+
+@pytest.mark.parametrize("fmt", [Format.JSON, Format.JSONL, Format.YAML, Format.CSV, Format.TSV])
+def test_load_gzipped(tmp_path, fmt):
+    import gzip
+
+    path = tmp_path / f"objects.{fmt.value}.gz"
+    with gzip.open(path, "wt") as stream:
+        stream.write(render_output(OBJECTS, fmt))
+    assert load_objects(path, format=fmt, compression="gz") == OBJECTS
+
+
+def test_load_pickle(tmp_path):
+    import pandas as pd
+
+    path = tmp_path / "objects.pkl"
+    pd.DataFrame(OBJECTS).to_pickle(path)
+    assert load_objects(path) == OBJECTS
+
+
+def test_load_yaml_single_document():
+    """A YAML file holding one object is still loaded as a list with that object."""
+    assert load_objects(YAML_FILE, expected_type=None) == TEST_DATA
+
+
+def test_render_jsonl_with_dates():
+    import datetime
+
+    rendered = render_output([{"d": datetime.date(2024, 1, 2)}], Format.JSONL)
+    assert json.loads(rendered) == {"d": "2024-01-02"}
