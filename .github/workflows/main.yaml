@@ -90,3 +90,12 @@ jobs:
 
       - name: Test with pytest
         run: uv run pytest -m "not integration and not neo4j" --ignore=tests/test_api/test_neo4j_adapter.py tests
+
+      - name: Run doctests
+        # One run per file: given several files, `python -m doctest` stops at the first that fails.
+        run: |
+          status=0
+          while IFS= read -r -d '' f; do
+            uv run python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE "$f" || status=1
+          done < <(find docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) ! -path "*/chromadb/*" ! -path "docs/_build/*" -print0)
+          exit $status

@@ -24,7 +24,6 @@ from linkml_store.api.stores.neo4j.neo4j_collection import DeletePolicy
 from linkml_store.graphs.graph_map import EdgeProjection, NodeProjection
 
 
-@pytest.mark.neo4j
 @pytest.fixture(scope="function")
 def neo4j_db():
     client = Client()

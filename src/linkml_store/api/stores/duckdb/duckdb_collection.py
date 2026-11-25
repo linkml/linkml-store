@@ -22,11 +22,14 @@ class DuckDBCollection(Collection):
         super().__init__(*args, **kwargs)
 
     def insert(self, objs: Union[OBJECT, List[OBJECT]], **kwargs):
-        logger.debug(f"Inserting {len(objs)}")
         if not isinstance(objs, list):
             objs = [objs]
         if not objs:
             return
+        logger.debug(f"Inserting {len(objs)}")
+        bad_objs = [obj for obj in objs if not isinstance(obj, dict)]
+        if bad_objs:
+            raise ValueError(f"Can only insert dict objects into {self.alias}; got: {bad_objs[0:5]}")
         cd = self.class_definition()
         if not cd:
             logger.debug(f"No class definition defined for {self.alias} {self.target_class_name}; will induce")
@@ -36,9 +39,10 @@ class DuckDBCollection(Collection):
         logger.info(f"Inserting into: {self.alias} // T={table.name}")
         engine = self.parent.engine
         col_names = [c.name for c in table.columns]
-        bad_objs = [obj for obj in objs if not isinstance(obj, dict)]
-        if bad_objs:
-            logger.error(f"Bad objects: {bad_objs}")
+        unknown_keys = sorted({k for obj in objs for k in obj} - set(col_names))
+        if unknown_keys:
+            # The table has a fixed set of columns; values for other keys are not stored.
+            logger.warning(f"Not storing fields that are not columns of {self.alias}: {unknown_keys}")
         objs = [{k: obj.get(k, None) for k in col_names} for obj in objs]
         with engine.connect() as conn:
             with conn.begin():
@@ -111,7 +115,7 @@ class DuckDBCollection(Collection):
                 else:
                     sd = cd.attributes[col]
                 facet_query = self._create_query(where_clause=where)
-                facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued)
+                facet_query_str = facet_count_sql(facet_query, col, multivalued=sd.multivalued, limit=facet_limit)
                 logger.debug(f"Facet query: {facet_query_str}")
                 rows = list(conn.execute(text(facet_query_str)))
                 results[col] = [tuple(row) for row in rows]

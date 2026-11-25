@@ -100,6 +100,8 @@ class LLMInferenceEngine(InferenceEngine):
         system_prompt = SYSTEM_PROMPT.format(llm_config=self.config.llm_config)
 
         system_prompt += "\n## SCHEMA:\n\n" + self._schema_str()
+        # feedback from a previous attempt that failed validation
+        system_prompt += "\n".join(additional_prompt_texts or [])
 
         stub = ", ".join([f"{k}: ..." for k in target_attributes])
         stub = "{" + stub + "}"

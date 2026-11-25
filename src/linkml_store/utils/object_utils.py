@@ -53,7 +53,9 @@ def object_path_update(
         key, index = last_part[:-1].split("[")
         index = int(index)
         if key not in obj or not isinstance(obj[key], list):
-            obj[key] = [{} for _ in range(index + 1)]
+            obj[key] = []
+        while len(obj[key]) <= index:
+            obj[key].append({})
         obj[key][index] = value
     else:
         obj[last_part] = value
@@ -81,6 +83,10 @@ def object_path_get(obj: Union[BaseModel, Dict[str, Any]], path: str, default_va
     {'bar': 1}
     >>> object_path_get({}, 'not there', "NA")
     'NA'
+    >>> object_path_get({}, 'not.there', "NA")
+    'NA'
+    >>> object_path_get({'a': None}, 'a.b') is None
+    True
     """
     if isinstance(obj, BaseModel):
         obj = obj.model_dump()
@@ -96,8 +102,11 @@ def object_path_get(obj: Union[BaseModel, Dict[str, Any]], path: str, default_va
         else:
             if isinstance(obj, list):
                 obj = [v1.get(part, default_value) for v1 in obj]
-            else:
+            elif isinstance(obj, dict):
                 obj = obj.get(part, default_value)
+            else:
+                # an intermediate part of the path is missing or is not a container
+                return default_value
     return obj
 
 

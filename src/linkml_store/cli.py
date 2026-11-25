@@ -16,8 +16,6 @@ from linkml_store.api import Collection, Database
 from linkml_store.api.config import ClientConfig
 from linkml_store.api.queries import Query
 from linkml_store.index import get_indexer
-from linkml_store.index.implementations.simple_indexer import SimpleIndexer
-from linkml_store.index.indexer import Indexer
 from linkml_store.inference import get_inference_engine
 from linkml_store.inference.evaluation import evaluate_predictor, score_text_overlap
 from linkml_store.inference.inference_config import InferenceConfig
@@ -92,7 +90,7 @@ class ContextSettings(BaseModel):
                 return None
             if not self.database.list_collections():
                 return None
-            name = list(self.database.list_collections())[0]
+            name = self.database.list_collections()[0].alias
         return self.database.get_collection(name)
 
     class Config:
@@ -152,11 +150,12 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
             parts = input.split("/")
             collection = parts[-1]
             collection = collection.split(".")[0]
+            source = {"url": input}
         else:
-            stem = underscore(Path(input).stem)
-            collection = stem
+            collection = underscore(Path(input).stem)
+            source = {"local_path": input}
         logger.info(f"Using input file: {input}, " f"default storage is {database} and collection is {collection}")
-        config = ClientConfig(databases={"duckdb": {"collections": {stem: {"source": {"local_path": input}}}}})
+        config = ClientConfig(databases={"duckdb": {"collections": {collection: {"source": source}}}})
     if config is None and DEFAULT_LOCAL_CONF_PATH.exists():
         config = DEFAULT_LOCAL_CONF_PATH
     if config is None and DEFAULT_GLOBAL_CONF_PATH.exists():
@@ -171,6 +170,8 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool, database, collection, 
     ctx.obj["settings"] = settings
     if schema:
         db = settings.database
+        if db is None:
+            raise click.UsageError("--schema requires a database; specify one with --database or --config")
         db.set_schema_view(schema)
     if settings.database_name:
         db = client.get_database(database)
@@ -321,9 +322,11 @@ def store(ctx, files, object, format, json_select_query):
         for object_str in object:
             logger.info(f"Parsing: {object_str}")
             objects = yaml.safe_load(object_str)
+            if not isinstance(objects, list):
+                objects = [objects]
             for obj in objects:
                 db.store(obj)
-            click.echo(f"Inserted {len(objects)} objects from {object_str} into collection '{db.name}'.")
+            click.echo(f"Inserted {len(objects)} objects from {object_str} into database '{db.alias}'.")
 
 
 @cli.command(name="import")
@@ -338,14 +341,14 @@ def import_database(ctx, files, format):
     """
     settings = ctx.obj["settings"]
     db = settings.database
-    if not files and not object:
-        files = ["-"]
+    if not files:
+        raise click.UsageError("At least one file to import must be specified.")
     for file_path in files:
         db.import_database(file_path, source_format=format)
 
 
 @cli.command()
-@click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
+@click.option("--output-type", "-O", type=format_choice, help="Output format (default: guessed from the output file)")
 @click.option("--output", "-o", required=True, type=click.Path(), help="Output file path")
 @click.pass_context
 def export(ctx, output_type, output):
@@ -460,7 +463,7 @@ def query(ctx, where, select, sql, limit, output_type, output):
 
     Examples:
 
-        linkml-store -d duckdb:///countries.db query --sql 'SELECT * FROM countries WHERE code = "NZ"'
+        linkml-store -d duckdb:///countries.db query --sql "SELECT * FROM countries WHERE code = 'NZ'"
 
         linkml-store -d dremio://lakehouse:32010 query --sql 'SELECT COUNT(*) FROM "gold"."samples"'
 
@@ -598,10 +601,10 @@ def fq(ctx, where, limit, columns, output_type, wide, output, **kwargs):
 
 @cli.command()
 @click.option("--where", "-w", type=click.STRING, help="WHERE clause for the query")
-@click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return per facet")
+@click.option("--limit", "-l", type=click.INT, help="Maximum number of groups to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--columns", "-S", help="Columns to facet on. Comma-separated, join combined facets with +")
+@click.option("--columns", "-S", required=True, help="Columns to group by. Comma-separated")
 @click.pass_context
 def groupby(ctx, where, limit, columns, output_type, output, **kwargs):
     """
@@ -615,42 +618,33 @@ def groupby(ctx, where, limit, columns, output_type, output, **kwargs):
 
     This can be grouped, e.g by subject:
 
-        linkml-store -d cl.ddb -c triple groupby -s subject
+        linkml-store -d cl.ddb -c triple groupby -S subject
 
     Or subject and predicate:
 
-        linkml-store -d cl.ddb -c triple groupby -s '[subject,predicate]'
+        linkml-store -d cl.ddb -c triple groupby -S subject,predicate
 
     """
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
-    columns = columns.split(",") if columns else None
-    if columns:
-        columns = [col.strip() for col in columns]
-        columns = [(tuple(col.split("+")) if "+" in col else col) for col in columns]
+    # "+" is accepted as a separator for consistency with the fq command
+    columns = [col.strip() for col in columns.replace("+", ",").split(",")]
     logger.info(f"Group by: {columns}")
     result = collection.group_by(
         group_by_fields=columns,
-        where_clause=where_clause,
+        where=where_clause,
         agg_map={},
-        limit=limit,
         **kwargs,
     )
     logger.info(f"Group by results: {result}")
-    output_data = render_output(result.rows, output_type)
+    rows = result.rows if limit is None else result.rows[:limit]
+    output_data = render_output(rows, output_type)
     if output:
         with open(output, "w") as f:
             f.write(output_data)
         click.echo(f"Query results saved to {output}")
     else:
         click.echo(output_data)
-
-
-def _get_index(index_type=None, **kwargs) -> Indexer:
-    if index_type is None or index_type == "simple":
-        return SimpleIndexer(name="test", **kwargs)
-    else:
-        raise ValueError(f"Unknown index type: {index_type}")
 
 
 @cli.command()
@@ -668,6 +662,8 @@ def describe(ctx, where, output_type, output, limit):
     where_clause = yaml.safe_load(where) if where else None
     collection = ctx.obj["settings"].collection
     df = collection.find(where_clause, limit=limit).rows_dataframe
+    if df is None:
+        raise click.ClickException(f"No objects found in collection '{collection.alias}'")
     write_output(df.describe(include="all").transpose(), output_type, target=output)
 
 
@@ -676,16 +672,16 @@ def describe(ctx, where, output_type, output, limit):
 @click.option("--limit", "-l", type=click.INT, help="Maximum number of results to return")
 @click.option("--output-type", "-O", type=format_choice, default="json", help="Output format")
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
-@click.option("--index", "-I", help="Attributes to index on in pivot")
-@click.option("--columns", "-A", help="Attributes to use as columns in pivot")
-@click.option("--values", "-V", help="Attributes to use as values in pivot")
+@click.option("--index", "-I", required=True, help="Attributes to index on in pivot")
+@click.option("--columns", "-A", required=True, help="Attributes to use as columns in pivot")
+@click.option("--values", "-V", required=True, help="Attributes to use as values in pivot")
 @click.pass_context
 def pivot(ctx, where, limit, index, columns, values, output_type, output):
     collection = ctx.obj["settings"].collection
     where_clause = yaml.safe_load(where) if where else None
-    column_atts = columns.split(",") if columns else None
-    value_atts = values.split(",") if values else None
-    index_atts = index.split(",") if index else None
+    column_atts = columns.split(",")
+    value_atts = values.split(",")
+    index_atts = index.split(",")
     results = collection.find(where_clause, limit=limit)
     pivoted = defaultdict(dict)
     for row in results.rows:
@@ -809,7 +805,7 @@ def infer(
 
     Example:
 
-        linkml-store  -i countries.jsonl inference -t rag  -q 'name: Uruguay'
+        linkml-store  -i countries.jsonl infer -t rag  -q 'name: Uruguay'
 
     Result:
 
@@ -817,13 +813,13 @@ def infer(
 
     You can pass in configurations as follows:
 
-        linkml-store  -i countries.jsonl inference -t rag:llm_config.model_name=llama-3  -q 'name: Uruguay'
+        linkml-store  -i countries.jsonl infer -t rag:llm_config.model_name=llama-3  -q 'name: Uruguay'
 
     ## SKLearn:
 
     This uses scikit-learn (defaulting to simple decision trees) to do the prediction.
 
-        linkml-store -i tests/input/iris.csv inference -t sklearn \
+        linkml-store -i tests/input/iris.csv infer -t sklearn \
            -q '{"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}'
     """
     where_clause = yaml.safe_load(where) if where else None
@@ -847,7 +843,7 @@ def infer(
     if target_attribute:
         target_attributes = list(target_attribute)
     else:
-        target_attributes = [att for att in atts if att not in features]
+        target_attributes = [att for att in atts if att not in (features or [])]
     if model_format:
         model_format = ModelSerialization(model_format)
     if load_model:
@@ -989,7 +985,7 @@ def indexes(ctx):
     """
     collection = ctx.obj["settings"].collection
     for name, ix in collection.indexers.items():
-        click.echo(f"{name}: {type(ix)}\n{ix.model_json()}")
+        click.echo(f"{name}: {type(ix)}\n{ix.model_dump_json()}")
 
 
 
@@ -1058,58 +1054,52 @@ def find_matches(ctx, source_collection, target_collection, index_name, metric, 
     )
 
     # Perform matching
-    try:
-        if target_collection and target_collection != source_collection:
-            # Between collections
-            click.echo(f"Finding matches between {source_collection} and {target_collection}...")
-            results = match_embeddings_between_collections(
-                database=db,
-                source_collection=source_collection,
-                target_collection=target_collection,
-                index_name=index_name,
-                config=config,
-                limit=limit
-            )
+    if target_collection and target_collection != source_collection:
+        # Between collections
+        click.echo(f"Finding matches between {source_collection} and {target_collection}...")
+        results = match_embeddings_between_collections(
+            database=db,
+            source_collection=source_collection,
+            target_collection=target_collection,
+            index_name=index_name,
+            config=config,
+            limit=limit
+        )
+    else:
+        # Within collection
+        click.echo(f"Finding matches within {source_collection}...")
+        results = match_embeddings_within_collection(
+            database=db,
+            collection_name=source_collection,
+            index_name=index_name,
+            config=config,
+            limit=limit
+        )
+
+    # Format output
+    if output_format == "report":
+        output_text = format_matches_report(results)
+    elif output_format == "json":
+        import json
+        output_text = json.dumps([m.to_dict() for m in results.matches], indent=2)
+    elif output_format == "csv":
+        df = results.to_dataframe()
+        if df is not None:
+            output_text = df.to_csv(index=False)
         else:
-            # Within collection
-            click.echo(f"Finding matches within {source_collection}...")
-            results = match_embeddings_within_collection(
-                database=db,
-                collection_name=source_collection,
-                index_name=index_name,
-                config=config,
-                limit=limit
-            )
+            click.echo("pandas required for CSV output", err=True)
+            return
 
-        # Format output
-        if output_format == "report":
-            output_text = format_matches_report(results)
-        elif output_format == "json":
-            import json
-            output_text = json.dumps([m.to_dict() for m in results.matches], indent=2)
-        elif output_format == "csv":
-            df = results.to_dataframe()
-            if df is not None:
-                output_text = df.to_csv(index=False)
-            else:
-                click.echo("pandas required for CSV output", err=True)
-                return
+    # Output results
+    if output:
+        with open(output, "w") as f:
+            f.write(output_text)
+        click.echo(f"Results saved to {output}")
+    else:
+        click.echo(output_text)
 
-        # Output results
-        if output:
-            with open(output, "w") as f:
-                f.write(output_text)
-            click.echo(f"Results saved to {output}")
-        else:
-            click.echo(output_text)
-
-        # Summary
-        click.echo(f"\nFound {len(results.matches)} total matches")
-
-    except Exception as e:
-        click.echo(f"Error: {e}", err=True)
-        import traceback
-        traceback.print_exc()
+    # Summary
+    click.echo(f"\nFound {len(results.matches)} total matches")
 
 
 @cli.command()
@@ -1133,7 +1123,8 @@ def validate(ctx, output_type, output, collection_only, **kwargs):
     if collection_only:
         collection = ctx.obj["settings"].collection
         logger.info(f"Validating collection {collection.alias}")
-        validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection(**kwargs)]
+        # referential integrity is a property of the database as a whole
+        validation_results = [json_dumper.to_dict(x) for x in collection.iter_validate_collection()]
     else:
         db = ctx.obj["settings"].database
         validation_results = [json_dumper.to_dict(x) for x in db.validate_database(**kwargs)]

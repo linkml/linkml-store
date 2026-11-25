@@ -89,8 +89,8 @@ class FileSystemCollection(Collection[DatabaseType]):
                 import csv
 
                 delimiter = "\t" if fmt == "tsv" else ","
-                fieldnames = list(self.objects_as_list[0].keys())
-                for obj in self.objects_as_list[1:]:
+                fieldnames = []
+                for obj in self.objects_as_list:
                     fieldnames.extend([k for k in obj.keys() if k not in fieldnames])
                 writer = csv.DictWriter(stream, fieldnames=fieldnames, delimiter=delimiter)
                 writer.writeheader()
@@ -128,9 +128,9 @@ class FileSystemCollection(Collection[DatabaseType]):
                     del self._object_map[pk_val]
                     n += 1
         else:
-            n = len(objs)
+            n = len(self._objects_list)
             self._objects_list = [o for o in self._objects_list if o not in objs]
-            n = n - len(objs)
+            n = n - len(self._objects_list)
         return n
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> Optional[int]:
@@ -144,11 +144,13 @@ class FileSystemCollection(Collection[DatabaseType]):
                     return False
             return True
 
-        print(type(self))
-        print(self)
-        print(vars(self))
-        curr_objects = [o for o in self.objects_as_list if not matches(o)]
+        all_objects = self.objects_as_list
+        curr_objects = [o for o in all_objects if not matches(o)]
+        deleted_rows_count = len(all_objects) - len(curr_objects)
+        if deleted_rows_count == 0 and not missing_ok:
+            raise ValueError(f"No rows found for {where}")
         self._set_objects(curr_objects)
+        return deleted_rows_count
 
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         limit = limit or query.limit

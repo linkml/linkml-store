@@ -121,7 +121,9 @@ class Database(ABC, Generic[CollectionType]):
     def _initialize_schema(self, **kwargs):
         db_config = self.metadata
         if db_config.schema_location:
-            schema_location = db_config.schema_location.format(base_dir=self.parent.metadata.base_dir)
+            # the database may not have been attached to a client yet
+            base_dir = self.parent.metadata.base_dir if self.parent else None
+            schema_location = db_config.schema_location.format(base_dir=base_dir)
             logger.info(f"Loading schema from: {schema_location}")
             self.load_schema_view(schema_location)
         if db_config.schema_dict:
@@ -711,7 +713,7 @@ class Database(ABC, Generic[CollectionType]):
         cmap = defaultdict(list)
         for collection in self.list_collections():
             if not collection.target_class_name:
-                raise ValueError(f"Collection {collection.name} has no target class")
+                raise ValueError(f"Collection {collection.alias} has no target class")
             cmap[collection.target_class_name].append(collection)
         for collection in self.list_collections():
             cd = collection.class_definition()
@@ -760,7 +762,7 @@ class Database(ABC, Generic[CollectionType]):
         >>> coll.find({}).num_rows
         1
         >>> db.drop()
-        >>> db = client.attach_database("duckdb:///tmp/test.db", alias="test")
+        >>> db = client.attach_database(f"duckdb:///{path}", alias="test")
         >>> coll = db.get_collection("persons")
         >>> coll.find({}).num_rows
         0

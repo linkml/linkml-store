@@ -88,3 +88,56 @@ def test_insert_and_query(fmt):
     assert len(top2) == 2
     top2_names = sorted([r["name"] for _, r in top2])
     assert top2_names == ["Alice", "Jie"]
+
+
+@pytest.mark.parametrize("fmt", ["json", "yaml", "tsv", "csv", "jsonl"])
+def test_changes_are_saved_to_the_file_that_was_loaded(tmp_path, fmt):
+    """A collection loaded from a file is saved back to that file, in the same format."""
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    collection = db.create_collection("persons")
+    collection.file_format = fmt
+    collection.insert([{"name": "Alice"}, {"name": "Bob"}])
+    db.commit()
+    assert [f.name for f in tmp_path.iterdir()] == [f"persons.{fmt}"]
+
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    collection = db.get_collection("persons")
+    assert collection.find().num_rows == 2
+    collection.insert([{"name": "Charlie"}])
+    db.commit()
+    assert [f.name for f in tmp_path.iterdir()] == [f"persons.{fmt}"]
+
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    assert sorted(row["name"] for row in db.get_collection("persons").find().rows) == ["Alice", "Bob", "Charlie"]
+
+
+def test_hidden_files_are_not_collections(tmp_path):
+    (tmp_path / ".linkml_metadata.yaml").write_text("alias: test\n")
+    (tmp_path / "persons.json").write_text('[{"name": "Alice"}]')
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    assert db.list_collection_names() == ["persons"]
+
+
+def test_delete(tmp_path, capsys):
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    collection = db.create_collection("persons")
+    collection.insert([{"name": "Alice"}, {"name": "Bob"}, {"name": "Charlie"}])
+    assert collection.delete({"name": "Alice"}) == 1
+    assert collection.delete({"name": "Nobody"}) == 0
+    assert collection.delete_where({"name": "Bob"}) == 1
+    assert collection.delete_where({"name": "Nobody"}) == 0
+    with pytest.raises(ValueError, match="No rows found"):
+        collection.delete_where({"name": "Nobody"}, missing_ok=False)
+    assert [row["name"] for row in collection.find().rows] == ["Charlie"]
+    assert collection.delete_where() == 1
+    # nothing is written to stdout, which the CLI reserves for results
+    assert capsys.readouterr().out == ""
+
+
+@pytest.mark.parametrize("fmt", ["csv", "tsv"])
+def test_commit_empty_collection(tmp_path, fmt):
+    db = FileSystemDatabase(handle=f"file:{tmp_path}")
+    collection = db.create_collection("persons")
+    collection.file_format = fmt
+    db.commit()
+    assert (tmp_path / f"persons.{fmt}").exists()

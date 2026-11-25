@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
-from linkml_runtime import SchemaView
-from linkml_runtime.utils.schema_builder import SchemaBuilder
 
 from linkml_store.api import Database
 from linkml_store.api.config import DatabaseConfig
@@ -13,6 +11,9 @@ from linkml_store.utils.file_utils import safe_remove_directory
 from linkml_store.utils.format_utils import Format, load_objects
 
 logger = logging.getLogger(__name__)
+
+WRITABLE_FORMATS = {"json", "jsonl", "yaml", "parquet", "csv", "tsv"}
+"""Formats that :class:`FileSystemCollection` can save."""
 
 
 class FileSystemDatabase(Database):
@@ -65,17 +66,17 @@ class FileSystemDatabase(Database):
                 suffix = fmt.value
                 logger.info(f"Looking for {suffix} files in {path}")
                 for f in path.glob(f"*.{suffix}"):
+                    if f.name.startswith("."):
+                        # hidden files (e.g. the metadata file) are not collections
+                        continue
                     logger.info(f"Found {f}")
                     n = f.stem
                     objs = load_objects(f, suffix, expected_type=list)
                     collection = FileSystemCollection(parent=self, name=n)
+                    if suffix in WRITABLE_FORMATS:
+                        # save back to the file the collection was loaded from, rather than
+                        # to a json file alongside it
+                        collection.file_format = suffix
                     self._collections[n] = collection
                     collection._set_objects(objs)
 
-    def xxxinduce_schema_view(self) -> SchemaView:
-        logger.info(f"Inducing schema view for {self.handle}")
-        sb = SchemaBuilder()
-
-        for collection_name in self.list_collection_names():
-            sb.add_class(collection_name)
-        return SchemaView(sb.schema)

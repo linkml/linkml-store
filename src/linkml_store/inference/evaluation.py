@@ -68,11 +68,11 @@ def score_match(target: Optional[Any], candidate: Optional[Any], match_function:
         score_matrix = np.array([[score_match(t, c, match_function) for c in candidate] for t in target])
         best_matches0 = np.max(score_matrix, axis=0)
         best_matches1 = np.max(score_matrix, axis=1)
-        return (np.sum(best_matches0) + np.sum(best_matches1)) / (len(target) + len(candidate))
+        return float((np.sum(best_matches0) + np.sum(best_matches1)) / (len(target) + len(candidate)))
     if isinstance(target, dict) and isinstance(candidate, dict):
         keys = set(target.keys()).union(candidate.keys())
         scores = [score_match(target.get(k), candidate.get(k), match_function) for k in keys]
-        return np.mean(scores)
+        return float(np.mean(scores))
     if match_function:
         return match_function(target, candidate)
     return 0.0

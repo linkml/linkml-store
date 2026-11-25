@@ -66,9 +66,13 @@ def dremio_database(dremio_client):
 class TestDremioHandleParsing:
     """Tests for Dremio handle/URL parsing."""
 
-    def test_parse_simple_handle(self):
+    def test_parse_simple_handle(self, monkeypatch):
         """Test parsing a simple handle without credentials."""
         from linkml_store.api.stores.dremio.dremio_database import DremioDatabase
+
+        # credentials default to these environment variables
+        monkeypatch.delenv("DREMIO_USER", raising=False)
+        monkeypatch.delenv("DREMIO_PASSWORD", raising=False)
 
         db = DremioDatabase.__new__(DremioDatabase)
         info = db._parse_handle("dremio://localhost:32010")
