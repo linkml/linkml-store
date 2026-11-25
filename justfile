@@ -32,7 +32,7 @@ pytest:
 
 # Run neo4j tests
 pytest-neo4j:
-    uv run pytest -k only_neo4j
+    uv run pytest -m neo4j tests
 
 # Run minimal pytest
 pytest-minimal:
@@ -52,7 +52,13 @@ all-pytest:
 
 # Run doctests
 doctest:
-    find docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) ! -path "*/chromadb/*" -print0 | xargs -0 uv run python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE
+    #!/usr/bin/env bash
+    # One doctest run per file: given several files, `python -m doctest` stops at the first that fails.
+    status=0
+    while IFS= read -r -d '' f; do
+        uv run python -m doctest --option ELLIPSIS --option NORMALIZE_WHITESPACE "$f" || status=1
+    done < <(find docs src/linkml_store/api src/linkml_store/index src/linkml_store/utils -type f \( -name "*.rst" -o -name "*.md" -o -name "*.py" \) ! -path "*/chromadb/*" ! -path "docs/_build/*" -print0)
+    exit $status
 
 # ============== Linting ==============
 

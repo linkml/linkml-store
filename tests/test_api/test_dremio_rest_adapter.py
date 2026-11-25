@@ -33,9 +33,13 @@ def vcr_config():
 class TestDremioRestHandleParsing:
     """Tests for Dremio REST handle/URL parsing."""
 
-    def test_parse_simple_handle(self):
+    def test_parse_simple_handle(self, monkeypatch):
         """Test parsing a simple handle without credentials."""
         from linkml_store.api.stores.dremio_rest.dremio_rest_database import DremioRestDatabase
+
+        # credentials default to these environment variables
+        monkeypatch.delenv("DREMIO_USER", raising=False)
+        monkeypatch.delenv("DREMIO_PASSWORD", raising=False)
 
         db = DremioRestDatabase.__new__(DremioRestDatabase)
         db._connection_info = None
