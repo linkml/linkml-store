@@ -97,7 +97,8 @@ class Client:
         self.metadata = metadata
         if not self.metadata:
             self.metadata = ClientConfig()
-        self.metadata.handle = handle
+        if handle is not None:
+            self.metadata.handle = handle
 
     @property
     def handle(self) -> Optional[str]:
@@ -147,7 +148,8 @@ class Client:
         if isinstance(config, str):
             if not base_dir:
                 base_dir = Path(config).parent
-            parsed_obj = yaml.safe_load(open(config))
+            with open(config) as stream:
+                parsed_obj = yaml.safe_load(stream)
             config = ClientConfig(**parsed_obj)
         self.metadata = config
         if base_dir:
@@ -360,9 +362,10 @@ class Client:
         >>> Path("tmp/test.db").exists()
         False
 
-        Dropping a non-existent database:
+        Dropping a database that is not attached:
 
         >>> client = Client()
+        >>> _ = client.attach_database("duckdb", alias="test")
         >>> client.drop_database("duckdb:///tmp/made-up1", missing_ok=True)
         >>> client.drop_database("duckdb:///tmp/made-up2", missing_ok=False)
         Traceback (most recent call last):

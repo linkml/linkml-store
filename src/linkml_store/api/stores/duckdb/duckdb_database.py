@@ -129,7 +129,7 @@ class DuckDBDatabase(Database):
             sv = self.schema_view
             if sv:
                 cd = None
-                for c in self._collections.values():
+                for c in (self._collections or {}).values():
                     if c.alias == table_name or c.target_class_name == table_name:
                         cd = c.class_definition()
                         break
@@ -156,7 +156,7 @@ class DuckDBDatabase(Database):
             if json_encoded_cols:
                 for row in qr.rows:
                     for col in json_encoded_cols:
-                        if row[col]:
+                        if row.get(col):
                             if isinstance(row[col], list):
                                 for i in range(len(row[col])):
                                     try:

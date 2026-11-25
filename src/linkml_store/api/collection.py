@@ -107,7 +107,7 @@ class Collection(Generic[DatabaseType]):
 
         :return: True if the collection is hidden
         """
-        # return self.metadata.hidden
+        return bool(self.metadata.hidden)
 
     @property
     def target_class_name(self):
@@ -239,14 +239,16 @@ class Collection(Generic[DatabaseType]):
         **kwargs,
     ):
         """
-        Add one or more objects to the collection.
+        Insert objects, or update them if an object matching ``filter_fields`` already exists.
 
-        >>> from linkml_store import Client
-        >>> client = Client()
-        >>> db = client.attach_database("mongodb", alias="test")
-        >>> collection = db.create_collection("Person")
-        >>> objs = [{"id": "P1", "name": "John", "age_in_years": 30}, {"id": "P2", "name": "Alice", "age_in_years": 25}]
-        >>> collection.upsert(objs)
+        Not all backends support this. Example (requires a running MongoDB):
+
+        .. code-block:: python
+
+            db = client.attach_database("mongodb", alias="test")
+            collection = db.create_collection("Person")
+            objs = [{"id": "P1", "name": "John", "age_in_years": 30}]
+            collection.upsert(objs, filter_fields=["id"])
 
         :param objs:
         :param filter_fields: List of field names to use as the filter for matching existing collections.
@@ -287,12 +289,21 @@ class Collection(Generic[DatabaseType]):
         self._post_modification_hook(**kwargs)
 
     def _post_modification_hook(self, **kwargs):
-        for indexer in self.indexers.values():
-            ix_collection_name = self.get_index_collection_name(indexer)
-            ix_collection = self.parent.get_collection(ix_collection_name)
-            # Currently updating the source triggers complete reindexing
-            # TODO: make this more efficient by only deleting modified
-            ix_collection.delete_where({})
+        if self.is_internal:
+            return
+        # Currently updating the source triggers complete reindexing
+        # TODO: make this more efficient by only deleting modified
+        #
+        # Indexers are not persisted, so an index built by another process (e.g. an earlier
+        # CLI invocation) has no entry in self.indexers. Clear every index collection
+        # that exists for this collection, not only those of the attached indexers.
+        ix_collection_names = {self.get_index_collection_name(indexer) for indexer in self.indexers.values()}
+        prefix = self._index_collection_name("")
+        ix_collection_names.update(
+            n for n in self.parent.list_collection_names(include_internal=True) if n.startswith(prefix)
+        )
+        for ix_collection_name in ix_collection_names:
+            self.parent.get_collection(ix_collection_name).delete_where({})
 
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> Optional[int]:
         """
@@ -577,7 +588,8 @@ class Collection(Generic[DatabaseType]):
             if len(self.indexers) == 1:
                 index_name = list(self.indexers.keys())[0]
             else:
-                logger.warning("Multiple indexes found. Using default index.")
+                if self.indexers:
+                    logger.warning("Multiple indexes found. Using default index.")
                 index_name = self.default_index_name
         ix_coll = self.parent.get_collection(self._index_collection_name(index_name))
         if index_name not in self.indexers:
@@ -641,6 +653,8 @@ class Collection(Generic[DatabaseType]):
         if isinstance(group_by_fields, str):
             group_by_fields = [group_by_fields]
         df = self.find(where=where, limit=-1).rows_dataframe
+        if df is None:
+            return QueryResult(num_rows=0, rows=[])
 
         # Handle the case where agg_map is None
         if agg_map is None:
@@ -907,7 +921,7 @@ class Collection(Generic[DatabaseType]):
         :param kwargs:
         :return:
         """
-        ix = self._indexers.get(index_name, None)
+        ix = self.indexers.get(index_name, None)
         if not ix:
             raise ValueError(f"No index named {index_name}")
         ix_coll_name = self._index_collection_name(index_name)
@@ -947,7 +961,7 @@ class Collection(Generic[DatabaseType]):
 
         :return:
         """
-        return list(self._indexers.keys())
+        return list(self.indexers.keys())
 
     @property
     def indexers(self) -> Dict[str, Indexer]:
@@ -1071,8 +1085,21 @@ class Collection(Generic[DatabaseType]):
         This uses a heuristic procedure to infer the class definition from a list of objects.
         In general it is recommended you explicitly provide a schema.
 
+        Every object contributes its keys, so an attribute that first appears late in the list
+        is still part of the class. The range of each attribute is inferred from a sample
+        of its first non-null values:
+
+        >>> from linkml_store import Client
+        >>> client = Client()
+        >>> db = client.attach_database("duckdb", alias="test")
+        >>> collection = db.create_collection("Person")
+        >>> objs = [{"id": i} for i in range(20)] + [{"id": 20, "nickname": "Al"}]
+        >>> cd = collection.induce_class_definition_from_objects(objs)
+        >>> cd.attributes["nickname"].range
+        'string'
+
         :param objs:
-        :param max_sample_size:
+        :param max_sample_size: maximum number of non-null values examined per attribute (default 10)
         :return:
         """
         # TODO: use schemaview
@@ -1082,14 +1109,16 @@ class Collection(Generic[DatabaseType]):
             raise ValueError(f"No target_class_name for {self.alias}")
         cd = ClassDefinition(self.target_class_name)
         keys = defaultdict(list)
-        for obj in objs[0:max_sample_size]:
+        for obj in objs:
             if isinstance(obj, BaseModel):
                 obj = obj.model_dump()
             if not isinstance(obj, dict):
                 logger.warning(f"Skipping non-dict object: {obj}")
                 continue
             for k, v in obj.items():
-                keys[k].append(v)
+                sample = keys[k]
+                if v is not None and len(sample) < max_sample_size:
+                    sample.append(v)
         for k, vs in keys.items():
             if k == "_id":
                 continue
@@ -1214,7 +1243,6 @@ class Collection(Generic[DatabaseType]):
         primary_key = self.identifier_attribute_name
         if not primary_key:
             raise ValueError(f"No primary key for {self.target_class_name}")
-        patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
         return patches_from_objects_lists(src_objs, tgt_objs, primary_key=primary_key)
 
     def iter_validate_collection(

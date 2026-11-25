@@ -28,6 +28,11 @@ def pairwise_cosine_similarity(vector1: np.array, vector2: np.array) -> float:
     >>> f"{pairwise_cosine_similarity(v010, v011):0.3f}"
     '0.707'
 
+    A zero vector is not similar to anything:
+
+    >>> pairwise_cosine_similarity(np.array([0, 0, 0]), v100)
+    0.0
+
     :param vector1:
     :param vector2:
     :return:
@@ -35,6 +40,8 @@ def pairwise_cosine_similarity(vector1: np.array, vector2: np.array) -> float:
     dot_product = np.dot(vector1, vector2)
     norm1 = np.linalg.norm(vector1)
     norm2 = np.linalg.norm(vector2)
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
     return float(dot_product / (norm1 * norm2))
 
 

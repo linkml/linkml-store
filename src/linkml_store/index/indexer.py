@@ -184,10 +184,7 @@ class Indexer(BaseModel):
             )
             results = []
             # TODO: this is inefficient when limit is high
-            for i in range(limit):
-                if i >= len(sorted_indices):
-                    break
-                pos = sorted_indices[i]
+            for pos in sorted_indices:
                 score = pairwise_cosine_similarity(query_vector, vlist[pos])
                 results.append((score, idlist[pos]))
             return results

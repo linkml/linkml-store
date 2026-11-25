@@ -24,6 +24,16 @@ OP_MAP = {
     "in": "ARRAY_CONTAINS",
 }
 
+# MongoDB-style comparison operators and their SQL equivalents
+COMPARISON_OP_MAP = {
+    "$eq": "=",
+    "$ne": "<>",
+    "$gt": ">",
+    "$gte": ">=",
+    "$lt": "<",
+    "$lte": "<=",
+}
+
 
 def _map_type(typ: Type) -> str:
     for k, v in TYPE_MAP.items():
@@ -33,45 +43,94 @@ def _map_type(typ: Type) -> str:
 
 
 def where_clause_to_sql(query: Query) -> str:
-    if not query.where_clause:
-        return ""
-    if isinstance(query.where_clause, str):
-        where_clause_sql = query.where_clause
-    elif isinstance(query.where_clause, list):
-        where_clause_sql = " AND ".join(query.where_clause)
-    elif isinstance(query.where_clause, dict):
-        conjs = []
-        for k, v in query.where_clause.items():
-            conjs.extend(col_val_constraints_to_conjs(k, v))
-        where_clause_sql = " AND ".join(conjs)
+    """
+    Translate the where clause of a query into a SQL WHERE clause.
 
+    >>> where_clause_to_sql(Query(where_clause={"name": "O'Neil", "age": {"$gte": 21, "$lt": 65}}))
+    "WHERE name = 'O''Neil' AND age >= 21 AND age < 65"
+    >>> where_clause_to_sql(Query(where_clause={"name": None}))
+    'WHERE name IS NULL'
+    >>> where_clause_to_sql(Query(where_clause={}))
+    ''
+
+    :param query:
+    :return: SQL WHERE clause, or an empty string if there are no conditions
+    """
+    where_clause = query.where_clause
+    if not where_clause:
+        return ""
+    if isinstance(where_clause, str):
+        conjs = [where_clause]
+    elif isinstance(where_clause, list):
+        conjs = where_clause
+    elif isinstance(where_clause, dict):
+        conjs = [conj for k, v in where_clause.items() for conj in col_val_constraints_to_conjs(k, v)]
     else:
-        raise ValueError(f"Invalid where_clause type: {type(query.where_clause)}")
-    return "WHERE " + where_clause_sql
+        raise ValueError(f"Invalid where_clause type: {type(where_clause)}")
+    if not conjs:
+        return ""
+    return "WHERE " + " AND ".join(conjs)
 
 
 def col_val_constraints_to_conjs(col_name: str, val_constraints: Any) -> list:
-    if val_constraints is None:
-        return []
+    """
+    Translate the constraints on a single column into a list of SQL conditions.
 
-    def _quote(v: Any):
+    A plain value is an equality test, and None tests for NULL:
+
+    >>> col_val_constraints_to_conjs("name", "Alice")
+    ["name = 'Alice'"]
+    >>> col_val_constraints_to_conjs("name", None)
+    ['name IS NULL']
+
+    A dict holds MongoDB-style operators:
+
+    >>> col_val_constraints_to_conjs("age", {"$gt": 21, "$ne": 30})
+    ['age > 21', 'age <> 30']
+    >>> col_val_constraints_to_conjs("id", {"$in": [1, 2]})
+    ['id IN (1, 2)']
+    >>> col_val_constraints_to_conjs("id", {"$nin": ["a", "b"]})
+    ["id NOT IN ('a', 'b')"]
+    >>> col_val_constraints_to_conjs("name", {"$ne": None})
+    ['name IS NOT NULL']
+    >>> col_val_constraints_to_conjs("age", {"$near": 21})
+    Traceback (most recent call last):
+    ...
+    ValueError: Unsupported operator for age: $near
+
+    :param col_name:
+    :param val_constraints:
+    :return: list of SQL conditions
+    """
+
+    def _quote(v: Any) -> str:
         if isinstance(v, str):
-            # escape internal vs
+            # escape internal quotes
             v = v.replace("'", "''")
             return f"'{v}'"
-        else:
-            return v
+        if v is None:
+            return "NULL"
+        return str(v)
 
+    if val_constraints is None:
+        return [f"{col_name} IS NULL"]
     if isinstance(val_constraints, dict):
         conjs = []
         for k, v in val_constraints.items():
-            if k in OP_MAP:
-                if k == "$in" and isinstance(v, list):
-                    v_mapped = [_quote(v1) for v1 in v]
-                    t = f"{col_name} IN ({', '.join(v_mapped)})"
+            if k in ("$in", "$nin") and isinstance(v, (list, tuple)):
+                sql_op = "IN" if k == "$in" else "NOT IN"
+                t = f"{col_name} {sql_op} ({', '.join(_quote(v1) for v1 in v)})"
+            elif k in COMPARISON_OP_MAP:
+                if v is None and k in ("$eq", "$ne"):
+                    t = f"{col_name} IS NULL" if k == "$eq" else f"{col_name} IS NOT NULL"
                 else:
-                    t = f"{OP_MAP[k]}({col_name}, {_quote(v)})"
+                    t = f"{col_name} {COMPARISON_OP_MAP[k]} {_quote(v)}"
+            elif k in OP_MAP:
+                t = f"{OP_MAP[k]}({col_name}, {_quote(v)})"
+            elif k.startswith("$"):
+                raise ValueError(f"Unsupported operator for {col_name}: {k}")
             else:
+                # a native SQL operator, e.g. {"name": {"LIKE": "A%"}}
                 t = f"{col_name} {k} {_quote(v)}"
             conjs.append(t)
         return conjs
@@ -107,7 +166,26 @@ def query_to_sql(query: Query, count=False, limit=None, offset: Optional[int] = 
 
 
 def facet_count_sql(query: Query, facet_column: Union[str, Tuple[str, ...]], multivalued=False, limit=100) -> str:
+    """
+    Generate SQL to count the occurrences of each value of a column (or combination of columns).
+
+    >>> q = Query(from_table="person", where_clause={"city": "Paris"})
+    >>> print(facet_count_sql(q, "job", limit=5))
+    SELECT job, COUNT(*) as count
+    FROM person WHERE city = 'Paris'
+    GROUP BY job
+    ORDER BY count DESC
+    LIMIT 5
+
+    :param query: base query
+    :param facet_column: column name, or a tuple of column names for a combined facet
+    :param multivalued: whether the column holds lists, in which case each element is counted
+    :param limit: maximum number of facet values to return
+    :return: SQL string
+    """
     # Create a modified WHERE clause that excludes conditions directly related to facet_column
+    # TODO: the first condition is never excluded (it starts with "WHERE "); MongoDB and the
+    # filesystem adapter exclude nothing. Decide on one behavior for all adapters.
     modified_where = None
     if query.where_clause:
         where_clause_sql = where_clause_to_sql(query)
