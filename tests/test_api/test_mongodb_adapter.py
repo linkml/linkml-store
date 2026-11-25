@@ -51,7 +51,9 @@ def mongodb_collection(mongodb_client):
     if collection_name not in db.list_collection_names():
         db.create_collection(collection_name)
 
-    collection = MongoDBCollection(name=collection_name, parent=db)
+    database = MongoDBDatabase(handle=f"mongodb://localhost:27017/{db_name}")
+    collection = database.get_collection(collection_name)
+    assert isinstance(collection, MongoDBCollection)
 
     yield collection
 
@@ -281,3 +283,56 @@ def test_find_iter_no_count_calls(mongodb_client):
         )
     finally:
         db.drop()
+
+
+def test_upsert_updates_all_fields_by_default(mongodb_collection):
+    """Without update_fields, every changed field of a matching document is updated."""
+    mongodb_collection.upsert({"_id": "1", "name": "Alice", "age": 25}, filter_fields=["_id"])
+    mongodb_collection.upsert({"_id": "1", "name": "Alice", "age": 26, "occupation": "Engineer"}, filter_fields=["_id"])
+    assert list(mongodb_collection.mongo_collection.find({})) == [
+        {"_id": "1", "name": "Alice", "age": 26, "occupation": "Engineer"}
+    ]
+
+
+def test_delete(mongodb_collection):
+    mongodb_collection.insert([{"name": "Alice"}, {"name": "Bob"}, {"name": "Charlie"}])
+    assert mongodb_collection.delete([]) == 0
+    assert mongodb_collection.delete({"name": "Alice"}) == 1
+    assert mongodb_collection.delete_where({"name": "Bob"}) == 1
+    assert [row["name"] for row in mongodb_collection.find().rows] == ["Charlie"]
+
+
+@pytest.mark.parametrize(
+    "sort_by,expected",
+    [
+        (["age"], ["Bob", "Alice", "Charlie"]),
+        (["age DESC"], ["Charlie", "Alice", "Bob"]),
+        (["-age"], ["Charlie", "Alice", "Bob"]),
+        (["name"], ["Alice", "Bob", "Charlie"]),
+    ],
+)
+def test_query_sort_by(mongodb_collection, sort_by, expected):
+    from linkml_store.api.queries import Query
+
+    objs = [{"name": "Alice", "age": 30}, {"name": "Bob", "age": 20}, {"name": "Charlie", "age": 40}]
+    mongodb_collection.insert(objs)
+    query = Query(from_table=mongodb_collection.alias, sort_by=sort_by)
+    assert [row["name"] for row in mongodb_collection.query(query).rows] == expected
+
+
+def test_modifications_invalidate_index(mongodb_collection):
+    """upsert and delete clear the search index, as insert does."""
+    mongodb_collection.insert([{"name": "alpha scientist"}, {"name": "beta plumber"}])
+    mongodb_collection.attach_indexer("simple")
+    database = mongodb_collection.parent
+    ix_collection = database.get_collection(mongodb_collection._index_collection_name("simple"))
+    try:
+        assert ix_collection.size() == 2
+        mongodb_collection.upsert({"name": "gamma astronaut"}, filter_fields=["name"])
+        assert ix_collection.size() == 0
+        assert mongodb_collection.search("astronaut").ranked_rows[0][1]["name"] == "gamma astronaut"
+        assert ix_collection.size() == 3
+        mongodb_collection.delete({"name": "beta plumber"})
+        assert ix_collection.size() == 0
+    finally:
+        ix_collection.mongo_collection.drop()

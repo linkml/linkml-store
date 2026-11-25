@@ -115,8 +115,11 @@ class MongoDBCollection(Collection):
             existing_doc = self.mongo_collection.find_one(filter_criteria)
 
             if existing_doc:
-                # Update only changed fields
-                updates = {key: obj[key] for key in update_fields if key in obj and obj[key] != existing_doc.get(key)}
+                # Update only changed fields; by default all fields of the object are candidates
+                candidate_fields = update_fields if update_fields is not None else list(obj.keys())
+                updates = {
+                    key: obj[key] for key in candidate_fields if key in obj and obj[key] != existing_doc.get(key)
+                }
 
                 if updates:
                     self.mongo_collection.update_one(filter_criteria, {"$set": updates})
@@ -127,6 +130,7 @@ class MongoDBCollection(Collection):
                 # Insert a new document
                 self.mongo_collection.insert_one(obj)
                 logging.debug(f"Inserted new document: {obj}")
+        self._post_modification_hook()
 
     def query(self, query: Query, limit: Optional[int] = None, offset: Optional[int] = None, **kwargs) -> QueryResult:
         mongo_filter = self._build_mongo_filter(query.where_clause)
@@ -140,6 +144,8 @@ class MongoDBCollection(Collection):
                 projection[col] = 1
         
         cursor = self.mongo_collection.find(mongo_filter, projection)
+        if query.sort_by:
+            cursor = cursor.sort(self._build_mongo_sort(query.sort_by))
         if limit and limit >= 0:
             cursor = cursor.limit(limit)
         offset = offset or query.offset
@@ -211,14 +217,35 @@ class MongoDBCollection(Collection):
         finally:
             cursor.close()
 
+    @staticmethod
+    def _build_mongo_sort(sort_by: List[str]) -> List[Tuple[str, int]]:
+        """
+        Translate a list of sort fields to a pymongo sort specification.
+
+        A field may be followed by a direction, as in SQL; a leading "-" also means descending.
+
+        >>> MongoDBCollection._build_mongo_sort(["name", "age DESC", "-height"])
+        [('name', 1), ('age', -1), ('height', -1)]
+        """
+        sort_spec = []
+        for field in sort_by:
+            direction = 1
+            toks = field.split()
+            if len(toks) == 2 and toks[1].upper() in ("ASC", "DESC"):
+                field = toks[0]
+                direction = -1 if toks[1].upper() == "DESC" else 1
+            elif field.startswith("-"):
+                field = field[1:]
+                direction = -1
+            sort_spec.append((field, direction))
+        return sort_spec
+
     def _build_mongo_filter(self, where_clause: Dict[str, Any]) -> Dict[str, Any]:
         mongo_filter = {}
         if where_clause:
             for field, value in where_clause.items():
                 mongo_filter[field] = value
         return mongo_filter
-
-    from typing import Any, Dict, List, Union
 
     def query_facets(
         self,
@@ -307,6 +334,8 @@ class MongoDBCollection(Collection):
     def delete(self, objs: Union[OBJECT, List[OBJECT]], **kwargs) -> int:
         if not isinstance(objs, list):
             objs = [objs]
+        if not objs:
+            return 0
         filter_conditions = []
         for obj in objs:
             filter_condition = {}
@@ -314,6 +343,7 @@ class MongoDBCollection(Collection):
                 filter_condition[key] = value
             filter_conditions.append(filter_condition)
         result = self.mongo_collection.delete_many({"$or": filter_conditions})
+        self._post_delete_hook()
         return result.deleted_count
 
     def delete_where(self, where: Optional[Dict[str, Any]] = None, missing_ok=True, **kwargs) -> int:
@@ -324,6 +354,7 @@ class MongoDBCollection(Collection):
         deleted_rows_count = result.deleted_count
         if deleted_rows_count == 0 and not missing_ok:
             raise ValueError(f"No rows found for {where}")
+        self._post_delete_hook()
         return deleted_rows_count
 
     def group_by(
