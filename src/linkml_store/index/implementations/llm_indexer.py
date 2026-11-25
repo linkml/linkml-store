@@ -78,6 +78,8 @@ class LLMIndexer(Indexer):
         """
         from tiktoken import encoding_for_model
 
+        if not texts:
+            return []
         logging.info(f"Converting {len(texts)} texts to vectors")
         model = self.embedding_model
         # TODO: make this more accurate
@@ -104,7 +106,7 @@ class LLMIndexer(Indexer):
         logger.info(f"Average text token count: {avg_text_tokens}")
         if batch_size is None:
             # TODO: empirically determine best batch size
-            batch_size = max(int(token_limit / avg_text_tokens), 5)
+            batch_size = max(int(token_limit / max(avg_text_tokens, 1)), 5)
             logger.info(f"Setting batch size to {batch_size}")
         
 

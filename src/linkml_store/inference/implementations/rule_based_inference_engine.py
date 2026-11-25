@@ -43,8 +43,8 @@ def expression_matches(ce: AnonymousClassExpression, object: OBJECT) -> bool:
             if slot.equals_string is not None:
                 if slot.equals_string != str(v):
                     return False
-            if slot.equals_integer is not None:
-                if slot.equals_integer != v:
+            if slot.equals_number is not None:
+                if slot.equals_number != v:
                     return False
             if slot.equals_expression is not None:
                 eval_v = eval_expr(slot.equals_expression, **object)
@@ -62,19 +62,19 @@ def apply_rule(rule: ClassRule, object: OBJECT):
     :param rule: The rule to apply
     :param object: The object to apply the rule to
     """
-    for condition in rule.preconditions:
-        if expression_matches(condition, object):
-            for postcondition in rule.postconditions:
-                all_of = [x for x in postcondition.all_of] + [postcondition]
-                for pc in all_of:
-                    sc = pc.slot_condition
-                    if sc:
-                        if sc.equals_string:
-                            object[sc.name] = sc.equals_string
-                        if sc.equals_integer:
-                            object[sc.name] = sc.equals_integer
-                        if sc.equals_expression:
-                            object[sc.name] = eval_expr(sc.equals_expression, **object)
+    precondition = rule.preconditions
+    postcondition = rule.postconditions
+    if postcondition is None:
+        return object
+    if precondition is None or expression_matches(precondition, object):
+        for pc in list(postcondition.all_of) + [postcondition]:
+            for sc in pc.slot_conditions.values():
+                if sc.equals_string is not None:
+                    object[sc.name] = sc.equals_string
+                if sc.equals_number is not None:
+                    object[sc.name] = sc.equals_number
+                if sc.equals_expression is not None:
+                    object[sc.name] = eval_expr(sc.equals_expression, **object)
     return object
 
 
@@ -101,6 +101,8 @@ class RuleBasedInferenceEngine(InferenceEngine):
             self.class_rules = class_rules
         for slot in sv.class_induced_slots(cd.name):
             if slot.equals_expression:
+                if self.slot_expressions is None:
+                    self.slot_expressions = {}
                 self.slot_expressions[slot.name] = slot.equals_expression
 
     def derive(self, object: OBJECT) -> Optional[Inference]:

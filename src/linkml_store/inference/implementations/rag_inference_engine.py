@@ -61,14 +61,17 @@ class RAGInferenceEngine(InferenceEngine):
     >>> config = InferenceConfig(target_attributes=targets, feature_attributes=features, llm_config=llm_config)
     >>> ie = RAGInferenceEngine(config=config)
     >>> ie.load_and_split_data(collection)
-    >>> ie.initialize_model()
-    >>> prediction = ie.derive({"name": "Uruguay"})
-    >>> prediction.predicted_object
+
+    The remaining steps call the LLM, so they need credentials for the model provider:
+
+    >>> ie.initialize_model()  # doctest: +SKIP
+    >>> prediction = ie.derive({"name": "Uruguay"})  # doctest: +SKIP
+    >>> prediction.predicted_object  # doctest: +SKIP
     {'capital': 'Montevideo', 'code': 'UY', 'continent': 'South America', 'languages': ['Spanish']}
 
     The "model" can be saved for later use:
 
-    >>> ie.export_model("tests/output/countries.rag_model.json")
+    >>> ie.export_model("tests/output/countries.rag_model.json")  # doctest: +SKIP
 
     Note in this case the model is not the underlying LLM, but the "RAG Model" which is the vectorized
     representation of training set objects.

@@ -158,7 +158,8 @@ class IbisDatabase(Database):
             backend = parsed["backend"]
             connection_string = parsed["connection_string"]
 
-            logger.info(f"Connecting to Ibis backend: {backend} with connection: {connection_string}")
+            # the connection string may hold credentials, so it is not logged
+            logger.info(f"Connecting to Ibis backend: {backend}")
 
             try:
                 if backend == "duckdb":
